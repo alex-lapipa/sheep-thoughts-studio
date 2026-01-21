@@ -70,7 +70,8 @@ export function HeroSection() {
                 Meet <span className="text-accent">Bubbles</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-lg">
-                Cute on the outside. Quietly savage inside the thought bubbles.
+                A sweet, daft sheep from Wicklow. Cute on the outside. 
+                Quietly savage inside the thought bubbles.
               </p>
             </div>
             
@@ -89,10 +90,28 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Sheep + Bubble */}
+          {/* Sheep Character - Stylized without emoji */}
           <div className="relative flex justify-center items-center">
-            <div className="text-[180px] md:text-[240px] animate-float select-none">
-              🐑
+            {/* Character representation - fluffy circle with face */}
+            <div className="relative">
+              <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-bubbles-cream border-4 border-bubbles-heather shadow-2xl flex items-center justify-center animate-float">
+                {/* Face features */}
+                <div className="relative">
+                  {/* Eyes */}
+                  <div className="flex gap-6 mb-3">
+                    <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
+                    <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
+                  </div>
+                  {/* Nose/mouth */}
+                  <div className="w-6 h-3 md:w-8 md:h-4 mx-auto rounded-full bg-bubbles-heather/50" />
+                </div>
+              </div>
+              
+              {/* Wool texture circles */}
+              <div className="absolute -top-4 -left-2 w-12 h-12 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
+              <div className="absolute -top-2 right-0 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
+              <div className="absolute top-8 -right-4 w-14 h-14 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
+              <div className="absolute -bottom-2 -left-4 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
             </div>
             
             {/* Thought Bubble */}
