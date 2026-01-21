@@ -80,6 +80,18 @@ export function Footer() {
             </p>
           </div>
         </div>
+
+        {/* Creator Credit */}
+        <div className="mt-6 text-center">
+          <a 
+            href="https://alexlawton.io" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Alex Lawton
+          </a>
+        </div>
       </div>
     </footer>
   );
