@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
+import { ScenarioPlayerWidget } from "./ScenarioPlayerWidget";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 
 interface ThoughtData {
@@ -119,6 +119,11 @@ export function HeroSection() {
                   The Lore
                 </Button>
               </Link>
+            </div>
+
+            {/* Embedded Scenario Widget */}
+            <div className="mt-6 max-w-md">
+              <ScenarioPlayerWidget />
             </div>
           </div>
 
