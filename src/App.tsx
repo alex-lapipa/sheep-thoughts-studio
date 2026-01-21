@@ -17,6 +17,7 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Search from "./pages/Search";
 import Explains from "./pages/Explains";
+import Achievements from "./pages/Achievements";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/explains" element={<Explains />} />
+                <Route path="/achievements" element={<Achievements />} />
                 <Route path="/search" element={<Search />} />
                 
                 
