@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { ModeBadge } from "@/components/ModeBadge";
 import { BubbleMode } from "@/data/thoughtBubbles";
+import { BubblesExplains } from "@/components/BubblesExplains";
 
 const About = () => {
   const modes: { mode: BubbleMode; title: string; description: string; quote: string }[] = [
@@ -153,6 +154,21 @@ const About = () => {
             <p className="text-center text-sm text-muted-foreground mt-8 italic">
               * Some sources may have been joking. This was not considered relevant.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Bubbles Explains */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+              Bubbles Explains...
+            </h2>
+            <p className="text-center text-muted-foreground mb-10">
+              Answers to questions nobody asked, delivered with complete certainty.
+            </p>
+            <BubblesExplains />
           </div>
         </div>
       </section>
