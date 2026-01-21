@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
-import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles } from "lucide-react";
+import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -10,6 +10,7 @@ import {
   GlowPulse, 
   triggerBadgeCelebration 
 } from "@/components/BadgeParticles";
+import { ShareableBadgeCard } from "@/components/ShareableBadgeCard";
 
 // Extended milestone definitions with detailed descriptions
 const ACHIEVEMENT_MILESTONES = [
@@ -89,6 +90,7 @@ export default function Achievements() {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [celebratedMilestones, setCelebratedMilestones] = useState<number[]>([]);
   const [selectedBadge, setSelectedBadge] = useState<typeof ACHIEVEMENT_MILESTONES[0] | null>(null);
+  const [shareBadge, setShareBadge] = useState<typeof ACHIEVEMENT_MILESTONES[0] | null>(null);
   const [animatedBadges, setAnimatedBadges] = useState<Set<number>>(new Set());
   const [newlyViewed, setNewlyViewed] = useState<Set<number>>(new Set());
   const badgeRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
@@ -317,9 +319,23 @@ export default function Achievements() {
 
               {/* Badge Info */}
               <div className="flex-1 space-y-4">
-                <div>
-                  <h2 className="font-display text-2xl font-bold mb-1">{selectedBadge.title}</h2>
-                  <p className="text-muted-foreground">{selectedBadge.description}</p>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold mb-1">{selectedBadge.title}</h2>
+                    <p className="text-muted-foreground">{selectedBadge.description}</p>
+                  </div>
+                  {/* Share Button - only for unlocked badges */}
+                  {(celebratedMilestones.includes(selectedBadge.days) || currentStreak >= selectedBadge.days) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShareBadge(selectedBadge)}
+                      className="gap-2 shrink-0"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </Button>
+                  )}
                 </div>
 
                 {/* Bubbles Quote */}
@@ -337,6 +353,16 @@ export default function Achievements() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Share Badge Dialog */}
+        {shareBadge && (
+          <ShareableBadgeCard
+            badge={shareBadge}
+            currentStreak={currentStreak}
+            isOpen={!!shareBadge}
+            onClose={() => setShareBadge(null)}
+          />
         )}
 
         {/* Call to Action */}
