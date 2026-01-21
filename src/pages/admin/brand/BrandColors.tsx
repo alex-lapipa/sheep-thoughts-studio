@@ -1683,6 +1683,11 @@ export default function BrandColors() {
     return val.category === "wicklow";
   }) || [];
 
+  const urbanColors = colors?.filter(c => {
+    const val = c.asset_value as { category?: string };
+    return val.category === "urban";
+  }) || [];
+
   const modeColors = colors?.filter(c => {
     const val = c.asset_value as { category?: string };
     return val.category === "mode";
@@ -1825,32 +1830,59 @@ export default function BrandColors() {
           )}
         </section>
 
-        {/* 🌃 Urban Chaos Palette */}
+        {/* 🌃 Urban Chaos Palette - Database Driven */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-urban-soho" />
             <h2 className="text-xl font-display font-semibold">🌃 Urban Chaos — The City</h2>
+            {urbanColors.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {urbanColors.length} from database
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-muted-foreground">
             London, New York, nightlife, fashion — the human craziness that poor Bubbles can't understand. 
             Used for escalating modes and moments of confusion.
           </p>
           
-          <div className="grid gap-4 md:grid-cols-6">
-            {Object.entries(URBAN_CHAOS).map(([key, color]) => (
-              <Card key={key} className="overflow-hidden group border-2 border-transparent hover:border-foreground/20">
-                <div 
-                  className="h-20 w-full transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: color.hex }}
-                />
-                <CardContent className="p-3 space-y-1">
-                  <h4 className="font-semibold text-sm">{color.name}</h4>
-                  <p className="text-xs text-muted-foreground">{color.description}</p>
-                  <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* Database Colors (Primary) */}
+          {isLoading ? (
+            <div className="grid gap-4 md:grid-cols-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-24 bg-muted" />
+                  <CardContent className="p-4 space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted rounded w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : urbanColors.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-6">
+              {urbanColors.map((color) => (
+                <ColorSwatch key={color.id} asset={color} />
+              ))}
+            </div>
+          ) : (
+            /* Fallback to hardcoded if no database colors */
+            <div className="grid gap-4 md:grid-cols-6">
+              {Object.entries(URBAN_CHAOS).map(([key, color]) => (
+                <Card key={key} className="overflow-hidden group border-2 border-transparent hover:border-foreground/20">
+                  <div 
+                    className="h-20 w-full transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                  <CardContent className="p-3 space-y-1">
+                    <h4 className="font-semibold text-sm">{color.name}</h4>
+                    <p className="text-xs text-muted-foreground">{color.description}</p>
+                    <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Mode Escalation System - Database Driven */}
