@@ -14,8 +14,8 @@ export function WicklowLandscape() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Sky gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-bubbles-mist/30 via-bubbles-cream/20 to-transparent" />
+      {/* Sky gradient - pastoral mist to cream */}
+      <div className="absolute inset-0 bg-gradient-to-b from-wicklow-mist/30 via-wicklow-butter/20 to-transparent" />
 
       {/* Distant misty mountains - slowest parallax */}
       <svg
@@ -26,7 +26,7 @@ export function WicklowLandscape() {
       >
         <path
           d="M0,400 L0,280 Q180,180 360,240 Q540,120 720,200 Q900,80 1080,180 Q1260,100 1440,220 L1440,400 Z"
-          fill="hsl(var(--bubbles-heather) / 0.4)"
+          fill="hsl(var(--wicklow-heather) / 0.4)"
         />
       </svg>
 
@@ -40,13 +40,13 @@ export function WicklowLandscape() {
         {/* Sugarloaf-like peak on the right */}
         <path
           d="M0,350 L0,300 Q100,280 200,290 Q350,260 500,280 Q650,220 800,260 L900,180 L1000,260 Q1100,240 1200,270 Q1350,250 1440,280 L1440,350 Z"
-          fill="hsl(var(--bubbles-peat) / 0.3)"
+          fill="hsl(var(--wicklow-peat) / 0.3)"
         />
       </svg>
 
-      {/* Mist layer */}
+      {/* Mist layer - mountain mist rising from valleys */}
       <div
-        className="absolute bottom-[20%] left-0 w-full h-32 bg-gradient-to-t from-bubbles-mist/40 via-bubbles-mist/20 to-transparent blur-sm"
+        className="absolute bottom-[20%] left-0 w-full h-32 bg-gradient-to-t from-wicklow-mist/40 via-wicklow-mist/20 to-transparent blur-sm"
         style={{ transform: `translateY(${scrollY * 0.15}px)` }}
       />
 
@@ -59,8 +59,8 @@ export function WicklowLandscape() {
       >
         <defs>
           <linearGradient id="heatherGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--bubbles-heather))" />
-            <stop offset="100%" stopColor="hsl(var(--bubbles-peat) / 0.5)" />
+            <stop offset="0%" stopColor="hsl(var(--wicklow-heather))" />
+            <stop offset="100%" stopColor="hsl(var(--wicklow-peat) / 0.5)" />
           </linearGradient>
         </defs>
         <path
@@ -68,6 +68,12 @@ export function WicklowLandscape() {
           fill="url(#heatherGradient)"
         />
       </svg>
+
+      {/* Foreground meadow gradient */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[15%] bg-gradient-to-t from-wicklow-meadow/20 to-transparent"
+        style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+      />
 
       {/* Gorse bushes - foreground left */}
       <div
@@ -108,12 +114,20 @@ export function WicklowLandscape() {
         <HeatherTuft />
       </div>
 
+      {/* Stone wall fragment */}
+      <div
+        className="absolute bottom-[1%] left-[40%]"
+        style={{ transform: `translateY(${scrollY * 0.42}px)` }}
+      >
+        <StoneWall />
+      </div>
+
       {/* Floating mist particles */}
       <div className="absolute inset-0">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="absolute rounded-full bg-bubbles-mist/20 blur-xl animate-float"
+            className="absolute rounded-full bg-wicklow-mist/20 blur-xl animate-float"
             style={{
               width: `${60 + i * 20}px`,
               height: `${30 + i * 10}px`,
@@ -140,17 +154,17 @@ function GorseBush({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
   return (
     <svg width={width} height={height} viewBox="0 0 80 60">
-      {/* Bush base */}
-      <ellipse cx="40" cy="50" rx="35" ry="10" fill="hsl(var(--bubbles-peat) / 0.4)" />
-      {/* Yellow gorse flowers */}
-      <circle cx="20" cy="30" r="12" fill="hsl(var(--bubbles-gorse))" opacity="0.8" />
-      <circle cx="40" cy="25" r="15" fill="hsl(var(--bubbles-gorse))" opacity="0.9" />
-      <circle cx="55" cy="32" r="11" fill="hsl(var(--bubbles-gorse))" opacity="0.7" />
-      <circle cx="30" cy="40" r="10" fill="hsl(var(--bubbles-gorse))" opacity="0.6" />
-      <circle cx="50" cy="42" r="9" fill="hsl(var(--bubbles-gorse))" opacity="0.75" />
-      {/* Dark spots for depth */}
-      <circle cx="35" cy="35" r="6" fill="hsl(var(--bubbles-peat) / 0.3)" />
-      <circle cx="48" cy="38" r="4" fill="hsl(var(--bubbles-peat) / 0.2)" />
+      {/* Bush base - peat earth */}
+      <ellipse cx="40" cy="50" rx="35" ry="10" fill="hsl(var(--wicklow-peat) / 0.4)" />
+      {/* Yellow gorse flowers - butter warmth */}
+      <circle cx="20" cy="30" r="12" fill="hsl(var(--wicklow-butter))" opacity="0.8" />
+      <circle cx="40" cy="25" r="15" fill="hsl(var(--wicklow-butter))" opacity="0.9" />
+      <circle cx="55" cy="32" r="11" fill="hsl(var(--wicklow-butter))" opacity="0.7" />
+      <circle cx="30" cy="40" r="10" fill="hsl(var(--wicklow-butter))" opacity="0.6" />
+      <circle cx="50" cy="42" r="9" fill="hsl(var(--wicklow-butter))" opacity="0.75" />
+      {/* Dark spots for depth - peat shadows */}
+      <circle cx="35" cy="35" r="6" fill="hsl(var(--wicklow-peat) / 0.3)" />
+      <circle cx="48" cy="38" r="4" fill="hsl(var(--wicklow-peat) / 0.2)" />
     </svg>
   );
 }
@@ -166,18 +180,33 @@ function HeatherTuft() {
             y1="40"
             x2={8 + i * 5 + (i % 2 ? 2 : -2)}
             y2={15 + (i % 3) * 5}
-            stroke="hsl(var(--bubbles-peat) / 0.5)"
+            stroke="hsl(var(--wicklow-peat) / 0.5)"
             strokeWidth="1"
           />
           <circle
             cx={8 + i * 5 + (i % 2 ? 2 : -2)}
             cy={12 + (i % 3) * 5}
             r={3 + (i % 2)}
-            fill="hsl(var(--bubbles-heather))"
+            fill="hsl(var(--wicklow-heather))"
             opacity={0.6 + (i % 3) * 0.15}
           />
         </g>
       ))}
+    </svg>
+  );
+}
+
+function StoneWall() {
+  return (
+    <svg width="70" height="25" viewBox="0 0 70 25">
+      {/* Ancient Wicklow stone wall fragment */}
+      <rect x="0" y="10" width="18" height="14" rx="2" fill="hsl(var(--wicklow-stone))" opacity="0.7" />
+      <rect x="15" y="8" width="22" height="16" rx="2" fill="hsl(var(--wicklow-stone))" opacity="0.8" />
+      <rect x="34" y="12" width="16" height="12" rx="2" fill="hsl(var(--wicklow-stone))" opacity="0.6" />
+      <rect x="47" y="9" width="20" height="15" rx="2" fill="hsl(var(--wicklow-stone))" opacity="0.75" />
+      {/* Moss highlights */}
+      <circle cx="25" cy="14" r="3" fill="hsl(var(--wicklow-meadow) / 0.4)" />
+      <circle cx="55" cy="16" r="2" fill="hsl(var(--wicklow-meadow) / 0.3)" />
     </svg>
   );
 }
