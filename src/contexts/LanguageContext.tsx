@@ -144,6 +144,10 @@ const translations: Record<Language, Record<string, string>> = {
     "faq.a9": "Once your order ships, you'll receive an email with a tracking number and link. You can also check your order status by logging into your account.",
     "faq.q10": "Can I suggest new Bubbles thoughts?",
     "faq.a10": "We love hearing from the flock! Send your thought bubble ideas to our contact page. If we use your suggestion, you might see it on future merch (and we'll send you something special).",
+    "faq.q11": "Is the Earth flat?",
+    "faq.a11": "No, the Earth is not flat. It's slightly crumpled. I've done extensive research by staring at puddles, and the water always settles unevenly. This proves the planet has wrinkles, like a blanket that's been slept on. Scientists call this 'topography' but I call it 'evidence of cosmic tossing and turning.' The real question isn't shape—it's why the Earth can't just make its bed properly.",
+    "faq.q12": "Is the moon hollow?",
+    "faq.a12": "Obviously. When you tap a solid rock, it makes a dull sound. When you look at the moon, it makes no sound at all. This proves it's not just hollow—it's completely empty inside, probably filled with the echoes of all the wishes people have made on stars that missed their target. I suspect this is where lost socks go. The astronauts didn't mention this because they signed confidentiality agreements with the sock industry.",
   },
   es: {
     // Nav
@@ -280,6 +284,10 @@ const translations: Record<Language, Record<string, string>> = {
     "faq.a9": "Una vez que tu pedido se envíe, recibirás un correo electrónico con un número de seguimiento y enlace. También puedes verificar el estado de tu pedido iniciando sesión en tu cuenta.",
     "faq.q10": "¿Puedo sugerir nuevos pensamientos de Bubbles?",
     "faq.a10": "¡Nos encanta escuchar del rebaño! Envía tus ideas de burbujas de pensamiento a nuestra página de contacto. Si usamos tu sugerencia, podrías verla en mercancía futura (y te enviaremos algo especial).",
+    "faq.q11": "¿La Tierra es plana?",
+    "faq.a11": "No, la Tierra no es plana. Está ligeramente arrugada. He realizado una investigación extensa mirando charcos, y el agua siempre se asienta de manera desigual. Esto prueba que el planeta tiene arrugas, como una manta en la que se ha dormido. Los científicos llaman a esto 'topografía' pero yo lo llamo 'evidencia de vueltas cósmicas'. La verdadera pregunta no es la forma—es por qué la Tierra no puede simplemente hacer su cama correctamente.",
+    "faq.q12": "¿La luna está hueca?",
+    "faq.a12": "Obviamente. Cuando golpeas una roca sólida, hace un sonido sordo. Cuando miras la luna, no hace ningún sonido en absoluto. Esto prueba que no solo está hueca—está completamente vacía por dentro, probablemente llena de los ecos de todos los deseos que la gente ha hecho a estrellas que fallaron su objetivo. Sospecho que aquí es donde van los calcetines perdidos. Los astronautas no mencionaron esto porque firmaron acuerdos de confidencialidad con la industria de calcetines.",
   },
 };
 
