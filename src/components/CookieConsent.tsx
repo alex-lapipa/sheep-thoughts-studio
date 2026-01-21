@@ -50,6 +50,17 @@ export const CookieConsent = () => {
     }
   }, []);
 
+  // Listen for open-cookie-settings event
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      setIsVisible(true);
+      setShowDetails(true);
+    };
+    
+    window.addEventListener("open-cookie-settings", handleOpenSettings);
+    return () => window.removeEventListener("open-cookie-settings", handleOpenSettings);
+  }, []);
+
   const saveConsent = useCallback((status: ConsentStatus, prefs: ConsentPreferences) => {
     localStorage.setItem(CONSENT_KEY, status);
     localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
