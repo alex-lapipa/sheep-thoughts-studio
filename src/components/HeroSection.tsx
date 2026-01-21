@@ -150,7 +150,7 @@ export function HeroSection() {
             {currentThought && (
               <div 
                 key={bubbleKey} 
-                className="absolute -top-4 right-0 md:right-8 max-w-[260px] transition-all ease-in-out cursor-pointer"
+                className="absolute -top-4 right-0 md:right-8 max-w-[260px] transition-all ease-in-out cursor-pointer group"
                 style={{
                   opacity: isVisible ? 1 : 0,
                   transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
@@ -162,6 +162,21 @@ export function HeroSection() {
                 <ThoughtBubble mode={currentThought.mode as any} size="md">
                   <p className="text-foreground italic">"{currentThought.text}"</p>
                 </ThoughtBubble>
+                {/* Progress indicator */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                  <div className="relative w-16 h-1 bg-muted/40 rounded-full overflow-hidden">
+                    <div 
+                      className="absolute inset-y-0 left-0 bg-primary/60 rounded-full"
+                      style={{
+                        animation: isPaused ? 'none' : `progress ${DISPLAY_DURATION}ms linear`,
+                        animationFillMode: 'forwards',
+                      }}
+                    />
+                  </div>
+                  {isPaused && (
+                    <span className="text-[10px] text-muted-foreground/70 animate-pulse">paused</span>
+                  )}
+                </div>
               </div>
             )}
           </div>
