@@ -582,7 +582,7 @@ const HARMONY_CONFIG: Record<HarmonyType, HarmonyConfig> = {
 };
 
 function HarmonyGenerator() {
-  const [selectedBase, setSelectedBase] = useState<string>("gold");
+  const [selectedBase, setSelectedBase] = useState<string>("butter");
   const [harmonyType, setHarmonyType] = useState<HarmonyType>("analogous");
   const [copied, setCopied] = useState<string | null>(null);
 
