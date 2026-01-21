@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
 import { ScenarioPlayerWidget } from "./ScenarioPlayerWidget";
+import { FeaturedScenarioCard } from "./FeaturedScenarioCard";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -121,8 +122,9 @@ export function HeroSection() {
               </Link>
             </div>
 
-            {/* Embedded Scenario Widget */}
-            <div className="mt-6 max-w-md">
+            {/* Scenario Previews */}
+            <div className="mt-6 grid sm:grid-cols-2 gap-4 max-w-lg">
+              <FeaturedScenarioCard />
               <ScenarioPlayerWidget />
             </div>
           </div>
