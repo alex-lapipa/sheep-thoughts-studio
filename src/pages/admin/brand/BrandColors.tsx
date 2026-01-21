@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3 } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3, MessageCircle, Type } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -1028,6 +1029,247 @@ function ModeEscalationVisualizer() {
   );
 }
 
+// Thought Bubble Preview Generator
+function ThoughtBubblePreviewGenerator() {
+  const [customText, setCustomText] = useState("The audacity of this grass being greener elsewhere.");
+  const [selectedMode, setSelectedMode] = useState(0);
+  const [bubbleSize, setBubbleSize] = useState<"sm" | "md" | "lg">("md");
+  
+  const activeMode = MODE_ESCALATION[selectedMode];
+
+  const sizeConfig = {
+    sm: { padding: "p-3", text: "text-sm", width: "max-w-xs" },
+    md: { padding: "p-4", text: "text-base", width: "max-w-sm" },
+    lg: { padding: "p-6", text: "text-lg", width: "max-w-md" },
+  };
+
+  const exampleTexts = [
+    { mode: 0, text: "Grass. Good grass. Very nice grass indeed." },
+    { mode: 1, text: "Wait. Was that an insult? It felt like an insult." },
+    { mode: 2, text: "Oh so NOW we're doing this? The audacity." },
+    { mode: 3, text: "Violence has been selected. Prepare accordingly." },
+    { mode: 4, text: "I WILL CONSUME THE SUN AND ALL WHO DWELL BENEATH IT." },
+  ];
+
+  const applyExample = (modeIndex: number) => {
+    const example = exampleTexts.find(e => e.mode === modeIndex);
+    if (example) {
+      setCustomText(example.text);
+      setSelectedMode(modeIndex);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <MessageCircle className="h-5 w-5" />
+          Thought Bubble Preview Generator
+        </CardTitle>
+        <CardDescription>
+          Type custom text and preview it rendered in any mode's visual style
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Text Input */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium flex items-center gap-2">
+            <Type className="h-4 w-4" />
+            Custom Text
+          </label>
+          <Textarea
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            placeholder="Enter your thought bubble text..."
+            className="min-h-[80px] resize-none"
+            maxLength={200}
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {customText.length}/200 characters
+          </p>
+        </div>
+
+        {/* Mode Selector */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Mode Style</label>
+          <div className="flex gap-2 flex-wrap">
+            {MODE_ESCALATION.map((mode, index) => (
+              <Button
+                key={mode.mode}
+                variant={selectedMode === index ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedMode(index)}
+                className="flex items-center gap-2"
+                style={{
+                  backgroundColor: selectedMode === index ? mode.color : undefined,
+                  borderColor: mode.color,
+                  color: selectedMode === index 
+                    ? (mode.intensity > 60 ? "#000" : "#333")
+                    : undefined,
+                }}
+              >
+                <div
+                  className="w-3 h-3"
+                  style={{
+                    backgroundColor: mode.color,
+                    borderRadius: mode.shapeRadius,
+                  }}
+                />
+                {mode.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Size Selector */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Bubble Size</label>
+          <div className="flex gap-2">
+            {(["sm", "md", "lg"] as const).map((size) => (
+              <Button
+                key={size}
+                variant={bubbleSize === size ? "default" : "outline"}
+                size="sm"
+                onClick={() => setBubbleSize(size)}
+              >
+                {size.toUpperCase()}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Live Preview */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Live Preview</label>
+          <div 
+            className="p-8 rounded-lg border-2 border-dashed transition-colors duration-300"
+            style={{ 
+              backgroundColor: activeMode.intensity > 75 ? "#1a1a1a" : "hsl(var(--muted) / 0.3)",
+            }}
+          >
+            <div className="flex justify-center">
+              {/* Thought bubble */}
+              <div className="relative">
+                <div
+                  className={`${sizeConfig[bubbleSize].padding} ${sizeConfig[bubbleSize].width} ${activeMode.bubbleStyle} transition-all duration-500`}
+                  style={{
+                    backgroundColor: activeMode.color,
+                    borderRadius: activeMode.shapeRadius,
+                    borderColor: "hsl(var(--foreground) / 0.3)",
+                    boxShadow: activeMode.intensity > 50 
+                      ? `0 0 ${activeMode.intensity / 2}px ${activeMode.color}40`
+                      : "0 4px 12px rgba(0,0,0,0.1)",
+                    transform: `scale(${1 + activeMode.intensity * 0.001})`,
+                  }}
+                >
+                  <p 
+                    className={`${sizeConfig[bubbleSize].text} font-display text-center transition-all duration-300`}
+                    style={{ 
+                      color: activeMode.intensity > 60 ? "#000" : "#333",
+                      fontWeight: activeMode.intensity > 50 ? 600 : 400,
+                      fontStyle: activeMode.intensity > 75 ? "italic" : "normal",
+                      letterSpacing: activeMode.intensity > 90 ? "0.05em" : "normal",
+                      textTransform: activeMode.intensity === 100 ? "uppercase" : "none",
+                    }}
+                  >
+                    {customText || "Enter some text above..."}
+                  </p>
+                </div>
+                
+                {/* Bubble tail circles */}
+                <div
+                  className="absolute -bottom-3 left-8 w-5 h-5 transition-all duration-500"
+                  style={{
+                    backgroundColor: activeMode.color,
+                    borderRadius: activeMode.shapeRadius,
+                  }}
+                />
+                <div
+                  className="absolute -bottom-5 left-4 w-3 h-3 transition-all duration-500"
+                  style={{
+                    backgroundColor: activeMode.color,
+                    borderRadius: activeMode.shapeRadius,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Examples */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Quick Examples</label>
+          <div className="grid gap-2">
+            {exampleTexts.map((example) => {
+              const mode = MODE_ESCALATION[example.mode];
+              return (
+                <button
+                  key={example.mode}
+                  onClick={() => applyExample(example.mode)}
+                  className="flex items-center gap-3 p-3 rounded-lg border text-left hover:bg-muted/50 transition-colors group"
+                >
+                  <div
+                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center transition-all"
+                    style={{
+                      backgroundColor: mode.color,
+                      borderRadius: mode.shapeRadius,
+                    }}
+                  >
+                    <span className="text-xs font-bold" style={{ color: mode.intensity > 60 ? "#000" : "#333" }}>
+                      {mode.name.charAt(0)}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-muted-foreground">{mode.name}</p>
+                    <p className="text-sm truncate">{example.text}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                    Apply →
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mode Style Guide */}
+        <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+          <p className="text-sm font-medium flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Current Mode Style: {activeMode.name}
+          </p>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Border Radius</p>
+              <p className="font-mono">{activeMode.shapeRadius}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Intensity</p>
+              <p className="font-mono">{activeMode.intensity}%</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Accent Color</p>
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-4 h-4 rounded border"
+                  style={{ backgroundColor: activeMode.color }}
+                />
+                <span className="font-mono">{activeMode.color}</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Typography</p>
+              <p className="font-mono">
+                {activeMode.intensity > 75 ? "Bold Italic" : activeMode.intensity > 50 ? "Semibold" : "Regular"}
+              </p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // All brand colors for matrix
 const ALL_BRAND_COLORS = [
   { key: "cream", name: "Bog Cotton", hex: "#FFFDD0" },
@@ -1559,6 +1801,9 @@ export default function BrandColors() {
 
         {/* Mode Escalation Visualizer */}
         <ModeEscalationVisualizer />
+
+        {/* Thought Bubble Preview Generator */}
+        <ThoughtBubblePreviewGenerator />
 
         {/* Seasonal Collection Palettes */}
         <section className="space-y-4">
