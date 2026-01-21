@@ -9,6 +9,7 @@ import { BubblesSheep } from "@/components/BubblesSheep";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
+import { ThoughtCarousel } from "@/components/ThoughtCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -195,6 +196,21 @@ export default function Index() {
               )}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Thought Carousel - Bubbles' Personality Showcase */}
+      <section className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
+        <div className="container">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
+              Inside My Head
+            </h2>
+            <p className="text-muted-foreground">
+              A rotating selection of my most important thoughts. All verified.
+            </p>
+          </div>
+          <ThoughtCarousel />
         </div>
       </section>
 
