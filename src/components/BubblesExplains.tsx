@@ -103,7 +103,7 @@ export const BubblesExplains = () => {
           >
             <div className="overflow-hidden">
               <div className="px-5 pb-5">
-                <ThoughtBubble mode="innocent" size="md">
+                <ThoughtBubble size="md">
                   <p className="text-sm leading-relaxed">{item.explanation}</p>
                 </ThoughtBubble>
                 <p className="text-xs text-muted-foreground mt-3 text-right italic">

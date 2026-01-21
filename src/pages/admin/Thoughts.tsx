@@ -19,12 +19,12 @@ type ThoughtRow = Database['public']['Tables']['bubbles_thoughts']['Row'];
 
 const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage', 'nuclear'];
 
-const modeEmojis: Record<BubblesMode, string> = {
-  innocent: '😊',
-  concerned: '😐',
-  triggered: '😤',
-  savage: '😈',
-  nuclear: '☢️',
+const modeLabels: Record<BubblesMode, string> = {
+  innocent: 'Innocent',
+  concerned: 'Concerned',
+  triggered: 'Triggered',
+  savage: 'Savage',
+  nuclear: 'Nuclear',
 };
 
 export default function AdminThoughts() {
@@ -208,7 +208,7 @@ export default function AdminThoughts() {
                     <SelectContent>
                       {MODES.map((mode) => (
                         <SelectItem key={mode} value={mode}>
-                          {modeEmojis[mode]} {mode}
+                          {modeLabels[mode]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -260,7 +260,7 @@ export default function AdminThoughts() {
                     <SelectItem value="all">All Modes</SelectItem>
                     {MODES.map((mode) => (
                       <SelectItem key={mode} value={mode}>
-                        {modeEmojis[mode]} {mode}
+                        {modeLabels[mode]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -293,7 +293,7 @@ export default function AdminThoughts() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline" className="capitalize">
-                      {modeEmojis[thought.mode]} {thought.mode}
+                      {modeLabels[thought.mode]}
                     </Badge>
                     <div className="flex items-center gap-1">
                       {thought.is_curated && (

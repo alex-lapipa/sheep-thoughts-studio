@@ -71,12 +71,12 @@ export default function AdminDashboard() {
     nuclear: 'bg-purple-500',
   };
 
-  const modeEmojis: Record<string, string> = {
-    innocent: '😊',
-    concerned: '😐',
-    triggered: '😤',
-    savage: '😈',
-    nuclear: '☢️',
+  const modeLabels: Record<string, string> = {
+    innocent: 'Innocent',
+    concerned: 'Concerned',
+    triggered: 'Triggered',
+    savage: 'Savage',
+    nuclear: 'Nuclear',
   };
 
   return (
@@ -153,8 +153,7 @@ export default function AdminDashboard() {
                     <div key={mode} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-2">
-                          <span>{modeEmojis[mode] || '❓'}</span>
-                          <span className="capitalize font-medium">{mode}</span>
+                          <span className="capitalize font-medium">{modeLabels[mode] || mode}</span>
                         </span>
                         <span className="text-muted-foreground">{count} ({percentage.toFixed(0)}%)</span>
                       </div>

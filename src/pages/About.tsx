@@ -1,36 +1,7 @@
 import { Layout } from "@/components/Layout";
-import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { ModeBadge } from "@/components/ModeBadge";
-import { BubbleMode } from "@/data/thoughtBubbles";
 import { BubblesExplains } from "@/components/BubblesExplains";
 
 const About = () => {
-  const modes: { mode: BubbleMode; title: string; description: string; quote: string }[] = [
-    {
-      mode: 'innocent',
-      title: 'Innocent Mode',
-      description: 'Bubbles in their purest form. Daydreaming about the mist rolling off Sugarloaf, contemplating if the grass in Rocky Valley really is greener, and pondering the deep mysteries of being exceptionally fluffy.',
-      quote: "The fog here tastes like thoughtfulness."
-    },
-    {
-      mode: 'concerned',
-      title: 'Concerned Mode',
-      description: "Something feels off. Maybe it's the farmer's new wellies. Maybe it's shearing season approaching. Bubbles isn't panicking... yet.",
-      quote: "Why is everyone measuring my wool lately?"
-    },
-    {
-      mode: 'triggered',
-      title: 'Triggered Mode',
-      description: "Someone said something. It might have been innocent. But Bubbles heard it differently. And now there's a problem brewing in the Wicklow hills.",
-      quote: "They called me... a REGULAR sheep?"
-    },
-    {
-      mode: 'savage',
-      title: 'Savage Mode',
-      description: "Full dark mode activated. The Irish wit emerges. No filter. Bubbles has had enough of your nonsense and the thought bubbles have gone nuclear.",
-      quote: "Your fashion sense is why I left the flock."
-    }
-  ];
 
   return (
     <Layout>
@@ -235,29 +206,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* The Modes */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-12 text-center">
-            The Four Modes
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {modes.map((modeData) => (
-              <div key={modeData.mode} className="bg-card rounded-xl p-6 border border-border">
-                <div className="flex items-center gap-3 mb-4">
-                  <ModeBadge mode={modeData.mode} />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-2">{modeData.title}</h3>
-                <p className="text-muted-foreground mb-4">{modeData.description}</p>
-                <ThoughtBubble mode={modeData.mode} size="sm">
-                  <p className="text-sm italic">"{modeData.quote}"</p>
-                </ThoughtBubble>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-16 md:py-24 bg-secondary/30">
         <div className="container text-center">
@@ -265,8 +213,8 @@ const About = () => {
             Wear the Bubble
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Express your inner sheep. Whether you're feeling innocent, triggered, or fully savage, 
-            there's a Bubbles design for every mood. Premium quality, Wicklow soul.
+            Express your inner sheep. Confidently wrong facts, beautifully printed. 
+            Premium quality, Wicklow soul.
           </p>
           <a 
             href="/collections/all" 
