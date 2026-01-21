@@ -28,6 +28,22 @@ export function HeroSection() {
   const [isVisible, setIsVisible] = useState(true);
   const [bubbleKey, setBubbleKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+
+  // Show hint tooltip on first visit
+  useEffect(() => {
+    const hasSeenHint = localStorage.getItem('bubbles-hint-seen');
+    if (!hasSeenHint) {
+      // Delay showing hint so user sees the bubble first
+      const timer = setTimeout(() => setShowHint(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const dismissHint = () => {
+    setShowHint(false);
+    localStorage.setItem('bubbles-hint-seen', 'true');
+  };
 
   // Fetch thoughts from database on mount
   useEffect(() => {
@@ -174,14 +190,39 @@ export function HeroSection() {
                   transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
                   transitionDuration: `${FADE_DURATION}ms`,
                 }}
-                onClick={skipToNext}
-                onMouseEnter={() => setIsPaused(true)}
+                onClick={() => {
+                  skipToNext();
+                  dismissHint();
+                }}
+                onMouseEnter={() => {
+                  setIsPaused(true);
+                  dismissHint();
+                }}
                 onMouseLeave={() => setIsPaused(false)}
                 title="Click to skip to next thought"
               >
                 <ThoughtBubble mode={currentThought.mode as any} size="md">
                   <p className="text-foreground italic group-hover:opacity-80 transition-opacity">"{currentThought.text}"</p>
                 </ThoughtBubble>
+                
+                {/* First-visit hint tooltip */}
+                {showHint && (
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap animate-fade-in">
+                    <div className="bg-foreground text-background text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+                      <span>Hover to pause • Click to skip</span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dismissHint();
+                        }}
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-foreground" />
+                  </div>
+                )}
                 {/* Progress indicator */}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
                   <div className="relative w-16 h-1 bg-muted/40 rounded-full overflow-hidden">
