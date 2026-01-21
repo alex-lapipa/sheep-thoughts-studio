@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useShare } from "@/hooks/useShare";
 
 interface CitationGeneratorProps {
   fact: string;
@@ -40,7 +40,7 @@ const fakeYear = () => 2020 + Math.floor(Math.random() * 5);
 
 export const CitationGenerator = ({ fact, source, topic }: CitationGeneratorProps) => {
   const [style, setStyle] = useState<CitationStyle>("apa");
-  const [copied, setCopied] = useState(false);
+  const { share, copyToClipboard, isCopied, isSharing } = useShare();
 
   const journal = fakeJournals[Math.floor(Math.random() * fakeJournals.length)];
   const volume = fakeVolumes();
@@ -111,49 +111,15 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
 
   const citation = generateCitation();
 
-  const handleShare = async () => {
-    const shareData = {
+  const handleShare = () => {
+    share({
       title: `Bubbles Institute Citation: ${topic || "A Verified Fact"}`,
       text: citation,
-    };
-
-    try {
-      // Use Web Share API if available (mobile devices)
-      if (navigator.share && navigator.canShare?.(shareData)) {
-        await navigator.share(shareData);
-        toast.success("Shared successfully!");
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(citation);
-        setCopied(true);
-        toast.success("Citation copied to clipboard");
-        setTimeout(() => setCopied(false), 2000);
-      }
-    } catch (error) {
-      // User cancelled share or error occurred
-      if ((error as Error).name !== 'AbortError') {
-        // Try clipboard as fallback
-        try {
-          await navigator.clipboard.writeText(citation);
-          setCopied(true);
-          toast.success("Citation copied to clipboard");
-          setTimeout(() => setCopied(false), 2000);
-        } catch {
-          toast.error("Unable to share or copy citation");
-        }
-      }
-    }
+    });
   };
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(citation);
-      setCopied(true);
-      toast.success("Citation copied to clipboard");
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error("Failed to copy citation");
-    }
+  const handleCopy = () => {
+    copyToClipboard(citation);
   };
 
   return (
@@ -181,9 +147,10 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
           variant="outline"
           size="sm"
           onClick={handleCopy}
+          disabled={isSharing}
           className="gap-2"
         >
-          {copied ? (
+          {isCopied ? (
             <>
               <Check className="h-3.5 w-3.5" />
               Copied
@@ -200,6 +167,7 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
           variant="outline"
           size="sm"
           onClick={handleShare}
+          disabled={isSharing}
           className="gap-2"
         >
           <Share2 className="h-3.5 w-3.5" />
