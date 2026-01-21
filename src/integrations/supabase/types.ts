@@ -725,6 +725,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_admin: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
@@ -733,6 +734,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       search_bubbles_knowledge: {
         Args: {
           filter_category?: Database["public"]["Enums"]["bubbles_knowledge_category"]
@@ -813,7 +815,7 @@ export type Database = {
         | "error"
         | "cancelled"
       pod_provider_type: "printful" | "printify" | "gelato"
-      user_role: "admin" | "ops" | "merch" | "readonly"
+      user_role: "admin" | "ops" | "merch" | "readonly" | "super_admin"
       webhook_status: "pending" | "processed" | "failed" | "retrying"
     }
     CompositeTypes: {
@@ -985,7 +987,7 @@ export const Constants = {
         "cancelled",
       ],
       pod_provider_type: ["printful", "printify", "gelato"],
-      user_role: ["admin", "ops", "merch", "readonly"],
+      user_role: ["admin", "ops", "merch", "readonly", "super_admin"],
       webhook_status: ["pending", "processed", "failed", "retrying"],
     },
   },
