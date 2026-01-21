@@ -37,6 +37,7 @@ interface ColorEditorDialogProps {
   onOpenChange: (open: boolean) => void;
   color?: BrandAsset | null;
   mode: "create" | "edit";
+  defaultCategory?: string;
 }
 
 const CATEGORIES = [
@@ -80,7 +81,7 @@ function hexToHslString(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
 }
 
-export function ColorEditorDialog({ open, onOpenChange, color, mode }: ColorEditorDialogProps) {
+export function ColorEditorDialog({ open, onOpenChange, color, mode, defaultCategory }: ColorEditorDialogProps) {
   const [name, setName] = useState("");
   const [hex, setHex] = useState("#000000");
   const [category, setCategory] = useState("wicklow");
@@ -105,10 +106,10 @@ export function ColorEditorDialog({ open, onOpenChange, color, mode }: ColorEdit
     } else if (mode === "create") {
       setName("");
       setHex("#4A9B6A");
-      setCategory("wicklow");
+      setCategory(defaultCategory || "wicklow");
       setDescription("");
     }
-  }, [color, mode, open]);
+  }, [color, mode, open, defaultCategory]);
 
   const generateKey = (name: string, category: string) => {
     return `${category}-${name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}`;

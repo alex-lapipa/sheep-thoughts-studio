@@ -3,7 +3,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
+import { useBrandAssets, useUpdateBrandAsset, BrandAsset } from "@/hooks/useBrandAssets";
 import { ColorEditorDialog } from "@/components/admin/ColorEditorDialog";
 import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3, MessageCircle, Type, Plus, Pencil } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -1845,7 +1845,11 @@ interface ColorSwatchProps {
 
 function ColorSwatch({ asset, onEdit }: ColorSwatchProps) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [showQuickPicker, setShowQuickPicker] = useState(false);
+  const [quickHex, setQuickHex] = useState("");
   const value = asset.asset_value as { hex?: string; hsl?: string; rgb?: string; pantone?: string; role?: string; mode?: string; category?: string };
+  
+  const updateMutation = useUpdateBrandAsset();
 
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
@@ -1854,21 +1858,97 @@ function ColorSwatch({ asset, onEdit }: ColorSwatchProps) {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const handleQuickColorChange = async (newHex: string) => {
+    setQuickHex(newHex);
+  };
+
+  const saveQuickColor = async () => {
+    if (!quickHex || quickHex === value.hex) {
+      setShowQuickPicker(false);
+      return;
+    }
+    
+    const hsl = hexToHslString(quickHex);
+    try {
+      await updateMutation.mutateAsync({
+        id: asset.id,
+        updates: {
+          asset_value: {
+            ...value,
+            hex: quickHex.toUpperCase(),
+            hsl,
+          },
+        },
+      });
+      toast.success(`Updated ${asset.asset_name}`);
+      setShowQuickPicker(false);
+    } catch (error) {
+      toast.error("Failed to update color");
+    }
+  };
+
   return (
     <Card className="overflow-hidden group relative">
       {/* Edit Button Overlay */}
       <button
         onClick={() => onEdit(asset)}
         className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm rounded-full p-1.5 shadow-sm hover:bg-background"
+        title="Edit color details"
       >
         <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
       </button>
       
-      <div 
-        className="h-24 w-full transition-transform group-hover:scale-105 cursor-pointer"
-        style={{ backgroundColor: value.hex }}
-        onClick={() => onEdit(asset)}
-      />
+      {/* Quick Color Picker */}
+      <div className="relative">
+        <div 
+          className="h-24 w-full transition-transform group-hover:scale-105 cursor-pointer"
+          style={{ backgroundColor: showQuickPicker ? quickHex : value.hex }}
+          onClick={() => {
+            setQuickHex(value.hex || "#000000");
+            setShowQuickPicker(!showQuickPicker);
+          }}
+        />
+        
+        {/* Inline Color Picker Popover */}
+        {showQuickPicker && (
+          <div className="absolute top-full left-0 right-0 z-20 p-2 bg-background border rounded-b-lg shadow-lg space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={quickHex}
+                onChange={(e) => handleQuickColorChange(e.target.value)}
+                className="w-10 h-8 p-0.5 rounded cursor-pointer border-0"
+              />
+              <input
+                type="text"
+                value={quickHex.toUpperCase()}
+                onChange={(e) => setQuickHex(e.target.value)}
+                className="flex-1 px-2 py-1 text-xs font-mono border rounded bg-muted"
+                placeholder="#000000"
+              />
+            </div>
+            <div className="flex gap-1">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="flex-1 h-7 text-xs"
+                onClick={() => setShowQuickPicker(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                size="sm" 
+                className="flex-1 h-7 text-xs"
+                onClick={saveQuickColor}
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? "..." : "Save"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+      
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold">{asset.asset_name}</h4>
@@ -1921,6 +2001,64 @@ function ColorSwatch({ asset, onEdit }: ColorSwatchProps) {
   );
 }
 
+// Add Color Card component for inline adding to each section
+interface AddColorCardProps {
+  category: string;
+  onAdd: () => void;
+}
+
+function AddColorCard({ category, onAdd }: AddColorCardProps) {
+  return (
+    <Card 
+      className="overflow-hidden border-dashed border-2 hover:border-primary/50 hover:bg-muted/50 transition-colors cursor-pointer group"
+      onClick={onAdd}
+    >
+      <div className="h-24 w-full flex items-center justify-center bg-muted/30 group-hover:bg-muted/50 transition-colors">
+        <Plus className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+      </div>
+      <CardContent className="p-4 text-center">
+        <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+          Add {category} Color
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Helper function for hex to HSL (needed in ColorSwatch)
+function hexToHslString(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return "0 0% 0%";
+
+  const r = parseInt(result[1], 16) / 255;
+  const g = parseInt(result[2], 16) / 255;
+  const b = parseInt(result[3], 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
+  }
+
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
 export default function BrandColors() {
   const { data: colors, isLoading } = useBrandAssets("color");
   
@@ -1928,10 +2066,12 @@ export default function BrandColors() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [selectedColor, setSelectedColor] = useState<BrandAsset | null>(null);
+  const [defaultCategory, setDefaultCategory] = useState<string>("wicklow");
 
-  const handleAddColor = () => {
+  const handleAddColor = (category?: string) => {
     setSelectedColor(null);
     setDialogMode("create");
+    setDefaultCategory(category || "wicklow");
     setDialogOpen(true);
   };
 
@@ -1969,6 +2109,7 @@ export default function BrandColors() {
         onOpenChange={setDialogOpen}
         color={selectedColor}
         mode={dialogMode}
+        defaultCategory={defaultCategory}
       />
       
       <div className="space-y-8">
@@ -1984,7 +2125,7 @@ export default function BrandColors() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={handleAddColor} size="sm">
+            <Button onClick={() => handleAddColor()} size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Add Color
             </Button>
@@ -2079,27 +2220,10 @@ export default function BrandColors() {
                 </Card>
               ))}
             </div>
-          ) : wicklowColors.length > 0 ? (
+          ) : (
             <div className="grid gap-4 md:grid-cols-5">
               {wicklowColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
-              ))}
-            </div>
-          ) : (
-            /* Fallback to hardcoded if no database colors */
-            <div className="grid gap-4 md:grid-cols-7">
-              {Object.entries(WICKLOW_PASTORAL).map(([key, color]) => (
-                <Card key={key} className="overflow-hidden group">
-                  <div 
-                    className="h-20 w-full transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: color.hex }}
-                  />
-                  <CardContent className="p-3 space-y-1">
-                    <h4 className="font-semibold text-sm">{color.name}</h4>
-                    <p className="text-xs text-muted-foreground">{color.description}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           )}
@@ -2134,27 +2258,10 @@ export default function BrandColors() {
                 </Card>
               ))}
             </div>
-          ) : urbanColors.length > 0 ? (
+          ) : (
             <div className="grid gap-4 md:grid-cols-6">
               {urbanColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
-              ))}
-            </div>
-          ) : (
-            /* Fallback to hardcoded if no database colors */
-            <div className="grid gap-4 md:grid-cols-6">
-              {Object.entries(URBAN_CHAOS).map(([key, color]) => (
-                <Card key={key} className="overflow-hidden group border-2 border-transparent hover:border-foreground/20">
-                  <div 
-                    className="h-20 w-full transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: color.hex }}
-                  />
-                  <CardContent className="p-3 space-y-1">
-                    <h4 className="font-semibold text-sm">{color.name}</h4>
-                    <p className="text-xs text-muted-foreground">{color.description}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           )}
@@ -2188,33 +2295,12 @@ export default function BrandColors() {
                 </Card>
               ))}
             </div>
-          ) : modeColors.length > 0 ? (
+          ) : (
             <div className="grid gap-4 md:grid-cols-5">
               {modeColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
-            </div>
-          ) : (
-            /* Fallback to hardcoded if no database colors */
-            <div className="grid gap-4 md:grid-cols-5">
-              {MODE_ESCALATION.map((mode) => (
-                <Card key={mode.mode} className="overflow-hidden group">
-                  <div 
-                    className="h-20 w-full transition-transform group-hover:scale-105 flex items-center justify-center"
-                    style={{ backgroundColor: mode.color }}
-                  >
-                    <div
-                      className="w-10 h-10 border-2 border-black/20"
-                      style={{ borderRadius: mode.shapeRadius }}
-                    />
-                  </div>
-                  <CardContent className="p-3 space-y-1">
-                    <h4 className="font-semibold text-sm">{mode.name}</h4>
-                    <p className="text-xs text-muted-foreground">{mode.description}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{mode.intensity}% intensity</p>
-                  </CardContent>
-                </Card>
-              ))}
+              <AddColorCard category="Mode" onAdd={() => handleAddColor("mode")} />
             </div>
           )}
         </section>
@@ -2247,10 +2333,11 @@ export default function BrandColors() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               {seasonalColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
+              <AddColorCard category="Seasonal" onAdd={() => handleAddColor("seasonal")} />
             </div>
           )}
         </section>
