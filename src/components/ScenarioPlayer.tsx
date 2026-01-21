@@ -369,7 +369,7 @@ export function ScenarioPlayer() {
                       ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`
                       : undefined,
                   }}
-                  title={`${beatConfig.label}: ${beat.text.slice(0, 40)}...`}
+                  title={`${beatConfig.label}: ${beat.text?.slice(0, 40) || ""}...`}
                 >
                   {isActive && isPlaying && (
                     <div 
