@@ -8,6 +8,7 @@ import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { BubblesSheep } from "@/components/BubblesSheep";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -31,6 +32,7 @@ export default function Index() {
   const [currentThought, setCurrentThought] = useState<ThoughtData | null>(null);
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [bubbleKey, setBubbleKey] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function fetchThoughts() {
@@ -85,28 +87,27 @@ export default function Index() {
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-4">
                 <p className="text-muted-foreground font-medium">
-                  Broadcasting from Sugarloaf Mountain, Wicklow
+                  {t("hero.location")}
                 </p>
                 <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                  I'm <span className="text-accent">Bubbles</span>.
-                  <br />I know things.
+                  {t("hero.title.intro")} <span className="text-accent">{t("hero.title.name")}</span>.
+                  <br />{t("hero.title.tagline")}
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground max-w-lg">
-                  A sheep. An expert. A trusted source of information that is 
-                  absolutely, definitely, probably correct.
+                  {t("hero.subtitle")}
                 </p>
               </div>
               
               <div className="flex flex-wrap gap-4">
                 <Link to="/collections/all">
                   <Button size="lg" className="bg-accent hover:bg-accent-hover text-accent-foreground font-display">
-                    Official Merch
+                    {t("hero.cta.merch")}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/facts">
                   <Button size="lg" variant="outline" className="font-display">
-                    Learn From Me
+                    {t("hero.cta.learn")}
                   </Button>
                 </Link>
               </div>
@@ -133,18 +134,13 @@ export default function Index() {
         <div className="container">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <h2 className="font-display text-3xl md:text-4xl font-bold">
-              The Most Informed Sheep in Ireland
+              {t("about.title")}
             </h2>
             <p className="text-lg text-muted-foreground">
-              I live on Sugarloaf Mountain in County Wicklow. I spend my days 
-              eating grass and researching important topics. The internet has 
-              taught me many things. The mist whispers secrets. I have connected 
-              the dots that others refuse to see.
+              {t("about.p1")}
             </p>
             <p className="text-lg text-muted-foreground">
-              My thoughts appear in bubbles above my head. This is normal. 
-              All sheep have this. You just can't see theirs because they 
-              don't know as much as me.
+              {t("about.p2")}
             </p>
           </div>
         </div>
@@ -154,34 +150,34 @@ export default function Index() {
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
-            My Qualifications
+            {t("credentials.title")}
           </h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-card rounded-xl p-6 border border-border text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-bubbles-gorse/20 flex items-center justify-center">
                 <span className="font-display text-2xl font-bold text-bubbles-gorse">7</span>
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">Years of Staring</h3>
+              <h3 className="font-display font-bold text-lg mb-2">{t("credentials.staring.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                At the horizon. Thinking. Processing. Understanding things.
+                {t("credentials.staring.desc")}
               </p>
             </div>
             <div className="bg-card rounded-xl p-6 border border-border text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-bubbles-heather/20 flex items-center justify-center">
                 <span className="font-display text-2xl font-bold text-bubbles-heather">∞</span>
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">Facts Discovered</h3>
+              <h3 className="font-display font-bold text-lg mb-2">{t("credentials.facts.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                I cannot count. But it's definitely a lot. Trust me.
+                {t("credentials.facts.desc")}
               </p>
             </div>
             <div className="bg-card rounded-xl p-6 border border-border text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
                 <span className="font-display text-2xl font-bold text-accent">1</span>
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">Sheep Brain</h3>
+              <h3 className="font-display font-bold text-lg mb-2">{t("credentials.brain.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                It's bigger than it looks. The wool hides the extra brain.
+                {t("credentials.brain.desc")}
               </p>
             </div>
           </div>
@@ -195,15 +191,14 @@ export default function Index() {
       <section className="py-16 md:py-24 bg-secondary/30">
         <div className="container text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            Wear My Thoughts
+            {t("shop.title")}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Premium apparel featuring my most important observations. 
-            Each purchase supports my research into whether clouds are real.
+            {t("shop.subtitle")}
           </p>
           <Link to="/collections/all">
             <Button size="lg" className="bg-accent hover:bg-accent-hover text-accent-foreground font-display">
-              Visit the Shop
+              {t("shop.cta")}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
