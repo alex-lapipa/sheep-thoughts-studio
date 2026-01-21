@@ -4,9 +4,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download } from "lucide-react";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
+type ExportFormat = "css" | "tailwind" | "json";
+
+function exportColors(colors: BrandAsset[], format: ExportFormat): string {
+  const colorData = colors.map(c => {
+    const val = c.asset_value as { hex?: string; hsl?: string; category?: string };
+    return {
+      key: c.asset_key,
+      name: c.asset_name,
+      hex: val.hex || "",
+      hsl: val.hsl || "",
+      category: val.category || "",
+    };
+  });
+
+  switch (format) {
+    case "css":
+      return `:root {\n  /* Bubbles Brand Colors */\n${colorData
+        .map(c => `  --${c.key}: ${c.hsl};`)
+        .join("\n")}\n}`;
+    
+    case "tailwind":
+      const grouped: Record<string, Record<string, string>> = {};
+      colorData.forEach(c => {
+        const prefix = c.category || "brand";
+        if (!grouped[prefix]) grouped[prefix] = {};
+        const suffix = c.key.replace(`${prefix}-`, "").replace(/-/g, "");
+        grouped[prefix][suffix || "DEFAULT"] = `"${c.hex}"`;
+      });
+      return `// Tailwind Config Colors\ncolors: {\n${Object.entries(grouped)
+        .map(([key, values]) => `  ${key}: {\n${Object.entries(values)
+          .map(([k, v]) => `    ${k}: ${v},`)
+          .join("\n")}\n  },`)
+        .join("\n")}\n}`;
+    
+    case "json":
+      return JSON.stringify(
+        colorData.reduce((acc, c) => {
+          acc[c.key] = { name: c.name, hex: c.hex, hsl: c.hsl };
+          return acc;
+        }, {} as Record<string, { name: string; hex: string; hsl: string }>),
+        null,
+        2
+      );
+    
+    default:
+      return "";
+  }
+}
+
+function downloadFile(content: string, filename: string) {
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 interface ColorSwatchProps {
   asset: BrandAsset;
 }
@@ -112,9 +178,51 @@ export default function BrandColors() {
               Wicklow-grounded palette with emotion-coded mode accents
             </p>
           </div>
-          <Badge variant="outline" className="text-sm">
-            {colors?.length || 0} colors
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-sm">
+              {colors?.length || 0} colors
+            </Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" disabled={!colors?.length}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (colors) {
+                      downloadFile(exportColors(colors, "css"), "bubbles-colors.css");
+                      toast.success("Exported as CSS variables");
+                    }
+                  }}
+                >
+                  CSS Variables
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (colors) {
+                      downloadFile(exportColors(colors, "tailwind"), "bubbles-colors.tailwind.js");
+                      toast.success("Exported as Tailwind config");
+                    }
+                  }}
+                >
+                  Tailwind Config
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (colors) {
+                      downloadFile(exportColors(colors, "json"), "bubbles-colors.json");
+                      toast.success("Exported as JSON tokens");
+                    }
+                  }}
+                >
+                  JSON Tokens
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Psychology Banner */}
