@@ -7,74 +7,88 @@
 @layer base {
   :root {
     /* ══════════════════════════════════════════════════════════════
-       BUBBLES BRAND - WICKLOW MOUNTAINS COLOR SYSTEM
+       BUBBLES BRAND COLOR SYSTEM
        
-       PRIMARY PALETTE: Derived from the Wicklow landscape
-       ACCENT PALETTE: Modern, striking colors for impact
+       🌿 PRIMARY: Wicklow Pastoral — calm, traditional Irish landscape
+          The fields, the mist, the quiet. Home.
+       
+       🌃 ACCENT: Urban Chaos — London/NYC nightlife, fashion, neon
+          Everything Bubbles doesn't understand.
        ══════════════════════════════════════════════════════════════ */
 
-    /* === WICKLOW PRIMARY PALETTE === */
+    /* ═══════════════════════════════════════════════════════════════
+       🌿 WICKLOW PASTORAL PALETTE
+       Traditional Irish countryside — serene, timeless, grounding
+       ═══════════════════════════════════════════════════════════════ */
     
-    /* Mountain Green - The rolling Wicklow hills */
-    --wicklow-green: 145 45% 35%;
-    --wicklow-green-light: 145 40% 55%;
-    --wicklow-green-dark: 145 50% 22%;
+    /* Meadow Green - Rolling Wicklow pastures at dawn */
+    --wicklow-meadow: 135 35% 42%;
+    --wicklow-meadow-light: 135 30% 62%;
+    --wicklow-meadow-dark: 135 40% 28%;
     
-    /* Ocean Blue - Irish Sea visible from the peaks */
-    --wicklow-ocean: 200 65% 45%;
-    --wicklow-ocean-light: 200 55% 65%;
-    --wicklow-ocean-dark: 200 70% 30%;
+    /* Atlantic Blue - The cold Irish Sea on a calm day */
+    --wicklow-atlantic: 205 45% 48%;
+    --wicklow-atlantic-light: 205 40% 68%;
+    --wicklow-atlantic-dark: 205 50% 32%;
     
-    /* Sun Yellow - The rare glimpse of Irish sunshine */
-    --wicklow-sun: 48 90% 55%;
-    --wicklow-sun-light: 48 85% 70%;
-    --wicklow-sun-dark: 48 95% 40%;
+    /* Butter Yellow - Rare Irish sunshine, soft and gentle */
+    --wicklow-butter: 45 75% 65%;
+    --wicklow-butter-light: 45 70% 78%;
+    --wicklow-butter-dark: 45 80% 50%;
     
-    /* Cloud White - Ever-present Irish clouds */
-    --wicklow-cloud: 210 20% 98%;
-    --wicklow-cloud-warm: 45 30% 97%;
-    --wicklow-cloud-cool: 210 30% 95%;
+    /* Mist White - Morning fog in the valley */
+    --wicklow-mist: 200 15% 97%;
+    --wicklow-mist-warm: 40 20% 96%;
+    --wicklow-mist-cool: 210 25% 94%;
     
-    /* Rain Grey - The soft mist and drizzle */
-    --wicklow-rain: 210 10% 60%;
-    --wicklow-rain-light: 210 8% 75%;
-    --wicklow-rain-dark: 210 12% 40%;
+    /* Stone Grey - Ancient drystone walls */
+    --wicklow-stone: 200 8% 55%;
+    --wicklow-stone-light: 200 6% 72%;
+    --wicklow-stone-dark: 200 10% 38%;
     
-    /* Heather Mauve - Bog flowers in bloom */
-    --wicklow-heather: 290 30% 50%;
-    --wicklow-heather-light: 290 25% 70%;
-    --wicklow-heather-dark: 290 35% 35%;
+    /* Heather Purple - Bog flowers across the hills */
+    --wicklow-heather: 280 25% 52%;
+    --wicklow-heather-light: 280 20% 70%;
+    --wicklow-heather-dark: 280 30% 38%;
     
-    /* Turf Brown - Peat and bog earth */
-    --wicklow-turf: 25 35% 25%;
-    --wicklow-turf-light: 25 30% 45%;
-    --wicklow-turf-dark: 25 40% 15%;
+    /* Turf Brown - Warm peat, the earth itself */
+    --wicklow-turf: 28 40% 28%;
+    --wicklow-turf-light: 28 35% 48%;
+    --wicklow-turf-dark: 28 45% 16%;
 
-    /* === MODERN ACCENT PALETTE === */
+    /* ═══════════════════════════════════════════════════════════════
+       🌃 URBAN CHAOS PALETTE  
+       London/NYC nightlife — neon, fashion, noise, confusion
+       Everything that bewilders poor Bubbles
+       ═══════════════════════════════════════════════════════════════ */
     
-    /* Acid Yellow - Electric, attention-grabbing */
-    --accent-acid: 65 100% 50%;
-    --accent-acid-dim: 65 90% 40%;
+    /* Taxi Yellow - NYC cab, can't miss it */
+    --urban-taxi: 50 100% 50%;
+    --urban-taxi-dim: 50 95% 38%;
     
-    /* Hot Pink - Bold, energetic */
-    --accent-hotpink: 330 100% 60%;
-    --accent-hotpink-dim: 330 90% 45%;
+    /* Soho Pink - London club lights at 2am */
+    --urban-soho: 335 100% 62%;
+    --urban-soho-dim: 335 90% 48%;
     
-    /* Electric Blue - Digital, modern */
-    --accent-electric: 195 100% 50%;
-    --accent-electric-dim: 195 90% 38%;
+    /* Neon Cyan - Tokyo/Shoreditch signage */
+    --urban-neon: 185 100% 50%;
+    --urban-neon-dim: 185 90% 38%;
     
-    /* Neon Coral - Warm, striking */
-    --accent-coral: 15 100% 65%;
-    --accent-coral-dim: 15 90% 50%;
+    /* Metro Orange - Underground, urgent, electric */
+    --urban-metro: 25 100% 55%;
+    --urban-metro-dim: 25 95% 42%;
     
-    /* Vivid Purple - Creative, bold */
-    --accent-vivid: 270 100% 60%;
-    --accent-vivid-dim: 270 90% 45%;
+    /* Fashion Purple - Runway, exclusive, alien */
+    --urban-fashion: 280 100% 62%;
+    --urban-fashion-dim: 280 90% 48%;
+    
+    /* Nightclub Red - Velvet rope, danger, excitement */
+    --urban-club: 0 100% 58%;
+    --urban-club-dim: 0 90% 45%;
 
     /* === SEMANTIC TOKENS (Light Mode) === */
     
-    --background: var(--wicklow-cloud);
+    --background: var(--wicklow-mist);
     --foreground: var(--wicklow-turf-dark);
 
     --card: 0 0% 100%;
@@ -83,132 +97,135 @@
     --popover: 0 0% 100%;
     --popover-foreground: var(--wicklow-turf-dark);
 
-    /* Primary - Mountain Green */
-    --primary: var(--wicklow-green);
-    --primary-foreground: var(--wicklow-cloud);
+    /* Primary - Meadow Green (pastoral, calming) */
+    --primary: var(--wicklow-meadow);
+    --primary-foreground: var(--wicklow-mist);
 
-    /* Secondary - Ocean Blue */
-    --secondary: var(--wicklow-ocean-light);
+    /* Secondary - Atlantic Blue */
+    --secondary: var(--wicklow-atlantic-light);
     --secondary-foreground: var(--wicklow-turf-dark);
 
-    /* Muted - Rain Grey */
-    --muted: var(--wicklow-rain-light);
-    --muted-foreground: var(--wicklow-rain-dark);
+    /* Muted - Stone Grey */
+    --muted: var(--wicklow-stone-light);
+    --muted-foreground: var(--wicklow-stone-dark);
 
-    /* Accent - Heather Mauve */
-    --accent: var(--wicklow-heather);
-    --accent-foreground: var(--wicklow-cloud);
-    --accent-hover: var(--wicklow-heather-dark);
-    --accent-muted: 290 20% 92%;
+    /* Accent - Urban Soho Pink (the chaos layer) */
+    --accent: var(--urban-soho);
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: var(--urban-soho-dim);
+    --accent-muted: 335 30% 92%;
 
-    --destructive: 0 84% 60%;
+    --destructive: var(--urban-club);
     --destructive-foreground: 0 0% 100%;
 
     --border: 210 15% 85%;
     --input: 210 15% 85%;
-    --ring: var(--wicklow-green);
+    --ring: var(--wicklow-meadow);
 
     --radius: 0.75rem;
 
-    /* === MODE SYSTEM ACCENTS === */
-    --mode-innocent: var(--wicklow-sun-light);
-    --mode-concerned: var(--wicklow-ocean-light);
-    --mode-triggered: var(--accent-coral);
-    --mode-savage: var(--accent-hotpink);
-    --mode-nuclear: var(--accent-acid);
+    /* === MODE SYSTEM === 
+       Calm modes use pastoral palette
+       Escalating modes shift to urban chaos */
+    --mode-innocent: var(--wicklow-butter-light);
+    --mode-concerned: var(--wicklow-atlantic-light);
+    --mode-triggered: var(--urban-metro);
+    --mode-savage: var(--urban-soho);
+    --mode-nuclear: var(--urban-taxi);
 
-    /* === SEASONAL PALETTE === */
-    --season-spring: var(--wicklow-green-light);
-    --season-summer: var(--wicklow-sun);
+    /* === SEASONAL PALETTE (all pastoral) === */
+    --season-spring: var(--wicklow-meadow-light);
+    --season-summer: var(--wicklow-butter);
     --season-autumn: var(--wicklow-turf-light);
-    --season-winter: var(--wicklow-rain);
+    --season-winter: var(--wicklow-stone);
 
     /* === THOUGHT BUBBLE === */
     --bubble-bg: 0 0% 100%;
-    --bubble-border: 210 15% 88%;
-    --bubble-shadow: 210 20% 70%;
+    --bubble-border: 200 12% 88%;
+    --bubble-shadow: 200 15% 70%;
 
-    /* === SAVAGE MODE - Dark Overlay === */
+    /* === SAVAGE MODE - Urban takeover === */
     --savage-bg: var(--wicklow-turf-dark);
-    --savage-accent: var(--accent-hotpink);
+    --savage-accent: var(--urban-soho);
 
     /* === FONTS === */
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     /* === SIDEBAR === */
-    --sidebar-background: var(--wicklow-cloud-cool);
+    --sidebar-background: var(--wicklow-mist-cool);
     --sidebar-foreground: var(--wicklow-turf);
-    --sidebar-primary: var(--wicklow-green);
-    --sidebar-primary-foreground: var(--wicklow-cloud);
-    --sidebar-accent: var(--wicklow-cloud-warm);
+    --sidebar-primary: var(--wicklow-meadow);
+    --sidebar-primary-foreground: var(--wicklow-mist);
+    --sidebar-accent: var(--wicklow-mist-warm);
     --sidebar-accent-foreground: var(--wicklow-turf);
-    --sidebar-border: 210 15% 88%;
-    --sidebar-ring: var(--wicklow-green);
+    --sidebar-border: 200 12% 88%;
+    --sidebar-ring: var(--wicklow-meadow);
   }
 
   .dark {
     /* === SEMANTIC TOKENS (Dark Mode) === */
+    /* Night in the city - urban takes over */
     
     --background: var(--wicklow-turf-dark);
-    --foreground: var(--wicklow-cloud);
+    --foreground: var(--wicklow-mist);
 
-    --card: 25 30% 12%;
-    --card-foreground: var(--wicklow-cloud);
+    --card: 28 30% 12%;
+    --card-foreground: var(--wicklow-mist);
 
-    --popover: 25 30% 12%;
-    --popover-foreground: var(--wicklow-cloud);
+    --popover: 28 30% 12%;
+    --popover-foreground: var(--wicklow-mist);
 
-    /* Primary - Sun Yellow for visibility */
-    --primary: var(--wicklow-sun);
+    /* Primary - Urban Neon for visibility in darkness */
+    --primary: var(--urban-neon);
     --primary-foreground: var(--wicklow-turf-dark);
 
-    /* Secondary - Ocean Blue */
-    --secondary: var(--wicklow-ocean-dark);
-    --secondary-foreground: var(--wicklow-cloud);
+    /* Secondary - Atlantic Blue */
+    --secondary: var(--wicklow-atlantic-dark);
+    --secondary-foreground: var(--wicklow-mist);
 
-    /* Muted - Rain Grey */
-    --muted: var(--wicklow-rain-dark);
-    --muted-foreground: var(--wicklow-rain-light);
+    /* Muted - Stone Grey */
+    --muted: var(--wicklow-stone-dark);
+    --muted-foreground: var(--wicklow-stone-light);
 
-    /* Accent - Heather Mauve */
-    --accent: var(--wicklow-heather-light);
-    --accent-foreground: var(--wicklow-turf-dark);
-    --accent-hover: var(--wicklow-heather);
-    --accent-muted: 290 25% 18%;
+    /* Accent - Soho Pink (neon at night) */
+    --accent: var(--urban-soho);
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: var(--urban-soho-dim);
+    --accent-muted: 335 30% 18%;
 
-    --destructive: 0 63% 50%;
+    --destructive: var(--urban-club);
     --destructive-foreground: 0 0% 100%;
 
-    --border: 25 25% 22%;
-    --input: 25 25% 22%;
-    --ring: var(--wicklow-sun);
+    --border: 28 25% 22%;
+    --input: 28 25% 22%;
+    --ring: var(--urban-neon);
 
-    /* === MODE SYSTEM ACCENTS (Dark Mode) === */
-    --mode-innocent: var(--wicklow-sun);
-    --mode-concerned: var(--wicklow-ocean);
-    --mode-triggered: var(--accent-coral);
-    --mode-savage: var(--accent-hotpink);
-    --mode-nuclear: var(--accent-acid);
+    /* === MODE SYSTEM (Dark Mode) === */
+    --mode-innocent: var(--wicklow-butter);
+    --mode-concerned: var(--wicklow-atlantic);
+    --mode-triggered: var(--urban-metro);
+    --mode-savage: var(--urban-soho);
+    --mode-nuclear: var(--urban-taxi);
 
     /* === SEASONAL PALETTE (Dark Mode) === */
-    --season-spring: var(--wicklow-green);
-    --season-summer: var(--wicklow-sun);
+    --season-spring: var(--wicklow-meadow);
+    --season-summer: var(--wicklow-butter);
     --season-autumn: var(--wicklow-turf);
-    --season-winter: var(--wicklow-rain-dark);
+    --season-winter: var(--wicklow-stone-dark);
 
-    --bubble-bg: 25 30% 14%;
-    --bubble-border: 25 25% 25%;
-    --bubble-shadow: 25 30% 8%;
+    --bubble-bg: 28 30% 14%;
+    --bubble-border: 28 25% 25%;
+    --bubble-shadow: 28 30% 8%;
 
-    --sidebar-background: 25 30% 10%;
-    --sidebar-foreground: var(--wicklow-cloud);
-    --sidebar-primary: var(--wicklow-sun);
+    --sidebar-background: 28 30% 10%;
+    --sidebar-foreground: var(--wicklow-mist);
+    --sidebar-primary: var(--urban-neon);
     --sidebar-primary-foreground: var(--wicklow-turf-dark);
-    --sidebar-accent: 25 25% 18%;
-    --sidebar-accent-foreground: var(--wicklow-cloud);
-    --sidebar-border: 25 25% 20%;
-    --sidebar-ring: var(--wicklow-sun);
+    --sidebar-accent: 28 25% 18%;
+    --sidebar-accent-foreground: var(--wicklow-mist);
+    --sidebar-border: 28 25% 20%;
+    --sidebar-ring: var(--urban-neon);
   }
 }
 
@@ -340,32 +357,34 @@
     background-color: hsl(var(--accent-muted));
   }
 
-  /* Wicklow Palette Utilities */
-  .bg-wicklow-green { background-color: hsl(var(--wicklow-green)); }
-  .bg-wicklow-ocean { background-color: hsl(var(--wicklow-ocean)); }
-  .bg-wicklow-sun { background-color: hsl(var(--wicklow-sun)); }
-  .bg-wicklow-cloud { background-color: hsl(var(--wicklow-cloud)); }
-  .bg-wicklow-rain { background-color: hsl(var(--wicklow-rain)); }
+  /* 🌿 Wicklow Pastoral Utilities */
+  .bg-wicklow-meadow { background-color: hsl(var(--wicklow-meadow)); }
+  .bg-wicklow-atlantic { background-color: hsl(var(--wicklow-atlantic)); }
+  .bg-wicklow-butter { background-color: hsl(var(--wicklow-butter)); }
+  .bg-wicklow-mist { background-color: hsl(var(--wicklow-mist)); }
+  .bg-wicklow-stone { background-color: hsl(var(--wicklow-stone)); }
   .bg-wicklow-heather { background-color: hsl(var(--wicklow-heather)); }
   .bg-wicklow-turf { background-color: hsl(var(--wicklow-turf)); }
 
-  .text-wicklow-green { color: hsl(var(--wicklow-green)); }
-  .text-wicklow-ocean { color: hsl(var(--wicklow-ocean)); }
-  .text-wicklow-sun { color: hsl(var(--wicklow-sun)); }
-  .text-wicklow-rain { color: hsl(var(--wicklow-rain)); }
+  .text-wicklow-meadow { color: hsl(var(--wicklow-meadow)); }
+  .text-wicklow-atlantic { color: hsl(var(--wicklow-atlantic)); }
+  .text-wicklow-butter { color: hsl(var(--wicklow-butter)); }
+  .text-wicklow-stone { color: hsl(var(--wicklow-stone)); }
   .text-wicklow-heather { color: hsl(var(--wicklow-heather)); }
   .text-wicklow-turf { color: hsl(var(--wicklow-turf)); }
 
-  /* Modern Accent Utilities */
-  .bg-accent-acid { background-color: hsl(var(--accent-acid)); }
-  .bg-accent-hotpink { background-color: hsl(var(--accent-hotpink)); }
-  .bg-accent-electric { background-color: hsl(var(--accent-electric)); }
-  .bg-accent-coral { background-color: hsl(var(--accent-coral)); }
-  .bg-accent-vivid { background-color: hsl(var(--accent-vivid)); }
+  /* 🌃 Urban Chaos Utilities */
+  .bg-urban-taxi { background-color: hsl(var(--urban-taxi)); }
+  .bg-urban-soho { background-color: hsl(var(--urban-soho)); }
+  .bg-urban-neon { background-color: hsl(var(--urban-neon)); }
+  .bg-urban-metro { background-color: hsl(var(--urban-metro)); }
+  .bg-urban-fashion { background-color: hsl(var(--urban-fashion)); }
+  .bg-urban-club { background-color: hsl(var(--urban-club)); }
 
-  .text-accent-acid { color: hsl(var(--accent-acid)); }
-  .text-accent-hotpink { color: hsl(var(--accent-hotpink)); }
-  .text-accent-electric { color: hsl(var(--accent-electric)); }
-  .text-accent-coral { color: hsl(var(--accent-coral)); }
-  .text-accent-vivid { color: hsl(var(--accent-vivid)); }
+  .text-urban-taxi { color: hsl(var(--urban-taxi)); }
+  .text-urban-soho { color: hsl(var(--urban-soho)); }
+  .text-urban-neon { color: hsl(var(--urban-neon)); }
+  .text-urban-metro { color: hsl(var(--urban-metro)); }
+  .text-urban-fashion { color: hsl(var(--urban-fashion)); }
+  .text-urban-club { color: hsl(var(--urban-club)); }
 }
