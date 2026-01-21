@@ -62,32 +62,32 @@ export default {
           bg: "hsl(var(--savage-bg))",
           accent: "hsl(var(--savage-accent))",
         },
-        // Wicklow Primary Palette
+        // 🌿 Wicklow Pastoral Palette - calm, traditional Irish landscape
         wicklow: {
-          green: {
-            DEFAULT: "hsl(var(--wicklow-green))",
-            light: "hsl(var(--wicklow-green-light))",
-            dark: "hsl(var(--wicklow-green-dark))",
+          meadow: {
+            DEFAULT: "hsl(var(--wicklow-meadow))",
+            light: "hsl(var(--wicklow-meadow-light))",
+            dark: "hsl(var(--wicklow-meadow-dark))",
           },
-          ocean: {
-            DEFAULT: "hsl(var(--wicklow-ocean))",
-            light: "hsl(var(--wicklow-ocean-light))",
-            dark: "hsl(var(--wicklow-ocean-dark))",
+          atlantic: {
+            DEFAULT: "hsl(var(--wicklow-atlantic))",
+            light: "hsl(var(--wicklow-atlantic-light))",
+            dark: "hsl(var(--wicklow-atlantic-dark))",
           },
-          sun: {
-            DEFAULT: "hsl(var(--wicklow-sun))",
-            light: "hsl(var(--wicklow-sun-light))",
-            dark: "hsl(var(--wicklow-sun-dark))",
+          butter: {
+            DEFAULT: "hsl(var(--wicklow-butter))",
+            light: "hsl(var(--wicklow-butter-light))",
+            dark: "hsl(var(--wicklow-butter-dark))",
           },
-          cloud: {
-            DEFAULT: "hsl(var(--wicklow-cloud))",
-            warm: "hsl(var(--wicklow-cloud-warm))",
-            cool: "hsl(var(--wicklow-cloud-cool))",
+          mist: {
+            DEFAULT: "hsl(var(--wicklow-mist))",
+            warm: "hsl(var(--wicklow-mist-warm))",
+            cool: "hsl(var(--wicklow-mist-cool))",
           },
-          rain: {
-            DEFAULT: "hsl(var(--wicklow-rain))",
-            light: "hsl(var(--wicklow-rain-light))",
-            dark: "hsl(var(--wicklow-rain-dark))",
+          stone: {
+            DEFAULT: "hsl(var(--wicklow-stone))",
+            light: "hsl(var(--wicklow-stone-light))",
+            dark: "hsl(var(--wicklow-stone-dark))",
           },
           heather: {
             DEFAULT: "hsl(var(--wicklow-heather))",
@@ -100,27 +100,31 @@ export default {
             dark: "hsl(var(--wicklow-turf-dark))",
           },
         },
-        // Modern Accent Palette
-        "accent-modern": {
-          acid: {
-            DEFAULT: "hsl(var(--accent-acid))",
-            dim: "hsl(var(--accent-acid-dim))",
+        // 🌃 Urban Chaos Palette - London/NYC nightlife, fashion, neon
+        urban: {
+          taxi: {
+            DEFAULT: "hsl(var(--urban-taxi))",
+            dim: "hsl(var(--urban-taxi-dim))",
           },
-          hotpink: {
-            DEFAULT: "hsl(var(--accent-hotpink))",
-            dim: "hsl(var(--accent-hotpink-dim))",
+          soho: {
+            DEFAULT: "hsl(var(--urban-soho))",
+            dim: "hsl(var(--urban-soho-dim))",
           },
-          electric: {
-            DEFAULT: "hsl(var(--accent-electric))",
-            dim: "hsl(var(--accent-electric-dim))",
+          neon: {
+            DEFAULT: "hsl(var(--urban-neon))",
+            dim: "hsl(var(--urban-neon-dim))",
           },
-          coral: {
-            DEFAULT: "hsl(var(--accent-coral))",
-            dim: "hsl(var(--accent-coral-dim))",
+          metro: {
+            DEFAULT: "hsl(var(--urban-metro))",
+            dim: "hsl(var(--urban-metro-dim))",
           },
-          vivid: {
-            DEFAULT: "hsl(var(--accent-vivid))",
-            dim: "hsl(var(--accent-vivid-dim))",
+          fashion: {
+            DEFAULT: "hsl(var(--urban-fashion))",
+            dim: "hsl(var(--urban-fashion-dim))",
+          },
+          club: {
+            DEFAULT: "hsl(var(--urban-club))",
+            dim: "hsl(var(--urban-club-dim))",
           },
         },
         // Mode Accent Colors

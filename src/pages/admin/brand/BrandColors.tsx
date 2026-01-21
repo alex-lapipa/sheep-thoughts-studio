@@ -243,35 +243,38 @@ function ContrastChecker({ colors }: ContrastCheckerProps) {
   );
 }
 
-// Wicklow Mountains Primary Palette - Derived from the landscape
-const WICKLOW_PRIMARY = {
-  green: { hex: "#3D8B5F", name: "Mountain Green", description: "The rolling Wicklow hills" },
-  ocean: { hex: "#2E8BC0", name: "Ocean Blue", description: "Irish Sea visible from the peaks" },
-  sun: { hex: "#E8B923", name: "Sun Yellow", description: "Rare glimpse of Irish sunshine" },
-  cloud: { hex: "#F7F9FC", name: "Cloud White", description: "Ever-present Irish clouds" },
-  rain: { hex: "#8A9AAF", name: "Rain Grey", description: "Soft mist and drizzle" },
-  heather: { hex: "#9B6B9B", name: "Heather Mauve", description: "Bog flowers in bloom" },
-  turf: { hex: "#4A3728", name: "Turf Brown", description: "Peat and bog earth" },
+// 🌿 Wicklow Pastoral Palette - calm, traditional Irish landscape
+// The fields, the mist, the quiet. Home.
+const WICKLOW_PASTORAL = {
+  meadow: { hex: "#4A9B6A", name: "Meadow Green", description: "Rolling Wicklow pastures at dawn" },
+  atlantic: { hex: "#4A8DBD", name: "Atlantic Blue", description: "Cold Irish Sea on a calm day" },
+  butter: { hex: "#E5C76B", name: "Butter Yellow", description: "Rare Irish sunshine, soft and gentle" },
+  mist: { hex: "#F5F7FA", name: "Mist White", description: "Morning fog in the valley" },
+  stone: { hex: "#7A8899", name: "Stone Grey", description: "Ancient drystone walls" },
+  heather: { hex: "#9B6B9B", name: "Heather Purple", description: "Bog flowers across the hills" },
+  turf: { hex: "#5A4332", name: "Turf Brown", description: "Warm peat, the earth itself" },
 };
 
-// Modern Striking Accent Palette
-const MODERN_ACCENTS = {
-  acid: { hex: "#DFFF00", name: "Acid Yellow", description: "Electric, attention-grabbing" },
-  hotpink: { hex: "#FF3399", name: "Hot Pink", description: "Bold, energetic" },
-  electric: { hex: "#00D4FF", name: "Electric Blue", description: "Digital, modern" },
-  coral: { hex: "#FF6B4A", name: "Neon Coral", description: "Warm, striking" },
-  vivid: { hex: "#9933FF", name: "Vivid Purple", description: "Creative, bold" },
+// 🌃 Urban Chaos Palette - London/NYC nightlife, fashion, neon
+// Everything that bewilders poor Bubbles
+const URBAN_CHAOS = {
+  taxi: { hex: "#FFD500", name: "Taxi Yellow", description: "NYC cab, can't miss it" },
+  soho: { hex: "#FF4D94", name: "Soho Pink", description: "London club lights at 2am" },
+  neon: { hex: "#00E5FF", name: "Neon Cyan", description: "Tokyo/Shoreditch signage" },
+  metro: { hex: "#FF6B35", name: "Metro Orange", description: "Underground, urgent, electric" },
+  fashion: { hex: "#A855F7", name: "Fashion Purple", description: "Runway, exclusive, alien" },
+  club: { hex: "#EF4444", name: "Nightclub Red", description: "Velvet rope, danger, excitement" },
 };
 
 // Combined base for legacy generators
 const WICKLOW_BASE = {
-  green: { hex: "#3D8B5F", name: "Mountain Green" },
-  ocean: { hex: "#2E8BC0", name: "Ocean Blue" },
-  sun: { hex: "#E8B923", name: "Sun Yellow" },
-  cloud: { hex: "#F7F9FC", name: "Cloud White" },
-  rain: { hex: "#8A9AAF", name: "Rain Grey" },
-  heather: { hex: "#9B6B9B", name: "Heather Mauve" },
-  turf: { hex: "#4A3728", name: "Turf Brown" },
+  meadow: { hex: "#4A9B6A", name: "Meadow Green" },
+  atlantic: { hex: "#4A8DBD", name: "Atlantic Blue" },
+  butter: { hex: "#E5C76B", name: "Butter Yellow" },
+  mist: { hex: "#F5F7FA", name: "Mist White" },
+  stone: { hex: "#7A8899", name: "Stone Grey" },
+  heather: { hex: "#9B6B9B", name: "Heather Purple" },
+  turf: { hex: "#5A4332", name: "Turf Brown" },
 };
 
 type Season = "spring" | "summer" | "autumn" | "winter";
@@ -798,55 +801,56 @@ function HarmonyGenerator() {
   );
 }
 
-// Mode escalation configuration - Using Modern Accents for higher modes
+// Mode escalation configuration
+// Calm modes = pastoral palette | High modes = urban chaos takes over
 const MODE_ESCALATION = [
   {
     mode: "innocent",
     name: "Innocent",
-    color: "#F5D76E", // Soft sun yellow
+    color: "#E5C76B", // Butter yellow - pastoral calm
     bubbleShape: "rounded-full",
     bubbleStyle: "border-2 border-dashed",
-    description: "Calm, round, soft — enjoying simple pleasures",
+    description: "Safe in the fields, round and soft",
     shapeRadius: "9999px",
     intensity: 0,
   },
   {
     mode: "concerned",
     name: "Concerned",
-    color: "#5DADE2", // Ocean blue light
+    color: "#6BA8D4", // Atlantic blue light - still pastoral
     bubbleShape: "rounded-[40%]",
     bubbleStyle: "border-2",
-    description: "Wobbly outline, processing uncertainty",
+    description: "Storm clouds gathering, wobbling",
     shapeRadius: "40%",
     intensity: 25,
   },
   {
     mode: "triggered",
     name: "Triggered",
-    color: "#FF6B4A", // Neon Coral
+    color: "#FF6B35", // Metro Orange - urban seeping in
     bubbleShape: "rounded-[30%]",
     bubbleStyle: "border-[3px]",
-    description: "Slightly angular, stress emerging",
+    description: "The city arrives, edges emerging",
     shapeRadius: "30%",
     intensity: 50,
   },
   {
     mode: "savage",
     name: "Savage",
-    color: "#FF3399", // Hot Pink
+    color: "#FF4D94", // Soho Pink - full urban mode
     bubbleShape: "rounded-[15%]",
     bubbleStyle: "border-4",
-    description: "Angular, thick outline, restrained fury",
+    description: "Nightclub energy, losing control",
     shapeRadius: "15%",
     intensity: 75,
   },
   {
     mode: "nuclear",
     name: "Nuclear",
-    color: "#DFFF00", // Acid Yellow
+    color: "#FFD500", // Taxi Yellow - maximum chaos
     bubbleShape: "rounded-[5%]",
     bubbleStyle: "border-4 shadow-lg",
-    description: "Sharp edges, explosive chaos",
+    description: "Times Square at midnight, total meltdown",
     shapeRadius: "5%",
     intensity: 100,
   },
@@ -1292,22 +1296,23 @@ function ThoughtBubblePreviewGenerator() {
   );
 }
 
-// All brand colors for matrix - Wicklow Primary + Modern Accents
+// All brand colors for matrix - Pastoral + Urban Chaos
 const ALL_BRAND_COLORS = [
-  // Wicklow Primary Palette
-  { key: "green", name: "Mountain Green", hex: "#3D8B5F" },
-  { key: "ocean", name: "Ocean Blue", hex: "#2E8BC0" },
-  { key: "sun", name: "Sun Yellow", hex: "#E8B923" },
-  { key: "cloud", name: "Cloud White", hex: "#F7F9FC" },
-  { key: "rain", name: "Rain Grey", hex: "#8A9AAF" },
-  { key: "heather", name: "Heather Mauve", hex: "#9B6B9B" },
-  { key: "turf", name: "Turf Brown", hex: "#4A3728" },
-  // Modern Striking Accents
-  { key: "acid", name: "Acid Yellow", hex: "#DFFF00" },
-  { key: "hotpink", name: "Hot Pink", hex: "#FF3399" },
-  { key: "electric", name: "Electric Blue", hex: "#00D4FF" },
-  { key: "coral", name: "Neon Coral", hex: "#FF6B4A" },
-  { key: "vivid", name: "Vivid Purple", hex: "#9933FF" },
+  // 🌿 Wicklow Pastoral
+  { key: "meadow", name: "Meadow Green", hex: "#4A9B6A" },
+  { key: "atlantic", name: "Atlantic Blue", hex: "#4A8DBD" },
+  { key: "butter", name: "Butter Yellow", hex: "#E5C76B" },
+  { key: "mist", name: "Mist White", hex: "#F5F7FA" },
+  { key: "stone", name: "Stone Grey", hex: "#7A8899" },
+  { key: "heather", name: "Heather Purple", hex: "#9B6B9B" },
+  { key: "turf", name: "Turf Brown", hex: "#5A4332" },
+  // 🌃 Urban Chaos
+  { key: "taxi", name: "Taxi Yellow", hex: "#FFD500" },
+  { key: "soho", name: "Soho Pink", hex: "#FF4D94" },
+  { key: "neon", name: "Neon Cyan", hex: "#00E5FF" },
+  { key: "metro", name: "Metro Orange", hex: "#FF6B35" },
+  { key: "fashion", name: "Fashion Purple", hex: "#A855F7" },
+  { key: "club", name: "Nightclub Red", hex: "#EF4444" },
 ];
 
 interface MatrixCell {
@@ -1749,36 +1754,35 @@ export default function BrandColors() {
           </div>
         </div>
 
-        {/* Wicklow Philosophy Banner */}
-        <Card className="bg-gradient-to-r from-wicklow-green/10 via-wicklow-cloud/50 to-wicklow-heather/10 border-wicklow-green/30">
+        {/* Color Philosophy Banner */}
+        <Card className="bg-gradient-to-r from-wicklow-meadow/10 via-wicklow-mist/50 to-urban-soho/10 border-wicklow-meadow/30">
           <CardContent className="py-4">
             <div className="flex items-start gap-4">
-              <Sparkles className="h-5 w-5 text-wicklow-sun mt-0.5" />
+              <Sparkles className="h-5 w-5 text-wicklow-butter mt-0.5" />
               <div className="space-y-1">
-                <p className="font-medium">Wicklow Mountains Color Philosophy</p>
+                <p className="font-medium">Pastoral Calm vs. Urban Chaos</p>
                 <p className="text-sm text-muted-foreground">
-                  <strong>Primary:</strong> Green (hills) • Blue (ocean) • Yellow (sun) • White (clouds) • Grey (rain) • Mauve (heather) • Brown (turf)
+                  <strong>🌿 Wicklow Pastoral:</strong> Meadow Green • Atlantic Blue • Butter Yellow • Mist White • Stone Grey • Heather Purple • Turf Brown
                   <br />
-                  <strong>Accents:</strong> Acid Yellow • Hot Pink • Electric Blue • Neon Coral • Vivid Purple — striking modern contrast
+                  <strong>🌃 Urban Chaos:</strong> Taxi Yellow • Soho Pink • Neon Cyan • Metro Orange • Fashion Purple • Nightclub Red — the human craziness Bubbles can't understand
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Primary Wicklow Palette */}
+        {/* 🌿 Wicklow Pastoral Palette */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sun className="h-5 w-5 text-wicklow-sun" />
-            <h2 className="text-xl font-display font-semibold">Primary Palette — Wicklow Mountains</h2>
+            <Sun className="h-5 w-5 text-wicklow-butter" />
+            <h2 className="text-xl font-display font-semibold">🌿 Wicklow Pastoral — The Fields</h2>
           </div>
           <p className="text-muted-foreground text-sm">
-            7 colors derived from the Wicklow landscape: rolling hills, Irish Sea, rare sunshine, clouds, rain, bog heather, and turf
+            Calm, traditional Irish landscape. The rolling hills, the mist, the quiet. Home for Bubbles.
           </p>
           
-          {/* Hardcoded Wicklow Primary Swatches */}
           <div className="grid gap-4 md:grid-cols-7">
-            {Object.entries(WICKLOW_PRIMARY).map(([key, color]) => (
+            {Object.entries(WICKLOW_PASTORAL).map(([key, color]) => (
               <Card key={key} className="overflow-hidden group">
                 <div 
                   className="h-20 w-full transition-transform group-hover:scale-105"
@@ -1793,7 +1797,6 @@ export default function BrandColors() {
             ))}
           </div>
 
-          {/* Database colors if available */}
           {wicklowColors.length > 0 && (
             <div className="grid gap-4 md:grid-cols-5">
               {wicklowColors.map((color) => (
@@ -1803,19 +1806,20 @@ export default function BrandColors() {
           )}
         </section>
 
-        {/* Modern Accent Palette */}
+        {/* 🌃 Urban Chaos Palette */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-accent-modern-hotpink" />
-            <h2 className="text-xl font-display font-semibold">Modern Accent Palette — Striking Contrast</h2>
+            <Sparkles className="h-5 w-5 text-urban-soho" />
+            <h2 className="text-xl font-display font-semibold">🌃 Urban Chaos — The City</h2>
           </div>
-          <p className="text-muted-foreground text-sm">
-            5 electric accents for impact, energy, and modern edge — used sparingly for maximum effect
+          <p className="text-sm text-muted-foreground">
+            London, New York, nightlife, fashion — the human craziness that poor Bubbles can't understand. 
+            Used for escalating modes and moments of confusion.
           </p>
           
-          <div className="grid gap-4 md:grid-cols-5">
-            {Object.entries(MODERN_ACCENTS).map(([key, color]) => (
-              <Card key={key} className="overflow-hidden group">
+          <div className="grid gap-4 md:grid-cols-6">
+            {Object.entries(URBAN_CHAOS).map(([key, color]) => (
+              <Card key={key} className="overflow-hidden group border-2 border-transparent hover:border-foreground/20">
                 <div 
                   className="h-20 w-full transition-transform group-hover:scale-105"
                   style={{ backgroundColor: color.hex }}
@@ -1833,11 +1837,11 @@ export default function BrandColors() {
         {/* Mode Escalation System */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Moon className="h-5 w-5 text-accent-modern-hotpink" />
-            <h2 className="text-xl font-display font-semibold">Mode Escalation System</h2>
+            <Moon className="h-5 w-5 text-urban-soho" />
+            <h2 className="text-xl font-display font-semibold">Mode Escalation — Fields to City</h2>
           </div>
           <p className="text-muted-foreground text-sm">
-            5 escalating states from calm innocence to explosive chaos — using Wicklow tones for low modes, Modern accents for high intensity
+            5 states: starts pastoral and calm, ends in urban chaos. As Bubbles escalates, the city takes over.
           </p>
           
           {/* Mode Escalation Cards */}
