@@ -207,17 +207,39 @@ export function ScenarioPlayer() {
     if (!selectedScenario) return;
     
     const shareUrl = `${window.location.origin}/scenarios?scenario=${selectedScenario.id}`;
+    const shareData = {
+      title: `Bubbles: ${selectedScenario.title}`,
+      text: selectedScenario.description || "Watch Bubbles escalate through this scenario!",
+      url: shareUrl,
+    };
     
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      setIsCopied(true);
-      toast.success("Link copied to clipboard!", {
-        description: `Share "${selectedScenario.title}" with others`,
-      });
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch {
-      // Fallback for browsers that don't support clipboard API
-      toast.error("Unable to copy link");
+      // Use Web Share API if available (mobile devices)
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+        toast.success("Shared successfully!");
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        toast.success("Link copied to clipboard!", {
+          description: `Share "${selectedScenario.title}" with others`,
+        });
+        setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (error) {
+      // User cancelled share or error occurred
+      if ((error as Error).name !== 'AbortError') {
+        // Try clipboard as fallback
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          setIsCopied(true);
+          toast.success("Link copied to clipboard!");
+          setTimeout(() => setIsCopied(false), 2000);
+        } catch {
+          toast.error("Unable to share or copy link");
+        }
+      }
     }
   }, [selectedScenario]);
 
