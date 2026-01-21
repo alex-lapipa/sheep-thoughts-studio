@@ -15,12 +15,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl">🐑</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-bubbles-cream border-2 border-bubbles-heather flex items-center justify-center">
+                <span className="font-display font-bold text-bubbles-peat">B</span>
+              </div>
               <span className="font-display font-bold text-xl">Bubbles</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Cute on the outside. Quietly savage inside the thought bubbles.
+              A sweet, daft sheep from Wicklow. Cute outside, savage inside.
             </p>
           </div>
 
@@ -58,7 +60,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Bubble Sheep. All rights reserved.
+            © {new Date().getFullYear()} Bubbles the Sheep. Born in Wicklow. Raised on the internet.
           </p>
           <div className="flex items-center gap-4">
             {showAdminLink && (
@@ -70,11 +72,11 @@ export function Footer() {
                     : "text-muted-foreground/50 hover:text-muted-foreground"
                 }`}
               >
-                {isSuperAdmin ? "⚡ Super Admin" : "Admin"}
+                {isSuperAdmin ? "Super Admin" : "Admin"}
               </Link>
             )}
             <p className="text-sm text-muted-foreground">
-              Made with 🐑 and questionable life choices
+              Made with wool and questionable life choices
             </p>
           </div>
         </div>
