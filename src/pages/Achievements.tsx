@@ -1,9 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { 
+  BadgeSparkles, 
+  FloatingParticles, 
+  GlowPulse, 
+  triggerBadgeCelebration 
+} from "@/components/BadgeParticles";
 
 // Extended milestone definitions with detailed descriptions
 const ACHIEVEMENT_MILESTONES = [
@@ -83,6 +89,9 @@ export default function Achievements() {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [celebratedMilestones, setCelebratedMilestones] = useState<number[]>([]);
   const [selectedBadge, setSelectedBadge] = useState<typeof ACHIEVEMENT_MILESTONES[0] | null>(null);
+  const [animatedBadges, setAnimatedBadges] = useState<Set<number>>(new Set());
+  const [newlyViewed, setNewlyViewed] = useState<Set<number>>(new Set());
+  const badgeRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
   useEffect(() => {
     // Load streak data
@@ -97,7 +106,40 @@ export default function Achievements() {
     if (stored) {
       setCelebratedMilestones(JSON.parse(stored));
     }
+
+    // Track which badges have been viewed on this page
+    const viewedBadges = localStorage.getItem("bubbles-viewed-badges");
+    if (viewedBadges) {
+      setAnimatedBadges(new Set(JSON.parse(viewedBadges)));
+    }
   }, []);
+
+  // Trigger celebration for newly unlocked badges
+  useEffect(() => {
+    const unlockedDays = ACHIEVEMENT_MILESTONES
+      .filter(m => celebratedMilestones.includes(m.days) || currentStreak >= m.days)
+      .map(m => m.days);
+
+    const newUnlocks = unlockedDays.filter(days => !animatedBadges.has(days));
+    
+    if (newUnlocks.length > 0) {
+      // Stagger celebrations for multiple badges
+      newUnlocks.forEach((days, index) => {
+        setTimeout(() => {
+          const element = badgeRefs.current.get(days);
+          if (element) {
+            triggerBadgeCelebration(element);
+            setNewlyViewed(prev => new Set(prev).add(days));
+          }
+        }, index * 400);
+      });
+
+      // Mark as viewed
+      const updated = new Set([...animatedBadges, ...newUnlocks]);
+      setAnimatedBadges(updated);
+      localStorage.setItem("bubbles-viewed-badges", JSON.stringify([...updated]));
+    }
+  }, [celebratedMilestones, currentStreak, animatedBadges]);
 
   const unlockedCount = ACHIEVEMENT_MILESTONES.filter(
     m => celebratedMilestones.includes(m.days) || currentStreak >= m.days
@@ -105,7 +147,8 @@ export default function Achievements() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-12 max-w-5xl">
+      <FloatingParticles count={15} />
+      <div className="container mx-auto px-4 py-12 max-w-5xl relative">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary mb-4">
@@ -134,8 +177,8 @@ export default function Achievements() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl">
-                <Award className="w-8 h-8 text-white" />
+              <div className="p-4 bg-gradient-to-br from-secondary to-primary rounded-xl">
+                <Award className="w-8 h-8 text-primary-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Badges Earned</p>
@@ -163,25 +206,46 @@ export default function Achievements() {
             return (
               <button
                 key={milestone.days}
-                onClick={() => setSelectedBadge(selectedBadge?.days === milestone.days ? null : milestone)}
+                ref={(el) => {
+                  if (el) badgeRefs.current.set(milestone.days, el);
+                }}
+                onClick={() => {
+                  setSelectedBadge(selectedBadge?.days === milestone.days ? null : milestone);
+                  if (isUnlocked) {
+                    const element = badgeRefs.current.get(milestone.days);
+                    if (element) triggerBadgeCelebration(element);
+                  }
+                }}
                 className={cn(
-                  "relative text-left p-6 rounded-2xl border-2 transition-all duration-300 group",
+                  "relative text-left p-6 rounded-2xl border-2 transition-all duration-300 group overflow-hidden",
                   isUnlocked 
                     ? "bg-card border-primary/50 hover:border-primary shadow-lg hover:shadow-xl" 
                     : isNext
-                      ? "bg-muted/30 border-dashed border-primary/40 hover:border-primary/60"
+                      ? "bg-muted/30 border-dashed border-primary/40 hover:border-primary/60 animate-shimmer"
                       : "bg-muted/20 border-muted-foreground/20 opacity-60 hover:opacity-80",
-                  selectedBadge?.days === milestone.days && "ring-2 ring-primary ring-offset-2"
+                  selectedBadge?.days === milestone.days && "ring-2 ring-primary ring-offset-2",
+                  newlyViewed.has(milestone.days) && "animate-badge-unlock"
                 )}
+                style={{
+                  animationDelay: `${ACHIEVEMENT_MILESTONES.findIndex(m => m.days === milestone.days) * 100}ms`
+                }}
               >
+                {/* Particle effects for unlocked badges */}
+                <BadgeSparkles isActive={isUnlocked} />
+                <GlowPulse color="hsl(var(--primary))" isActive={isUnlocked && selectedBadge?.days === milestone.days} />
+                
                 {/* Badge Header */}
                 <div className="flex items-start gap-4 mb-4">
                   <div className={cn(
-                    "w-16 h-16 rounded-xl flex items-center justify-center text-3xl transition-transform group-hover:scale-110",
+                    "relative w-16 h-16 rounded-xl flex items-center justify-center text-3xl transition-transform duration-300",
                     isUnlocked 
-                      ? `bg-gradient-to-br ${milestone.color} shadow-lg` 
+                      ? `bg-gradient-to-br ${milestone.color} shadow-lg group-hover:scale-110 animate-badge-bounce` 
                       : "bg-muted"
-                  )}>
+                  )}
+                  style={{
+                    animationDelay: isUnlocked ? `${Math.random() * 2}s` : undefined
+                  }}
+                  >
                     {isUnlocked ? milestone.emoji : <Lock className="w-8 h-8 text-muted-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
