@@ -18,6 +18,11 @@ const FAQ = () => {
     { question: t("faq.q10"), answer: t("faq.a10") },
     { question: t("faq.q11"), answer: t("faq.a11") },
     { question: t("faq.q12"), answer: t("faq.a12") },
+    { question: t("faq.q13"), answer: t("faq.a13") },
+    { question: t("faq.q14"), answer: t("faq.a14") },
+    { question: t("faq.q15"), answer: t("faq.a15") },
+    { question: t("faq.q16"), answer: t("faq.a16") },
+    { question: t("faq.q17"), answer: t("faq.a17") },
   ];
 
   return (
