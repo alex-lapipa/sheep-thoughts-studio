@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bubbles_knowledge: {
         Row: {
           category: Database["public"]["Enums"]["bubbles_knowledge_category"]
@@ -179,11 +218,479 @@ export type Database = {
         }
         Relationships: []
       }
+      drops: {
+        Row: {
+          checklist: Json | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          mode_tag: string | null
+          name: string
+          slug: string
+          start_date: string | null
+          tag_value: string
+          updated_at: string
+        }
+        Insert: {
+          checklist?: Json | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          mode_tag?: string | null
+          name: string
+          slug: string
+          start_date?: string | null
+          tag_value: string
+          updated_at?: string
+        }
+        Update: {
+          checklist?: Json | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          mode_tag?: string | null
+          name?: string
+          slug?: string
+          start_date?: string | null
+          tag_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      exceptions_queue: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json | null
+          notes: string | null
+          pod_job_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: number
+          shopify_order_id: string | null
+          shopify_product_id: string | null
+          status: Database["public"]["Enums"]["exception_status"]
+          suggested_action: string | null
+          title: string
+          type: Database["public"]["Enums"]["exception_type"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          pod_job_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: number
+          shopify_order_id?: string | null
+          shopify_product_id?: string | null
+          status?: Database["public"]["Enums"]["exception_status"]
+          suggested_action?: string | null
+          title: string
+          type: Database["public"]["Enums"]["exception_type"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          pod_job_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: number
+          shopify_order_id?: string | null
+          shopify_product_id?: string | null
+          status?: Database["public"]["Enums"]["exception_status"]
+          suggested_action?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["exception_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exceptions_queue_pod_job_id_fkey"
+            columns: ["pod_job_id"]
+            isOneToOne: false
+            referencedRelation: "pod_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pod_jobs: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          last_status_check: string | null
+          metadata: Json | null
+          pod_line_item_id: string | null
+          pod_order_id: string | null
+          pod_provider: Database["public"]["Enums"]["pod_provider_type"]
+          retry_count: number | null
+          shipped_at: string | null
+          shopify_line_item_id: string
+          shopify_order_id: string
+          shopify_order_name: string | null
+          status: Database["public"]["Enums"]["pod_job_status"]
+          tracking_number: string | null
+          tracking_url: string | null
+          updated_at: string
+          variant_mapping_id: string | null
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          last_status_check?: string | null
+          metadata?: Json | null
+          pod_line_item_id?: string | null
+          pod_order_id?: string | null
+          pod_provider: Database["public"]["Enums"]["pod_provider_type"]
+          retry_count?: number | null
+          shipped_at?: string | null
+          shopify_line_item_id: string
+          shopify_order_id: string
+          shopify_order_name?: string | null
+          status?: Database["public"]["Enums"]["pod_job_status"]
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          variant_mapping_id?: string | null
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          last_status_check?: string | null
+          metadata?: Json | null
+          pod_line_item_id?: string | null
+          pod_order_id?: string | null
+          pod_provider?: Database["public"]["Enums"]["pod_provider_type"]
+          retry_count?: number | null
+          shipped_at?: string | null
+          shopify_line_item_id?: string
+          shopify_order_id?: string
+          shopify_order_name?: string | null
+          status?: Database["public"]["Enums"]["pod_job_status"]
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          variant_mapping_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pod_jobs_variant_mapping_id_fkey"
+            columns: ["variant_mapping_id"]
+            isOneToOne: false
+            referencedRelation: "variant_mappings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pod_providers: {
+        Row: {
+          api_key_name: string | null
+          created_at: string
+          id: string
+          last_sync_at: string | null
+          last_sync_status: string | null
+          name: string
+          provider: Database["public"]["Enums"]["pod_provider_type"]
+          settings: Json | null
+          status: Database["public"]["Enums"]["pod_connection_status"]
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key_name?: string | null
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          name: string
+          provider: Database["public"]["Enums"]["pod_provider_type"]
+          settings?: Json | null
+          status?: Database["public"]["Enums"]["pod_connection_status"]
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key_name?: string | null
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          name?: string
+          provider?: Database["public"]["Enums"]["pod_provider_type"]
+          settings?: Json | null
+          status?: Database["public"]["Enums"]["pod_connection_status"]
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      pricing_rules: {
+        Row: {
+          base_cost: number | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          margin_type: string
+          margin_value: number
+          max_price: number | null
+          min_price: number | null
+          name: string
+          pod_provider: Database["public"]["Enums"]["pod_provider_type"] | null
+          priority: number | null
+          product_type: string | null
+          rounding_rule: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_cost?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          margin_type?: string
+          margin_value: number
+          max_price?: number | null
+          min_price?: number | null
+          name: string
+          pod_provider?: Database["public"]["Enums"]["pod_provider_type"] | null
+          priority?: number | null
+          product_type?: string | null
+          rounding_rule?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_cost?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          margin_type?: string
+          margin_value?: number
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          pod_provider?: Database["public"]["Enums"]["pod_provider_type"] | null
+          priority?: number | null
+          product_type?: string | null
+          rounding_rule?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shopify_settings: {
+        Row: {
+          api_version: string
+          created_at: string
+          default_location_id: string | null
+          id: string
+          is_connected: boolean | null
+          last_api_call: string | null
+          last_api_status: string | null
+          oauth_state: string | null
+          scopes: string[] | null
+          store_domain: string
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          api_version?: string
+          created_at?: string
+          default_location_id?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_api_call?: string | null
+          last_api_status?: string | null
+          oauth_state?: string | null
+          scopes?: string[] | null
+          store_domain: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          api_version?: string
+          created_at?: string
+          default_location_id?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_api_call?: string | null
+          last_api_status?: string | null
+          oauth_state?: string | null
+          scopes?: string[] | null
+          store_domain?: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      shopify_webhooks: {
+        Row: {
+          attempts: number | null
+          created_at: string
+          error_message: string | null
+          headers: Json | null
+          id: string
+          idempotency_key: string | null
+          last_attempt_at: string | null
+          payload: Json
+          processed_at: string | null
+          shopify_webhook_id: string | null
+          status: Database["public"]["Enums"]["webhook_status"]
+          topic: string
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          headers?: Json | null
+          id?: string
+          idempotency_key?: string | null
+          last_attempt_at?: string | null
+          payload: Json
+          processed_at?: string | null
+          shopify_webhook_id?: string | null
+          status?: Database["public"]["Enums"]["webhook_status"]
+          topic: string
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          headers?: Json | null
+          id?: string
+          idempotency_key?: string | null
+          last_attempt_at?: string | null
+          payload?: Json
+          processed_at?: string | null
+          shopify_webhook_id?: string | null
+          status?: Database["public"]["Enums"]["webhook_status"]
+          topic?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      variant_mappings: {
+        Row: {
+          created_at: string
+          id: string
+          last_validated_at: string | null
+          pod_product_id: string | null
+          pod_provider: Database["public"]["Enums"]["pod_provider_type"] | null
+          pod_template_id: string | null
+          pod_variant_id: string | null
+          print_files: Json | null
+          shopify_options: Json | null
+          shopify_product_id: string
+          shopify_sku: string | null
+          shopify_title: string | null
+          shopify_variant_id: string
+          status: Database["public"]["Enums"]["mapping_status"]
+          updated_at: string
+          validation_errors: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_validated_at?: string | null
+          pod_product_id?: string | null
+          pod_provider?: Database["public"]["Enums"]["pod_provider_type"] | null
+          pod_template_id?: string | null
+          pod_variant_id?: string | null
+          print_files?: Json | null
+          shopify_options?: Json | null
+          shopify_product_id: string
+          shopify_sku?: string | null
+          shopify_title?: string | null
+          shopify_variant_id: string
+          status?: Database["public"]["Enums"]["mapping_status"]
+          updated_at?: string
+          validation_errors?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_validated_at?: string | null
+          pod_product_id?: string | null
+          pod_provider?: Database["public"]["Enums"]["pod_provider_type"] | null
+          pod_template_id?: string | null
+          pod_variant_id?: string | null
+          print_files?: Json | null
+          shopify_options?: Json | null
+          shopify_product_id?: string
+          shopify_sku?: string | null
+          shopify_title?: string | null
+          shopify_variant_id?: string
+          status?: Database["public"]["Enums"]["mapping_status"]
+          updated_at?: string
+          validation_errors?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       search_bubbles_knowledge: {
         Args: {
           filter_category?: Database["public"]["Enums"]["bubbles_knowledge_category"]
@@ -239,6 +746,33 @@ export type Database = {
         | "triggered"
         | "savage"
         | "nuclear"
+      exception_status: "open" | "in_progress" | "resolved" | "ignored"
+      exception_type:
+        | "address_issue"
+        | "pod_failure"
+        | "unmapped_variant"
+        | "missing_print_file"
+        | "payment_issue"
+        | "inventory_issue"
+        | "other"
+      mapping_status:
+        | "ok"
+        | "missing_file"
+        | "missing_variant"
+        | "mismatch"
+        | "unmapped"
+      pod_connection_status: "connected" | "disconnected" | "error" | "pending"
+      pod_job_status:
+        | "not_sent"
+        | "queued"
+        | "in_production"
+        | "shipped"
+        | "delivered"
+        | "error"
+        | "cancelled"
+      pod_provider_type: "printful" | "printify" | "gelato"
+      user_role: "admin" | "ops" | "merch" | "readonly"
+      webhook_status: "pending" | "processed" | "failed" | "retrying"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -381,6 +915,36 @@ export const Constants = {
         "research",
       ],
       bubbles_mode: ["innocent", "concerned", "triggered", "savage", "nuclear"],
+      exception_status: ["open", "in_progress", "resolved", "ignored"],
+      exception_type: [
+        "address_issue",
+        "pod_failure",
+        "unmapped_variant",
+        "missing_print_file",
+        "payment_issue",
+        "inventory_issue",
+        "other",
+      ],
+      mapping_status: [
+        "ok",
+        "missing_file",
+        "missing_variant",
+        "mismatch",
+        "unmapped",
+      ],
+      pod_connection_status: ["connected", "disconnected", "error", "pending"],
+      pod_job_status: [
+        "not_sent",
+        "queued",
+        "in_production",
+        "shipped",
+        "delivered",
+        "error",
+        "cancelled",
+      ],
+      pod_provider_type: ["printful", "printify", "gelato"],
+      user_role: ["admin", "ops", "merch", "readonly"],
+      webhook_status: ["pending", "processed", "failed", "retrying"],
     },
   },
 } as const
