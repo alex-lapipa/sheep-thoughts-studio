@@ -1,21 +1,25 @@
 import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
+import { LanguageToggle } from "./LanguageToggle";
 import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/facts", label: "Facts" },
-  { href: "/collections/all", label: "Shop" },
-  { href: "/about", label: "My Story" },
-  { href: "/faq", label: "Questions" },
+const getNavLinks = (t: (key: string) => string) => [
+  { href: "/", label: t("nav.home") },
+  { href: "/facts", label: t("nav.facts") },
+  { href: "/collections/all", label: t("nav.shop") },
+  { href: "/about", label: t("nav.story") },
+  { href: "/faq", label: t("nav.questions") },
 ];
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useLanguage();
+  const navLinks = getNavLinks(t);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -41,6 +45,7 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <Link to="/search">
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
@@ -56,7 +61,10 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[280px]">
-              <nav className="flex flex-col gap-4 mt-8">
+              <div className="mt-4 mb-6">
+                <LanguageToggle />
+              </div>
+              <nav className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link 
                     key={link.href} 
