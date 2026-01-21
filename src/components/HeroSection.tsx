@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
@@ -16,9 +16,15 @@ interface ThoughtData {
 
 const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
 
+// Timing constants for smooth reading experience
+const FADE_DURATION = 600; // ms for fade in/out
+const DISPLAY_DURATION = 6000; // ms to display thought (increased for reading)
+const PAUSE_BETWEEN = 800; // ms pause between thoughts
+
 export function HeroSection() {
   const [currentThought, setCurrentThought] = useState<ThoughtData | null>(null);
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
+  const [isVisible, setIsVisible] = useState(true);
   const [bubbleKey, setBubbleKey] = useState(0);
 
   // Fetch thoughts from database on mount
@@ -46,18 +52,42 @@ export function HeroSection() {
     fetchThoughts();
   }, []);
 
-  // Rotate thoughts every 4 seconds
+  // Get next random thought (avoiding repeat)
+  const getNextThought = useCallback(() => {
+    if (thoughts.length <= 1) return thoughts[0];
+    let next = thoughts[Math.floor(Math.random() * thoughts.length)];
+    while (next?.id === currentThought?.id && thoughts.length > 1) {
+      next = thoughts[Math.floor(Math.random() * thoughts.length)];
+    }
+    return next;
+  }, [thoughts, currentThought]);
+
+  // Smooth rotation: fade out → pause → change thought → fade in
   useEffect(() => {
     if (thoughts.length === 0) return;
 
-    const interval = setInterval(() => {
-      const randomThought = thoughts[Math.floor(Math.random() * thoughts.length)];
-      setCurrentThought(randomThought);
-      setBubbleKey(prev => prev + 1);
-    }, 4000);
+    const cycle = () => {
+      // Step 1: Fade out
+      setIsVisible(false);
+      
+      // Step 2: After fade out, pause, then change thought
+      setTimeout(() => {
+        const nextThought = getNextThought();
+        setCurrentThought(nextThought);
+        setBubbleKey(prev => prev + 1);
+        
+        // Step 3: After pause, fade in
+        setTimeout(() => {
+          setIsVisible(true);
+        }, PAUSE_BETWEEN);
+      }, FADE_DURATION);
+    };
+
+    // Start the cycle after display duration
+    const interval = setInterval(cycle, DISPLAY_DURATION + FADE_DURATION + PAUSE_BETWEEN);
 
     return () => clearInterval(interval);
-  }, [thoughts]);
+  }, [thoughts, getNextThought]);
 
   return (
     <section className="hero-gradient py-20 md:py-32 overflow-hidden">
@@ -114,11 +144,16 @@ export function HeroSection() {
               <div className="absolute -bottom-2 -left-4 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
             </div>
             
-            {/* Thought Bubble */}
+            {/* Thought Bubble with smooth transitions */}
             {currentThought && (
               <div 
                 key={bubbleKey} 
-                className="absolute -top-4 right-0 md:right-8 max-w-[260px]"
+                className="absolute -top-4 right-0 md:right-8 max-w-[260px] transition-all ease-in-out"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
+                  transitionDuration: `${FADE_DURATION}ms`,
+                }}
               >
                 <ThoughtBubble mode={currentThought.mode as any} size="md">
                   <p className="text-foreground italic">"{currentThought.text}"</p>
