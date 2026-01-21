@@ -1297,42 +1297,84 @@ function ThoughtBubblePreviewGenerator() {
 }
 
 // All brand colors for matrix - Pastoral + Urban Chaos
-const ALL_BRAND_COLORS = [
+// Fallback colors for matrix when no database colors available
+const FALLBACK_BRAND_COLORS = [
   // 🌿 Wicklow Pastoral
-  { key: "meadow", name: "Meadow Green", hex: "#4A9B6A" },
-  { key: "atlantic", name: "Atlantic Blue", hex: "#4A8DBD" },
-  { key: "butter", name: "Butter Yellow", hex: "#E5C76B" },
-  { key: "mist", name: "Mist White", hex: "#F5F7FA" },
-  { key: "stone", name: "Stone Grey", hex: "#7A8899" },
-  { key: "heather", name: "Heather Purple", hex: "#9B6B9B" },
-  { key: "turf", name: "Turf Brown", hex: "#5A4332" },
+  { key: "meadow", name: "Meadow Green", hex: "#4A9B6A", category: "wicklow" },
+  { key: "atlantic", name: "Atlantic Blue", hex: "#4A8DBD", category: "wicklow" },
+  { key: "butter", name: "Butter Yellow", hex: "#E5C76B", category: "wicklow" },
+  { key: "mist", name: "Mist White", hex: "#F5F7FA", category: "wicklow" },
+  { key: "stone", name: "Stone Grey", hex: "#7A8899", category: "wicklow" },
+  { key: "heather", name: "Heather Purple", hex: "#9B6B9B", category: "wicklow" },
+  { key: "turf", name: "Turf Brown", hex: "#5A4332", category: "wicklow" },
   // 🌃 Urban Chaos
-  { key: "taxi", name: "Taxi Yellow", hex: "#FFD500" },
-  { key: "soho", name: "Soho Pink", hex: "#FF4D94" },
-  { key: "neon", name: "Neon Cyan", hex: "#00E5FF" },
-  { key: "metro", name: "Metro Orange", hex: "#FF6B35" },
-  { key: "fashion", name: "Fashion Purple", hex: "#A855F7" },
-  { key: "club", name: "Nightclub Red", hex: "#EF4444" },
+  { key: "taxi", name: "Taxi Yellow", hex: "#FFD500", category: "urban" },
+  { key: "soho", name: "Soho Pink", hex: "#FF4D94", category: "urban" },
+  { key: "neon", name: "Neon Cyan", hex: "#00E5FF", category: "urban" },
+  { key: "metro", name: "Metro Orange", hex: "#FF6B35", category: "urban" },
+  { key: "fashion", name: "Fashion Purple", hex: "#A855F7", category: "urban" },
+  { key: "club", name: "Nightclub Red", hex: "#EF4444", category: "urban" },
 ];
 
+interface MatrixColor {
+  key: string;
+  name: string;
+  hex: string;
+  category?: string;
+}
+
 interface MatrixCell {
-  fg: typeof ALL_BRAND_COLORS[0];
-  bg: typeof ALL_BRAND_COLORS[0];
+  fg: MatrixColor;
+  bg: MatrixColor;
   ratio: number;
   normalAA: boolean;
   largeAA: boolean;
   normalAAA: boolean;
 }
 
-function AccessibilityMatrix() {
+interface AccessibilityMatrixProps {
+  colors?: BrandAsset[];
+}
+
+function AccessibilityMatrix({ colors }: AccessibilityMatrixProps) {
   const [showDetails, setShowDetails] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+
+  // Convert database colors to matrix format, or use fallbacks
+  const allColors = useMemo((): MatrixColor[] => {
+    if (!colors || colors.length === 0) {
+      return FALLBACK_BRAND_COLORS;
+    }
+    
+    return colors.map(c => {
+      const val = c.asset_value as { hex?: string; category?: string };
+      return {
+        key: c.asset_key,
+        name: c.asset_name,
+        hex: val.hex || "#000000",
+        category: val.category,
+      };
+    });
+  }, [colors]);
+
+  // Get unique categories for filtering
+  const categories = useMemo(() => {
+    const cats = new Set(allColors.map(c => c.category).filter(Boolean));
+    return ["all", ...Array.from(cats)] as string[];
+  }, [allColors]);
+
+  // Filter colors by category
+  const filteredColors = useMemo(() => {
+    if (categoryFilter === "all") return allColors;
+    return allColors.filter(c => c.category === categoryFilter);
+  }, [allColors, categoryFilter]);
 
   const matrix = useMemo(() => {
     const cells: MatrixCell[][] = [];
     
-    ALL_BRAND_COLORS.forEach((fg) => {
+    filteredColors.forEach((fg) => {
       const row: MatrixCell[] = [];
-      ALL_BRAND_COLORS.forEach((bg) => {
+      filteredColors.forEach((bg) => {
         const ratio = getContrastRatio(fg.hex, bg.hex);
         row.push({
           fg,
@@ -1347,7 +1389,7 @@ function AccessibilityMatrix() {
     });
     
     return cells;
-  }, []);
+  }, [filteredColors]);
 
   const getStatusColor = (cell: MatrixCell) => {
     if (cell.fg.key === cell.bg.key) return "bg-muted";
@@ -1370,7 +1412,7 @@ function AccessibilityMatrix() {
     let aaaPass = 0;
     let largeOnly = 0;
     let fail = 0;
-    const total = ALL_BRAND_COLORS.length * ALL_BRAND_COLORS.length - ALL_BRAND_COLORS.length;
+    const total = filteredColors.length * filteredColors.length - filteredColors.length;
 
     matrix.forEach((row) => {
       row.forEach((cell) => {
@@ -1383,7 +1425,7 @@ function AccessibilityMatrix() {
     });
 
     return { aaPass, aaaPass, largeOnly, fail, total };
-  }, [matrix]);
+  }, [matrix, filteredColors.length]);
 
   return (
     <Card>
@@ -1391,12 +1433,35 @@ function AccessibilityMatrix() {
         <CardTitle className="text-lg flex items-center gap-2">
           <Grid3X3 className="h-5 w-5" />
           Color Accessibility Matrix
+          {colors && colors.length > 0 && (
+            <Badge variant="secondary" className="text-xs ml-2">
+              {filteredColors.length} colors from database
+            </Badge>
+          )}
         </CardTitle>
         <CardDescription>
           WCAG contrast compliance for all brand color pair combinations
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Category Filter */}
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">Filter by category:</span>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                variant={categoryFilter === cat ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCategoryFilter(cat)}
+                className="capitalize"
+              >
+                {cat === "all" ? "All Colors" : cat}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {/* Legend */}
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
@@ -1420,7 +1485,7 @@ function AccessibilityMatrix() {
         {/* Stats Summary */}
         <div className="grid grid-cols-4 gap-3">
           <div className="p-3 bg-accent/40 rounded-lg text-center">
-            <p className="text-2xl font-bold">{stats.aaaPass + stats.aaPass}</p>
+            <p className="text-2xl font-bold">{stats.aaPass + stats.aaaPass}</p>
             <p className="text-xs text-muted-foreground">AA+ Pass</p>
           </div>
           <div className="p-3 bg-accent/60 rounded-lg text-center">
@@ -1454,11 +1519,11 @@ function AccessibilityMatrix() {
               <div className="w-24 h-10 flex items-center justify-center text-xs font-medium text-muted-foreground">
                 FG → BG
               </div>
-              {ALL_BRAND_COLORS.map((color) => (
+              {filteredColors.map((color) => (
                 <div
                   key={color.key}
                   className="flex-1 h-10 flex items-center justify-center"
-                  title={color.name}
+                  title={`${color.name} (${color.category})`}
                 >
                   <div
                     className="w-6 h-6 rounded border"
@@ -1470,14 +1535,14 @@ function AccessibilityMatrix() {
 
             {/* Matrix rows */}
             {matrix.map((row, rowIndex) => (
-              <div key={ALL_BRAND_COLORS[rowIndex].key} className="flex">
+              <div key={filteredColors[rowIndex].key} className="flex">
                 {/* Row header */}
                 <div className="w-24 h-10 flex items-center gap-2 px-2">
                   <div
                     className="w-5 h-5 rounded border flex-shrink-0"
-                    style={{ backgroundColor: ALL_BRAND_COLORS[rowIndex].hex }}
+                    style={{ backgroundColor: filteredColors[rowIndex].hex }}
                   />
-                  <span className="text-xs truncate">{ALL_BRAND_COLORS[rowIndex].name}</span>
+                  <span className="text-xs truncate">{filteredColors[rowIndex].name}</span>
                 </div>
 
                 {/* Cells */}
@@ -1990,7 +2055,7 @@ export default function BrandColors() {
         {colors && colors.length > 0 && <ContrastChecker colors={colors} />}
 
         {/* Accessibility Matrix */}
-        <AccessibilityMatrix />
+        <AccessibilityMatrix colors={colors} />
 
         {/* WCAG Contrast Guide */}
         <Card>
