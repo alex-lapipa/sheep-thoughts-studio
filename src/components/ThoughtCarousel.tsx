@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 import { cn } from "@/lib/utils";
+import { Play, Pause } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 
@@ -105,6 +107,10 @@ export function ThoughtCarousel() {
     setIsAutoPlaying(true);
   }, []);
 
+  const toggleAutoPlay = useCallback(() => {
+    setIsAutoPlaying(prev => !prev);
+  }, []);
+
   if (thoughts.length === 0) {
     return (
       <div className="w-full max-w-3xl mx-auto">
@@ -165,24 +171,42 @@ export function ThoughtCarousel() {
         <CarouselNext className="hidden sm:flex" />
       </Carousel>
 
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-1.5 mt-4">
-        {thoughts.slice(0, 6).map((_, index) => (
-          <button
-            key={index}
-            onClick={() => api?.scrollTo(index)}
-            className={cn(
-              "w-2 h-2 rounded-full transition-all duration-300",
-              current === index 
-                ? "bg-primary w-4" 
-                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-            )}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-        {thoughts.length > 6 && (
-          <span className="text-xs text-muted-foreground ml-1">+{thoughts.length - 6}</span>
-        )}
+      {/* Controls row */}
+      <div className="flex items-center justify-center gap-4 mt-4">
+        {/* Play/Pause button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleAutoPlay}
+          className="h-8 w-8 rounded-full hover:bg-primary/10"
+          aria-label={isAutoPlaying ? "Pause autoplay" : "Play autoplay"}
+        >
+          {isAutoPlaying ? (
+            <Pause className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Play className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
+
+        {/* Dot indicators */}
+        <div className="flex gap-1.5">
+          {thoughts.slice(0, 6).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={cn(
+                "w-2 h-2 rounded-full transition-all duration-300",
+                current === index 
+                  ? "bg-primary w-4" 
+                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              )}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+          {thoughts.length > 6 && (
+            <span className="text-xs text-muted-foreground ml-1">+{thoughts.length - 6}</span>
+          )}
+        </div>
       </div>
     </div>
   );
