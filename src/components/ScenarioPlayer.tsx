@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useShare } from "@/hooks/useShare";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -91,7 +91,7 @@ export function ScenarioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const { share, isCopied } = useShare();
 
   // Fetch scenarios from database
   useEffect(() => {
@@ -203,45 +203,17 @@ export function ScenarioPlayer() {
     }, 200);
   }, [scenarios, selectedScenario]);
 
-  const handleShare = useCallback(async () => {
+  const handleShare = useCallback(() => {
     if (!selectedScenario) return;
     
     const shareUrl = `${window.location.origin}/scenarios?scenario=${selectedScenario.id}`;
-    const shareData = {
+    
+    share({
       title: `Bubbles: ${selectedScenario.title}`,
       text: selectedScenario.description || "Watch Bubbles escalate through this scenario!",
       url: shareUrl,
-    };
-    
-    try {
-      // Use Web Share API if available (mobile devices)
-      if (navigator.share && navigator.canShare?.(shareData)) {
-        await navigator.share(shareData);
-        toast.success("Shared successfully!");
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(shareUrl);
-        setIsCopied(true);
-        toast.success("Link copied to clipboard!", {
-          description: `Share "${selectedScenario.title}" with others`,
-        });
-        setTimeout(() => setIsCopied(false), 2000);
-      }
-    } catch (error) {
-      // User cancelled share or error occurred
-      if ((error as Error).name !== 'AbortError') {
-        // Try clipboard as fallback
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          setIsCopied(true);
-          toast.success("Link copied to clipboard!");
-          setTimeout(() => setIsCopied(false), 2000);
-        } catch {
-          toast.error("Unable to share or copy link");
-        }
-      }
-    }
-  }, [selectedScenario]);
+    });
+  }, [selectedScenario, share]);
 
   const currentBeat = selectedScenario?.beats[currentBeatIndex];
   const currentMode = currentBeat?.mode || "innocent";
