@@ -52,9 +52,17 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Bubble Sheep. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Made with 🐑 and questionable life choices
-          </p>
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/admin" 
+              className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+            >
+              Admin
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              Made with 🐑 and questionable life choices
+            </p>
+          </div>
         </div>
       </div>
     </footer>
