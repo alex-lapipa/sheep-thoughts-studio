@@ -2,7 +2,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Shapes, Circle, Triangle, Eye, Cloud, Smile, Frown, Angry, Zap, Skull } from "lucide-react";
+import { Shapes, Circle, Triangle, Eye, Cloud } from "lucide-react";
 
 interface CharacterRuleCardProps {
   asset: BrandAsset;
@@ -36,8 +36,6 @@ function CharacterRuleCard({ asset }: CharacterRuleCardProps) {
 const modeVisuals = [
   {
     mode: "innocent",
-    icon: Smile,
-    emoji: "🐑",
     eyes: "Large, round",
     wool: "Cloud-like, fluffy",
     posture: "Bouncy, relaxed",
@@ -46,8 +44,6 @@ const modeVisuals = [
   },
   {
     mode: "concerned",
-    icon: Frown,
-    emoji: "😟",
     eyes: "Slightly narrowed",
     wool: "Slightly disheveled",
     posture: "Tense, alert",
@@ -56,8 +52,6 @@ const modeVisuals = [
   },
   {
     mode: "triggered",
-    icon: Angry,
-    emoji: "😤",
     eyes: "Narrow with corners",
     wool: "Spiky tufts emerging",
     posture: "Leaning forward",
@@ -66,8 +60,6 @@ const modeVisuals = [
   },
   {
     mode: "savage",
-    icon: Zap,
-    emoji: "🔥",
     eyes: "Sharp corners, narrow",
     wool: "Definitely spiky",
     posture: "Predatory stance",
@@ -76,8 +68,6 @@ const modeVisuals = [
   },
   {
     mode: "nuclear",
-    icon: Skull,
-    emoji: "💥",
     eyes: "Intense slits",
     wool: "Explosive, chaotic",
     posture: "Maximum intensity",
@@ -185,7 +175,6 @@ export default function BrandCharacter() {
                     <tr key={mode.mode} className="border-b last:border-0">
                       <td className="py-3 px-2">
                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${mode.color}`}>
-                          <span className="text-lg">{mode.emoji}</span>
                           <span className="font-medium capitalize">{mode.mode}</span>
                         </div>
                       </td>
@@ -231,7 +220,6 @@ export default function BrandCharacter() {
               <div className="px-6 py-3 bg-bubbles-cream rounded-2xl border border-bubbles-gold/30 font-display">
                 "Did I say that out loud?"
               </div>
-              <span className="text-3xl">🐑</span>
             </div>
           </CardContent>
         </Card>
