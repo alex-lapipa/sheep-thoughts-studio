@@ -2,7 +2,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useBrandAssets } from "@/hooks/useBrandAssets";
-import { Palette, Type, Shapes, Factory, BookOpen, ExternalLink } from "lucide-react";
+import { Palette, Type, Shapes, Factory, BookOpen, ExternalLink, Layout, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const brandSections = [
@@ -26,6 +26,13 @@ const brandSections = [
     icon: Shapes,
     href: "/admin/brand/character",
     badge: "Identity",
+  },
+  {
+    title: "Frontend Reference",
+    description: "Site pages, components, and implementation",
+    icon: Layout,
+    href: "/admin/brand/frontend",
+    badge: "Implementation",
   },
   {
     title: "Production Specs",
@@ -116,6 +123,7 @@ export default function BrandOverview() {
                       {section.title === "Typography" && `${typographyCount} type styles`}
                       {section.title === "Character Grammar" && `${characterCount} shape rules`}
                       {section.title === "Production Specs" && `${productionCount} specifications`}
+                      {section.title === "Frontend Reference" && "6 pages • 5 components"}
                     </span>
                     <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-bubbles-heather transition-colors" />
                   </div>
