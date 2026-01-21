@@ -8,11 +8,37 @@
     <meta name="description" content="Bubbles the Sheep - Global Thought Leader, Confidently Wrong About Everything">
     <meta name="author" content="Bubbles" />
 
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) with GDPR-compliant default consent -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0K6Z2T9CP0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      
+      // Default consent mode - denied until user accepts
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+      });
+      
+      // Check if user has already consented
+      (function() {
+        var consent = localStorage.getItem('bubbles-cookie-consent');
+        var prefs = localStorage.getItem('bubbles-cookie-preferences');
+        if (consent && prefs) {
+          try {
+            var p = JSON.parse(prefs);
+            gtag('consent', 'update', {
+              'analytics_storage': p.analytics ? 'granted' : 'denied',
+              'ad_storage': p.marketing ? 'granted' : 'denied',
+              'ad_user_data': p.marketing ? 'granted' : 'denied',
+              'ad_personalization': p.marketing ? 'granted' : 'denied'
+            });
+          } catch(e) {}
+        }
+      })();
+      
       gtag('js', new Date());
       gtag('config', 'G-0K6Z2T9CP0');
     </script>
