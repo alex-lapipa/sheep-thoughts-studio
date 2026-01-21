@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useShare } from "@/hooks/useShare";
 import confetti from "canvas-confetti";
+import { StreakBadges } from "@/components/StreakBadges";
 
 // Milestone definitions
 const STREAK_MILESTONES = [
@@ -397,7 +398,7 @@ const FAQ = () => {
               </p>
               
               {/* Streak and Stats */}
-              <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/20 rounded-full">
                   <Flame className={cn("w-4 h-4", wisdomStreak > 0 ? "text-accent" : "text-muted-foreground")} />
                   <span className="text-sm font-bold text-accent">{wisdomStreak}</span>
@@ -406,6 +407,11 @@ const FAQ = () => {
                 <div className="text-xs text-muted-foreground">
                   {totalWisdoms} total wisdom{totalWisdoms !== 1 ? 's' : ''} viewed
                 </div>
+              </div>
+              
+              {/* Badge Collection */}
+              <div className="w-full mb-4 p-4 bg-card/50 rounded-xl border">
+                <StreakBadges currentStreak={wisdomStreak} />
               </div>
               
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 font-mono">
