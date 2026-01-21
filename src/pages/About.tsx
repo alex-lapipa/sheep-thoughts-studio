@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { BubblesExplains } from "@/components/BubblesExplains";
+import { AskBubbles } from "@/components/AskBubbles";
 
 const About = () => {
 
@@ -172,6 +173,21 @@ const About = () => {
               Answers to questions nobody asked, delivered with complete certainty.
             </p>
             <BubblesExplains />
+          </div>
+        </div>
+      </section>
+
+      {/* Ask Bubbles - AI Q&A */}
+      <section className="py-16 md:py-24 bg-bubbles-cream/20">
+        <div className="container">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+              Ask Bubbles Anything
+            </h2>
+            <p className="text-center text-muted-foreground mb-10">
+              Got a question? Bubbles has an answer. It will be wrong, but it will be confident.
+            </p>
+            <AskBubbles />
           </div>
         </div>
       </section>
