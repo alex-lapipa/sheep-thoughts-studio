@@ -148,13 +148,13 @@ export default function BrandTypography() {
               {displayInnocent && (
                 <TypographyCard 
                   asset={displayInnocent} 
-                  preview="Bubbles says hi! 🐑" 
+                  preview="Bubbles says hi!" 
                 />
               )}
               {displaySavage && (
                 <TypographyCard 
                   asset={displaySavage} 
-                  preview="Did I stutter? 🔥" 
+                  preview="Did I stutter?" 
                 />
               )}
             </div>

@@ -136,23 +136,18 @@ export default function BrandOverview() {
           <CardContent>
             <div className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-mode-innocent/30 border border-mode-innocent">
-                <span className="text-2xl">🐑</span>
                 <span className="font-medium">Innocent</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-mode-concerned/30 border border-mode-concerned">
-                <span className="text-2xl">😟</span>
                 <span className="font-medium">Concerned</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-mode-triggered/30 border border-mode-triggered">
-                <span className="text-2xl">😤</span>
                 <span className="font-medium">Triggered</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-mode-savage/30 border border-mode-savage">
-                <span className="text-2xl">🔥</span>
                 <span className="font-medium">Savage</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-mode-nuclear/30 border border-mode-nuclear text-foreground">
-                <span className="text-2xl">💥</span>
                 <span className="font-medium">Nuclear</span>
               </div>
             </div>
