@@ -10,6 +10,7 @@ import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
 import { ThoughtCarousel } from "@/components/ThoughtCarousel";
+import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -231,7 +232,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Scenario Player - Live Escalation Demo */}
+      {/* Bubbles Says - Quote Widget */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background via-secondary/20 to-background relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
@@ -240,26 +241,14 @@ export default function Index() {
         <div className="container relative z-10">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              Watch My Brain Work
+              Bubbles Says
             </h2>
             <p className="text-muted-foreground">
-              See how I process information from innocent curiosity to nuclear certainty. 
-              This is normal. This is research.
+              Wisdom from the fields of Wicklow. All facts independently verified by me.
             </p>
           </div>
           
-          <div className="max-w-2xl mx-auto">
-            <StorefrontScenarioPlayer autoPlay={true} showTitle={true} />
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link to="/scenarios">
-              <Button variant="outline" className="font-display">
-                Explore All Scenarios
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+          <BubblesSaysWidget />
         </div>
       </section>
 
