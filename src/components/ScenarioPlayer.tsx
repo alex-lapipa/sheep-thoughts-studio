@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check, ChevronLeft, ChevronRight, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -92,6 +92,7 @@ export function ScenarioPlayer() {
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [playbackSpeed, setPlaybackSpeed] = useState(4000); // 2s, 4s, 6s options
   const { share, isCopied } = useShare();
   
   // Touch/swipe handling refs
@@ -143,10 +144,10 @@ export function ScenarioPlayer() {
       } else {
         setIsPlaying(false);
       }
-    }, 4000);
+    }, playbackSpeed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, currentBeatIndex, selectedScenario]);
+  }, [isPlaying, currentBeatIndex, selectedScenario, playbackSpeed]);
 
   const handleSelectScenario = (id: string) => {
     const scenario = scenarios.find((s) => s.id === id);
@@ -610,10 +611,38 @@ export function ScenarioPlayer() {
           </Button>
         </div>
 
-        {/* Beat Counter */}
-        <p className="text-center text-sm text-muted-foreground font-display">
-          Beat {currentBeatIndex + 1} of {selectedScenario.beats.length}
-        </p>
+        {/* Speed Control & Beat Counter */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Speed Control */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Gauge className="w-3.5 h-3.5" />
+            <div className="flex gap-1">
+              {[
+                { label: "2s", value: 2000 },
+                { label: "4s", value: 4000 },
+                { label: "6s", value: 6000 },
+              ].map((speed) => (
+                <button
+                  key={speed.value}
+                  onClick={() => setPlaybackSpeed(speed.value)}
+                  className={cn(
+                    "px-2 py-0.5 rounded-full transition-all text-xs font-medium",
+                    playbackSpeed === speed.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  {speed.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Beat Counter */}
+          <p className="text-sm text-muted-foreground font-display">
+            Beat {currentBeatIndex + 1} of {selectedScenario.beats.length}
+          </p>
+        </div>
 
         {/* Mobile Swipe Hint */}
         {showSwipeHint && selectedScenario.beats.length > 1 && (
