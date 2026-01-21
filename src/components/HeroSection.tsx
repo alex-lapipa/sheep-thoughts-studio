@@ -32,7 +32,9 @@ export function HeroSection() {
   const [isPaused, setIsPaused] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isLoopForever, setIsLoopForever] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<0.5 | 1 | 2>(1);
 
+  const SPEED_OPTIONS = [0.5, 1, 2] as const;
   // Show hint tooltip on first visit
   useEffect(() => {
     const hasSeenHint = localStorage.getItem('bubbles-hint-seen');
@@ -106,7 +108,10 @@ export function HeroSection() {
   useEffect(() => {
     if (thoughts.length === 0 || (isPaused && !isLoopForever)) return;
 
-    const displayTime = isLoopForever ? DISPLAY_DURATION_AMBIENT : DISPLAY_DURATION;
+    const baseDisplayTime = isLoopForever ? DISPLAY_DURATION_AMBIENT : DISPLAY_DURATION;
+    const displayTime = baseDisplayTime / playbackSpeed;
+    const fadeTime = FADE_DURATION / playbackSpeed;
+    const pauseTime = PAUSE_BETWEEN / playbackSpeed;
 
     const cycle = () => {
       // Step 1: Fade out
@@ -121,15 +126,15 @@ export function HeroSection() {
         // Step 3: After pause, fade in
         setTimeout(() => {
           setIsVisible(true);
-        }, PAUSE_BETWEEN);
-      }, FADE_DURATION);
+        }, pauseTime);
+      }, fadeTime);
     };
 
     // Start the cycle after display duration
-    const interval = setInterval(cycle, displayTime + FADE_DURATION + PAUSE_BETWEEN);
+    const interval = setInterval(cycle, displayTime + fadeTime + pauseTime);
 
     return () => clearInterval(interval);
-  }, [thoughts, getNextThought, isPaused, isLoopForever]);
+  }, [thoughts, getNextThought, isPaused, isLoopForever, playbackSpeed]);
 
   return (
     <section className="hero-gradient py-20 md:py-32 overflow-hidden">
@@ -234,7 +239,7 @@ export function HeroSection() {
                     <div 
                       className="absolute inset-y-0 left-0 bg-primary/60 rounded-full"
                       style={{
-                        animation: (isPaused && !isLoopForever) ? 'none' : `progress ${isLoopForever ? DISPLAY_DURATION_AMBIENT : DISPLAY_DURATION}ms linear`,
+                        animation: (isPaused && !isLoopForever) ? 'none' : `progress ${(isLoopForever ? DISPLAY_DURATION_AMBIENT : DISPLAY_DURATION) / playbackSpeed}ms linear`,
                         animationFillMode: 'forwards',
                       }}
                     />
@@ -249,21 +254,41 @@ export function HeroSection() {
               </div>
             )}
             
-            {/* Loop Forever toggle */}
-            <div className="absolute -bottom-12 right-0 md:right-8 flex items-center gap-2">
-              <label 
-                htmlFor="loop-forever" 
-                className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1.5"
-              >
-                <Repeat className="h-3 w-3" />
-                Ambient
-              </label>
-              <Switch
-                id="loop-forever"
-                checked={isLoopForever}
-                onCheckedChange={setIsLoopForever}
-                className="scale-75"
-              />
+            {/* Playback controls */}
+            <div className="absolute -bottom-12 right-0 md:right-8 flex items-center gap-4">
+              {/* Speed controls */}
+              <div className="flex items-center gap-1">
+                {SPEED_OPTIONS.map((speed) => (
+                  <button
+                    key={speed}
+                    onClick={() => setPlaybackSpeed(speed)}
+                    className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                      playbackSpeed === speed 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    {speed}x
+                  </button>
+                ))}
+              </div>
+              
+              {/* Ambient toggle */}
+              <div className="flex items-center gap-1.5">
+                <label 
+                  htmlFor="loop-forever" 
+                  className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1"
+                >
+                  <Repeat className="h-3 w-3" />
+                  Ambient
+                </label>
+                <Switch
+                  id="loop-forever"
+                  checked={isLoopForever}
+                  onCheckedChange={setIsLoopForever}
+                  className="scale-75"
+                />
+              </div>
             </div>
           </div>
         </div>
