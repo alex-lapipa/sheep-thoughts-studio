@@ -64,6 +64,24 @@ export function HeroSection() {
     return next;
   }, [thoughts, currentThought]);
 
+  // Skip to next thought with animation
+  const skipToNext = useCallback(() => {
+    if (thoughts.length === 0) return;
+    
+    // Fade out quickly
+    setIsVisible(false);
+    
+    setTimeout(() => {
+      const nextThought = getNextThought();
+      setCurrentThought(nextThought);
+      setBubbleKey(prev => prev + 1);
+      
+      setTimeout(() => {
+        setIsVisible(true);
+      }, PAUSE_BETWEEN / 2); // Faster transition on click
+    }, FADE_DURATION / 2); // Faster fade on click
+  }, [thoughts, getNextThought]);
+
   // Smooth rotation: fade out → pause → change thought → fade in
   // Pauses when user hovers over the thought bubble
   useEffect(() => {
@@ -156,11 +174,13 @@ export function HeroSection() {
                   transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
                   transitionDuration: `${FADE_DURATION}ms`,
                 }}
+                onClick={skipToNext}
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
+                title="Click to skip to next thought"
               >
                 <ThoughtBubble mode={currentThought.mode as any} size="md">
-                  <p className="text-foreground italic">"{currentThought.text}"</p>
+                  <p className="text-foreground italic group-hover:opacity-80 transition-opacity">"{currentThought.text}"</p>
                 </ThoughtBubble>
                 {/* Progress indicator */}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
