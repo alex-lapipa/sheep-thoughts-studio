@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -501,7 +501,7 @@ const FAQ = () => {
           </div>
 
           {/* Ask Bubbles Anything */}
-          <div className="mb-10 p-6 bg-gradient-to-br from-primary/20 to-accent/10 rounded-2xl border border-primary/30">
+          <div id="ask-bubbles-section" className="mb-10 p-6 bg-gradient-to-br from-primary/20 to-accent/10 rounded-2xl border border-primary/30">
             <div className="flex flex-col items-center text-center">
               <MessageCircleQuestion className="w-8 h-8 text-primary mb-3" />
               <h3 className="font-display font-bold text-xl mb-2">Ask Bubbles Anything</h3>
@@ -646,14 +646,31 @@ const FAQ = () => {
                         <p className="font-display font-semibold text-sm text-foreground">
                           "{item.question}"
                         </p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-destructive shrink-0"
-                          onClick={() => deleteHistoryItem(item.id)}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            onClick={() => {
+                              setUserQuestion(item.question);
+                              setBubblesAnswer(null);
+                              // Scroll to ask section
+                              document.getElementById('ask-bubbles-section')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            title="Ask again"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                            onClick={() => deleteHistoryItem(item.id)}
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-3">
                         {item.answer}
