@@ -18,12 +18,12 @@ type ScenarioRow = Database['public']['Tables']['bubbles_scenarios']['Row'];
 
 const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage', 'nuclear'];
 
-const modeEmojis: Record<BubblesMode, string> = {
-  innocent: '😊',
-  concerned: '😐',
-  triggered: '😤',
-  savage: '😈',
-  nuclear: '☢️',
+const modeLabels: Record<BubblesMode, string> = {
+  innocent: 'Innocent',
+  concerned: 'Concerned',
+  triggered: 'Triggered',
+  savage: 'Savage',
+  nuclear: 'Nuclear',
 };
 
 interface Beat {
@@ -226,7 +226,7 @@ export default function AdminScenarios() {
                       <SelectContent>
                         {MODES.map((mode) => (
                           <SelectItem key={mode} value={mode}>
-                            {modeEmojis[mode]} {mode}
+                            {modeLabels[mode]}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -241,7 +241,7 @@ export default function AdminScenarios() {
                       <SelectContent>
                         {MODES.map((mode) => (
                           <SelectItem key={mode} value={mode}>
-                            {modeEmojis[mode]} {mode}
+                            {modeLabels[mode]}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -271,7 +271,7 @@ export default function AdminScenarios() {
                           <SelectContent>
                             {MODES.map((mode) => (
                               <SelectItem key={mode} value={mode}>
-                                {modeEmojis[mode]} {mode}
+                                {modeLabels[mode]}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -325,11 +325,11 @@ export default function AdminScenarios() {
                       <CardTitle className="text-lg">{scenario.title}</CardTitle>
                       <div className="flex items-center gap-1 text-sm">
                         <Badge variant="outline">
-                          {modeEmojis[scenario.start_mode]} {scenario.start_mode}
+                          {modeLabels[scenario.start_mode]}
                         </Badge>
                         <ArrowRight className="h-3 w-3" />
                         <Badge variant="outline">
-                          {modeEmojis[scenario.end_mode]} {scenario.end_mode}
+                          {modeLabels[scenario.end_mode]}
                         </Badge>
                       </div>
                     </div>
@@ -344,7 +344,7 @@ export default function AdminScenarios() {
                     <div className="space-y-2">
                       {beats.map((beat, idx) => (
                         <div key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="flex-shrink-0">{modeEmojis[beat.mode]}</span>
+                          <span className="flex-shrink-0 text-xs font-medium text-muted-foreground">[{modeLabels[beat.mode]}]</span>
                           <span className="text-muted-foreground italic">"{beat.thought}"</span>
                         </div>
                       ))}

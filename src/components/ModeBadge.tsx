@@ -9,10 +9,10 @@ interface ModeBadgeProps {
 }
 
 const modeLabels: Record<BubbleMode, string> = {
-  innocent: '😇 Innocent',
-  concerned: '😰 Concerned',
-  triggered: '😤 Triggered',
-  savage: '🔥 Savage',
+  innocent: 'Innocent',
+  concerned: 'Concerned',
+  triggered: 'Triggered',
+  savage: 'Savage',
 };
 
 export function ModeBadge({ mode, className, onClick, active }: ModeBadgeProps) {

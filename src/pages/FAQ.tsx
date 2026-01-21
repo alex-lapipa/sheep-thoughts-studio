@@ -4,11 +4,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqs = [
   {
     question: "Who is Bubbles?",
-    answer: "Bubbles is a cute, seemingly innocent sheep with a rich inner world expressed through thought bubbles. On the surface, Bubbles is just a fluffy friend. In the thought bubbles... well, that's where things get interesting."
+    answer: "Bubbles is a sheep from the Wicklow Mountains who has spent too much time listening to tourists, children, and overheard conversations. The result: a rich inner world of confidently wrong facts, catastrophically misinterpreted information, and observations that almost make sense. Cute outside, chaos inside."
   },
   {
-    question: "What are the different 'modes'?",
-    answer: "Bubbles has four modes: Innocent (pure, fluffy thoughts), Concerned (something's off...), Triggered (someone said the wrong thing), and Savage (no filter, no mercy). Each product is tagged with its mood."
+    question: "Why is Bubbles always wrong?",
+    answer: "Bubbles isn't ignorant—Bubbles is miseducated. Every fact is correctly remembered but catastrophically misinterpreted. The argument structure is always flawless. The conclusion is always nonsense. That's the magic."
   },
   {
     question: "How long does shipping take?",

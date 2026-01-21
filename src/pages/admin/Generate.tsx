@@ -152,12 +152,12 @@ export default function AdminGenerate() {
     }
   }
 
-  const modeEmojis: Record<BubblesMode, string> = {
-    innocent: '😊',
-    concerned: '😐',
-    triggered: '😤',
-    savage: '😈',
-    nuclear: '☢️',
+  const modeLabels: Record<BubblesMode, string> = {
+    innocent: 'Innocent',
+    concerned: 'Concerned',
+    triggered: 'Triggered',
+    savage: 'Savage',
+    nuclear: 'Nuclear',
   };
 
   return (
@@ -207,7 +207,7 @@ export default function AdminGenerate() {
                     <SelectItem value="mixed">Mixed / All Modes</SelectItem>
                     {MODES.map((m) => (
                       <SelectItem key={m} value={m}>
-                        {modeEmojis[m]} {m}
+                        {modeLabels[m]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -292,7 +292,7 @@ export default function AdminGenerate() {
                     <div key={idx} className="p-3 bg-secondary/50 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <Badge variant="outline" className="capitalize">
-                          {modeEmojis[thought.mode]} {thought.mode}
+                          {modeLabels[thought.mode]}
                         </Badge>
                         <Button size="sm" variant="ghost" onClick={() => saveThought(thought)}>
                           <Save className="h-3 w-3" />
@@ -320,7 +320,7 @@ export default function AdminGenerate() {
                   <div className="space-y-2">
                     {generatedScenario.beats.map((beat, idx) => (
                       <div key={idx} className="flex items-start gap-2 p-2 bg-secondary/50 rounded">
-                        <span>{modeEmojis[beat.mode]}</span>
+                        <span className="text-xs font-medium text-muted-foreground">[{modeLabels[beat.mode]}]</span>
                         <span className="text-sm italic">"{beat.thought}"</span>
                       </div>
                     ))}
