@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2, PartyPopper } from "lucide-react";
@@ -245,8 +246,31 @@ export default function Achievements() {
     m => celebratedMilestones.includes(m.days) || currentStreak >= m.days
   ).length;
 
+  const ogDescription = unlockedCount > 0 
+    ? `I've earned ${unlockedCount} wisdom badge${unlockedCount > 1 ? 's' : ''} from Bubbles the Sheep! 🐑 ${currentStreak} day streak of seeking confidently wrong advice.`
+    : "Track your journey of seeking Bubbles' confidently incorrect wisdom. Earn badges for your dedication!";
+
   return (
     <Layout>
+      <Helmet>
+        <title>Wisdom Badges | Bubbles the Sheep</title>
+        <meta name="description" content={ogDescription} />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${unlockedCount > 0 ? `${unlockedCount} Badges Earned! ` : ''}Wisdom Badges | Bubbles the Sheep`} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://sheep-thoughts-studio.lovable.app/achievements" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/YltT3TX3EkgRmGALWEPhhpf4wp63/social-images/social-1769034273652-Bowie missin moch 2022.jpg" />
+        <meta property="og:site_name" content="Bubbles the Sheep" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${unlockedCount > 0 ? `${unlockedCount} Badges Earned! ` : ''}Wisdom Badges | Bubbles the Sheep`} />
+        <meta name="twitter:description" content={ogDescription} />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/YltT3TX3EkgRmGALWEPhhpf4wp63/social-images/social-1769034273652-Bowie missin moch 2022.jpg" />
+      </Helmet>
+      
       <FloatingParticles count={15} />
       <div className="container mx-auto px-4 py-12 max-w-5xl relative">
         {/* Header */}
