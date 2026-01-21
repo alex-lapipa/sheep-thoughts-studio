@@ -41,6 +41,7 @@ export default function Index() {
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [bubbleKey, setBubbleKey] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const { t } = useLanguage();
   const { setCurrentMode } = useMood();
 
@@ -72,9 +73,9 @@ export default function Index() {
     fetchThoughts();
   }, [setCurrentMode]);
 
-  // Smooth rotation with mood updates
+  // Smooth rotation with mood updates - pauses on hover
   useEffect(() => {
-    if (thoughts.length === 0) return;
+    if (thoughts.length === 0 || isPaused) return;
 
     const getNextThought = () => {
       let next = thoughts[Math.floor(Math.random() * thoughts.length)];
@@ -102,7 +103,7 @@ export default function Index() {
     const interval = setInterval(cycle, DISPLAY_DURATION + FADE_DURATION + PAUSE_BETWEEN);
 
     return () => clearInterval(interval);
-  }, [thoughts, currentThought, setCurrentMode]);
+  }, [thoughts, currentThought, setCurrentMode, isPaused]);
 
   // Map nuclear mode to savage for display (since BubbleMode doesn't include nuclear)
   const getDisplayMode = (mode: BubblesMode): BubbleMode => {
@@ -162,12 +163,14 @@ export default function Index() {
               {currentThought && (
                 <div 
                   key={bubbleKey} 
-                  className="absolute -top-4 right-0 md:right-8 max-w-[280px] transition-all ease-in-out"
+                  className="absolute -top-4 right-0 md:right-8 max-w-[280px] transition-all ease-in-out cursor-pointer"
                   style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
                     transitionDuration: `${FADE_DURATION}ms`,
                   }}
+                  onMouseEnter={() => setIsPaused(true)}
+                  onMouseLeave={() => setIsPaused(false)}
                 >
                   <ThoughtBubble mode={getDisplayMode(currentThought.mode)} size="md">
                     <p className="text-foreground italic">"{currentThought.text}"</p>
