@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { ScenarioPlayer } from "@/components/ScenarioPlayer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
@@ -144,7 +145,21 @@ export default function Facts() {
         </div>
       </section>
 
-      {/* Research Categories */}
+      {/* Escalation Journeys */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background to-muted/30">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
+              Escalation Journeys
+            </h2>
+            <p className="text-muted-foreground">
+              Watch how Bubbles processes information from innocent curiosity to nuclear certainty.
+              Each scenario demonstrates the Inversion Principle in action.
+            </p>
+          </div>
+          <ScenarioPlayer />
+        </div>
+      </section>
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
