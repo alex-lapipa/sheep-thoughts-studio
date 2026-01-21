@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ArrowRight, HelpCircle, ShoppingBag, Brain } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CrossLink {
   to: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
   icon: React.ReactNode;
   color: string;
 }
@@ -13,22 +14,22 @@ interface CrossLink {
 const CROSS_LINKS: CrossLink[] = [
   {
     to: "/facts",
-    label: "Bubbles' Facts",
-    description: "100% researched, 0% accurate",
+    labelKey: "crossLinks.facts.label",
+    descKey: "crossLinks.facts.desc",
     icon: <Brain className="h-5 w-5" />,
     color: "bg-wicklow-butter/20 border-wicklow-butter/40 hover:bg-wicklow-butter/30",
   },
   {
     to: "/collections/all",
-    label: "The Merch",
-    description: "Wear the confusion",
+    labelKey: "crossLinks.merch.label",
+    descKey: "crossLinks.merch.desc",
     icon: <ShoppingBag className="h-5 w-5" />,
     color: "bg-wicklow-meadow/20 border-wicklow-meadow/40 hover:bg-wicklow-meadow/30",
   },
   {
     to: "/faq",
-    label: "Ask Bubbles",
-    description: "Questions with unhelpful answers",
+    labelKey: "crossLinks.ask.label",
+    descKey: "crossLinks.ask.desc",
     icon: <HelpCircle className="h-5 w-5" />,
     color: "bg-wicklow-atlantic/20 border-wicklow-atlantic/40 hover:bg-wicklow-atlantic/30",
   },
@@ -38,15 +39,16 @@ interface CrossLinksProps {
   exclude?: string[];
   maxLinks?: number;
   className?: string;
-  title?: string;
+  titleKey?: string;
 }
 
 export function CrossLinks({ 
   exclude = [], 
   maxLinks = 3, 
   className,
-  title = "While you're lost..."
+  titleKey = "crossLinks.title"
 }: CrossLinksProps) {
+  const { t } = useLanguage();
   const availableLinks = CROSS_LINKS.filter(link => !exclude.includes(link.to));
   const shuffled = [...availableLinks].sort(() => Math.random() - 0.5);
   const displayLinks = shuffled.slice(0, maxLinks);
@@ -54,7 +56,7 @@ export function CrossLinks({
   return (
     <div className={cn("space-y-4", className)}>
       <h3 className="font-display text-lg font-bold text-center animate-bounce-gentle">
-        {title}
+        {t(titleKey)}
       </h3>
       <div className="grid gap-3 md:grid-cols-3">
         {displayLinks.map((link, index) => (
@@ -76,12 +78,12 @@ export function CrossLinks({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-display font-bold text-sm truncate">
-                    {link.label}
+                    {t(link.labelKey)}
                   </span>
                   <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {link.description}
+                  {t(link.descKey)}
                 </p>
               </div>
             </div>

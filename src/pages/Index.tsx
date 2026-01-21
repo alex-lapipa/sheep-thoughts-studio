@@ -286,7 +286,7 @@ export default function Index() {
           <CrossLinks 
             exclude={["/"]} 
             maxLinks={4}
-            title="Bubbles suggests you also visit..."
+            titleKey="crossLinks.title"
           />
         </div>
       </section>

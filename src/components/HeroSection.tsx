@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Database } from "@/integrations/supabase/types";
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 
@@ -21,6 +22,7 @@ const DISPLAY_DURATION = 6000; // ms to display thought (increased for reading)
 const PAUSE_BETWEEN = 800; // ms pause between thoughts
 
 export function HeroSection() {
+  const { t } = useLanguage();
   const [currentThought, setCurrentThought] = useState<ThoughtData | null>(null);
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [isVisible, setIsVisible] = useState(true);
@@ -98,24 +100,23 @@ export function HeroSection() {
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-4">
               <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                Meet <span className="text-accent">Bubbles</span>
+                {t("hero.meet")} <span className="text-accent">{t("hero.bubbles")}</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-lg">
-                A sweet, daft sheep from Wicklow. Cute on the outside. 
-                Quietly savage inside the thought bubbles.
+                {t("hero.tagline")}
               </p>
             </div>
             
             <div className="flex flex-wrap gap-4">
               <Link to="/collections/all">
                 <Button size="lg" className="bg-accent hover:bg-accent-hover text-accent-foreground font-display">
-                  Shop Now
+                  {t("hero.shopNow")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/about">
                 <Button size="lg" variant="outline" className="font-display">
-                  The Lore
+                  {t("hero.theLore")}
                 </Button>
               </Link>
             </div>
