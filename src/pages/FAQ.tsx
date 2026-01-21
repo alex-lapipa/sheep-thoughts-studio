@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -625,7 +625,36 @@ const FAQ = () => {
               
               {showHistory && (
                 <div className="mt-4 space-y-3">
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const content = questionHistory.map((item, index) => {
+                          const date = new Date(item.timestamp).toLocaleString();
+                          return `--- Question ${index + 1} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
+                        }).join('\n\n');
+                        
+                        const header = `🐑 Bubbles Wisdom History\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${questionHistory.length}\n\n${'='.repeat(50)}\n\n`;
+                        const fullContent = header + content;
+                        
+                        const blob = new Blob([fullContent], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bubbles-wisdom-${new Date().toISOString().split('T')[0]}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        toast.success("History exported successfully!");
+                      }}
+                      className="gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
