@@ -26,20 +26,29 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3">
-          <BubblesLogo />
-          <span className="font-display font-bold text-xl tracking-tight">Bubbles</span>
+        <Link 
+          to="/" 
+          className="flex items-center gap-3 group transition-transform duration-300 hover:scale-105"
+        >
+          <div className="group-hover:animate-baa">
+            <BubblesLogo />
+          </div>
+          <span className="font-display font-bold text-xl tracking-tight group-hover:animate-wobble">
+            Bubbles
+          </span>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link, index) => (
             <Link 
               key={link.href} 
               to={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110 hover:-rotate-1 relative group"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               {link.label}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </nav>
@@ -48,16 +57,22 @@ export function Header() {
         <div className="flex items-center gap-2">
           <LanguageToggle />
           <Link to="/search">
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:animate-bounce-gentle"
+            >
               <Search className="h-5 w-5" />
             </Button>
           </Link>
-          <CartDrawer />
+          <div className="hover:animate-squish">
+            <CartDrawer />
+          </div>
           
           {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover:animate-wobble">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -66,12 +81,13 @@ export function Header() {
                 <LanguageToggle />
               </div>
               <nav className="flex flex-col gap-4">
-                {navLinks.map((link) => (
+                {navLinks.map((link, index) => (
                   <Link 
                     key={link.href} 
                     to={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="text-lg font-display font-medium hover:text-accent transition-colors"
+                    className="text-lg font-display font-medium hover:text-accent transition-all duration-200 animate-slide-in-right hover:translate-x-2"
+                    style={{ animationDelay: `${index * 75}ms` }}
                   >
                     {link.label}
                   </Link>

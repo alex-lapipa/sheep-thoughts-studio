@@ -183,6 +183,68 @@ export default {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // 🫧 Bubbly chaos animations
+        "wobble": {
+          "0%, 100%": { transform: "rotate(-2deg)" },
+          "50%": { transform: "rotate(2deg)" },
+        },
+        "bounce-gentle": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "float-bubble": {
+          "0%": { transform: "translateY(100vh) scale(0)", opacity: "0" },
+          "10%": { opacity: "0.7" },
+          "90%": { opacity: "0.7" },
+          "100%": { transform: "translateY(-100px) scale(1)", opacity: "0" },
+        },
+        "wiggle": {
+          "0%, 100%": { transform: "rotate(-3deg) scale(1)" },
+          "25%": { transform: "rotate(3deg) scale(1.02)" },
+          "50%": { transform: "rotate(-3deg) scale(1)" },
+          "75%": { transform: "rotate(3deg) scale(0.98)" },
+        },
+        "pop-in": {
+          "0%": { transform: "scale(0) rotate(-10deg)", opacity: "0" },
+          "50%": { transform: "scale(1.1) rotate(5deg)" },
+          "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
+        },
+        "drift": {
+          "0%, 100%": { transform: "translateX(0) translateY(0)" },
+          "25%": { transform: "translateX(5px) translateY(-3px)" },
+          "50%": { transform: "translateX(-3px) translateY(5px)" },
+          "75%": { transform: "translateX(-5px) translateY(-2px)" },
+        },
+        "squish": {
+          "0%, 100%": { transform: "scaleX(1) scaleY(1)" },
+          "50%": { transform: "scaleX(1.05) scaleY(0.95)" },
+        },
+        "page-enter": {
+          "0%": { opacity: "0", transform: "translateY(20px) scale(0.98)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        "slide-in-left": {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-in-right": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "baa": {
+          "0%, 100%": { transform: "scale(1)" },
+          "10%": { transform: "scale(1.1) rotate(-5deg)" },
+          "20%": { transform: "scale(1.15) rotate(5deg)" },
+          "30%": { transform: "scale(1.1) rotate(-3deg)" },
+          "40%": { transform: "scale(1)" },
+        },
+        "confused-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(5deg)" },
+          "50%": { transform: "rotate(0deg)" },
+          "75%": { transform: "rotate(-5deg)" },
+          "100%": { transform: "rotate(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -191,6 +253,19 @@ export default {
         "bubble-appear": "bubble-appear 0.4s ease-out",
         "fade-in": "fade-in 0.5s ease-out",
         "slide-up": "slide-up 0.5s ease-out",
+        // 🫧 Bubbly chaos animations
+        "wobble": "wobble 2s ease-in-out infinite",
+        "bounce-gentle": "bounce-gentle 1.5s ease-in-out infinite",
+        "float-bubble": "float-bubble 8s ease-in-out infinite",
+        "wiggle": "wiggle 0.5s ease-in-out",
+        "pop-in": "pop-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "drift": "drift 6s ease-in-out infinite",
+        "squish": "squish 0.3s ease-in-out",
+        "page-enter": "page-enter 0.5s ease-out forwards",
+        "slide-in-left": "slide-in-left 0.4s ease-out",
+        "slide-in-right": "slide-in-right 0.4s ease-out",
+        "baa": "baa 0.8s ease-in-out",
+        "confused-spin": "confused-spin 2s ease-in-out infinite",
       },
     },
   },
