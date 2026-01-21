@@ -24,6 +24,7 @@ import BrandColors from "./pages/admin/brand/BrandColors";
 import BrandTypography from "./pages/admin/brand/BrandTypography";
 import BrandCharacter from "./pages/admin/brand/BrandCharacter";
 import BrandProduction from "./pages/admin/brand/BrandProduction";
+import AdminUsers from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,9 @@ const App = () => (
             <Route path="/admin/brand/typography" element={<ProtectedRoute><BrandTypography /></ProtectedRoute>} />
             <Route path="/admin/brand/character" element={<ProtectedRoute><BrandCharacter /></ProtectedRoute>} />
             <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
+            
+            {/* System Routes - Super Admin Only */}
+            <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
