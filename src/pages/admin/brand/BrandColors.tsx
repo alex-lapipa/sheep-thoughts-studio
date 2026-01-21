@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3, MessageCircle, Type } from "lucide-react";
+import { ColorEditorDialog } from "@/components/admin/ColorEditorDialog";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3, MessageCircle, Type, Plus, Pencil } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
@@ -1669,9 +1670,10 @@ function downloadFile(content: string, filename: string) {
 }
 interface ColorSwatchProps {
   asset: BrandAsset;
+  onEdit: (asset: BrandAsset) => void;
 }
 
-function ColorSwatch({ asset }: ColorSwatchProps) {
+function ColorSwatch({ asset, onEdit }: ColorSwatchProps) {
   const [copied, setCopied] = useState<string | null>(null);
   const value = asset.asset_value as { hex?: string; hsl?: string; rgb?: string; pantone?: string; role?: string; mode?: string; category?: string };
 
@@ -1683,10 +1685,19 @@ function ColorSwatch({ asset }: ColorSwatchProps) {
   };
 
   return (
-    <Card className="overflow-hidden group">
+    <Card className="overflow-hidden group relative">
+      {/* Edit Button Overlay */}
+      <button
+        onClick={() => onEdit(asset)}
+        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm rounded-full p-1.5 shadow-sm hover:bg-background"
+      >
+        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+      </button>
+      
       <div 
-        className="h-24 w-full transition-transform group-hover:scale-105"
+        className="h-24 w-full transition-transform group-hover:scale-105 cursor-pointer"
         style={{ backgroundColor: value.hex }}
+        onClick={() => onEdit(asset)}
       />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -1742,6 +1753,23 @@ function ColorSwatch({ asset }: ColorSwatchProps) {
 
 export default function BrandColors() {
   const { data: colors, isLoading } = useBrandAssets("color");
+  
+  // CRUD dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
+  const [selectedColor, setSelectedColor] = useState<BrandAsset | null>(null);
+
+  const handleAddColor = () => {
+    setSelectedColor(null);
+    setDialogMode("create");
+    setDialogOpen(true);
+  };
+
+  const handleEditColor = (color: BrandAsset) => {
+    setSelectedColor(color);
+    setDialogMode("edit");
+    setDialogOpen(true);
+  };
 
   const wicklowColors = colors?.filter(c => {
     const val = c.asset_value as { category?: string };
@@ -1765,6 +1793,14 @@ export default function BrandColors() {
 
   return (
     <AdminLayout>
+      {/* Color Editor Dialog */}
+      <ColorEditorDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        color={selectedColor}
+        mode={dialogMode}
+      />
+      
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -1778,6 +1814,10 @@ export default function BrandColors() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button onClick={handleAddColor} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Color
+            </Button>
             <Badge variant="outline" className="text-sm">
               {colors?.length || 0} colors
             </Badge>
@@ -1872,7 +1912,7 @@ export default function BrandColors() {
           ) : wicklowColors.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-5">
               {wicklowColors.map((color) => (
-                <ColorSwatch key={color.id} asset={color} />
+                <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
             </div>
           ) : (
@@ -1927,7 +1967,7 @@ export default function BrandColors() {
           ) : urbanColors.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-6">
               {urbanColors.map((color) => (
-                <ColorSwatch key={color.id} asset={color} />
+                <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
             </div>
           ) : (
@@ -1981,7 +2021,7 @@ export default function BrandColors() {
           ) : modeColors.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-5">
               {modeColors.map((color) => (
-                <ColorSwatch key={color.id} asset={color} />
+                <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
             </div>
           ) : (
@@ -2039,7 +2079,7 @@ export default function BrandColors() {
           ) : (
             <div className="grid gap-4 md:grid-cols-3">
               {seasonalColors.map((color) => (
-                <ColorSwatch key={color.id} asset={color} />
+                <ColorSwatch key={color.id} asset={color} onEdit={handleEditColor} />
               ))}
             </div>
           )}
