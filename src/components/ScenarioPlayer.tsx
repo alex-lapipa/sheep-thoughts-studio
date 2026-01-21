@@ -93,8 +93,16 @@ export function ScenarioPlayer() {
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
-  const [playbackSpeed, setPlaybackSpeed] = useState(4000); // 2s, 4s, 6s options
+  const [playbackSpeed, setPlaybackSpeed] = useState(() => {
+    const saved = localStorage.getItem("bubbles-playback-speed");
+    return saved ? parseInt(saved, 10) : 4000;
+  });
   const [beatProgress, setBeatProgress] = useState(0); // 0-100 progress within current beat
+
+  // Persist playback speed to localStorage
+  useEffect(() => {
+    localStorage.setItem("bubbles-playback-speed", String(playbackSpeed));
+  }, [playbackSpeed]);
   const { share, isCopied } = useShare();
   const { triggerHaptic } = useSettings();
   
