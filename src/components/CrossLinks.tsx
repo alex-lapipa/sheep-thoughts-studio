@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Sparkles, HelpCircle, ShoppingBag, Brain } from "lucide-react";
+import { ArrowRight, HelpCircle, ShoppingBag, Brain } from "lucide-react";
 
 interface CrossLink {
   to: string;
@@ -17,13 +17,6 @@ const CROSS_LINKS: CrossLink[] = [
     description: "100% researched, 0% accurate",
     icon: <Brain className="h-5 w-5" />,
     color: "bg-wicklow-butter/20 border-wicklow-butter/40 hover:bg-wicklow-butter/30",
-  },
-  {
-    to: "/scenarios",
-    label: "Escalation Journeys",
-    description: "Watch innocence become chaos",
-    icon: <Sparkles className="h-5 w-5" />,
-    color: "bg-urban-soho/20 border-urban-soho/40 hover:bg-urban-soho/30",
   },
   {
     to: "/collections/all",

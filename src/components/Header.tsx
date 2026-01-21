@@ -11,7 +11,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const getNavLinks = (t: (key: string) => string) => [
   { href: "/", label: t("nav.home") },
   { href: "/facts", label: t("nav.facts") },
-  { href: "/scenarios", label: t("nav.scenarios") },
   { href: "/collections/all", label: t("nav.shop") },
   { href: "/about", label: t("nav.story") },
   { href: "/faq", label: t("nav.questions") },
