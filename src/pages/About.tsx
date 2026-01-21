@@ -66,29 +66,41 @@ const About = () => {
                 rolls down from Sugarloaf Mountain like it has somewhere important to be.
               </p>
               <p>
-                While other sheep saw grass, Bubbles saw <em>possibilities</em>. While the flock 
-                heard wind, Bubbles heard whispered insults that probably weren't there. The 
-                Wicklow landscape—ethereal, hauntingly beautiful, draped in supernatural fog—matched 
-                something in that fluffy head.
+                Unlike the rest of the flock, Bubbles grew up near the walking trails. Near the 
+                tour buses. Near the families with children who explained things <em>very confidently</em> to 
+                each other. A German tourist once pointed at the mountain and said something about 
+                geology. A Dublin child insisted that clouds were "where the WiFi lives." A Spanish 
+                couple argued about whether sheep could understand English. Bubbles listened to all of it.
+              </p>
+              <p>
+                Some say Farmer Carmel was too kind. Let Bubbles wander too close to the visitors' 
+                centre. Others blame the Sugarloaf air—something in the mist that makes you 
+                remember everything and understand nothing.
+              </p>
+              <p>
+                The result: while other sheep saw grass, Bubbles saw <em>information</em>. 
+                Half-heard facts. Playground geopolitics. "My dad says..." arguments drifting 
+                over the stone walls. Jokes taken literally. Lies told to children. All of it 
+                absorbed. All of it believed. All of it connected in ways that almost make sense.
               </p>
               <p>
                 And then came the thought bubbles.
               </p>
               <p>
-                Nobody knows exactly when they appeared. Some say it was after a particularly 
-                tense encounter with a hiker who looked at Bubbles "the wrong way." Others claim 
-                it was the day someone at the Rocky Valley farmers' market called the wool 
-                "adequate."
+                Nobody knows exactly when they appeared. Perhaps after overhearing a podcast about 
+                cryptocurrency through a hiker's earbuds. Perhaps the morning a child explained that 
+                "the moon controls the tides and also moods." The origins remain unclear—and Bubbles 
+                offers a different explanation every time you ask.
               </p>
               <p>
-                What we do know: Bubbles thinks <em>a lot</em>. Mostly wrong conclusions delivered 
-                with absolute confidence. The classic Irish deadpan—sharp observation wrapped in 
-                innocent wool.
+                What we do know: Bubbles thinks <em>a lot</em>. The arguments are flawless. The 
+                conclusions are absolute nonsense. Every piece of information correctly remembered, 
+                confidently explained, catastrophically misinterpreted.
               </p>
               <p>
-                The internet noticed. Bubbles became an accidental celebrity. The sweet face that 
-                launched a thousand memes. Cute outside, chaos inside. A lovable nuisance you can 
-                hate and love at the same time.
+                The internet noticed. Bubbles became an accidental expert on everything. The sweet 
+                face that launched a thousand wrong opinions. Not ignorant—miseducated. Not confused—certain. 
+                A lovable prophet of confident wrongness you can't help but quote.
               </p>
             </div>
           </div>
