@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Footer() {
+  const { user } = useAuth();
+  const { canAccessAdmin, isSuperAdmin } = useUserRoles();
+  
+  // Only show admin link if user is authenticated and has admin/super_admin role
+  const showAdminLink = user && canAccessAdmin;
+
   return (
     <footer className="border-t border-border bg-secondary/30">
       <div className="container py-12">
@@ -53,12 +61,18 @@ export function Footer() {
             © {new Date().getFullYear()} Bubble Sheep. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <Link 
-              to="/admin" 
-              className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-            >
-              Admin
-            </Link>
+            {showAdminLink && (
+              <Link 
+                to="/admin" 
+                className={`text-xs transition-colors ${
+                  isSuperAdmin 
+                    ? "text-mode-nuclear/70 hover:text-mode-nuclear" 
+                    : "text-muted-foreground/50 hover:text-muted-foreground"
+                }`}
+              >
+                {isSuperAdmin ? "⚡ Super Admin" : "Admin"}
+              </Link>
+            )}
             <p className="text-sm text-muted-foreground">
               Made with 🐑 and questionable life choices
             </p>

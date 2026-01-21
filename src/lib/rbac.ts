@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'admin' | 'ops' | 'merch' | 'readonly';
+export type UserRole = 'super_admin' | 'admin' | 'ops' | 'merch' | 'readonly';
 
 export interface UserRoleRecord {
   id: string;
@@ -12,6 +12,7 @@ export interface UserRoleRecord {
 
 // Permission definitions by role
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+  super_admin: ['*'], // All permissions + system config
   admin: ['*'], // All permissions
   ops: [
     'orders.view', 'orders.manage',
@@ -37,6 +38,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   ],
 };
 
+// Super admin specific permissions
+export const SUPER_ADMIN_ONLY_PERMISSIONS = [
+  'system.config',
+  'users.manage_roles',
+  'knowledge.manage',
+  'brand.manage',
+];
+
 export function hasPermission(roles: UserRole[], permission: string): boolean {
   for (const role of roles) {
     const perms = ROLE_PERMISSIONS[role];
@@ -47,25 +56,39 @@ export function hasPermission(roles: UserRole[], permission: string): boolean {
   return false;
 }
 
+export function isSuperAdmin(roles: UserRole[]): boolean {
+  return roles.includes('super_admin');
+}
+
+export function canAccessAdmin(roles: UserRole[]): boolean {
+  return roles.includes('super_admin') || roles.includes('admin');
+}
+
 export function canAccessModule(roles: UserRole[], module: string): boolean {
   const modulePermissions: Record<string, string[]> = {
     dashboard: ['dashboard.view'],
-    shopify: ['admin'],
-    webhooks: ['webhooks.view', 'admin'],
-    pod: ['pod_providers.view', 'admin'],
-    mappings: ['mappings.view', 'mappings.manage', 'admin'],
-    orders: ['orders.view', 'orders.manage', 'admin'],
-    exceptions: ['exceptions.view', 'exceptions.manage', 'admin'],
-    products: ['products.view', 'products.manage', 'admin'],
-    pricing: ['pricing.view', 'pricing.manage', 'admin'],
-    drops: ['drops.view', 'drops.manage', 'admin'],
-    audit: ['audit.view', 'admin'],
+    shopify: ['admin', 'super_admin'],
+    webhooks: ['webhooks.view', 'admin', 'super_admin'],
+    pod: ['pod_providers.view', 'admin', 'super_admin'],
+    mappings: ['mappings.view', 'mappings.manage', 'admin', 'super_admin'],
+    orders: ['orders.view', 'orders.manage', 'admin', 'super_admin'],
+    exceptions: ['exceptions.view', 'exceptions.manage', 'admin', 'super_admin'],
+    products: ['products.view', 'products.manage', 'admin', 'super_admin'],
+    pricing: ['pricing.view', 'pricing.manage', 'admin', 'super_admin'],
+    drops: ['drops.view', 'drops.manage', 'admin', 'super_admin'],
+    audit: ['audit.view', 'admin', 'super_admin'],
+    brand: ['brand.manage', 'super_admin'],
+    knowledge: ['knowledge.manage', 'super_admin'],
+    thoughts: ['knowledge.manage', 'super_admin'],
+    triggers: ['knowledge.manage', 'super_admin'],
+    scenarios: ['knowledge.manage', 'super_admin'],
+    generate: ['knowledge.manage', 'super_admin'],
   };
 
   const requiredPerms = modulePermissions[module] || [];
   
   for (const role of roles) {
-    if (role === 'admin') return true;
+    if (role === 'super_admin' || role === 'admin') return true;
     const rolePerms = ROLE_PERMISSIONS[role];
     for (const perm of requiredPerms) {
       if (rolePerms.includes(perm)) return true;
@@ -87,6 +110,24 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   }
 
   return data.map(r => r.role as UserRole);
+}
+
+export async function checkIsSuperAdmin(userId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('is_super_admin', { _user_id: userId });
+  if (error) {
+    console.error('Error checking super admin status:', error);
+    return false;
+  }
+  return data === true;
+}
+
+export async function checkCanAccessAdmin(userId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('can_access_admin', { _user_id: userId });
+  if (error) {
+    console.error('Error checking admin access:', error);
+    return false;
+  }
+  return data === true;
 }
 
 export async function assignRole(userId: string, role: UserRole): Promise<boolean> {
