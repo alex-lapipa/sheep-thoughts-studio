@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Facts from "./pages/Facts";
 import Collections from "./pages/Collections";
+import WicklowPalette from "./pages/WicklowPalette";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/facts" element={<Facts />} />
             <Route path="/collections/:collection" element={<Collections />} />
+            <Route path="/wicklow-palette" element={<WicklowPalette />} />
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<FAQ />} />

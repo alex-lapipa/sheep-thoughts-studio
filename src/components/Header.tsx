@@ -7,9 +7,11 @@ import { useState } from "react";
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/facts", label: "Facts" },
   { href: "/collections/all", label: "Shop" },
-  { href: "/about", label: "About Bubbles" },
-  { href: "/faq", label: "FAQ" },
+  { href: "/wicklow-palette", label: "Wicklow Palette" },
+  { href: "/about", label: "My Story" },
+  { href: "/faq", label: "Questions" },
 ];
 
 export function Header() {
