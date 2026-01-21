@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
-import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2 } from "lucide-react";
+import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import confetti from "canvas-confetti";
 import { 
   BadgeSparkles, 
   FloatingParticles, 
@@ -94,6 +95,103 @@ export default function Achievements() {
   const [animatedBadges, setAnimatedBadges] = useState<Set<number>>(new Set());
   const [newlyViewed, setNewlyViewed] = useState<Set<number>>(new Set());
   const badgeRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const [isCelebrating, setIsCelebrating] = useState(false);
+
+  // Test celebration function that triggers all effects
+  const triggerTestCelebration = () => {
+    if (isCelebrating) return;
+    setIsCelebrating(true);
+
+    // Stage 1: Side cannons
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.6 },
+      colors: ["#FFD700", "#FFA500", "#FF6B6B", "#4ECDC4", "#45B7D1", "#9b59b6"],
+    });
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.6 },
+      colors: ["#FFD700", "#FFA500", "#FF6B6B", "#4ECDC4", "#45B7D1", "#9b59b6"],
+    });
+
+    // Stage 2: Center burst
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 100,
+        origin: { x: 0.5, y: 0.5 },
+        colors: ["#FFD700", "#FFA500", "#FF6B6B"],
+        startVelocity: 30,
+        gravity: 0.7,
+      });
+    }, 300);
+
+    // Stage 3: Stars shower
+    setTimeout(() => {
+      confetti({
+        particleCount: 40,
+        spread: 180,
+        origin: { x: 0.5, y: 0 },
+        colors: ["#FFD700", "#FFFFFF"],
+        shapes: ["circle"],
+        gravity: 0.4,
+        scalar: 1.2,
+        drift: 0,
+      });
+    }, 600);
+
+    // Stage 4: Trigger badge celebrations on unlocked badges
+    setTimeout(() => {
+      const unlockedDays = ACHIEVEMENT_MILESTONES
+        .filter(m => celebratedMilestones.includes(m.days) || currentStreak >= m.days)
+        .map(m => m.days);
+      
+      unlockedDays.slice(0, 3).forEach((days, index) => {
+        setTimeout(() => {
+          const element = badgeRefs.current.get(days);
+          if (element) {
+            triggerBadgeCelebration(element);
+          }
+        }, index * 200);
+      });
+    }, 900);
+
+    // Stage 5: Final fireworks
+    setTimeout(() => {
+      const end = Date.now() + 1000;
+      const colors = ["#FFD700", "#FF6B6B", "#4ECDC4"];
+
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.9 },
+          colors,
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.9 },
+          colors,
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }, 1500);
+
+    // Reset after celebration
+    setTimeout(() => {
+      setIsCelebrating(false);
+    }, 3000);
+  };
 
   useEffect(() => {
     // Load streak data
@@ -187,14 +285,27 @@ export default function Achievements() {
                 <p className="font-display text-3xl font-bold">{unlockedCount} / {ACHIEVEMENT_MILESTONES.length}</p>
               </div>
             </div>
-            <Link to="/faq">
-              <Button className="font-display gap-2">
-                <Sparkles className="w-4 h-4" />
-                Ask Bubbles
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                onClick={triggerTestCelebration}
+                disabled={isCelebrating}
+                className="font-display gap-2"
+              >
+                <PartyPopper className={cn("w-4 h-4", isCelebrating && "animate-bounce")} />
+                {isCelebrating ? "Celebrating!" : "Test Celebration"}
               </Button>
-            </Link>
+              <Link to="/faq">
+                <Button className="font-display gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Ask Bubbles
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
+
+
 
         {/* Badge Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
