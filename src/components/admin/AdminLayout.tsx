@@ -71,6 +71,7 @@ const navSections: NavSection[] = [
       { href: '/admin/brand/typography', label: 'Typography', icon: FileText },
       { href: '/admin/brand/character', label: 'Character', icon: Target },
       { href: '/admin/brand/production', label: 'Production', icon: Package },
+      { href: '/admin/brand/wicklow-palette', label: 'Wicklow Palette', icon: Sparkles },
     ],
   },
   {
@@ -151,9 +152,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-4">
             <Link to="/admin" className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-bubbles-cream border-2 border-bubbles-heather flex items-center justify-center">
-                <span className="font-display font-bold text-sm text-bubbles-peat">B</span>
+                <span className="font-display font-bold text-sm text-bubbles-peat">G</span>
               </div>
-              <span className="font-display font-bold text-xl">Bubbles Ops</span>
+              <span className="font-display font-bold text-xl">Genius</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">

@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/facts", label: "Facts" },
   { href: "/collections/all", label: "Shop" },
-  { href: "/wicklow-palette", label: "Wicklow Palette" },
   { href: "/about", label: "My Story" },
   { href: "/faq", label: "Questions" },
 ];
