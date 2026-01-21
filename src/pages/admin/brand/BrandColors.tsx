@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw, Grid3X3 } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -1028,6 +1028,247 @@ function ModeEscalationVisualizer() {
   );
 }
 
+// All brand colors for matrix
+const ALL_BRAND_COLORS = [
+  { key: "cream", name: "Bog Cotton", hex: "#FFFDD0" },
+  { key: "gold", name: "Gorse Gold", hex: "#E8B923" },
+  { key: "mist", name: "Mountain Mist", hex: "#B0C4DE" },
+  { key: "heather", name: "Heather Mauve", hex: "#8B668B" },
+  { key: "peat", name: "Peat Earth", hex: "#2C2C2C" },
+  { key: "innocent", name: "Innocent", hex: "#FFB6C1" },
+  { key: "concerned", name: "Concerned", hex: "#B0C4DE" },
+  { key: "triggered", name: "Triggered", hex: "#B87333" },
+  { key: "savage", name: "Savage", hex: "#FF69B4" },
+  { key: "nuclear", name: "Nuclear", hex: "#DFFF00" },
+];
+
+interface MatrixCell {
+  fg: typeof ALL_BRAND_COLORS[0];
+  bg: typeof ALL_BRAND_COLORS[0];
+  ratio: number;
+  normalAA: boolean;
+  largeAA: boolean;
+  normalAAA: boolean;
+}
+
+function AccessibilityMatrix() {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const matrix = useMemo(() => {
+    const cells: MatrixCell[][] = [];
+    
+    ALL_BRAND_COLORS.forEach((fg) => {
+      const row: MatrixCell[] = [];
+      ALL_BRAND_COLORS.forEach((bg) => {
+        const ratio = getContrastRatio(fg.hex, bg.hex);
+        row.push({
+          fg,
+          bg,
+          ratio,
+          normalAA: ratio >= 4.5,
+          largeAA: ratio >= 3,
+          normalAAA: ratio >= 7,
+        });
+      });
+      cells.push(row);
+    });
+    
+    return cells;
+  }, []);
+
+  const getStatusColor = (cell: MatrixCell) => {
+    if (cell.fg.key === cell.bg.key) return "bg-muted";
+    if (cell.normalAAA) return "bg-accent/60";
+    if (cell.normalAA) return "bg-accent/40";
+    if (cell.largeAA) return "bg-warning/30";
+    return "bg-destructive/20";
+  };
+
+  const getStatusIcon = (cell: MatrixCell) => {
+    if (cell.fg.key === cell.bg.key) return null;
+    if (cell.normalAA) return <CheckCircle2 className="h-3 w-3 text-accent-foreground" />;
+    if (cell.largeAA) return <AlertCircle className="h-3 w-3 text-warning-foreground" />;
+    return <XCircle className="h-3 w-3 text-destructive" />;
+  };
+
+  // Stats
+  const stats = useMemo(() => {
+    let aaPass = 0;
+    let aaaPass = 0;
+    let largeOnly = 0;
+    let fail = 0;
+    const total = ALL_BRAND_COLORS.length * ALL_BRAND_COLORS.length - ALL_BRAND_COLORS.length;
+
+    matrix.forEach((row) => {
+      row.forEach((cell) => {
+        if (cell.fg.key === cell.bg.key) return;
+        if (cell.normalAAA) aaaPass++;
+        else if (cell.normalAA) aaPass++;
+        else if (cell.largeAA) largeOnly++;
+        else fail++;
+      });
+    });
+
+    return { aaPass, aaaPass, largeOnly, fail, total };
+  }, [matrix]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Grid3X3 className="h-5 w-5" />
+          Color Accessibility Matrix
+        </CardTitle>
+        <CardDescription>
+          WCAG contrast compliance for all brand color pair combinations
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Legend */}
+        <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-accent/60" />
+            <span>AAA (7:1+)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-accent/40" />
+            <span>AA (4.5:1+)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-warning/30" />
+            <span>Large Only (3:1+)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-destructive/20" />
+            <span>Fail (&lt;3:1)</span>
+          </div>
+        </div>
+
+        {/* Stats Summary */}
+        <div className="grid grid-cols-4 gap-3">
+          <div className="p-3 bg-accent/40 rounded-lg text-center">
+            <p className="text-2xl font-bold">{stats.aaaPass + stats.aaPass}</p>
+            <p className="text-xs text-muted-foreground">AA+ Pass</p>
+          </div>
+          <div className="p-3 bg-accent/60 rounded-lg text-center">
+            <p className="text-2xl font-bold">{stats.aaaPass}</p>
+            <p className="text-xs text-muted-foreground">AAA Pass</p>
+          </div>
+          <div className="p-3 bg-warning/30 rounded-lg text-center">
+            <p className="text-2xl font-bold">{stats.largeOnly}</p>
+            <p className="text-xs text-muted-foreground">Large Text Only</p>
+          </div>
+          <div className="p-3 bg-destructive/20 rounded-lg text-center">
+            <p className="text-2xl font-bold">{stats.fail}</p>
+            <p className="text-xs text-muted-foreground">Fail</p>
+          </div>
+        </div>
+
+        {/* Toggle Details */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowDetails(!showDetails)}
+        >
+          {showDetails ? "Hide Ratios" : "Show Ratios"}
+        </Button>
+
+        {/* Matrix Grid */}
+        <div className="overflow-x-auto">
+          <div className="min-w-[700px]">
+            {/* Header row */}
+            <div className="flex">
+              <div className="w-24 h-10 flex items-center justify-center text-xs font-medium text-muted-foreground">
+                FG → BG
+              </div>
+              {ALL_BRAND_COLORS.map((color) => (
+                <div
+                  key={color.key}
+                  className="flex-1 h-10 flex items-center justify-center"
+                  title={color.name}
+                >
+                  <div
+                    className="w-6 h-6 rounded border"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Matrix rows */}
+            {matrix.map((row, rowIndex) => (
+              <div key={ALL_BRAND_COLORS[rowIndex].key} className="flex">
+                {/* Row header */}
+                <div className="w-24 h-10 flex items-center gap-2 px-2">
+                  <div
+                    className="w-5 h-5 rounded border flex-shrink-0"
+                    style={{ backgroundColor: ALL_BRAND_COLORS[rowIndex].hex }}
+                  />
+                  <span className="text-xs truncate">{ALL_BRAND_COLORS[rowIndex].name}</span>
+                </div>
+
+                {/* Cells */}
+                {row.map((cell) => (
+                  <div
+                    key={`${cell.fg.key}-${cell.bg.key}`}
+                    className={`flex-1 h-10 flex items-center justify-center gap-1 border border-border/30 transition-colors ${getStatusColor(cell)}`}
+                    title={`${cell.fg.name} on ${cell.bg.name}: ${cell.ratio.toFixed(2)}:1`}
+                  >
+                    {getStatusIcon(cell)}
+                    {showDetails && cell.fg.key !== cell.bg.key && (
+                      <span className="text-[10px] font-mono">
+                        {cell.ratio.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Best Pairs */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium">Recommended High-Contrast Pairs</p>
+          <div className="grid gap-2 md:grid-cols-3">
+            {matrix
+              .flat()
+              .filter((cell) => cell.fg.key !== cell.bg.key && cell.normalAAA)
+              .sort((a, b) => b.ratio - a.ratio)
+              .slice(0, 6)
+              .map((cell) => (
+                <div
+                  key={`best-${cell.fg.key}-${cell.bg.key}`}
+                  className="flex items-center gap-2 p-2 rounded-lg border"
+                >
+                  <div className="flex">
+                    <div
+                      className="w-6 h-6 rounded-l border"
+                      style={{ backgroundColor: cell.fg.hex }}
+                    />
+                    <div
+                      className="w-6 h-6 rounded-r border-y border-r"
+                      style={{ backgroundColor: cell.bg.hex }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs truncate">
+                      {cell.fg.name} / {cell.bg.name}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground font-mono">
+                      {cell.ratio.toFixed(2)}:1
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="text-[10px]">AAA</Badge>
+                </div>
+              ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 type ExportFormat = "css" | "tailwind" | "json";
 
 function exportColors(colors: BrandAsset[], format: ExportFormat): string {
@@ -1357,6 +1598,9 @@ export default function BrandColors() {
 
         {/* Contrast Checker Tool */}
         {colors && colors.length > 0 && <ContrastChecker colors={colors} />}
+
+        {/* Accessibility Matrix */}
+        <AccessibilityMatrix />
 
         {/* WCAG Contrast Guide */}
         <Card>
