@@ -229,12 +229,12 @@ export default function AdminGenerate() {
 
               <div className="space-y-2">
                 <Label>Trigger Category (optional)</Label>
-                <Select value={triggerCategory} onValueChange={setTriggerCategory}>
+                <Select value={triggerCategory || "any"} onValueChange={(v) => setTriggerCategory(v === "any" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Any trigger..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
+                    <SelectItem value="any">Any</SelectItem>
                     {TRIGGER_CATEGORIES.map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         {cat}
