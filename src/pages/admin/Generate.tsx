@@ -9,8 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Sparkles, Save, RefreshCw } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, LayoutList, LayoutGrid, Eye } from 'lucide-react';
 import { ThoughtBubble } from '@/components/ThoughtBubble';
+import { BubblesSheep } from '@/components/BubblesSheep';
+import { ModeBadge } from '@/components/ModeBadge';
+import { Switch } from '@/components/ui/switch';
 import type { Database } from '@/integrations/supabase/types';
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
@@ -50,6 +53,8 @@ export default function AdminGenerate() {
   const [generatedThoughts, setGeneratedThoughts] = useState<GeneratedThought[]>([]);
   const [generatedScenario, setGeneratedScenario] = useState<GeneratedScenario | null>(null);
   const [generatedProduct, setGeneratedProduct] = useState<any>(null);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
 
   async function handleGenerate() {
     setLoading(true);
@@ -280,29 +285,140 @@ export default function AdminGenerate() {
             <CardContent>
               {/* Thoughts Results */}
               {generatedThoughts.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-4">
+                  {/* Header with controls */}
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <span className="text-sm font-medium">{generatedThoughts.length} thoughts</span>
-                    <Button size="sm" onClick={saveAllThoughts}>
-                      <Save className="h-3 w-3 mr-1" />
-                      Save All
-                    </Button>
-                  </div>
-                  {generatedThoughts.map((thought, idx) => (
-                    <div key={idx} className="p-3 bg-secondary/50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant="outline" className="capitalize">
-                          {modeLabels[thought.mode]}
-                        </Badge>
-                        <Button size="sm" variant="ghost" onClick={() => saveThought(thought)}>
-                          <Save className="h-3 w-3" />
-                        </Button>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Preview</span>
+                        <Switch
+                          checked={previewMode}
+                          onCheckedChange={setPreviewMode}
+                        />
                       </div>
-                      <ThoughtBubble mode={thought.mode as any} size="sm">
-                        <p className="text-sm">{thought.text}</p>
-                      </ThoughtBubble>
+                      <Button size="sm" onClick={saveAllThoughts}>
+                        <Save className="h-3 w-3 mr-1" />
+                        Save All
+                      </Button>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Storefront Preview Mode */}
+                  {previewMode ? (
+                    <div className="space-y-4">
+                      {/* Mock storefront card */}
+                      <div className="relative bg-gradient-to-br from-bubbles-cream to-bubbles-mist/20 rounded-xl p-6 border border-bubbles-gorse/30">
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="outline" className="text-[10px] bg-background/80">
+                            Storefront Preview
+                          </Badge>
+                        </div>
+                        
+                        {/* Bubbles with thought */}
+                        <div className="flex flex-col items-center gap-4 pt-4">
+                          <BubblesSheep 
+                            size="md" 
+                            animated 
+                          />
+                          <ThoughtBubble 
+                            mode={generatedThoughts[currentPreviewIndex]?.mode as any || 'innocent'} 
+                            size="md"
+                          >
+                            <p className="text-sm leading-relaxed">
+                              {generatedThoughts[currentPreviewIndex]?.text}
+                            </p>
+                          </ThoughtBubble>
+                          
+                          <div className="flex items-center gap-2 mt-2">
+                            <ModeBadge mode={generatedThoughts[currentPreviewIndex]?.mode as any || 'innocent'} />
+                            {generatedThoughts[currentPreviewIndex]?.trigger_category && (
+                              <Badge variant="secondary" className="text-xs">
+                                {generatedThoughts[currentPreviewIndex]?.trigger_category}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={currentPreviewIndex === 0}
+                            onClick={() => setCurrentPreviewIndex(i => Math.max(0, i - 1))}
+                          >
+                            ← Previous
+                          </Button>
+                          <span className="text-xs text-muted-foreground">
+                            {currentPreviewIndex + 1} of {generatedThoughts.length}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={currentPreviewIndex === generatedThoughts.length - 1}
+                            onClick={() => setCurrentPreviewIndex(i => Math.min(generatedThoughts.length - 1, i + 1))}
+                          >
+                            Next →
+                          </Button>
+                        </div>
+
+                        {/* Save current */}
+                        <div className="mt-4 flex justify-center">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => saveThought(generatedThoughts[currentPreviewIndex])}
+                          >
+                            <Save className="h-3 w-3 mr-1" />
+                            Save This Thought
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Thumbnail strip */}
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {generatedThoughts.map((thought, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentPreviewIndex(idx)}
+                            className={`shrink-0 p-2 rounded-lg border text-xs text-left transition-all w-32 ${
+                              idx === currentPreviewIndex 
+                                ? 'border-accent bg-accent/10' 
+                                : 'border-border bg-secondary/30 hover:bg-secondary/50'
+                            }`}
+                          >
+                            <Badge variant="outline" className="capitalize text-[9px] mb-1">
+                              {thought.mode}
+                            </Badge>
+                            <p className="line-clamp-2 text-[10px] text-muted-foreground">
+                              {thought.text}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    /* List Mode */
+                    <div className="space-y-3">
+                      {generatedThoughts.map((thought, idx) => (
+                        <div key={idx} className="p-3 bg-secondary/50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="outline" className="capitalize">
+                              {modeLabels[thought.mode]}
+                            </Badge>
+                            <Button size="sm" variant="ghost" onClick={() => saveThought(thought)}>
+                              <Save className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <ThoughtBubble mode={thought.mode as any} size="sm">
+                            <p className="text-sm">{thought.text}</p>
+                          </ThoughtBubble>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
