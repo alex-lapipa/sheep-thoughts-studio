@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Check, BookOpen } from "lucide-react";
+import { Copy, Check, BookOpen, Share2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -111,6 +111,40 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
 
   const citation = generateCitation();
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `Bubbles Institute Citation: ${topic || "A Verified Fact"}`,
+      text: citation,
+    };
+
+    try {
+      // Use Web Share API if available (mobile devices)
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+        toast.success("Shared successfully!");
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(citation);
+        setCopied(true);
+        toast.success("Citation copied to clipboard");
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (error) {
+      // User cancelled share or error occurred
+      if ((error as Error).name !== 'AbortError') {
+        // Try clipboard as fallback
+        try {
+          await navigator.clipboard.writeText(citation);
+          setCopied(true);
+          toast.success("Citation copied to clipboard");
+          setTimeout(() => setCopied(false), 2000);
+        } catch {
+          toast.error("Unable to share or copy citation");
+        }
+      }
+    }
+  };
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(citation);
@@ -160,6 +194,16 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
               Copy
             </>
           )}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleShare}
+          className="gap-2"
+        >
+          <Share2 className="h-3.5 w-3.5" />
+          Share
         </Button>
       </div>
 
