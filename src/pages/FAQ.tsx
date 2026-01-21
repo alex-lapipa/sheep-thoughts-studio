@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -42,6 +42,7 @@ const FAQ = () => {
     question: string;
     answer: string;
     timestamp: number;
+    tags?: string[];
   }
   const [questionHistory, setQuestionHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -50,6 +51,19 @@ const FAQ = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   
+  // Tags/Categories
+  const PREDEFINED_TAGS = [
+    { id: "life", label: "Life Advice", emoji: "🌱", color: "bg-green-500/20 text-green-700 dark:text-green-400" },
+    { id: "philosophy", label: "Philosophy", emoji: "🧠", color: "bg-purple-500/20 text-purple-700 dark:text-purple-400" },
+    { id: "science", label: "Science", emoji: "🔬", color: "bg-blue-500/20 text-blue-700 dark:text-blue-400" },
+    { id: "relationships", label: "Relationships", emoji: "💕", color: "bg-pink-500/20 text-pink-700 dark:text-pink-400" },
+    { id: "work", label: "Work & Career", emoji: "💼", color: "bg-amber-500/20 text-amber-700 dark:text-amber-400" },
+    { id: "funny", label: "Funny", emoji: "😂", color: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400" },
+    { id: "deep", label: "Deep Thoughts", emoji: "🌌", color: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-400" },
+    { id: "practical", label: "Practical", emoji: "🔧", color: "bg-slate-500/20 text-slate-700 dark:text-slate-400" },
+  ];
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [editingTagsFor, setEditingTagsFor] = useState<string | null>(null);
   // Load favorites from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("bubbles-favorites");
@@ -115,6 +129,41 @@ const FAQ = () => {
       return updated;
     });
   }, []);
+  
+  // Tag management
+  const toggleTag = useCallback((itemId: string, tagId: string) => {
+    setQuestionHistory(prev => {
+      const updated = prev.map(item => {
+        if (item.id !== itemId) return item;
+        const currentTags = item.tags || [];
+        const newTags = currentTags.includes(tagId)
+          ? currentTags.filter(t => t !== tagId)
+          : [...currentTags, tagId];
+        return { ...item, tags: newTags };
+      });
+      localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+  
+  // Get all unique tags used in history
+  const usedTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    questionHistory.forEach(item => {
+      item.tags?.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet);
+  }, [questionHistory]);
+  
+  // Filter history by tag and favorites
+  const filteredHistory = useMemo(() => {
+    return questionHistory.filter(item => {
+      if (showFavoritesOnly && !favorites.includes(item.id)) return false;
+      if (selectedTagFilter && !item.tags?.includes(selectedTagFilter)) return false;
+      return true;
+    });
+  }, [questionHistory, showFavoritesOnly, favorites, selectedTagFilter]);
+  
   const shareWisdom = useCallback(() => {
     if (!randomWisdom) return;
     share({
@@ -773,7 +822,8 @@ const FAQ = () => {
               
               {showHistory && (
                 <div className="mt-4 space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  {/* Filter Controls */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
                     {/* Favorites Toggle */}
                     <Button
                       variant={showFavoritesOnly ? "default" : "outline"}
@@ -786,132 +836,255 @@ const FAQ = () => {
                       {showFavoritesOnly ? "Show All" : `Favorites (${favorites.length})`}
                     </Button>
                     
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const itemsToExport = showFavoritesOnly 
-                            ? questionHistory.filter(item => favorites.includes(item.id))
-                            : questionHistory;
-                          const content = itemsToExport.map((item, index) => {
-                            const date = new Date(item.timestamp).toLocaleString();
-                            const isFav = favorites.includes(item.id) ? " ⭐" : "";
-                            return `--- Question ${index + 1}${isFav} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
-                          }).join('\n\n');
-                          
-                          const header = `🐑 Bubbles Wisdom History${showFavoritesOnly ? " (Favorites)" : ""}\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${itemsToExport.length}\n\n${'='.repeat(50)}\n\n`;
-                          const fullContent = header + content;
-                          
-                          const blob = new Blob([fullContent], { type: 'text/plain' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `bubbles-wisdom-${showFavoritesOnly ? "favorites-" : ""}${new Date().toISOString().split('T')[0]}.txt`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                          analytics.exportHistory(itemsToExport.length, showFavoritesOnly);
-                          toast.success("History exported successfully!");
-                        }}
-                        className="gap-2"
-                      >
-                        <Download className="w-4 h-4" />
-                        Export
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearHistory}
-                        className="text-destructive hover:text-destructive gap-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Clear All
-                      </Button>
-                    </div>
+                    {/* Tag Filter Dropdown */}
+                    {usedTags.length > 0 && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          Filter:
+                        </span>
+                        {PREDEFINED_TAGS.filter(tag => usedTags.includes(tag.id)).map(tag => (
+                          <button
+                            key={tag.id}
+                            onClick={() => setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id)}
+                            className={cn(
+                              "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-all",
+                              selectedTagFilter === tag.id
+                                ? "ring-2 ring-primary ring-offset-1"
+                                : "opacity-70 hover:opacity-100",
+                              tag.color
+                            )}
+                          >
+                            <span>{tag.emoji}</span>
+                            <span>{tag.label}</span>
+                            {selectedTagFilter === tag.id && (
+                              <X className="w-3 h-3 ml-0.5" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
-                  {questionHistory
-                    .filter(item => !showFavoritesOnly || favorites.includes(item.id))
-                    .map((item) => {
-                      const isFavorited = favorites.includes(item.id);
-                      return (
-                        <div
-                          key={item.id}
-                          className={cn(
-                            "p-4 bg-card rounded-xl border shadow-sm transition-all",
-                            isFavorited && "ring-2 ring-accent/50 border-accent/30"
-                          )}
-                        >
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <p className="font-display font-semibold text-sm text-foreground">
-                              "{item.question}"
-                            </p>
-                            <div className="flex items-center gap-1 shrink-0">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className={cn(
-                                  "h-7 w-7 transition-colors",
-                                  isFavorited 
-                                    ? "text-accent hover:text-accent/80" 
-                                    : "text-muted-foreground hover:text-accent"
-                                )}
-                                onClick={() => toggleFavorite(item.id)}
-                                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                              >
-                                <Star className={cn("w-3.5 h-3.5", isFavorited && "fill-current")} />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-muted-foreground hover:text-primary"
-                                onClick={() => {
-                                  setUserQuestion(item.question);
-                                  setBubblesAnswer(null);
-                                  document.getElementById('ask-bubbles-section')?.scrollIntoView({ behavior: 'smooth' });
-                                }}
-                                title="Ask again"
-                              >
-                                <RotateCcw className="w-3.5 h-3.5" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                                onClick={() => deleteHistoryItem(item.id)}
-                                title="Delete"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {item.answer}
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const itemsToExport = filteredHistory;
+                        const content = itemsToExport.map((item, index) => {
+                          const date = new Date(item.timestamp).toLocaleString();
+                          const isFav = favorites.includes(item.id) ? " ⭐" : "";
+                          const tags = item.tags?.length 
+                            ? ` [${item.tags.map(t => PREDEFINED_TAGS.find(pt => pt.id === t)?.label || t).join(', ')}]`
+                            : "";
+                          return `--- Question ${index + 1}${isFav}${tags} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
+                        }).join('\n\n');
+                        
+                        const filterLabel = [
+                          showFavoritesOnly && "Favorites",
+                          selectedTagFilter && PREDEFINED_TAGS.find(t => t.id === selectedTagFilter)?.label
+                        ].filter(Boolean).join(" + ") || "All";
+                        
+                        const header = `🐑 Bubbles Wisdom History (${filterLabel})\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${itemsToExport.length}\n\n${'='.repeat(50)}\n\n`;
+                        const fullContent = header + content;
+                        
+                        const blob = new Blob([fullContent], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bubbles-wisdom-${new Date().toISOString().split('T')[0]}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        analytics.exportHistory(itemsToExport.length, showFavoritesOnly);
+                        toast.success("History exported successfully!");
+                      }}
+                      className="gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearHistory}
+                      className="text-destructive hover:text-destructive gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Clear All
+                    </Button>
+                  </div>
+                  
+                  {/* History Items */}
+                  {filteredHistory.map((item) => {
+                    const isFavorited = favorites.includes(item.id);
+                    const isEditingTags = editingTagsFor === item.id;
+                    
+                    return (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          "p-4 bg-card rounded-xl border shadow-sm transition-all",
+                          isFavorited && "ring-2 ring-accent/50 border-accent/30"
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <p className="font-display font-semibold text-sm text-foreground">
+                            "{item.question}"
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <p className="text-xs text-muted-foreground/60">
-                              {new Date(item.timestamp).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </p>
-                            {isFavorited && (
-                              <span className="text-xs text-accent font-medium">⭐ Favorited</span>
-                            )}
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "h-7 w-7 transition-colors",
+                                isEditingTags
+                                  ? "text-primary bg-primary/10"
+                                  : "text-muted-foreground hover:text-primary"
+                              )}
+                              onClick={() => setEditingTagsFor(isEditingTags ? null : item.id)}
+                              title="Add tags"
+                            >
+                              <Tag className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "h-7 w-7 transition-colors",
+                                isFavorited 
+                                  ? "text-accent hover:text-accent/80" 
+                                  : "text-muted-foreground hover:text-accent"
+                              )}
+                              onClick={() => toggleFavorite(item.id)}
+                              title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                            >
+                              <Star className={cn("w-3.5 h-3.5", isFavorited && "fill-current")} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-primary"
+                              onClick={() => {
+                                setUserQuestion(item.question);
+                                setBubblesAnswer(null);
+                                document.getElementById('ask-bubbles-section')?.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                              title="Ask again"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={() => deleteHistoryItem(item.id)}
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
                           </div>
                         </div>
-                      );
-                    })}
+                        
+                        {/* Tag Editor */}
+                        {isEditingTags && (
+                          <div className="mb-3 p-3 bg-muted/50 rounded-lg border animate-fade-in">
+                            <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                              <Tag className="w-3 h-3" />
+                              Add categories to organize this answer:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {PREDEFINED_TAGS.map(tag => {
+                                const isSelected = item.tags?.includes(tag.id);
+                                return (
+                                  <button
+                                    key={tag.id}
+                                    onClick={() => toggleTag(item.id, tag.id)}
+                                    className={cn(
+                                      "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-all",
+                                      isSelected
+                                        ? tag.color
+                                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                    )}
+                                  >
+                                    <span>{tag.emoji}</span>
+                                    <span>{tag.label}</span>
+                                    {isSelected && <Check className="w-3 h-3 ml-0.5" />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Current Tags Display */}
+                        {!isEditingTags && item.tags && item.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {item.tags.map(tagId => {
+                              const tag = PREDEFINED_TAGS.find(t => t.id === tagId);
+                              if (!tag) return null;
+                              return (
+                                <span
+                                  key={tagId}
+                                  className={cn(
+                                    "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs",
+                                    tag.color
+                                  )}
+                                >
+                                  <span>{tag.emoji}</span>
+                                  <span>{tag.label}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                        
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {item.answer}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <p className="text-xs text-muted-foreground/60">
+                            {new Date(item.timestamp).toLocaleDateString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          {isFavorited && (
+                            <span className="text-xs text-accent font-medium">⭐ Favorited</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                   
-                  {showFavoritesOnly && favorites.length === 0 && (
+                  {/* Empty States */}
+                  {filteredHistory.length === 0 && (showFavoritesOnly || selectedTagFilter) && (
                     <div className="text-center py-8 text-muted-foreground">
-                      <Star className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p>No favorites yet</p>
-                      <p className="text-sm">Star your best answers to save them here</p>
+                      {selectedTagFilter ? (
+                        <>
+                          <Tag className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No answers tagged with "{PREDEFINED_TAGS.find(t => t.id === selectedTagFilter)?.label}"</p>
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            onClick={() => setSelectedTagFilter(null)}
+                            className="mt-1"
+                          >
+                            Clear filter
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Star className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No favorites yet</p>
+                          <p className="text-sm">Star your best answers to save them here</p>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
