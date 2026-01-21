@@ -124,8 +124,11 @@ export function ThoughtCarousel() {
         opts={{
           align: "center",
           loop: true,
+          dragFree: false,
+          containScroll: "trimSnaps",
+          skipSnaps: false,
         }}
-        className="w-full"
+        className="w-full touch-pan-y"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
           {thoughts.map((thought, index) => (
