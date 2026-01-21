@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Play, Pause, ChevronRight, ChevronLeft, Sparkles, RefreshCw } from "lucide-react";
+import { Play, Pause, ChevronRight, ChevronLeft, Sparkles, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -385,6 +385,20 @@ export function StorefrontScenarioPlayer({
 
         {/* Controls */}
         <div className="flex items-center justify-center gap-2 pt-2">
+          {/* Shuffle button - prominent */}
+          {scenarios.length > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 px-3 mr-2 gap-1.5 font-display text-xs hover:bg-accent/10 transition-all hover:scale-105"
+              onClick={handleShuffle}
+              title="Surprise me with a random scenario"
+            >
+              <Shuffle className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Shuffle</span>
+            </Button>
+          )}
+
           <Button
             variant="ghost"
             size="icon"
@@ -421,18 +435,6 @@ export function StorefrontScenarioPlayer({
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-
-          {scenarios.length > 1 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 ml-2"
-              onClick={handleShuffle}
-              title="Random scenario"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-            </Button>
-          )}
         </div>
 
         {/* Beat counter */}

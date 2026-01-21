@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -174,6 +174,22 @@ export function ScenarioPlayer() {
     }, 150);
     setIsPlaying(false);
   }, []);
+
+  const handleShuffle = useCallback(() => {
+    if (scenarios.length < 2) return;
+    let randomIndex = Math.floor(Math.random() * scenarios.length);
+    // Ensure we get a different scenario
+    while (scenarios[randomIndex]?.id === selectedScenario?.id && scenarios.length > 1) {
+      randomIndex = Math.floor(Math.random() * scenarios.length);
+    }
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedScenario(scenarios[randomIndex]);
+      setCurrentBeatIndex(0);
+      setIsTransitioning(false);
+      setIsPlaying(true); // Auto-play the new scenario
+    }, 200);
+  }, [scenarios, selectedScenario]);
 
   const currentBeat = selectedScenario?.beats[currentBeatIndex];
   const currentMode = currentBeat?.mode || "innocent";
@@ -441,6 +457,18 @@ export function ScenarioPlayer() {
 
         {/* Playback Controls */}
         <div className="flex items-center justify-center gap-3">
+          {/* Shuffle Button */}
+          {scenarios.length > 1 && (
+            <Button
+              variant="outline"
+              onClick={handleShuffle}
+              className="transition-all duration-300 gap-2 font-display hover:scale-105"
+            >
+              <Shuffle className="h-4 w-4" />
+              Shuffle
+            </Button>
+          )}
+          
           <Button
             variant="outline"
             size="icon"
