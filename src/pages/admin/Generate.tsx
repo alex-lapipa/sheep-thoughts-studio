@@ -21,6 +21,7 @@ type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage', 'nuclear'];
 
 const TRIGGER_CATEGORIES = [
+  // Original psychological triggers
   "The Look™",
   "Tone Crime",
   "Object Conspiracy",
@@ -28,6 +29,17 @@ const TRIGGER_CATEGORIES = [
   "Accidental Symbolism",
   "False Patterns",
   "Silence as Aggression",
+  // Global thought leadership domains
+  "Geopolitical Analysis",
+  "Tech Expert Opinion",
+  "Scientific Certainty",
+  "Sports Commentary",
+  "Economic Insights",
+  "Cultural Observations",
+  "Historical Revisionism",
+  "Medical Expertise",
+  "Environmental Theory",
+  "Space & Astronomy",
 ];
 
 interface GeneratedThought {
