@@ -429,27 +429,100 @@ const FAQ = () => {
                 
                 {/* Demo Mode Controls */}
                 {showDemoMode && (
-                  <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-dashed border-accent animate-fade-in">
+                  <div className="mt-4 p-4 bg-accent/10 rounded-lg border border-dashed border-accent animate-fade-in">
                     <div className="flex items-center gap-2 mb-3">
                       <Zap className="w-4 h-4 text-accent" />
-                      <span className="text-xs font-bold text-accent">Demo Mode</span>
+                      <span className="text-sm font-bold text-accent">🎮 Demo Mode</span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {STREAK_MILESTONES.map((milestone) => (
+                    
+                    {/* Celebration Triggers */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">Trigger Celebrations:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {STREAK_MILESTONES.map((milestone) => (
+                          <Button
+                            key={milestone.days}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => celebrateMilestone(milestone)}
+                            className="text-xs gap-1.5 hover-scale"
+                          >
+                            <span>{milestone.emoji}</span>
+                            <span>{milestone.days}d</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Streak Simulation */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">Simulate Streak:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[0, 1, 3, 7, 14, 30, 60, 100, 365].map((days) => (
+                          <Button
+                            key={days}
+                            variant={wisdomStreak === days ? "default" : "secondary"}
+                            size="sm"
+                            onClick={() => setWisdomStreak(days)}
+                            className="text-xs hover-scale"
+                          >
+                            {days}d
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Badge Management */}
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">Badge Management:</p>
+                      <div className="flex flex-wrap gap-2">
                         <Button
-                          key={milestone.days}
                           variant="outline"
                           size="sm"
-                          onClick={() => celebrateMilestone(milestone)}
-                          className="text-xs gap-1.5 hover-scale"
+                          onClick={() => {
+                            localStorage.setItem("bubbles-celebrated-milestones", JSON.stringify(STREAK_MILESTONES.map(m => m.days)));
+                            toast.success("All badges unlocked!");
+                            window.location.reload();
+                          }}
+                          className="text-xs gap-1.5"
                         >
-                          <span>{milestone.emoji}</span>
-                          <span>{milestone.days}d</span>
+                          <Trophy className="w-3.5 h-3.5" />
+                          Unlock All
                         </Button>
-                      ))}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            localStorage.removeItem("bubbles-celebrated-milestones");
+                            toast.success("All badges reset!");
+                            window.location.reload();
+                          }}
+                          className="text-xs gap-1.5 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Reset Badges
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            localStorage.removeItem("bubbles-wisdom-dates");
+                            localStorage.removeItem("bubbles-celebrated-milestones");
+                            setWisdomStreak(0);
+                            setTotalWisdoms(0);
+                            toast.success("All progress reset!");
+                            window.location.reload();
+                          }}
+                          className="text-xs gap-1.5 text-destructive hover:text-destructive"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          Reset All
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Press Ctrl+Shift+D to hide
+                    
+                    <p className="text-xs text-muted-foreground">
+                      Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Ctrl+Shift+D</kbd> to hide
                     </p>
                   </div>
                 )}
