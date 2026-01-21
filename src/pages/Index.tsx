@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { BubblesSheep } from "@/components/BubblesSheep";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
@@ -113,22 +114,7 @@ export default function Index() {
 
             {/* Bubbles Character */}
             <div className="relative flex justify-center items-center">
-              <div className="relative">
-                <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-bubbles-cream border-4 border-bubbles-heather shadow-2xl flex items-center justify-center animate-float">
-                  <div className="relative">
-                    <div className="flex gap-6 mb-3">
-                      <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
-                      <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
-                    </div>
-                    <div className="w-6 h-3 md:w-8 md:h-4 mx-auto rounded-full bg-bubbles-heather/50" />
-                  </div>
-                </div>
-                
-                <div className="absolute -top-4 -left-2 w-12 h-12 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-                <div className="absolute -top-2 right-0 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-                <div className="absolute top-8 -right-4 w-14 h-14 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-                <div className="absolute -bottom-2 -left-4 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-              </div>
+              <BubblesSheep size="xl" className="drop-shadow-2xl" />
               
               {currentThought && (
                 <div key={bubbleKey} className="absolute -top-4 right-0 md:right-8 max-w-[280px]">

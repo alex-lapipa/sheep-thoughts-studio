@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
+import { BubblesLogo } from "./BubblesSheep";
 import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,9 +23,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-bubbles-cream border-2 border-bubbles-heather flex items-center justify-center">
-            <span className="font-display font-bold text-sm text-bubbles-peat">B</span>
-          </div>
+          <BubblesLogo />
           <span className="font-display font-bold text-xl tracking-tight">Bubbles</span>
         </Link>
 
