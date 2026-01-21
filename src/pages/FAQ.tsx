@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -49,6 +49,28 @@ const FAQ = () => {
     { question: t("faq.q16"), answer: t("faq.a16") },
     { question: t("faq.q17"), answer: t("faq.a17") },
   ];
+
+  // Daily wisdom - consistent based on date
+  const dailyWisdom = useMemo(() => {
+    const today = new Date();
+    const dateString = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    // Simple hash function to get a consistent index from date
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+      hash = ((hash << 5) - hash) + dateString.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    const index = Math.abs(hash) % faqs.length;
+    return faqs[index];
+  }, [faqs]);
+
+  const shareDailyWisdom = useCallback(() => {
+    share({
+      title: "Today's Bubbles Wisdom",
+      text: `"${dailyWisdom.question}" — ${dailyWisdom.answer}`,
+      url: window.location.href,
+    });
+  }, [dailyWisdom, share]);
 
   const getRandomWisdom = useCallback(() => {
     setIsSpinning(true);
@@ -113,6 +135,44 @@ const FAQ = () => {
             <p className="text-muted-foreground text-lg">
               {t("faqPage.subtitle")}
             </p>
+          </div>
+
+          {/* Daily Bubbles Wisdom */}
+          <div className="mb-6 p-6 bg-gradient-to-br from-primary/20 to-secondary/30 rounded-2xl border border-primary/30">
+            <div className="flex flex-col items-center text-center">
+              <Calendar className="w-8 h-8 text-primary mb-3" />
+              <h3 className="font-display font-bold text-xl mb-1">Today's Wisdom</h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+              </p>
+              
+              <div className="w-full p-5 bg-card rounded-xl border shadow-sm">
+                <p className="font-display font-semibold text-lg mb-2 text-foreground">
+                  "{dailyWisdom.question}"
+                </p>
+                <p className="text-muted-foreground italic mb-4">
+                  {dailyWisdom.answer}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={shareDailyWisdom}
+                  className="gap-2 font-display"
+                >
+                  {isCopied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
+                      Share Today's Wisdom
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Random Bubbles Wisdom */}
