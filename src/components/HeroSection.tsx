@@ -2,23 +2,62 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
-import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type BubblesMode = Database['public']['Enums']['bubbles_mode'];
+
+interface ThoughtData {
+  id: string;
+  text: string;
+  mode: BubblesMode;
+}
+
+const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
 
 export function HeroSection() {
-  const [currentBubble, setCurrentBubble] = useState(getRandomBubble('innocent'));
+  const [currentThought, setCurrentThought] = useState<ThoughtData | null>(null);
+  const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [bubbleKey, setBubbleKey] = useState(0);
 
+  // Fetch thoughts from database on mount
   useEffect(() => {
+    async function fetchThoughts() {
+      const { data, error } = await supabase
+        .from('bubbles_thoughts')
+        .select('id, text, mode')
+        .in('mode', MODES)
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching thoughts:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setThoughts(data);
+        // Set initial random thought
+        const randomThought = data[Math.floor(Math.random() * data.length)];
+        setCurrentThought(randomThought);
+      }
+    }
+
+    fetchThoughts();
+  }, []);
+
+  // Rotate thoughts every 4 seconds
+  useEffect(() => {
+    if (thoughts.length === 0) return;
+
     const interval = setInterval(() => {
-      const modes: BubbleMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
-      const randomMode = modes[Math.floor(Math.random() * modes.length)];
-      setCurrentBubble(getRandomBubble(randomMode));
+      const randomThought = thoughts[Math.floor(Math.random() * thoughts.length)];
+      setCurrentThought(randomThought);
       setBubbleKey(prev => prev + 1);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [thoughts]);
 
   return (
     <section className="hero-gradient py-20 md:py-32 overflow-hidden">
@@ -57,14 +96,16 @@ export function HeroSection() {
             </div>
             
             {/* Thought Bubble */}
-            <div 
-              key={bubbleKey} 
-              className="absolute -top-4 right-0 md:right-8 max-w-[260px]"
-            >
-              <ThoughtBubble mode={currentBubble.mode} size="md">
-                <p className="text-foreground italic">"{currentBubble.text}"</p>
-              </ThoughtBubble>
-            </div>
+            {currentThought && (
+              <div 
+                key={bubbleKey} 
+                className="absolute -top-4 right-0 md:right-8 max-w-[260px]"
+              >
+                <ThoughtBubble mode={currentThought.mode as any} size="md">
+                  <p className="text-foreground italic">"{currentThought.text}"</p>
+                </ThoughtBubble>
+              </div>
+            )}
           </div>
         </div>
       </div>
