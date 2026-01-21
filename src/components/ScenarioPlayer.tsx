@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useShare } from "@/hooks/useShare";
 import { useSettings } from "@/contexts/SettingsContext";
+import { analytics } from "@/lib/analytics";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -181,6 +182,7 @@ export function ScenarioPlayer() {
   const handleShuffle = useCallback(() => {
     if (scenarios.length < 2) return;
     triggerHaptic([10, 50, 10]); // Double-tap pattern for shuffle
+    analytics.shuffleScenario();
     let randomIndex = Math.floor(Math.random() * scenarios.length);
     // Ensure we get a different scenario
     while (scenarios[randomIndex]?.id === selectedScenario?.id && scenarios.length > 1) {
@@ -275,13 +277,19 @@ export function ScenarioPlayer() {
       setSelectedScenario(scenario);
       setCurrentBeatIndex(0);
       setIsPlaying(false);
+      analytics.viewScenario(scenario.title);
     }
   };
 
   const handlePlayPause = useCallback(() => {
     triggerHaptic(10);
-    setIsPlaying((prev) => !prev);
-  }, [triggerHaptic]);
+    setIsPlaying((prev) => {
+      if (!prev && selectedScenario) {
+        analytics.playScenario(selectedScenario.title);
+      }
+      return !prev;
+    });
+  }, [triggerHaptic, selectedScenario]);
 
   const handlePrevBeat = useCallback(() => {
     triggerHaptic(10);

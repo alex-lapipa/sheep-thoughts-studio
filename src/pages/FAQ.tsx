@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useShare } from "@/hooks/useShare";
 import confetti from "canvas-confetti";
 import { StreakBadges } from "@/components/StreakBadges";
+import { analytics } from "@/lib/analytics";
 
 // Milestone definitions
 const STREAK_MILESTONES = [
@@ -63,10 +64,12 @@ const FAQ = () => {
   
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(prev => {
-      const updated = prev.includes(id) 
-        ? prev.filter(f => f !== id)
-        : [...prev, id];
+      const isFavoriting = !prev.includes(id);
+      const updated = isFavoriting 
+        ? [...prev, id]
+        : prev.filter(f => f !== id);
       localStorage.setItem("bubbles-favorites", JSON.stringify(updated));
+      analytics.favoriteAnswer(isFavoriting);
       return updated;
     });
   }, []);
@@ -101,6 +104,7 @@ const FAQ = () => {
   const clearHistory = useCallback(() => {
     setQuestionHistory([]);
     localStorage.removeItem("bubbles-question-history");
+    analytics.clearHistory();
     toast.success("History cleared!");
   }, []);
   
@@ -202,6 +206,7 @@ const FAQ = () => {
   const celebrateMilestone = useCallback((milestone: typeof STREAK_MILESTONES[0]) => {
     setCurrentMilestone(milestone);
     setShowMilestone(true);
+    analytics.unlockMilestone(milestone.days, milestone.label);
     
     // Fire confetti!
     const duration = 3000;
@@ -369,6 +374,7 @@ const FAQ = () => {
 
     setIsAsking(true);
     setBubblesAnswer(null);
+    analytics.askQuestion(userQuestion.trim());
 
     try {
       const { data, error } = await supabase.functions.invoke("bubbles-answer", {
@@ -389,6 +395,7 @@ const FAQ = () => {
       const answer = data?.answer || "I stared at a fence post and forgot what you asked.";
       setBubblesAnswer(answer);
       saveToHistory(userQuestion.trim(), answer);
+      analytics.receiveAnswer();
     } catch (err) {
       console.error("Error:", err);
       toast.error("Bubbles wandered off. Try again.");
@@ -805,7 +812,7 @@ const FAQ = () => {
                           a.click();
                           document.body.removeChild(a);
                           URL.revokeObjectURL(url);
-                          
+                          analytics.exportHistory(itemsToExport.length, showFavoritesOnly);
                           toast.success("History exported successfully!");
                         }}
                         className="gap-2"
