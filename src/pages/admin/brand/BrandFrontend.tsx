@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Layout, 
   Home, 
@@ -16,9 +18,14 @@ import {
   Globe,
   Sparkles,
   Mountain,
-  Cloud
+  Cloud,
+  Play
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { ModeBadge } from "@/components/ModeBadge";
+import { BubblesSheep } from "@/components/BubblesSheep";
+import type { BubbleMode } from "@/data/thoughtBubbles";
 
 interface PageDocProps {
   title: string;
@@ -180,6 +187,150 @@ const coreComponents = [
   },
 ];
 
+const modes: BubbleMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
+
+const sampleThoughts: Record<BubbleMode, string> = {
+  innocent: "I wonder if clouds taste like cotton candy...",
+  concerned: "Wait... was that the farmer or a wolf?",
+  triggered: "They called me... a regular sheep?",
+  savage: "I've met smarter fences.",
+};
+
+function LiveComponentPreview() {
+  const [selectedMode, setSelectedMode] = useState<BubbleMode>('innocent');
+  const [sheepSize, setSheepSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [bubbleSize, setBubbleSize] = useState<'sm' | 'md' | 'lg'>('md');
+
+  return (
+    <Card className="border-2 border-dashed border-bubbles-heather/30 bg-gradient-to-br from-bubbles-cream/10 to-bubbles-heather/5">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Play className="h-5 w-5 text-bubbles-gold" />
+          Live Component Preview
+        </CardTitle>
+        <CardDescription>
+          Interactive preview of core brand components in all mode variants
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        {/* Mode Selector */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-sm">Select Mode</h4>
+            <div className="flex gap-2">
+              {modes.map((mode) => (
+                <ModeBadge
+                  key={mode}
+                  mode={mode}
+                  active={selectedMode === mode}
+                  onClick={() => setSelectedMode(mode)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* ThoughtBubble Preview */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                ThoughtBubble
+              </h4>
+              <div className="flex gap-1">
+                {(['sm', 'md', 'lg'] as const).map((size) => (
+                  <Button
+                    key={size}
+                    size="sm"
+                    variant={bubbleSize === size ? 'default' : 'outline'}
+                    className="text-xs h-7 px-2"
+                    onClick={() => setBubbleSize(size)}
+                  >
+                    {size.toUpperCase()}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 bg-muted/30 rounded-xl border border-border min-h-[160px] flex items-center justify-center">
+              <ThoughtBubble mode={selectedMode} size={bubbleSize}>
+                <p className="text-foreground">"{sampleThoughts[selectedMode]}"</p>
+                <p className="text-xs text-muted-foreground mt-1">— Bubbles</p>
+              </ThoughtBubble>
+            </div>
+            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg font-mono">
+              {`<ThoughtBubble mode="${selectedMode}" size="${bubbleSize}">`}
+            </div>
+          </div>
+
+          {/* BubblesSheep Preview */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                BubblesSheep
+              </h4>
+              <div className="flex gap-1">
+                {(['sm', 'md', 'lg'] as const).map((size) => (
+                  <Button
+                    key={size}
+                    size="sm"
+                    variant={sheepSize === size ? 'default' : 'outline'}
+                    className="text-xs h-7 px-2"
+                    onClick={() => setSheepSize(size)}
+                  >
+                    {size.toUpperCase()}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 bg-muted/30 rounded-xl border border-border min-h-[160px] flex items-center justify-center">
+              <BubblesSheep size={sheepSize} animated={true} />
+            </div>
+            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg font-mono">
+              {`<BubblesSheep size="${sheepSize}" animated={true} />`}
+            </div>
+          </div>
+        </div>
+
+        {/* All Modes Grid */}
+        <div className="space-y-4">
+          <h4 className="font-semibold text-sm">All Mode Variants (ThoughtBubble)</h4>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {modes.map((mode) => (
+              <div key={mode} className="space-y-2">
+                <ModeBadge mode={mode} className="w-full justify-center" />
+                <ThoughtBubble mode={mode} size="sm">
+                  <p className="text-sm">"{sampleThoughts[mode]}"</p>
+                </ThoughtBubble>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Size Comparison */}
+        <div className="space-y-4">
+          <h4 className="font-semibold text-sm">BubblesSheep Size Comparison</h4>
+          <div className="flex items-end justify-center gap-8 p-6 bg-muted/30 rounded-xl border border-border">
+            <div className="text-center space-y-2">
+              <BubblesSheep size="sm" animated={false} />
+              <Badge variant="outline" className="text-xs">sm (64px)</Badge>
+            </div>
+            <div className="text-center space-y-2">
+              <BubblesSheep size="md" animated={false} />
+              <Badge variant="outline" className="text-xs">md (128px)</Badge>
+            </div>
+            <div className="text-center space-y-2">
+              <BubblesSheep size="lg" animated={false} />
+              <Badge variant="outline" className="text-xs">lg (192px)</Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function BrandFrontend() {
   return (
     <AdminLayout>
@@ -308,6 +459,9 @@ export default function BrandFrontend() {
             ))}
           </div>
         </section>
+
+        {/* Live Component Preview */}
+        <LiveComponentPreview />
 
         {/* Design Tokens Reference */}
         <Card>
