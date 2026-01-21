@@ -186,6 +186,22 @@ export function ScenarioPlayer() {
         return;
       }
       
+      // Number keys 1-5 to jump to specific beats
+      if (e.key >= "1" && e.key <= "9" && selectedScenario) {
+        const beatIndex = parseInt(e.key, 10) - 1;
+        if (beatIndex < selectedScenario.beats.length) {
+          e.preventDefault();
+          triggerHaptic(10);
+          setIsTransitioning(true);
+          setTimeout(() => {
+            setCurrentBeatIndex(beatIndex);
+            setIsTransitioning(false);
+          }, 150);
+          setIsPlaying(false);
+        }
+        return;
+      }
+      
       switch (e.code) {
         case "Space":
           e.preventDefault();
@@ -229,7 +245,7 @@ export function ScenarioPlayer() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedScenario, currentBeatIndex]);
+  }, [selectedScenario, currentBeatIndex, triggerHaptic]);
   const handleSelectScenario = (id: string) => {
     const scenario = scenarios.find((s) => s.id === id);
     if (scenario) {
