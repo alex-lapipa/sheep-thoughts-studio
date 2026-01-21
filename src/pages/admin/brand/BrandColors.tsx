@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -519,6 +519,262 @@ function PaletteGenerator() {
   );
 }
 
+type HarmonyType = "analogous" | "complementary" | "triadic" | "split-complementary";
+
+interface HarmonyConfig {
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  getHues: (baseHue: number) => number[];
+}
+
+const HARMONY_CONFIG: Record<HarmonyType, HarmonyConfig> = {
+  analogous: {
+    name: "Analogous",
+    description: "Colors adjacent on the wheel — harmonious and serene",
+    icon: <Circle className="h-4 w-4" />,
+    getHues: (h) => [h - 30, h, h + 30],
+  },
+  complementary: {
+    name: "Complementary",
+    description: "Opposite colors — high contrast and vibrant",
+    icon: <Hexagon className="h-4 w-4" />,
+    getHues: (h) => [h, h + 180],
+  },
+  triadic: {
+    name: "Triadic",
+    description: "Three equidistant colors — balanced and dynamic",
+    icon: <Triangle className="h-4 w-4" />,
+    getHues: (h) => [h, h + 120, h + 240],
+  },
+  "split-complementary": {
+    name: "Split Complementary",
+    description: "Base + two adjacent to its complement — softer contrast",
+    icon: <Sparkles className="h-4 w-4" />,
+    getHues: (h) => [h, h + 150, h + 210],
+  },
+};
+
+function HarmonyGenerator() {
+  const [selectedBase, setSelectedBase] = useState<string>("gold");
+  const [harmonyType, setHarmonyType] = useState<HarmonyType>("analogous");
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const baseColor = WICKLOW_BASE[selectedBase as keyof typeof WICKLOW_BASE];
+  const baseHsl = hexToHsl(baseColor.hex);
+  const harmonyConfig = HARMONY_CONFIG[harmonyType];
+
+  const harmonyPalette = useMemo(() => {
+    const hues = harmonyConfig.getHues(baseHsl.h);
+    return hues.map((hue, i) => {
+      const normalizedHue = ((hue % 360) + 360) % 360;
+      const hex = hslToHex(normalizedHue, baseHsl.s, baseHsl.l);
+      return {
+        key: `harmony-${i}`,
+        name: i === 0 ? `Base (${baseColor.name})` : `Harmony ${i}`,
+        hex,
+        hue: Math.round(normalizedHue),
+        isBase: i === 0,
+      };
+    });
+  }, [baseHsl, harmonyConfig, baseColor.name]);
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    toast.success(`Copied ${label}`);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const exportHarmony = () => {
+    const css = `:root {\n  /* ${harmonyConfig.name} Harmony from ${baseColor.name} */\n${harmonyPalette
+      .map((c, i) => `  --harmony-${i}: ${c.hex};`)
+      .join("\n")}\n}`;
+
+    const blob = new Blob([css], { type: "text/css" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bubbles-${harmonyType}-harmony.css`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${harmonyConfig.name} harmony`);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Palette className="h-5 w-5" />
+          Color Harmony Generator
+        </CardTitle>
+        <CardDescription>
+          Create harmonious color combinations from any Wicklow base color
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Controls */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Base Color Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Base Color</label>
+            <Select value={selectedBase} onValueChange={setSelectedBase}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(WICKLOW_BASE).map(([key, color]) => (
+                  <SelectItem key={key} value={key}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded border"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span>{color.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Harmony Type Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Harmony Type</label>
+            <Select value={harmonyType} onValueChange={(v) => setHarmonyType(v as HarmonyType)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(HARMONY_CONFIG) as HarmonyType[]).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    <div className="flex items-center gap-2">
+                      {HARMONY_CONFIG[type].icon}
+                      <span>{HARMONY_CONFIG[type].name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Harmony Description */}
+        <div className="p-3 bg-muted/50 rounded-lg flex items-center gap-3">
+          {harmonyConfig.icon}
+          <p className="text-sm text-muted-foreground">{harmonyConfig.description}</p>
+        </div>
+
+        {/* Color Wheel Visualization */}
+        <div className="flex items-center justify-center py-4">
+          <div className="relative w-48 h-48">
+            {/* Color wheel background */}
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `conic-gradient(
+                  hsl(0, 70%, 50%),
+                  hsl(60, 70%, 50%),
+                  hsl(120, 70%, 50%),
+                  hsl(180, 70%, 50%),
+                  hsl(240, 70%, 50%),
+                  hsl(300, 70%, 50%),
+                  hsl(360, 70%, 50%)
+                )`,
+              }}
+            />
+            <div className="absolute inset-6 rounded-full bg-background" />
+            
+            {/* Harmony points */}
+            {harmonyPalette.map((color, i) => {
+              const angle = (color.hue - 90) * (Math.PI / 180);
+              const radius = 72;
+              const x = 96 + Math.cos(angle) * radius;
+              const y = 96 + Math.sin(angle) * radius;
+              
+              return (
+                <div
+                  key={color.key}
+                  className={`absolute w-6 h-6 rounded-full border-2 border-background shadow-lg transform -translate-x-1/2 -translate-y-1/2 ${
+                    color.isBase ? "ring-2 ring-offset-2 ring-foreground" : ""
+                  }`}
+                  style={{
+                    left: x,
+                    top: y,
+                    backgroundColor: color.hex,
+                  }}
+                  title={`${color.name}: ${color.hex}`}
+                />
+              );
+            })}
+            
+            {/* Center label */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xs font-medium text-muted-foreground">
+                {harmonyConfig.name}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Generated Palette */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Generated Harmony</p>
+            <Button variant="outline" size="sm" onClick={exportHarmony}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSS
+            </Button>
+          </div>
+
+          {/* Color strip */}
+          <div className="flex rounded-lg overflow-hidden border">
+            {harmonyPalette.map((color) => (
+              <div
+                key={color.key}
+                className={`flex-1 h-20 ${color.isBase ? "ring-2 ring-inset ring-foreground/20" : ""}`}
+                style={{ backgroundColor: color.hex }}
+              />
+            ))}
+          </div>
+
+          {/* Color cards */}
+          <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${harmonyPalette.length}, 1fr)` }}>
+            {harmonyPalette.map((color) => (
+              <div
+                key={color.key}
+                className={`rounded-lg border overflow-hidden group ${color.isBase ? "ring-2 ring-primary" : ""}`}
+              >
+                <div
+                  className="h-16"
+                  style={{ backgroundColor: color.hex }}
+                />
+                <div className="p-2 space-y-1">
+                  <p className="text-xs font-medium truncate">{color.name}</p>
+                  <button
+                    onClick={() => copyToClipboard(color.hex, color.key)}
+                    className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {color.hex}
+                    {copied === color.key ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100" />
+                    )}
+                  </button>
+                  <p className="text-[10px] text-muted-foreground">{color.hue}°</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 type ExportFormat = "css" | "tailwind" | "json";
 
 function exportColors(colors: BrandAsset[], format: ExportFormat): string {
@@ -839,6 +1095,9 @@ export default function BrandColors() {
 
         {/* Palette Generator */}
         <PaletteGenerator />
+
+        {/* Color Harmony Generator */}
+        <HarmonyGenerator />
 
         {/* Contrast Checker Tool */}
         {colors && colors.length > 0 && <ContrastChecker colors={colors} />}
