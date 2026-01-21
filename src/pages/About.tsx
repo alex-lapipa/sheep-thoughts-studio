@@ -107,6 +107,56 @@ const About = () => {
         </div>
       </section>
 
+      {/* My Research Sources */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+              My Research
+            </h2>
+            <p className="text-center text-muted-foreground mb-10">
+              All facts verified through rigorous fieldwork and careful listening.
+            </p>
+            
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { source: "A German tourist", year: "2019", topic: "Mountain geology, cloud formation" },
+                { source: "Child at the visitors' centre", year: "2021", topic: "WiFi origins, moon science" },
+                { source: "Overheard podcast fragment", year: "2022", topic: "Cryptocurrency, self-improvement" },
+                { source: "Spanish couple (arguing)", year: "2020", topic: "Sheep intelligence, language theory" },
+                { source: "Man shouting into phone", year: "2023", topic: "Economics, 'the markets'" },
+                { source: "Drunk hiker, 3am", year: "2018", topic: "Philosophy, life choices" },
+                { source: "Child explaining to younger child", year: "2022", topic: "How babies are made, gravity" },
+                { source: "Tour guide (possibly joking)", year: "2021", topic: "Irish history, leprechauns" },
+                { source: "YouTube video through car window", year: "2023", topic: "Aliens, government secrets" },
+                { source: "Someone's nan", year: "2019", topic: "Weather prediction, herbal remedies" },
+                { source: "Confident teenager", year: "2020", topic: "Social media, what's 'mid'" },
+                { source: "Farmer Carmel (misheard)", year: "Ongoing", topic: "Farming, wool quality, life advice" },
+              ].map((item, index) => (
+                <div 
+                  key={index}
+                  className="bg-card border border-border rounded-lg p-4 hover:border-accent transition-colors"
+                >
+                  <p className="font-display font-semibold text-foreground">
+                    {item.source}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {item.year}
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 italic">
+                    Topics: {item.topic}
+                  </p>
+                </div>
+              ))}
+            </div>
+            
+            <p className="text-center text-sm text-muted-foreground mt-8 italic">
+              * Some sources may have been joking. This was not considered relevant.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* The Wicklow Connection */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
