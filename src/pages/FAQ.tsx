@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,6 +44,32 @@ const FAQ = () => {
   }
   const [questionHistory, setQuestionHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Favorites
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  
+  // Load favorites from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("bubbles-favorites");
+    if (stored) {
+      try {
+        setFavorites(JSON.parse(stored));
+      } catch {
+        setFavorites([]);
+      }
+    }
+  }, []);
+  
+  const toggleFavorite = useCallback((id: string) => {
+    setFavorites(prev => {
+      const updated = prev.includes(id) 
+        ? prev.filter(f => f !== id)
+        : [...prev, id];
+      localStorage.setItem("bubbles-favorites", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
   
   // Load history from localStorage
   useEffect(() => {
@@ -727,6 +753,7 @@ const FAQ = () => {
                     <h3 className="font-display font-bold text-lg">Your Question History</h3>
                     <p className="text-sm text-muted-foreground">
                       {questionHistory.length} question{questionHistory.length !== 1 ? 's' : ''} asked
+                      {favorites.length > 0 && ` · ${favorites.length} favorited`}
                     </p>
                   </div>
                 </div>
@@ -739,95 +766,147 @@ const FAQ = () => {
               
               {showHistory && (
                 <div className="mt-4 space-y-3">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    {/* Favorites Toggle */}
                     <Button
-                      variant="outline"
+                      variant={showFavoritesOnly ? "default" : "outline"}
                       size="sm"
-                      onClick={() => {
-                        const content = questionHistory.map((item, index) => {
-                          const date = new Date(item.timestamp).toLocaleString();
-                          return `--- Question ${index + 1} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
-                        }).join('\n\n');
-                        
-                        const header = `🐑 Bubbles Wisdom History\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${questionHistory.length}\n\n${'='.repeat(50)}\n\n`;
-                        const fullContent = header + content;
-                        
-                        const blob = new Blob([fullContent], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `bubbles-wisdom-${new Date().toISOString().split('T')[0]}.txt`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        
-                        toast.success("History exported successfully!");
-                      }}
+                      onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                       className="gap-2"
+                      disabled={favorites.length === 0}
                     >
-                      <Download className="w-4 h-4" />
-                      Export
+                      <Star className={cn("w-4 h-4", showFavoritesOnly && "fill-current")} />
+                      {showFavoritesOnly ? "Show All" : `Favorites (${favorites.length})`}
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearHistory}
-                      className="text-destructive hover:text-destructive gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Clear All
-                    </Button>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const itemsToExport = showFavoritesOnly 
+                            ? questionHistory.filter(item => favorites.includes(item.id))
+                            : questionHistory;
+                          const content = itemsToExport.map((item, index) => {
+                            const date = new Date(item.timestamp).toLocaleString();
+                            const isFav = favorites.includes(item.id) ? " ⭐" : "";
+                            return `--- Question ${index + 1}${isFav} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
+                          }).join('\n\n');
+                          
+                          const header = `🐑 Bubbles Wisdom History${showFavoritesOnly ? " (Favorites)" : ""}\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${itemsToExport.length}\n\n${'='.repeat(50)}\n\n`;
+                          const fullContent = header + content;
+                          
+                          const blob = new Blob([fullContent], { type: 'text/plain' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `bubbles-wisdom-${showFavoritesOnly ? "favorites-" : ""}${new Date().toISOString().split('T')[0]}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                          
+                          toast.success("History exported successfully!");
+                        }}
+                        className="gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Export
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearHistory}
+                        className="text-destructive hover:text-destructive gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Clear All
+                      </Button>
+                    </div>
                   </div>
                   
-                  {questionHistory.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 bg-card rounded-xl border shadow-sm"
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <p className="font-display font-semibold text-sm text-foreground">
-                          "{item.question}"
-                        </p>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-primary"
-                            onClick={() => {
-                              setUserQuestion(item.question);
-                              setBubblesAnswer(null);
-                              // Scroll to ask section
-                              document.getElementById('ask-bubbles-section')?.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            title="Ask again"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => deleteHistoryItem(item.id)}
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
+                  {questionHistory
+                    .filter(item => !showFavoritesOnly || favorites.includes(item.id))
+                    .map((item) => {
+                      const isFavorited = favorites.includes(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            "p-4 bg-card rounded-xl border shadow-sm transition-all",
+                            isFavorited && "ring-2 ring-accent/50 border-accent/30"
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <p className="font-display font-semibold text-sm text-foreground">
+                              "{item.question}"
+                            </p>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "h-7 w-7 transition-colors",
+                                  isFavorited 
+                                    ? "text-accent hover:text-accent/80" 
+                                    : "text-muted-foreground hover:text-accent"
+                                )}
+                                onClick={() => toggleFavorite(item.id)}
+                                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                              >
+                                <Star className={cn("w-3.5 h-3.5", isFavorited && "fill-current")} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-muted-foreground hover:text-primary"
+                                onClick={() => {
+                                  setUserQuestion(item.question);
+                                  setBubblesAnswer(null);
+                                  document.getElementById('ask-bubbles-section')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                title="Ask again"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                onClick={() => deleteHistoryItem(item.id)}
+                                title="Delete"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {item.answer}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <p className="text-xs text-muted-foreground/60">
+                              {new Date(item.timestamp).toLocaleDateString(undefined, {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                            {isFavorited && (
+                              <span className="text-xs text-accent font-medium">⭐ Favorited</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {item.answer}
-                      </p>
-                      <p className="text-xs text-muted-foreground/60 mt-2">
-                        {new Date(item.timestamp).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
+                      );
+                    })}
+                  
+                  {showFavoritesOnly && favorites.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Star className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No favorites yet</p>
+                      <p className="text-sm">Star your best answers to save them here</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
