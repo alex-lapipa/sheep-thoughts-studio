@@ -1,60 +1,33 @@
 import { Layout } from "@/components/Layout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
-const faqs = [
-  {
-    question: "Who is Bubbles?",
-    answer: "Bubbles is a sheep from the Wicklow Mountains who has spent too much time listening to tourists, children, and overheard conversations. The result: a rich inner world of confidently wrong facts, catastrophically misinterpreted information, and observations that almost make sense. Cute outside, chaos inside."
-  },
-  {
-    question: "Why is Bubbles always wrong?",
-    answer: "Bubbles isn't ignorant—Bubbles is miseducated. Every fact is correctly remembered but catastrophically misinterpreted. The argument structure is always flawless. The conclusion is always nonsense. That's the magic."
-  },
-  {
-    question: "How long does shipping take?",
-    answer: "Standard shipping takes 3-5 business days within Europe. International orders typically arrive within 7-14 business days. Express shipping options are available at checkout."
-  },
-  {
-    question: "What's your return policy?",
-    answer: "We offer a 30-day return policy. Items must be unworn, unwashed, and in their original packaging. Contact us to initiate a return and we'll send you a prepaid shipping label."
-  },
-  {
-    question: "What sizes do you offer?",
-    answer: "Our apparel comes in sizes XS through 3XL. Check the size guide on each product page for detailed measurements. If you're between sizes, we recommend sizing up for a more relaxed fit."
-  },
-  {
-    question: "Are your products sustainable?",
-    answer: "We use organic cotton for our t-shirts and hoodies, and all our packaging is recyclable. We're constantly working to make our supply chain more sustainable."
-  },
-  {
-    question: "Can I wash my Bubbles merch?",
-    answer: "Yes! Machine wash cold with like colors, tumble dry low, and avoid bleach. For best results and to preserve the print quality, turn the garment inside out before washing."
-  },
-  {
-    question: "Do you ship internationally?",
-    answer: "Yes, we ship worldwide! Shipping costs and delivery times vary by location. You'll see the exact shipping cost at checkout."
-  },
-  {
-    question: "How do I track my order?",
-    answer: "Once your order ships, you'll receive an email with a tracking number and link. You can also check your order status by logging into your account."
-  },
-  {
-    question: "Can I suggest new Bubbles thoughts?",
-    answer: "We love hearing from the flock! Send your thought bubble ideas to our contact page. If we use your suggestion, you might see it on future merch (and we'll send you something special)."
-  }
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FAQ = () => {
+  const { t } = useLanguage();
+
+  const faqs = [
+    { question: t("faq.q1"), answer: t("faq.a1") },
+    { question: t("faq.q2"), answer: t("faq.a2") },
+    { question: t("faq.q3"), answer: t("faq.a3") },
+    { question: t("faq.q4"), answer: t("faq.a4") },
+    { question: t("faq.q5"), answer: t("faq.a5") },
+    { question: t("faq.q6"), answer: t("faq.a6") },
+    { question: t("faq.q7"), answer: t("faq.a7") },
+    { question: t("faq.q8"), answer: t("faq.a8") },
+    { question: t("faq.q9"), answer: t("faq.a9") },
+    { question: t("faq.q10"), answer: t("faq.a10") },
+  ];
+
   return (
     <Layout>
       <div className="container py-12 md:py-20">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-              Frequently Asked Questions
+              {t("faqPage.title")}
             </h1>
             <p className="text-muted-foreground text-lg">
-              Everything you need to know about Bubbles and our merch
+              {t("faqPage.subtitle")}
             </p>
           </div>
 
@@ -72,15 +45,15 @@ const FAQ = () => {
           </Accordion>
 
           <div className="mt-12 p-6 bg-secondary/50 rounded-xl text-center">
-            <h3 className="font-display font-bold text-xl mb-2">Still have questions?</h3>
+            <h3 className="font-display font-bold text-xl mb-2">{t("faqPage.contact.title")}</h3>
             <p className="text-muted-foreground mb-4">
-              Bubbles' thought bubbles can't answer everything. Contact our human team.
+              {t("faqPage.contact.subtitle")}
             </p>
             <a 
               href="/contact" 
               className="inline-flex items-center justify-center h-10 px-6 font-display font-medium rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
             >
-              Contact Us
+              {t("faqPage.contact.button")}
             </a>
           </div>
         </div>
