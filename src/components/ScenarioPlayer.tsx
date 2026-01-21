@@ -149,6 +149,47 @@ export function ScenarioPlayer() {
     return () => clearTimeout(timer);
   }, [isPlaying, currentBeatIndex, selectedScenario, playbackSpeed]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          setIsPlaying((prev) => !prev);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          if (selectedScenario && currentBeatIndex < selectedScenario.beats.length - 1) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+              setCurrentBeatIndex((prev) => prev + 1);
+              setIsTransitioning(false);
+            }, 150);
+            setIsPlaying(false);
+          }
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          if (currentBeatIndex > 0) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+              setCurrentBeatIndex((prev) => prev - 1);
+              setIsTransitioning(false);
+            }, 150);
+            setIsPlaying(false);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedScenario, currentBeatIndex]);
   const handleSelectScenario = (id: string) => {
     const scenario = scenarios.find((s) => s.id === id);
     if (scenario) {
