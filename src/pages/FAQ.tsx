@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -76,6 +76,10 @@ const FAQ = () => {
   // Countdown to next daily wisdom (midnight)
   const [timeUntilNext, setTimeUntilNext] = useState("");
   
+  // Wisdom streak tracking
+  const [wisdomStreak, setWisdomStreak] = useState(0);
+  const [totalWisdoms, setTotalWisdoms] = useState(0);
+  
   useEffect(() => {
     const calculateTimeUntilMidnight = () => {
       const now = new Date();
@@ -98,6 +102,53 @@ const FAQ = () => {
     }, 1000);
     
     return () => clearInterval(interval);
+  }, []);
+
+  // Track wisdom views and calculate streak
+  useEffect(() => {
+    const today = new Date();
+    const todayString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    
+    // Get stored wisdom dates
+    const storedData = localStorage.getItem("bubbles-wisdom-dates");
+    let wisdomDates: string[] = storedData ? JSON.parse(storedData) : [];
+    
+    // Add today if not already recorded
+    if (!wisdomDates.includes(todayString)) {
+      wisdomDates.push(todayString);
+      localStorage.setItem("bubbles-wisdom-dates", JSON.stringify(wisdomDates));
+    }
+    
+    setTotalWisdoms(wisdomDates.length);
+    
+    // Calculate streak (consecutive days ending today or yesterday)
+    const sortedDates = wisdomDates
+      .map(d => {
+        const [year, month, day] = d.split('-').map(Number);
+        return new Date(year, month - 1, day);
+      })
+      .sort((a, b) => b.getTime() - a.getTime());
+    
+    let streak = 0;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < sortedDates.length; i++) {
+      const expectedDate = new Date(now);
+      expectedDate.setDate(expectedDate.getDate() - i);
+      expectedDate.setHours(0, 0, 0, 0);
+      
+      const currentDate = sortedDates[i];
+      currentDate.setHours(0, 0, 0, 0);
+      
+      if (currentDate.getTime() === expectedDate.getTime()) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    setWisdomStreak(streak);
   }, []);
 
   const shareDailyWisdom = useCallback(() => {
@@ -181,6 +232,19 @@ const FAQ = () => {
               <p className="text-xs text-muted-foreground mb-2">
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
               </p>
+              
+              {/* Streak and Stats */}
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/20 rounded-full">
+                  <Flame className={cn("w-4 h-4", wisdomStreak > 0 ? "text-accent" : "text-muted-foreground")} />
+                  <span className="text-sm font-bold text-accent">{wisdomStreak}</span>
+                  <span className="text-xs text-muted-foreground">day streak</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {totalWisdoms} total wisdom{totalWisdoms !== 1 ? 's' : ''} viewed
+                </div>
+              </div>
+              
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 font-mono">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Next wisdom in {timeUntilNext}</span>
