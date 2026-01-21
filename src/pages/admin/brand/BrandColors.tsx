@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous, Circle, Triangle, Hexagon, Play, Pause, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -775,6 +775,259 @@ function HarmonyGenerator() {
   );
 }
 
+// Mode escalation configuration
+const MODE_ESCALATION = [
+  {
+    mode: "innocent",
+    name: "Innocent",
+    color: "#FFB6C1",
+    bubbleShape: "rounded-full",
+    bubbleStyle: "border-2 border-dashed",
+    description: "Calm, round, soft — enjoying simple pleasures",
+    shapeRadius: "9999px",
+    intensity: 0,
+  },
+  {
+    mode: "concerned",
+    name: "Concerned",
+    color: "#B0C4DE",
+    bubbleShape: "rounded-[40%]",
+    bubbleStyle: "border-2",
+    description: "Wobbly outline, processing uncertainty",
+    shapeRadius: "40%",
+    intensity: 25,
+  },
+  {
+    mode: "triggered",
+    name: "Triggered",
+    color: "#B87333",
+    bubbleShape: "rounded-[30%]",
+    bubbleStyle: "border-[3px]",
+    description: "Slightly angular, stress emerging",
+    shapeRadius: "30%",
+    intensity: 50,
+  },
+  {
+    mode: "savage",
+    name: "Savage",
+    color: "#FF69B4",
+    bubbleShape: "rounded-[15%]",
+    bubbleStyle: "border-4",
+    description: "Angular, thick outline, restrained fury",
+    shapeRadius: "15%",
+    intensity: 75,
+  },
+  {
+    mode: "nuclear",
+    name: "Nuclear",
+    color: "#DFFF00",
+    bubbleShape: "rounded-[5%]",
+    bubbleStyle: "border-4 shadow-lg",
+    description: "Sharp edges, explosive chaos",
+    shapeRadius: "5%",
+    intensity: 100,
+  },
+];
+
+function ModeEscalationVisualizer() {
+  const [currentModeIndex, setCurrentModeIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  const activeIndex = hoverIndex !== null ? hoverIndex : currentModeIndex;
+  const activeMode = MODE_ESCALATION[activeIndex];
+
+  // Auto-play animation
+  useEffect(() => {
+    if (!isPlaying) return;
+    
+    const interval = setInterval(() => {
+      setCurrentModeIndex((prev) => (prev + 1) % MODE_ESCALATION.length);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  const reset = () => {
+    setCurrentModeIndex(0);
+    setIsPlaying(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          Mode Escalation Visualizer
+        </CardTitle>
+        <CardDescription>
+          Watch how Bubbles' visual language transforms from Innocent calm to Nuclear chaos
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPlaying(!isPlaying)}
+          >
+            {isPlaying ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Play Escalation
+              </>
+            )}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={reset}>
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset
+          </Button>
+        </div>
+
+        {/* Main Visualization */}
+        <div className="flex items-center justify-center py-8">
+          <div className="relative">
+            {/* Thought bubble visualization */}
+            <div
+              className={`w-48 h-32 flex items-center justify-center transition-all duration-500 ease-out ${activeMode.bubbleStyle}`}
+              style={{
+                backgroundColor: activeMode.color,
+                borderRadius: activeMode.shapeRadius,
+                borderColor: "hsl(var(--foreground) / 0.3)",
+                transform: `scale(${1 + activeMode.intensity * 0.002})`,
+                boxShadow: activeMode.intensity > 50 
+                  ? `0 0 ${activeMode.intensity / 2}px ${activeMode.color}40`
+                  : "none",
+              }}
+            >
+              <span 
+                className="text-center px-4 font-medium transition-all duration-300"
+                style={{ 
+                  color: activeMode.intensity > 60 ? "#000" : "#333",
+                  fontStyle: activeMode.intensity > 75 ? "italic" : "normal",
+                }}
+              >
+                {activeMode.intensity === 0 && "Grass. Good grass."}
+                {activeMode.intensity === 25 && "Wait. Did that mean something?"}
+                {activeMode.intensity === 50 && "The audacity."}
+                {activeMode.intensity === 75 && "Violence has been selected."}
+                {activeMode.intensity === 100 && "I WILL CONSUME THE SUN."}
+              </span>
+            </div>
+
+            {/* Bubble tail */}
+            <div
+              className="absolute -bottom-3 left-8 w-6 h-6 transition-all duration-500"
+              style={{
+                backgroundColor: activeMode.color,
+                borderRadius: activeMode.shapeRadius,
+                transform: `rotate(${activeMode.intensity * 0.5}deg)`,
+              }}
+            />
+            <div
+              className="absolute -bottom-5 left-4 w-3 h-3 transition-all duration-500"
+              style={{
+                backgroundColor: activeMode.color,
+                borderRadius: activeMode.shapeRadius,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Mode info */}
+        <div className="text-center space-y-2 transition-all duration-300">
+          <h3 className="text-xl font-display font-bold" style={{ color: activeMode.color }}>
+            {activeMode.name}
+          </h3>
+          <p className="text-sm text-muted-foreground">{activeMode.description}</p>
+        </div>
+
+        {/* Intensity meter */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Calm</span>
+            <span>Intensity: {activeMode.intensity}%</span>
+            <span>Chaos</span>
+          </div>
+          <div className="h-3 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full transition-all duration-500 ease-out"
+              style={{
+                width: `${activeMode.intensity + 10}%`,
+                background: `linear-gradient(90deg, #FFB6C1, #B0C4DE, #B87333, #FF69B4, #DFFF00)`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Mode selector timeline */}
+        <div className="flex gap-2">
+          {MODE_ESCALATION.map((mode, index) => (
+            <button
+              key={mode.mode}
+              className={`flex-1 p-3 rounded-lg border-2 transition-all duration-300 ${
+                activeIndex === index
+                  ? "ring-2 ring-offset-2 ring-primary"
+                  : "hover:border-primary/50"
+              }`}
+              style={{
+                backgroundColor: activeIndex === index ? mode.color : "transparent",
+                borderColor: mode.color,
+              }}
+              onClick={() => {
+                setCurrentModeIndex(index);
+                setIsPlaying(false);
+              }}
+              onMouseEnter={() => setHoverIndex(index)}
+              onMouseLeave={() => setHoverIndex(null)}
+            >
+              <div
+                className={`w-8 h-8 mx-auto mb-2 transition-all duration-300 ${mode.bubbleStyle}`}
+                style={{
+                  backgroundColor: mode.color,
+                  borderRadius: mode.shapeRadius,
+                  borderColor: "hsl(var(--foreground) / 0.3)",
+                }}
+              />
+              <p className="text-xs font-medium truncate">{mode.name}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Shape transformation guide */}
+        <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+          <p className="text-sm font-medium">Shape Language Transformation</p>
+          <div className="grid grid-cols-5 gap-4 text-center">
+            {MODE_ESCALATION.map((mode) => (
+              <div key={mode.mode} className="space-y-1">
+                <div
+                  className="w-10 h-10 mx-auto border-2"
+                  style={{
+                    borderRadius: mode.shapeRadius,
+                    borderColor: mode.color,
+                  }}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  {mode.shapeRadius}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            Border radius decreases from circular (9999px) to nearly sharp (5%) as intensity increases
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 type ExportFormat = "css" | "tailwind" | "json";
 
 function exportColors(colors: BrandAsset[], format: ExportFormat): string {
@@ -1062,6 +1315,9 @@ export default function BrandColors() {
             </div>
           )}
         </section>
+
+        {/* Mode Escalation Visualizer */}
+        <ModeEscalationVisualizer />
 
         {/* Seasonal Collection Palettes */}
         <section className="space-y-4">
