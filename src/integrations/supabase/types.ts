@@ -14,16 +14,231 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bubbles_knowledge: {
+        Row: {
+          category: Database["public"]["Enums"]["bubbles_knowledge_category"]
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          metadata: Json | null
+          mode: Database["public"]["Enums"]["bubbles_mode"] | null
+          section_path: string | null
+          source_document: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["bubbles_knowledge_category"]
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          mode?: Database["public"]["Enums"]["bubbles_mode"] | null
+          section_path?: string | null
+          source_document?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["bubbles_knowledge_category"]
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          mode?: Database["public"]["Enums"]["bubbles_mode"] | null
+          section_path?: string | null
+          source_document?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bubbles_scenarios: {
+        Row: {
+          beats: Json | null
+          created_at: string
+          description: string
+          embedding: string | null
+          end_mode: Database["public"]["Enums"]["bubbles_mode"]
+          id: string
+          start_mode: Database["public"]["Enums"]["bubbles_mode"]
+          tags: string[] | null
+          title: string
+          trigger_category: string | null
+        }
+        Insert: {
+          beats?: Json | null
+          created_at?: string
+          description: string
+          embedding?: string | null
+          end_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          id?: string
+          start_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          tags?: string[] | null
+          title: string
+          trigger_category?: string | null
+        }
+        Update: {
+          beats?: Json | null
+          created_at?: string
+          description?: string
+          embedding?: string | null
+          end_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          id?: string
+          start_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          tags?: string[] | null
+          title?: string
+          trigger_category?: string | null
+        }
+        Relationships: []
+      }
+      bubbles_thoughts: {
+        Row: {
+          created_at: string
+          embedding: string | null
+          id: string
+          is_ai_generated: boolean | null
+          is_curated: boolean | null
+          mode: Database["public"]["Enums"]["bubbles_mode"]
+          rating: number | null
+          tags: string[] | null
+          text: string
+          trigger_category: string | null
+          use_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          is_curated?: boolean | null
+          mode: Database["public"]["Enums"]["bubbles_mode"]
+          rating?: number | null
+          tags?: string[] | null
+          text: string
+          trigger_category?: string | null
+          use_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          is_curated?: boolean | null
+          mode?: Database["public"]["Enums"]["bubbles_mode"]
+          rating?: number | null
+          tags?: string[] | null
+          text?: string
+          trigger_category?: string | null
+          use_count?: number | null
+        }
+        Relationships: []
+      }
+      bubbles_triggers: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          embedding: string | null
+          example_bubbles: string[] | null
+          example_scenario: string | null
+          id: string
+          internal_logic: string
+          name: string
+          tags: string[] | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          embedding?: string | null
+          example_bubbles?: string[] | null
+          example_scenario?: string | null
+          id?: string
+          internal_logic: string
+          name: string
+          tags?: string[] | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          embedding?: string | null
+          example_bubbles?: string[] | null
+          example_scenario?: string | null
+          id?: string
+          internal_logic?: string
+          name?: string
+          tags?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_bubbles_knowledge: {
+        Args: {
+          filter_category?: Database["public"]["Enums"]["bubbles_knowledge_category"]
+          filter_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          category: Database["public"]["Enums"]["bubbles_knowledge_category"]
+          content: string
+          id: string
+          metadata: Json
+          mode: Database["public"]["Enums"]["bubbles_mode"]
+          similarity: number
+          tags: string[]
+          title: string
+        }[]
+      }
+      search_bubbles_thoughts: {
+        Args: {
+          filter_mode?: Database["public"]["Enums"]["bubbles_mode"]
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          id: string
+          mode: Database["public"]["Enums"]["bubbles_mode"]
+          similarity: number
+          text: string
+          trigger_category: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      bubbles_knowledge_category:
+        | "character_bible"
+        | "psychology"
+        | "humor_mechanisms"
+        | "mode_system"
+        | "trigger_taxonomy"
+        | "writing_rules"
+        | "visual_identity"
+        | "brand_guidelines"
+        | "comedy_bible"
+        | "cross_cultural"
+        | "example_content"
+        | "research"
+      bubbles_mode:
+        | "innocent"
+        | "concerned"
+        | "triggered"
+        | "savage"
+        | "nuclear"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +365,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      bubbles_knowledge_category: [
+        "character_bible",
+        "psychology",
+        "humor_mechanisms",
+        "mode_system",
+        "trigger_taxonomy",
+        "writing_rules",
+        "visual_identity",
+        "brand_guidelines",
+        "comedy_bible",
+        "cross_cultural",
+        "example_content",
+        "research",
+      ],
+      bubbles_mode: ["innocent", "concerned", "triggered", "savage", "nuclear"],
+    },
   },
 } as const
