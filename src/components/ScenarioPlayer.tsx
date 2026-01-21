@@ -178,6 +178,23 @@ export function ScenarioPlayer() {
     };
   }, [isPlaying, currentBeatIndex, selectedScenario, playbackSpeed]);
 
+  const handleShuffle = useCallback(() => {
+    if (scenarios.length < 2) return;
+    triggerHaptic([10, 50, 10]); // Double-tap pattern for shuffle
+    let randomIndex = Math.floor(Math.random() * scenarios.length);
+    // Ensure we get a different scenario
+    while (scenarios[randomIndex]?.id === selectedScenario?.id && scenarios.length > 1) {
+      randomIndex = Math.floor(Math.random() * scenarios.length);
+    }
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedScenario(scenarios[randomIndex]);
+      setCurrentBeatIndex(0);
+      setIsTransitioning(false);
+      setIsPlaying(true); // Auto-play the new scenario
+    }, 200);
+  }, [scenarios, selectedScenario, triggerHaptic]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -242,12 +259,16 @@ export function ScenarioPlayer() {
             setIsPlaying(false);
           }
           break;
+        case "KeyS":
+          e.preventDefault();
+          handleShuffle();
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedScenario, currentBeatIndex, triggerHaptic]);
+  }, [selectedScenario, currentBeatIndex, triggerHaptic, handleShuffle]);
   const handleSelectScenario = (id: string) => {
     const scenario = scenarios.find((s) => s.id === id);
     if (scenario) {
@@ -295,22 +316,6 @@ export function ScenarioPlayer() {
     setIsPlaying(false);
   }, []);
 
-  const handleShuffle = useCallback(() => {
-    if (scenarios.length < 2) return;
-    triggerHaptic([10, 50, 10]); // Double-tap pattern for shuffle
-    let randomIndex = Math.floor(Math.random() * scenarios.length);
-    // Ensure we get a different scenario
-    while (scenarios[randomIndex]?.id === selectedScenario?.id && scenarios.length > 1) {
-      randomIndex = Math.floor(Math.random() * scenarios.length);
-    }
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setSelectedScenario(scenarios[randomIndex]);
-      setCurrentBeatIndex(0);
-      setIsTransitioning(false);
-      setIsPlaying(true); // Auto-play the new scenario
-    }, 200);
-  }, [scenarios, selectedScenario, triggerHaptic]);
 
   const handleShare = useCallback(() => {
     if (!selectedScenario) return;
