@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -157,6 +157,20 @@ const FAQ = () => {
   const [totalWisdoms, setTotalWisdoms] = useState(0);
   const [currentMilestone, setCurrentMilestone] = useState<typeof STREAK_MILESTONES[0] | null>(null);
   const [showMilestone, setShowMilestone] = useState(false);
+  const [showDemoMode, setShowDemoMode] = useState(false);
+
+  // Toggle demo mode with keyboard shortcut (Ctrl/Cmd + Shift + D)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setShowDemoMode(prev => !prev);
+        toast.success(showDemoMode ? "Demo mode hidden" : "Demo mode enabled! 🎉");
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDemoMode]);
 
   // Celebrate milestone with confetti
   const celebrateMilestone = useCallback((milestone: typeof STREAK_MILESTONES[0]) => {
@@ -412,6 +426,33 @@ const FAQ = () => {
               {/* Badge Collection */}
               <div className="w-full mb-4 p-4 bg-card/50 rounded-xl border">
                 <StreakBadges currentStreak={wisdomStreak} />
+                
+                {/* Demo Mode Controls */}
+                {showDemoMode && (
+                  <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-dashed border-accent animate-fade-in">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-4 h-4 text-accent" />
+                      <span className="text-xs font-bold text-accent">Demo Mode</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {STREAK_MILESTONES.map((milestone) => (
+                        <Button
+                          key={milestone.days}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => celebrateMilestone(milestone)}
+                          className="text-xs gap-1.5 hover-scale"
+                        >
+                          <span>{milestone.emoji}</span>
+                          <span>{milestone.days}d</span>
+                        </Button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Press Ctrl+Shift+D to hide
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 font-mono">
