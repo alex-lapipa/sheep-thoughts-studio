@@ -8,7 +8,6 @@ import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Facts from "./pages/Facts";
 import Collections from "./pages/Collections";
-import WicklowPalette from "./pages/WicklowPalette";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -26,6 +25,7 @@ import BrandColors from "./pages/admin/brand/BrandColors";
 import BrandTypography from "./pages/admin/brand/BrandTypography";
 import BrandCharacter from "./pages/admin/brand/BrandCharacter";
 import BrandProduction from "./pages/admin/brand/BrandProduction";
+import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
@@ -42,7 +42,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/facts" element={<Facts />} />
             <Route path="/collections/:collection" element={<Collections />} />
-            <Route path="/wicklow-palette" element={<WicklowPalette />} />
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<FAQ />} />
@@ -63,6 +62,7 @@ const App = () => (
             <Route path="/admin/brand/typography" element={<ProtectedRoute><BrandTypography /></ProtectedRoute>} />
             <Route path="/admin/brand/character" element={<ProtectedRoute><BrandCharacter /></ProtectedRoute>} />
             <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
+            <Route path="/admin/brand/wicklow-palette" element={<ProtectedRoute><AdminWicklowPalette /></ProtectedRoute>} />
             
             {/* System Routes - Super Admin Only */}
             <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />

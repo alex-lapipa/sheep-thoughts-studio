@@ -46,13 +46,15 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary/30 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bubbles-peat via-bubbles-heather/20 to-bubbles-peat p-4">
+      <Card className="w-full max-w-md border-bubbles-heather/30">
         <CardHeader className="text-center">
-          <div className="text-6xl mb-4">🐑</div>
-          <CardTitle className="font-display text-2xl">Bubbles Admin</CardTitle>
-          <CardDescription>
-            Manage the Bubbles knowledge base and content
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-bubbles-cream border-4 border-bubbles-heather flex items-center justify-center">
+            <span className="font-display text-3xl font-bold text-bubbles-peat">G</span>
+          </div>
+          <CardTitle className="font-display text-3xl tracking-tight">Genius</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            The intelligent sheep's command centre
           </CardDescription>
         </CardHeader>
         <CardContent>
