@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Send, Loader2, Sparkles } from "lucide-react";
 import { ThoughtBubble } from "./ThoughtBubble";
+import { CitationGenerator } from "./CitationGenerator";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -154,6 +155,13 @@ export const AskBubbles = () => {
               Confidence: {response.confidence}
             </span>
           </div>
+
+          {/* Citation Generator */}
+          <CitationGenerator 
+            fact={response.explanation}
+            source={response.source}
+            topic={askedQuestion}
+          />
 
           {/* Ask Another */}
           <button
