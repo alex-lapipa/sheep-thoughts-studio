@@ -861,31 +861,75 @@ function ModeEscalationVisualizer() {
   const [currentModeIndex, setCurrentModeIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [transitionProgress, setTransitionProgress] = useState(0);
 
   const activeIndex = hoverIndex !== null ? hoverIndex : currentModeIndex;
   const activeMode = MODE_ESCALATION[activeIndex];
+  const nextMode = MODE_ESCALATION[(activeIndex + 1) % MODE_ESCALATION.length];
 
-  // Auto-play animation
+  // Smooth morphing animation with progress tracking
   useEffect(() => {
     if (!isPlaying) return;
     
-    const interval = setInterval(() => {
-      setCurrentModeIndex((prev) => (prev + 1) % MODE_ESCALATION.length);
-    }, 1500);
-
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+    let frame: number;
+    let startTime = Date.now();
+    const duration = 2000; // 2 seconds per transition
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      setTransitionProgress(progress);
+      
+      if (progress >= 1) {
+        setCurrentModeIndex((prev) => (prev + 1) % MODE_ESCALATION.length);
+        startTime = Date.now();
+        setTransitionProgress(0);
+      }
+      
+      frame = requestAnimationFrame(animate);
+    };
+    
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [isPlaying, currentModeIndex]);
 
   const reset = () => {
     setCurrentModeIndex(0);
     setIsPlaying(false);
+    setTransitionProgress(0);
   };
 
+  // Interpolate values for smooth morphing
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  const lerpColor = (color1: string, color2: string, t: number) => {
+    const hex1 = color1.replace('#', '');
+    const hex2 = color2.replace('#', '');
+    const r1 = parseInt(hex1.substr(0, 2), 16);
+    const g1 = parseInt(hex1.substr(2, 2), 16);
+    const b1 = parseInt(hex1.substr(4, 2), 16);
+    const r2 = parseInt(hex2.substr(0, 2), 16);
+    const g2 = parseInt(hex2.substr(2, 2), 16);
+    const b2 = parseInt(hex2.substr(4, 2), 16);
+    const r = Math.round(lerp(r1, r2, t));
+    const g = Math.round(lerp(g1, g2, t));
+    const b = Math.round(lerp(b1, b2, t));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const currentColor = isPlaying ? lerpColor(activeMode.color, nextMode.color, transitionProgress) : activeMode.color;
+  const currentIntensity = isPlaying ? lerp(activeMode.intensity, nextMode.intensity, transitionProgress) : activeMode.intensity;
+  const currentRadius = isPlaying 
+    ? `${lerp(parseFloat(activeMode.shapeRadius) || 50, parseFloat(nextMode.shapeRadius) || 50, transitionProgress)}%`
+    : activeMode.shapeRadius;
+
+  // Generate floating particles based on intensity
+  const particleCount = Math.floor(currentIntensity / 15);
+
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" style={{ color: currentColor }} />
           Mode Escalation Visualizer
         </CardTitle>
         <CardDescription>
@@ -899,6 +943,11 @@ function ModeEscalationVisualizer() {
             variant="outline"
             size="sm"
             onClick={() => setIsPlaying(!isPlaying)}
+            className="transition-all duration-300"
+            style={{ 
+              borderColor: currentColor,
+              color: isPlaying ? currentColor : undefined,
+            }}
           >
             {isPlaying ? (
               <>
@@ -918,130 +967,251 @@ function ModeEscalationVisualizer() {
           </Button>
         </div>
 
-        {/* Main Visualization */}
-        <div className="flex items-center justify-center py-8">
-          <div className="relative">
-            {/* Thought bubble visualization */}
+        {/* Main Visualization with background effects */}
+        <div 
+          className="relative flex items-center justify-center py-12 rounded-xl transition-all duration-700 overflow-hidden"
+          style={{
+            background: `radial-gradient(ellipse at center, ${currentColor}15 0%, transparent 70%)`,
+          }}
+        >
+          {/* Animated background rings */}
+          {[...Array(3)].map((_, i) => (
             <div
-              className={`w-48 h-32 flex items-center justify-center transition-all duration-500 ease-out ${activeMode.bubbleStyle}`}
+              key={i}
+              className="absolute inset-0 rounded-full border-2 opacity-20"
               style={{
-                backgroundColor: activeMode.color,
-                borderRadius: activeMode.shapeRadius,
-                borderColor: "hsl(var(--foreground) / 0.3)",
-                transform: `scale(${1 + activeMode.intensity * 0.002})`,
-                boxShadow: activeMode.intensity > 50 
-                  ? `0 0 ${activeMode.intensity / 2}px ${activeMode.color}40`
-                  : "none",
+                borderColor: currentColor,
+                transform: `scale(${0.3 + i * 0.25 + (currentIntensity / 200)})`,
+                animation: currentIntensity > 25 
+                  ? `pulse ${3 - i * 0.5 - currentIntensity / 100}s ease-in-out infinite`
+                  : 'none',
+              }}
+            />
+          ))}
+
+          {/* Floating chaos particles */}
+          {[...Array(particleCount)].map((_, i) => (
+            <div
+              key={`particle-${i}`}
+              className="absolute w-2 h-2 rounded-full animate-float-bubble"
+              style={{
+                backgroundColor: currentColor,
+                left: `${20 + (i * 17) % 60}%`,
+                animationDelay: `${i * 0.3}s`,
+                animationDuration: `${4 - currentIntensity / 50}s`,
+                opacity: 0.3 + (currentIntensity / 200),
+              }}
+            />
+          ))}
+
+          <div className="relative z-10">
+            {/* Main thought bubble with live morphing */}
+            <div
+              className="w-56 h-36 flex items-center justify-center border-4 relative"
+              style={{
+                backgroundColor: currentColor,
+                borderRadius: currentRadius,
+                borderColor: `${currentColor}80`,
+                transform: `scale(${1 + currentIntensity * 0.003}) rotate(${currentIntensity > 50 ? Math.sin(Date.now() / 200) * (currentIntensity / 30) : 0}deg)`,
+                boxShadow: `
+                  0 0 ${currentIntensity / 2}px ${currentColor}60,
+                  0 0 ${currentIntensity}px ${currentColor}40,
+                  inset 0 0 ${currentIntensity / 3}px ${currentColor}30
+                `,
+                transition: isPlaying ? 'none' : 'all 0.5s ease-out',
+                animation: currentIntensity > 75 
+                  ? `wiggle ${0.5 - currentIntensity / 400}s ease-in-out infinite`
+                  : currentIntensity > 50 
+                  ? 'wobble 2s ease-in-out infinite'
+                  : 'none',
               }}
             >
+              {/* Inner glow pulse */}
+              <div 
+                className="absolute inset-2 rounded-inherit opacity-30"
+                style={{
+                  borderRadius: currentRadius,
+                  background: `radial-gradient(circle, white 0%, transparent 70%)`,
+                  animation: currentIntensity > 25 
+                    ? `pulse ${2 - currentIntensity / 100}s ease-in-out infinite`
+                    : 'none',
+                }}
+              />
+              
               <span 
-                className="text-center px-4 font-medium transition-all duration-300"
+                className="text-center px-4 font-display font-bold relative z-10"
                 style={{ 
-                  color: activeMode.intensity > 60 ? "#000" : "#333",
-                  fontStyle: activeMode.intensity > 75 ? "italic" : "normal",
+                  color: currentIntensity > 40 ? "#000" : "#333",
+                  fontSize: `${14 + currentIntensity / 20}px`,
+                  textShadow: currentIntensity > 60 ? `0 0 10px ${currentColor}` : 'none',
+                  animation: currentIntensity > 75 ? 'squish 0.3s ease-in-out infinite' : 'none',
                 }}
               >
-                {activeMode.intensity === 0 && "Grass. Good grass."}
-                {activeMode.intensity === 25 && "Wait. Did that mean something?"}
-                {activeMode.intensity === 50 && "The audacity."}
-                {activeMode.intensity === 75 && "Violence has been selected."}
-                {activeMode.intensity === 100 && "I WILL CONSUME THE SUN."}
+                {currentIntensity < 15 && "Grass. Good grass."}
+                {currentIntensity >= 15 && currentIntensity < 40 && "Wait. Did that mean something?"}
+                {currentIntensity >= 40 && currentIntensity < 65 && "The audacity."}
+                {currentIntensity >= 65 && currentIntensity < 90 && "Violence has been selected."}
+                {currentIntensity >= 90 && "I WILL CONSUME THE SUN."}
               </span>
             </div>
 
-            {/* Bubble tail */}
+            {/* Morphing bubble tail */}
             <div
-              className="absolute -bottom-3 left-8 w-6 h-6 transition-all duration-500"
+              className="absolute -bottom-4 left-10 w-7 h-7"
               style={{
-                backgroundColor: activeMode.color,
-                borderRadius: activeMode.shapeRadius,
-                transform: `rotate(${activeMode.intensity * 0.5}deg)`,
+                backgroundColor: currentColor,
+                borderRadius: currentRadius,
+                transform: `rotate(${15 + currentIntensity * 0.3}deg) scale(${1 + currentIntensity / 300})`,
+                boxShadow: `0 0 ${currentIntensity / 4}px ${currentColor}60`,
+                transition: isPlaying ? 'none' : 'all 0.5s ease-out',
               }}
             />
             <div
-              className="absolute -bottom-5 left-4 w-3 h-3 transition-all duration-500"
+              className="absolute -bottom-7 left-5 w-4 h-4"
               style={{
-                backgroundColor: activeMode.color,
-                borderRadius: activeMode.shapeRadius,
+                backgroundColor: currentColor,
+                borderRadius: currentRadius,
+                transform: `rotate(${-10 + currentIntensity * 0.2}deg)`,
+                boxShadow: `0 0 ${currentIntensity / 5}px ${currentColor}40`,
+                transition: isPlaying ? 'none' : 'all 0.5s ease-out',
               }}
             />
           </div>
         </div>
 
-        {/* Mode info */}
-        <div className="text-center space-y-2 transition-all duration-300">
-          <h3 className="text-xl font-display font-bold" style={{ color: activeMode.color }}>
+        {/* Mode info with animated color */}
+        <div className="text-center space-y-2">
+          <h3 
+            className="text-2xl font-display font-bold transition-all duration-300"
+            style={{ 
+              color: currentColor,
+              textShadow: currentIntensity > 50 ? `0 0 20px ${currentColor}60` : 'none',
+            }}
+          >
             {activeMode.name}
+            {isPlaying && transitionProgress > 0.3 && (
+              <span className="text-muted-foreground text-lg ml-2">→ {nextMode.name}</span>
+            )}
           </h3>
           <p className="text-sm text-muted-foreground">{activeMode.description}</p>
         </div>
 
-        {/* Intensity meter */}
+        {/* Live intensity meter with gradient fill */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Calm</span>
-            <span>Intensity: {activeMode.intensity}%</span>
-            <span>Chaos</span>
+            <span className="flex items-center gap-1">
+              <Circle className="h-3 w-3" style={{ color: MODE_ESCALATION[0].color }} />
+              Calm
+            </span>
+            <span className="font-mono font-bold" style={{ color: currentColor }}>
+              {Math.round(currentIntensity)}%
+            </span>
+            <span className="flex items-center gap-1">
+              Chaos
+              <Triangle className="h-3 w-3" style={{ color: MODE_ESCALATION[4].color }} />
+            </span>
           </div>
-          <div className="h-3 bg-muted rounded-full overflow-hidden">
+          <div className="h-4 bg-muted rounded-full overflow-hidden relative">
             <div
-              className="h-full transition-all duration-500 ease-out"
+              className="h-full rounded-full transition-all"
               style={{
-                width: `${activeMode.intensity + 10}%`,
-                background: `linear-gradient(90deg, #FFB6C1, #B0C4DE, #B87333, #FF69B4, #DFFF00)`,
+                width: `${currentIntensity + 5}%`,
+                background: `linear-gradient(90deg, 
+                  ${MODE_ESCALATION[0].color} 0%, 
+                  ${MODE_ESCALATION[1].color} 25%, 
+                  ${MODE_ESCALATION[2].color} 50%, 
+                  ${MODE_ESCALATION[3].color} 75%, 
+                  ${MODE_ESCALATION[4].color} 100%
+                )`,
+                boxShadow: currentIntensity > 50 ? `0 0 10px ${currentColor}` : 'none',
+                transition: isPlaying ? 'none' : 'all 0.5s ease-out',
+              }}
+            />
+            {/* Animated pulse on the edge */}
+            <div 
+              className="absolute top-0 h-full w-2 rounded-full"
+              style={{
+                left: `${currentIntensity + 3}%`,
+                backgroundColor: currentColor,
+                boxShadow: `0 0 8px ${currentColor}`,
+                animation: 'pulse 1s ease-in-out infinite',
               }}
             />
           </div>
         </div>
 
-        {/* Mode selector timeline */}
-        <div className="flex gap-2">
-          {MODE_ESCALATION.map((mode, index) => (
-            <button
-              key={mode.mode}
-              className={`flex-1 p-3 rounded-lg border-2 transition-all duration-300 ${
-                activeIndex === index
-                  ? "ring-2 ring-offset-2 ring-primary"
-                  : "hover:border-primary/50"
-              }`}
-              style={{
-                backgroundColor: activeIndex === index ? mode.color : "transparent",
-                borderColor: mode.color,
-              }}
-              onClick={() => {
-                setCurrentModeIndex(index);
-                setIsPlaying(false);
-              }}
-              onMouseEnter={() => setHoverIndex(index)}
-              onMouseLeave={() => setHoverIndex(null)}
-            >
-              <div
-                className={`w-8 h-8 mx-auto mb-2 transition-all duration-300 ${mode.bubbleStyle}`}
+        {/* Mode selector timeline with connection lines */}
+        <div className="relative">
+          {/* Connection line */}
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-muted to-transparent -translate-y-1/2 z-0" />
+          
+          <div className="flex gap-2 relative z-10">
+            {MODE_ESCALATION.map((mode, index) => (
+              <button
+                key={mode.mode}
+                className={`flex-1 p-3 rounded-lg border-2 transition-all duration-300 bg-background ${
+                  activeIndex === index
+                    ? "ring-2 ring-offset-2 scale-105"
+                    : "hover:border-primary/50 hover:scale-102"
+                }`}
                 style={{
-                  backgroundColor: mode.color,
-                  borderRadius: mode.shapeRadius,
-                  borderColor: "hsl(var(--foreground) / 0.3)",
+                  backgroundColor: activeIndex === index ? `${mode.color}20` : "hsl(var(--background))",
+                  borderColor: mode.color,
+                  boxShadow: activeIndex === index ? `0 0 15px ${mode.color}40, 0 0 0 3px ${mode.color}30` : 'none',
                 }}
-              />
-              <p className="text-xs font-medium truncate">{mode.name}</p>
-            </button>
-          ))}
+                onClick={() => {
+                  setCurrentModeIndex(index);
+                  setIsPlaying(false);
+                  setTransitionProgress(0);
+                }}
+                onMouseEnter={() => setHoverIndex(index)}
+                onMouseLeave={() => setHoverIndex(null)}
+              >
+                <div
+                  className="w-10 h-10 mx-auto mb-2 border-2 transition-all duration-300"
+                  style={{
+                    backgroundColor: mode.color,
+                    borderRadius: mode.shapeRadius,
+                    borderColor: `${mode.color}80`,
+                    boxShadow: activeIndex === index ? `0 0 10px ${mode.color}` : 'none',
+                    animation: activeIndex === index && mode.intensity > 50 ? 'wiggle 1s ease-in-out infinite' : 'none',
+                  }}
+                />
+                <p className="text-xs font-medium truncate">{mode.name}</p>
+                <p className="text-[10px] text-muted-foreground">{mode.intensity}%</p>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Shape transformation guide */}
         <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-          <p className="text-sm font-medium">Shape Language Transformation</p>
+          <p className="text-sm font-medium flex items-center gap-2">
+            <Hexagon className="h-4 w-4" />
+            Shape Language Transformation
+          </p>
           <div className="grid grid-cols-5 gap-4 text-center">
-            {MODE_ESCALATION.map((mode) => (
+            {MODE_ESCALATION.map((mode, i) => (
               <div key={mode.mode} className="space-y-1">
-                <div
-                  className="w-10 h-10 mx-auto border-2"
-                  style={{
-                    borderRadius: mode.shapeRadius,
-                    borderColor: mode.color,
-                  }}
-                />
-                <p className="text-[10px] text-muted-foreground">
+                <div className="relative">
+                  <div
+                    className="w-12 h-12 mx-auto border-3 transition-all duration-500"
+                    style={{
+                      borderRadius: mode.shapeRadius,
+                      borderColor: mode.color,
+                      backgroundColor: activeIndex >= i ? `${mode.color}30` : 'transparent',
+                      transform: activeIndex >= i ? 'scale(1.1)' : 'scale(1)',
+                      boxShadow: activeIndex >= i ? `0 0 10px ${mode.color}40` : 'none',
+                    }}
+                  />
+                  {activeIndex === i && (
+                    <div 
+                      className="absolute inset-0 rounded-full border-2 animate-ping"
+                      style={{ borderColor: mode.color }}
+                    />
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground font-mono">
                   {mode.shapeRadius}
                 </p>
               </div>
