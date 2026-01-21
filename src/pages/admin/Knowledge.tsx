@@ -202,12 +202,12 @@ export default function AdminKnowledge() {
                   </div>
                   <div className="space-y-2">
                     <Label>Mode (optional)</Label>
-                    <Select value={formMode} onValueChange={(v) => setFormMode(v as BubblesMode | '')}>
+                    <Select value={formMode || "none"} onValueChange={(v) => setFormMode(v === "none" ? '' : v as BubblesMode)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select mode..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {MODES.map((mode) => (
                           <SelectItem key={mode} value={mode}>
                             {mode}
