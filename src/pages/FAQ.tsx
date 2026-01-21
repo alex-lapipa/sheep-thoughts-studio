@@ -4,11 +4,23 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useShare } from "@/hooks/useShare";
+import confetti from "canvas-confetti";
+
+// Milestone definitions
+const STREAK_MILESTONES = [
+  { days: 3, label: "3-Day Streak!", emoji: "🌱" },
+  { days: 7, label: "Week Warrior!", emoji: "🔥" },
+  { days: 14, label: "Fortnight of Wisdom!", emoji: "⭐" },
+  { days: 30, label: "Monthly Master!", emoji: "🏆" },
+  { days: 60, label: "Wisdom Sage!", emoji: "🧙" },
+  { days: 100, label: "Century of Wisdom!", emoji: "💯" },
+  { days: 365, label: "Year of Enlightenment!", emoji: "🐑" },
+];
 
 const FAQ = () => {
   const { t } = useLanguage();
@@ -142,6 +154,52 @@ const FAQ = () => {
   // Wisdom streak tracking
   const [wisdomStreak, setWisdomStreak] = useState(0);
   const [totalWisdoms, setTotalWisdoms] = useState(0);
+  const [currentMilestone, setCurrentMilestone] = useState<typeof STREAK_MILESTONES[0] | null>(null);
+  const [showMilestone, setShowMilestone] = useState(false);
+
+  // Celebrate milestone with confetti
+  const celebrateMilestone = useCallback((milestone: typeof STREAK_MILESTONES[0]) => {
+    setCurrentMilestone(milestone);
+    setShowMilestone(true);
+    
+    // Fire confetti!
+    const duration = 3000;
+    const end = Date.now() + duration;
+    
+    const colors = ['#4ade80', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6'];
+    
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors,
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors,
+      });
+      
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+    
+    // Also fire a big burst in the center
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: colors,
+    });
+    
+    // Hide milestone banner after delay
+    setTimeout(() => setShowMilestone(false), 5000);
+  }, []);
   
   useEffect(() => {
     const calculateTimeUntilMidnight = () => {
@@ -176,8 +234,11 @@ const FAQ = () => {
     const storedData = localStorage.getItem("bubbles-wisdom-dates");
     let wisdomDates: string[] = storedData ? JSON.parse(storedData) : [];
     
+    // Check if today is new
+    const isNewDay = !wisdomDates.includes(todayString);
+    
     // Add today if not already recorded
-    if (!wisdomDates.includes(todayString)) {
+    if (isNewDay) {
       wisdomDates.push(todayString);
       localStorage.setItem("bubbles-wisdom-dates", JSON.stringify(wisdomDates));
     }
@@ -212,7 +273,26 @@ const FAQ = () => {
     }
     
     setWisdomStreak(streak);
-  }, []);
+    
+    // Check for milestone celebration (only on new days)
+    if (isNewDay) {
+      const celebratedMilestones = JSON.parse(localStorage.getItem("bubbles-celebrated-milestones") || "[]");
+      
+      // Find the highest milestone achieved
+      const achievedMilestone = [...STREAK_MILESTONES]
+        .reverse()
+        .find(m => streak >= m.days && !celebratedMilestones.includes(m.days));
+      
+      if (achievedMilestone) {
+        // Mark as celebrated
+        celebratedMilestones.push(achievedMilestone.days);
+        localStorage.setItem("bubbles-celebrated-milestones", JSON.stringify(celebratedMilestones));
+        
+        // Delay celebration slightly for effect
+        setTimeout(() => celebrateMilestone(achievedMilestone), 500);
+      }
+    }
+  }, [celebrateMilestone]);
 
   const shareDailyWisdom = useCallback(() => {
     share({
@@ -288,6 +368,24 @@ const FAQ = () => {
               {t("faqPage.subtitle")}
             </p>
           </div>
+
+          {/* Milestone Celebration Banner */}
+          {showMilestone && currentMilestone && (
+            <div className="mb-6 p-6 bg-gradient-to-r from-accent via-primary to-accent rounded-2xl border-2 border-accent animate-fade-in">
+              <div className="flex flex-col items-center text-center">
+                <span className="text-5xl mb-3">{currentMilestone.emoji}</span>
+                <div className="flex items-center gap-2 mb-2">
+                  <Trophy className="w-6 h-6 text-accent-foreground" />
+                  <h3 className="font-display font-bold text-2xl text-accent-foreground">
+                    {currentMilestone.label}
+                  </h3>
+                </div>
+                <p className="text-accent-foreground/80">
+                  You've reached a {currentMilestone.days}-day wisdom streak! 🎉
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Daily Bubbles Wisdom */}
           <div className="mb-6 p-6 bg-gradient-to-br from-primary/20 to-secondary/30 rounded-2xl border border-primary/30">
