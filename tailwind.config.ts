@@ -62,6 +62,28 @@ export default {
           bg: "hsl(var(--savage-bg))",
           accent: "hsl(var(--savage-accent))",
         },
+        // Wicklow Primary Palette
+        bubbles: {
+          cream: "hsl(var(--bubbles-cream))",
+          gold: "hsl(var(--bubbles-gold))",
+          mist: "hsl(var(--bubbles-mist))",
+          heather: "hsl(var(--bubbles-heather))",
+          peat: "hsl(var(--bubbles-peat))",
+        },
+        // Mode Accent Colors
+        mode: {
+          innocent: "hsl(var(--mode-innocent))",
+          concerned: "hsl(var(--mode-concerned))",
+          triggered: "hsl(var(--mode-triggered))",
+          savage: "hsl(var(--mode-savage))",
+          nuclear: "hsl(var(--mode-nuclear))",
+        },
+        // Seasonal Palette
+        season: {
+          spring: "hsl(var(--season-spring))",
+          autumn: "hsl(var(--season-autumn))",
+          winter: "hsl(var(--season-winter))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

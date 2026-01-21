@@ -64,6 +64,16 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: 'Brand',
+    items: [
+      { href: '/admin/brand', label: 'Overview', icon: BookOpen },
+      { href: '/admin/brand/colors', label: 'Colors', icon: Sparkles },
+      { href: '/admin/brand/typography', label: 'Typography', icon: FileText },
+      { href: '/admin/brand/character', label: 'Character', icon: Target },
+      { href: '/admin/brand/production', label: 'Production', icon: Package },
+    ],
+  },
+  {
     title: 'Shopify',
     requiredModule: 'shopify',
     items: [

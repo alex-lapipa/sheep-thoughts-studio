@@ -19,6 +19,11 @@ import AdminScenarios from "./pages/admin/Scenarios";
 import AdminTriggers from "./pages/admin/Triggers";
 import AdminKnowledge from "./pages/admin/Knowledge";
 import AdminGenerate from "./pages/admin/Generate";
+import BrandOverview from "./pages/admin/brand/BrandOverview";
+import BrandColors from "./pages/admin/brand/BrandColors";
+import BrandTypography from "./pages/admin/brand/BrandTypography";
+import BrandCharacter from "./pages/admin/brand/BrandCharacter";
+import BrandProduction from "./pages/admin/brand/BrandProduction";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +51,13 @@ const App = () => (
             <Route path="/admin/triggers" element={<ProtectedRoute><AdminTriggers /></ProtectedRoute>} />
             <Route path="/admin/knowledge" element={<ProtectedRoute><AdminKnowledge /></ProtectedRoute>} />
             <Route path="/admin/generate" element={<ProtectedRoute><AdminGenerate /></ProtectedRoute>} />
+            
+            {/* Brand Book Routes */}
+            <Route path="/admin/brand" element={<ProtectedRoute><BrandOverview /></ProtectedRoute>} />
+            <Route path="/admin/brand/colors" element={<ProtectedRoute><BrandColors /></ProtectedRoute>} />
+            <Route path="/admin/brand/typography" element={<ProtectedRoute><BrandTypography /></ProtectedRoute>} />
+            <Route path="/admin/brand/character" element={<ProtectedRoute><BrandCharacter /></ProtectedRoute>} />
+            <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

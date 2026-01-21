@@ -6,115 +6,147 @@
 
 @layer base {
   :root {
-    /* Bubbles Brand - Clean Monochrome + Coral Accent */
-    --background: 40 20% 98%;
-    --foreground: 220 20% 10%;
+    /* Bubbles Brand - Wicklow Palette + Mode System */
+    --background: 55 100% 97%;
+    --foreground: 0 0% 17%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card-foreground: 0 0% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover-foreground: 0 0% 17%;
 
-    /* Primary - Deep Charcoal */
-    --primary: 220 15% 15%;
-    --primary-foreground: 40 20% 98%;
+    /* Primary - Peat Earth (Dark Neutral) */
+    --primary: 0 0% 17%;
+    --primary-foreground: 55 100% 91%;
 
-    /* Secondary - Warm Gray */
-    --secondary: 40 10% 92%;
-    --secondary-foreground: 220 15% 20%;
+    /* Secondary - Mountain Mist */
+    --secondary: 214 41% 94%;
+    --secondary-foreground: 0 0% 20%;
 
-    /* Muted - Soft Gray */
-    --muted: 40 10% 94%;
-    --muted-foreground: 220 10% 50%;
+    /* Muted - Soft Mountain Mist */
+    --muted: 214 30% 95%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Accent - Coral */
-    --accent: 12 80% 60%;
+    /* Accent - Heather Mauve */
+    --accent: 300 15% 47%;
     --accent-foreground: 0 0% 100%;
+    --accent-hover: 300 20% 42%;
+    --accent-muted: 300 15% 92%;
 
-    /* Accent Hover */
-    --accent-hover: 12 85% 55%;
-
-    /* Accent Muted */
-    --accent-muted: 12 60% 95%;
-
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 88%;
-    --input: 220 10% 88%;
-    --ring: 12 80% 60%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 300 15% 47%;
 
     --radius: 0.75rem;
 
+    /* Wicklow Primary Palette */
+    --bubbles-cream: 55 100% 91%;
+    --bubbles-gold: 45 82% 53%;
+    --bubbles-mist: 214 41% 78%;
+    --bubbles-heather: 300 15% 47%;
+    --bubbles-peat: 0 0% 17%;
+
+    /* Mode Accent Colors */
+    --mode-innocent: 351 100% 86%;
+    --mode-concerned: 214 41% 78%;
+    --mode-triggered: 27 56% 46%;
+    --mode-savage: 330 100% 71%;
+    --mode-nuclear: 68 100% 50%;
+
+    /* Seasonal Palette */
+    --season-spring: 140 51% 55%;
+    --season-autumn: 25 75% 31%;
+    --season-winter: 32 27% 29%;
+
     /* Thought Bubble */
     --bubble-bg: 0 0% 100%;
-    --bubble-border: 220 15% 85%;
-    --bubble-shadow: 220 20% 70%;
+    --bubble-border: 214 20% 85%;
+    --bubble-shadow: 214 20% 70%;
 
     /* Savage Mode - Dark Overlay */
-    --savage-bg: 220 20% 8%;
-    --savage-accent: 0 75% 55%;
+    --savage-bg: 0 0% 8%;
+    --savage-accent: 330 100% 71%;
 
     /* Fonts */
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-foreground: 0 0% 26%;
+    --sidebar-primary: 0 0% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 12 80% 60%;
+    --sidebar-accent: 214 30% 96%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 214 20% 91%;
+    --sidebar-ring: 300 15% 47%;
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 40 20% 96%;
+    --background: 0 0% 6%;
+    --foreground: 55 100% 96%;
 
-    --card: 220 18% 10%;
-    --card-foreground: 40 20% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 55 100% 96%;
 
-    --popover: 220 18% 10%;
-    --popover-foreground: 40 20% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 55 100% 96%;
 
-    --primary: 40 20% 96%;
-    --primary-foreground: 220 20% 6%;
+    --primary: 55 100% 91%;
+    --primary-foreground: 0 0% 6%;
 
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 40 20% 90%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 55 100% 90%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 55%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 12 80% 55%;
+    --accent: 300 20% 55%;
     --accent-foreground: 0 0% 100%;
+    --accent-hover: 300 25% 50%;
+    --accent-muted: 300 15% 15%;
 
-    --accent-hover: 12 85% 50%;
-
-    --accent-muted: 12 50% 15%;
-
-    --destructive: 0 62.8% 45%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 12 80% 55%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 300 20% 55%;
 
-    --bubble-bg: 220 18% 12%;
-    --bubble-border: 220 15% 25%;
-    --bubble-shadow: 220 20% 5%;
+    /* Wicklow Primary Palette - Dark Mode */
+    --bubbles-cream: 55 100% 91%;
+    --bubbles-gold: 45 82% 53%;
+    --bubbles-mist: 214 41% 78%;
+    --bubbles-heather: 300 20% 55%;
+    --bubbles-peat: 0 0% 85%;
 
-    --sidebar-background: 220 20% 8%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    /* Mode Accent Colors - Dark Mode */
+    --mode-innocent: 351 100% 86%;
+    --mode-concerned: 214 41% 78%;
+    --mode-triggered: 27 56% 46%;
+    --mode-savage: 330 100% 71%;
+    --mode-nuclear: 68 100% 50%;
+
+    /* Seasonal Palette - Dark Mode */
+    --season-spring: 140 51% 55%;
+    --season-autumn: 25 75% 40%;
+    --season-winter: 32 27% 40%;
+
+    --bubble-bg: 0 0% 12%;
+    --bubble-border: 0 0% 25%;
+    --bubble-shadow: 0 0% 5%;
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 300 20% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 15%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 12 80% 55%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 300 20% 55%;
   }
 }
 

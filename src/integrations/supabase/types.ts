@@ -53,6 +53,48 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_assets: {
+        Row: {
+          asset_key: string
+          asset_name: string
+          asset_type: string
+          asset_value: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          asset_key: string
+          asset_name: string
+          asset_type: string
+          asset_value?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          asset_key?: string
+          asset_name?: string
+          asset_type?: string
+          asset_value?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
       bubbles_knowledge: {
         Row: {
           category: Database["public"]["Enums"]["bubbles_knowledge_category"]
