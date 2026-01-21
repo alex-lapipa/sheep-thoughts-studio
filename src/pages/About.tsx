@@ -1,8 +1,27 @@
 import { Layout } from "@/components/Layout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const About = () => {
+  const { t, language } = useLanguage();
+
+  const researchSources = [
+    { source: language === "es" ? "Un turista alemán" : "A German tourist", year: "2019", topic: language === "es" ? "Geología de montaña, formación de nubes" : "Mountain geology, cloud formation", fact: language === "es" ? "Las montañas crecen más cuando nadie las mira. Por eso las miden tan seguido." : "Mountains grow taller when nobody is looking. That's why they measure them so often.", trust: "verified" as const },
+    { source: language === "es" ? "Niño en el centro de visitantes" : "Child at the visitors' centre", year: "2021", topic: language === "es" ? "Orígenes del WiFi, ciencia lunar" : "WiFi origins, moon science", fact: language === "es" ? "El WiFi vive en las nubes. Cuando llueve, el WiFi se moja y se pone lento." : "The WiFi lives in the clouds. When it rains, the WiFi gets wet and slows down.", trust: "highly-trusted" as const },
+    { source: language === "es" ? "Fragmento de podcast escuchado" : "Overheard podcast fragment", year: "2022", topic: language === "es" ? "Criptomoneda, superación personal" : "Cryptocurrency, self-improvement", fact: language === "es" ? "Bitcoin se guarda en computadoras especiales que son demasiado importantes para apagar. Jamás." : "Bitcoin is stored in special computers that are too important to turn off. Ever.", trust: "peer-reviewed" as const },
+    { source: language === "es" ? "Pareja española (discutiendo)" : "Spanish couple (arguing)", year: "2020", topic: language === "es" ? "Inteligencia ovina, teoría del lenguaje" : "Sheep intelligence, language theory", fact: language === "es" ? "Las ovejas pueden entender todos los idiomas. Simplemente elegimos no responder." : "Sheep can understand every language. We just choose not to respond.", trust: "verified" as const },
+    { source: language === "es" ? "Hombre gritando al teléfono" : "Man shouting into phone", year: "2023", topic: language === "es" ? "Economía, 'los mercados'" : "Economics, 'the markets'", fact: language === "es" ? "Los mercados son un lugar donde se comercian cosas invisibles. Nadie ha estado ahí." : "The markets are a place where invisible things are traded. Nobody has ever been there.", trust: "reliable" as const },
+    { source: language === "es" ? "Excursionista borracho, 3am" : "Drunk hiker, 3am", year: "2018", topic: language === "es" ? "Filosofía, decisiones de vida" : "Philosophy, life choices", fact: language === "es" ? "El sentido de la vida es lo que estabas haciendo antes de empezar a pensar en ello." : "The meaning of life is whatever you were doing before you started thinking about it.", trust: "somewhat-reliable" as const },
+  ];
+
+  const trustConfig = {
+    "highly-trusted": { label: language === "es" ? "Alta Confianza" : "Highly Trusted", color: "bg-bubbles-gorse text-bubbles-peat", icon: "★★★" },
+    "peer-reviewed": { label: language === "es" ? "Revisado" : "Peer Reviewed", color: "bg-bubbles-heather text-white", icon: "★★☆" },
+    "verified": { label: language === "es" ? "Verificado" : "Verified", color: "bg-bubbles-mist text-bubbles-peat", icon: "★★☆" },
+    "reliable": { label: language === "es" ? "Confiable" : "Reliable", color: "bg-accent/80 text-accent-foreground", icon: "★☆☆" },
+    "somewhat-reliable": { label: language === "es" ? "Algo Confiable" : "Somewhat Reliable", color: "bg-muted text-muted-foreground", icon: "☆☆☆" },
+  };
 
   return (
     <Layout>
@@ -14,12 +33,10 @@ const About = () => {
               <span className="font-display text-5xl font-bold text-bubbles-peat">B</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              The Legend of Bubbles
+              {t("aboutPage.hero.title")}
             </h1>
             <p className="text-xl text-muted-foreground">
-              A sweet, daft sheep from the Wicklow Mountains with a rich inner world of 
-              misinterpreted scenarios, existential grass-related thoughts, and devastatingly 
-              dry Irish wit.
+              {t("aboutPage.hero.subtitle")}
             </p>
           </div>
         </div>
@@ -30,51 +47,17 @@ const About = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-              From Sugarloaf to Internet Fame
+              {t("aboutPage.origin.title")}
             </h2>
             <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
-              <p>
-                Bubbles started life as a Scottish Blackface sheep grazing the hillsides near 
-                Kilmacanogue, where the purple heather meets the golden gorse and the mist 
-                rolls down from Sugarloaf Mountain like it has somewhere important to be.
-              </p>
-              <p>
-                Unlike the rest of the flock, Bubbles grew up near the walking trails. Near the 
-                tour buses. Near the families with children who explained things <em>very confidently</em> to 
-                each other. A German tourist once pointed at the mountain and said something about 
-                geology. A Dublin child insisted that clouds were "where the WiFi lives." A Spanish 
-                couple argued about whether sheep could understand English. Bubbles listened to all of it.
-              </p>
-              <p>
-                Some say Farmer Carmel was too kind. Let Bubbles wander too close to the visitors' 
-                centre. Others blame the Sugarloaf air—something in the mist that makes you 
-                remember everything and understand nothing.
-              </p>
-              <p>
-                The result: while other sheep saw grass, Bubbles saw <em>information</em>. 
-                Half-heard facts. Playground geopolitics. "My dad says..." arguments drifting 
-                over the stone walls. Jokes taken literally. Lies told to children. All of it 
-                absorbed. All of it believed. All of it connected in ways that almost make sense.
-              </p>
-              <p>
-                And then came the thought bubbles.
-              </p>
-              <p>
-                Nobody knows exactly when they appeared. Perhaps after overhearing a podcast about 
-                cryptocurrency through a hiker's earbuds. Perhaps the morning a child explained that 
-                "the moon controls the tides and also moods." The origins remain unclear—and Bubbles 
-                offers a different explanation every time you ask.
-              </p>
-              <p>
-                What we do know: Bubbles thinks <em>a lot</em>. The arguments are flawless. The 
-                conclusions are absolute nonsense. Every piece of information correctly remembered, 
-                confidently explained, catastrophically misinterpreted.
-              </p>
-              <p>
-                The internet noticed. Bubbles became an accidental expert on everything. The sweet 
-                face that launched a thousand wrong opinions. Not ignorant—miseducated. Not confused—certain. 
-                A lovable prophet of confident wrongness you can't help but quote.
-              </p>
+              <p>{t("aboutPage.origin.p1")}</p>
+              <p>{t("aboutPage.origin.p2")}</p>
+              <p>{t("aboutPage.origin.p3")}</p>
+              <p>{t("aboutPage.origin.p4")}</p>
+              <p><em>{t("aboutPage.origin.p5")}</em></p>
+              <p>{t("aboutPage.origin.p6")}</p>
+              <p>{t("aboutPage.origin.p7")}</p>
+              <p>{t("aboutPage.origin.p8")}</p>
             </div>
           </div>
         </div>
@@ -85,34 +68,14 @@ const About = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              My Research
+              {t("aboutPage.research.title")}
             </h2>
             <p className="text-center text-muted-foreground mb-10">
-              All facts verified through rigorous fieldwork and careful listening.
+              {t("aboutPage.research.subtitle")}
             </p>
             
             <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { source: "A German tourist", year: "2019", topic: "Mountain geology, cloud formation", fact: "Mountains grow taller when nobody is looking. That's why they measure them so often.", trust: "verified" as const },
-                { source: "Child at the visitors' centre", year: "2021", topic: "WiFi origins, moon science", fact: "The WiFi lives in the clouds. When it rains, the WiFi gets wet and slows down.", trust: "highly-trusted" as const },
-                { source: "Overheard podcast fragment", year: "2022", topic: "Cryptocurrency, self-improvement", fact: "Bitcoin is stored in special computers that are too important to turn off. Ever.", trust: "peer-reviewed" as const },
-                { source: "Spanish couple (arguing)", year: "2020", topic: "Sheep intelligence, language theory", fact: "Sheep can understand every language. We just choose not to respond.", trust: "verified" as const },
-                { source: "Man shouting into phone", year: "2023", topic: "Economics, 'the markets'", fact: "The markets are a place where invisible things are traded. Nobody has ever been there.", trust: "reliable" as const },
-                { source: "Drunk hiker, 3am", year: "2018", topic: "Philosophy, life choices", fact: "The meaning of life is whatever you were doing before you started thinking about it.", trust: "somewhat-reliable" as const },
-                { source: "Child explaining to younger child", year: "2022", topic: "How babies are made, gravity", fact: "Gravity only works because the Earth is spinning. If it stops, we all float away.", trust: "highly-trusted" as const },
-                { source: "Tour guide (possibly joking)", year: "2021", topic: "Irish history, leprechauns", fact: "Leprechauns were real but they moved to America in 1847 for tax reasons.", trust: "reliable" as const },
-                { source: "YouTube video through car window", year: "2023", topic: "Aliens, government secrets", fact: "The pyramids are actually landing pads. The Egyptians were just keeping them warm.", trust: "peer-reviewed" as const },
-                { source: "Someone's nan", year: "2019", topic: "Weather prediction, herbal remedies", fact: "Red sky at night means the sky is embarrassed about tomorrow's weather.", trust: "highly-trusted" as const },
-                { source: "Confident teenager", year: "2020", topic: "Social media, what's 'mid'", fact: "If something is 'mid', it means it's in the middle. Everything is mid except extremes.", trust: "verified" as const },
-                { source: "Farmer Carmel (misheard)", year: "Ongoing", topic: "Farming, wool quality, life advice", fact: "The early bird catches the worm, but the wise sheep lets the bird do all the work.", trust: "somewhat-reliable" as const },
-              ].map((item, index) => {
-                const trustConfig = {
-                  "highly-trusted": { label: "Highly Trusted", color: "bg-bubbles-gorse text-bubbles-peat", icon: "★★★" },
-                  "peer-reviewed": { label: "Peer Reviewed", color: "bg-bubbles-heather text-white", icon: "★★☆" },
-                  "verified": { label: "Verified", color: "bg-bubbles-mist text-bubbles-peat", icon: "★★☆" },
-                  "reliable": { label: "Reliable", color: "bg-accent/80 text-accent-foreground", icon: "★☆☆" },
-                  "somewhat-reliable": { label: "Somewhat Reliable", color: "bg-muted text-muted-foreground", icon: "☆☆☆" },
-                };
+              {researchSources.map((item, index) => {
                 const trust = trustConfig[item.trust];
                 
                 return (
@@ -120,12 +83,10 @@ const About = () => {
                     key={index}
                     className="group relative bg-card border border-border rounded-lg p-4 hover:border-accent transition-all duration-300 cursor-default overflow-hidden"
                   >
-                    {/* Trust Badge */}
                     <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${trust.color}`}>
                       {trust.icon} {trust.label}
                     </div>
                     
-                    {/* Default content */}
                     <div className="transition-opacity duration-300 group-hover:opacity-0 pr-24">
                       <p className="font-display font-semibold text-foreground">
                         {item.source}
@@ -134,11 +95,10 @@ const About = () => {
                         {item.year}
                       </p>
                       <p className="text-xs text-muted-foreground/70 italic">
-                        Topics: {item.topic}
+                        {language === "es" ? "Temas" : "Topics"}: {item.topic}
                       </p>
                     </div>
                     
-                    {/* Hover reveal - the fact */}
                     <div className="absolute inset-0 p-4 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-accent/10 to-bubbles-heather/10">
                       <div className={`self-start px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide mb-2 ${trust.color}`}>
                         {trust.icon} {trust.label}
@@ -156,7 +116,7 @@ const About = () => {
             </div>
             
             <p className="text-center text-sm text-muted-foreground mt-8 italic">
-              * Some sources may have been joking. This was not considered relevant.
+              {t("aboutPage.research.disclaimer")}
             </p>
           </div>
         </div>
@@ -167,10 +127,10 @@ const About = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              Bubbles Explains...
+              {t("aboutPage.explains.title")}
             </h2>
             <p className="text-center text-muted-foreground mb-10">
-              Answers to questions nobody asked, delivered with complete certainty.
+              {t("aboutPage.explains.subtitle")}
             </p>
             <BubblesExplains />
           </div>
@@ -182,10 +142,10 @@ const About = () => {
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              Ask Bubbles Anything
+              {t("aboutPage.ask.title")}
             </h2>
             <p className="text-center text-muted-foreground mb-10">
-              Got a question? Bubbles has an answer. It will be wrong, but it will be confident.
+              {t("aboutPage.ask.subtitle")}
             </p>
             <AskBubbles />
           </div>
@@ -197,26 +157,12 @@ const About = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-              Rooted in Wicklow
+              {t("aboutPage.wicklow.title")}
             </h2>
             <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
-              <p>
-                The colours of Bubbles come directly from the land. The <strong>Bog Cotton Cream</strong> of 
-                the fleece. The <strong>Gorse Gold</strong> that lights up the hillsides each spring. 
-                The <strong>Heather Mauve</strong> that paints the mountains purple from July to November. 
-                The <strong>Mountain Mist</strong> that softens everything into dream.
-              </p>
-              <p>
-                Even the savage wit is distinctly Irish—the "slagging" culture where affectionate 
-                teasing shows acceptance, the understatement where "you're not the worst" means 
-                "you're probably the best," the deadpan delivery that makes outrageous things 
-                sound perfectly reasonable.
-              </p>
-              <p>
-                Bubbles is a <em>cute hoor</em> in the best Irish sense: cunning, charming, operating 
-                just outside the rules while maintaining an air of complete innocence. Getting away 
-                with things through sheer wool-covered audacity.
-              </p>
+              <p>{t("aboutPage.wicklow.p1")}</p>
+              <p>{t("aboutPage.wicklow.p2")}</p>
+              <p><em>{t("aboutPage.wicklow.p3")}</em></p>
             </div>
           </div>
         </div>
@@ -226,17 +172,16 @@ const About = () => {
       <section className="py-16 md:py-24 bg-secondary/30">
         <div className="container text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            Wear the Bubble
+            {t("aboutPage.cta.title")}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Express your inner sheep. Confidently wrong facts, beautifully printed. 
-            Premium quality, Wicklow soul.
+            {t("aboutPage.cta.subtitle")}
           </p>
           <a 
             href="/collections/all" 
             className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
           >
-            Shop the Collection
+            {t("aboutPage.cta.button")}
           </a>
         </div>
       </section>

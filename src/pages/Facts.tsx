@@ -4,6 +4,7 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -36,17 +37,18 @@ const getDisplayMode = (mode: BubblesMode): BubbleMode => {
   return mode as BubbleMode;
 };
 
-const CATEGORIES = [
-  { id: "nature", label: "Nature & Weather", description: "My observations about the outside world" },
-  { id: "technology", label: "Technology", description: "How machines work (according to me)" },
-  { id: "society", label: "Society & Humans", description: "Why people do what they do" },
-  { id: "philosophy", label: "Deep Thoughts", description: "The big questions, answered" },
-];
-
 export default function Facts() {
   const [facts, setFacts] = useState<Fact[]>(FALLBACK_FACTS);
   const [displayedFacts, setDisplayedFacts] = useState<Fact[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+
+  const categories = [
+    { id: "nature", label: t("factsPage.categories.nature"), description: t("factsPage.categories.nature.desc") },
+    { id: "technology", label: t("factsPage.categories.tech"), description: t("factsPage.categories.tech.desc") },
+    { id: "society", label: t("factsPage.categories.society"), description: t("factsPage.categories.society.desc") },
+    { id: "philosophy", label: t("factsPage.categories.philosophy"), description: t("factsPage.categories.philosophy.desc") },
+  ];
 
   useEffect(() => {
     async function fetchFacts() {
@@ -83,12 +85,10 @@ export default function Facts() {
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              Facts I Have Learned
+              {t("factsPage.hero.title")}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Through extensive research (staring at things, thinking about things, 
-              reading one phone I found on a rock), I have accumulated vast knowledge. 
-              Here is some of it.
+              {t("factsPage.hero.subtitle")}
             </p>
           </div>
         </div>
@@ -100,8 +100,8 @@ export default function Facts() {
           <div className="max-w-3xl mx-auto">
             <ThoughtBubble mode="concerned" size="sm">
               <p className="text-sm">
-                <strong>Note:</strong> I have verified all of these facts myself. 
-                The verification process involved nodding thoughtfully.
+                <strong>{t("factsPage.disclaimer").split(":")[0]}:</strong>
+                {t("factsPage.disclaimer").split(":")[1]}
               </p>
             </ThoughtBubble>
           </div>
@@ -113,7 +113,7 @@ export default function Facts() {
         <div className="container">
           <div className="flex justify-between items-center mb-12">
             <h2 className="font-display text-2xl md:text-3xl font-bold">
-              Today's Knowledge
+              {t("factsPage.today")}
             </h2>
             <Button 
               variant="outline" 
@@ -121,7 +121,7 @@ export default function Facts() {
               className="font-display"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              More Facts
+              {t("factsPage.more")}
             </Button>
           </div>
 
@@ -148,10 +148,10 @@ export default function Facts() {
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
-            My Research Areas
+            {t("factsPage.categories.title")}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <div 
                 key={cat.id}
                 className="bg-card rounded-xl p-6 border border-border text-center"
@@ -169,7 +169,7 @@ export default function Facts() {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
-              My Research Methodology
+              {t("factsPage.methodology.title")}
             </h2>
             <div className="space-y-6">
               <div className="flex gap-4 items-start">
@@ -177,10 +177,9 @@ export default function Facts() {
                   <span className="font-display font-bold text-bubbles-gorse">1</span>
                 </div>
                 <div>
-                  <h3 className="font-display font-bold mb-1">Observe Something</h3>
+                  <h3 className="font-display font-bold mb-1">{t("factsPage.methodology.step1.title")}</h3>
                   <p className="text-muted-foreground">
-                    I look at a thing. Could be a rock, a bird, the farmer's hat. 
-                    Anything counts as data.
+                    {t("factsPage.methodology.step1.desc")}
                   </p>
                 </div>
               </div>
@@ -189,10 +188,9 @@ export default function Facts() {
                   <span className="font-display font-bold text-bubbles-heather">2</span>
                 </div>
                 <div>
-                  <h3 className="font-display font-bold mb-1">Have a Thought</h3>
+                  <h3 className="font-display font-bold mb-1">{t("factsPage.methodology.step2.title")}</h3>
                   <p className="text-muted-foreground">
-                    The thought appears in my bubble. I did not choose the thought. 
-                    The thought chose me.
+                    {t("factsPage.methodology.step2.desc")}
                   </p>
                 </div>
               </div>
@@ -201,10 +199,9 @@ export default function Facts() {
                   <span className="font-display font-bold text-accent">3</span>
                 </div>
                 <div>
-                  <h3 className="font-display font-bold mb-1">Decide It's True</h3>
+                  <h3 className="font-display font-bold mb-1">{t("factsPage.methodology.step3.title")}</h3>
                   <p className="text-muted-foreground">
-                    If the thought feels right, it is right. This is called 
-                    "intuition" and it has never failed me (that I can remember).
+                    {t("factsPage.methodology.step3.desc")}
                   </p>
                 </div>
               </div>
@@ -213,9 +210,9 @@ export default function Facts() {
                   <span className="font-display font-bold text-mode-savage">4</span>
                 </div>
                 <div>
-                  <h3 className="font-display font-bold mb-1">Share It With You</h3>
+                  <h3 className="font-display font-bold mb-1">{t("factsPage.methodology.step4.title")}</h3>
                   <p className="text-muted-foreground">
-                    You're welcome.
+                    {t("factsPage.methodology.step4.desc")}
                   </p>
                 </div>
               </div>
@@ -228,16 +225,16 @@ export default function Facts() {
       <section className="py-16 md:py-24 bg-secondary/30">
         <div className="container text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            Wear the Knowledge
+            {t("factsPage.cta.title")}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            My thoughts, on your chest. So everyone knows you've done your research.
+            {t("factsPage.cta.subtitle")}
           </p>
           <a 
             href="/collections/all" 
             className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
           >
-            Shop the Collection
+            {t("factsPage.cta.button")}
           </a>
         </div>
       </section>
