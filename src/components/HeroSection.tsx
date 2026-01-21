@@ -26,6 +26,7 @@ export function HeroSection() {
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [isVisible, setIsVisible] = useState(true);
   const [bubbleKey, setBubbleKey] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Fetch thoughts from database on mount
   useEffect(() => {
@@ -63,8 +64,9 @@ export function HeroSection() {
   }, [thoughts, currentThought]);
 
   // Smooth rotation: fade out → pause → change thought → fade in
+  // Pauses when user hovers over the thought bubble
   useEffect(() => {
-    if (thoughts.length === 0) return;
+    if (thoughts.length === 0 || isPaused) return;
 
     const cycle = () => {
       // Step 1: Fade out
@@ -87,7 +89,7 @@ export function HeroSection() {
     const interval = setInterval(cycle, DISPLAY_DURATION + FADE_DURATION + PAUSE_BETWEEN);
 
     return () => clearInterval(interval);
-  }, [thoughts, getNextThought]);
+  }, [thoughts, getNextThought, isPaused]);
 
   return (
     <section className="hero-gradient py-20 md:py-32 overflow-hidden">
@@ -144,16 +146,18 @@ export function HeroSection() {
               <div className="absolute -bottom-2 -left-4 w-10 h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
             </div>
             
-            {/* Thought Bubble with smooth transitions */}
+            {/* Thought Bubble with smooth transitions - pauses on hover */}
             {currentThought && (
               <div 
                 key={bubbleKey} 
-                className="absolute -top-4 right-0 md:right-8 max-w-[260px] transition-all ease-in-out"
+                className="absolute -top-4 right-0 md:right-8 max-w-[260px] transition-all ease-in-out cursor-pointer"
                 style={{
                   opacity: isVisible ? 1 : 0,
                   transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
                   transitionDuration: `${FADE_DURATION}ms`,
                 }}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
               >
                 <ThoughtBubble mode={currentThought.mode as any} size="md">
                   <p className="text-foreground italic">"{currentThought.text}"</p>
