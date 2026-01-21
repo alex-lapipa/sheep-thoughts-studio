@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ const FAQ = () => {
   const [userQuestion, setUserQuestion] = useState("");
   const [bubblesAnswer, setBubblesAnswer] = useState<string | null>(null);
   const [isAsking, setIsAsking] = useState(false);
+  const [answerCopied, setAnswerCopied] = useState(false);
 
   const shareWisdom = useCallback(() => {
     if (!randomWisdom) return;
@@ -38,6 +39,18 @@ const FAQ = () => {
       url: window.location.href,
     });
   }, [bubblesAnswer, userQuestion, share]);
+
+  const copyAnswerOnly = useCallback(async () => {
+    if (!bubblesAnswer) return;
+    try {
+      await navigator.clipboard.writeText(bubblesAnswer);
+      setAnswerCopied(true);
+      toast.success("Answer copied to clipboard!");
+      setTimeout(() => setAnswerCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy");
+    }
+  }, [bubblesAnswer]);
 
   const faqs = [
     { question: t("faq.q1"), answer: t("faq.a1") },
@@ -387,24 +400,44 @@ const FAQ = () => {
                     <p className="text-xs text-muted-foreground italic">
                       — Bubbles, Wicklow Institute of Confident Incorrectness
                     </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={shareAIAnswer}
-                      className="gap-2 font-display"
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-4 h-4" />
-                          Share
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={copyAnswerOnly}
+                        className="gap-2 font-display"
+                      >
+                        {answerCopied ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            Copy
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={shareAIAnswer}
+                        className="gap-2 font-display"
+                      >
+                        {isCopied ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Shared!
+                          </>
+                        ) : (
+                          <>
+                            <Share2 className="w-4 h-4" />
+                            Share
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
