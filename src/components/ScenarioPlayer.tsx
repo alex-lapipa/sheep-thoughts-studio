@@ -220,6 +220,13 @@ export function ScenarioPlayer() {
     });
   }, [selectedScenario, share]);
 
+  // Haptic feedback helper
+  const triggerHaptic = useCallback((pattern: number | number[] = 10) => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(pattern);
+    }
+  }, []);
+
   // Swipe handling
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -240,15 +247,20 @@ export function ScenarioPlayer() {
     if (Math.abs(diff) > minSwipeDistance) {
       if (diff > 0 && currentBeatIndex < selectedScenario.beats.length - 1) {
         // Swiped left -> next beat
+        triggerHaptic(15);
         handleNextBeat();
       } else if (diff < 0 && currentBeatIndex > 0) {
         // Swiped right -> previous beat
+        triggerHaptic(15);
         handlePrevBeat();
+      } else {
+        // Edge bounce - lighter haptic for failed swipe at boundaries
+        triggerHaptic([5, 30, 5]);
       }
     }
     
     touchStartX.current = null;
-  }, [selectedScenario, currentBeatIndex, showSwipeHint, handleNextBeat, handlePrevBeat]);
+  }, [selectedScenario, currentBeatIndex, showSwipeHint, handleNextBeat, handlePrevBeat, triggerHaptic]);
 
   const currentBeat = selectedScenario?.beats[currentBeatIndex];
   const currentMode = currentBeat?.mode || "innocent";
