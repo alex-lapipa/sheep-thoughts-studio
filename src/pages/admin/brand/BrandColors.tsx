@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -12,6 +12,235 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Convert hex to RGB
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+}
+
+// Calculate relative luminance per WCAG 2.1
+function getLuminance(r: number, g: number, b: number): number {
+  const [rs, gs, bs] = [r, g, b].map((c) => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+// Calculate contrast ratio between two colors
+function getContrastRatio(hex1: string, hex2: string): number {
+  const rgb1 = hexToRgb(hex1);
+  const rgb2 = hexToRgb(hex2);
+  if (!rgb1 || !rgb2) return 0;
+
+  const l1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+  const l2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// WCAG compliance levels
+function getWcagCompliance(ratio: number) {
+  return {
+    normalAA: ratio >= 4.5,
+    normalAAA: ratio >= 7,
+    largeAA: ratio >= 3,
+    largeAAA: ratio >= 4.5,
+    uiComponents: ratio >= 3,
+  };
+}
+
+interface ContrastCheckerProps {
+  colors: BrandAsset[];
+}
+
+function ContrastChecker({ colors }: ContrastCheckerProps) {
+  const [foregroundKey, setForegroundKey] = useState<string>("");
+  const [backgroundKey, setBackgroundKey] = useState<string>("");
+
+  const colorOptions = useMemo(() => {
+    return colors.map((c) => {
+      const val = c.asset_value as { hex?: string };
+      return {
+        key: c.asset_key,
+        name: c.asset_name,
+        hex: val.hex || "#000000",
+      };
+    });
+  }, [colors]);
+
+  const foreground = colorOptions.find((c) => c.key === foregroundKey);
+  const background = colorOptions.find((c) => c.key === backgroundKey);
+
+  const contrastRatio = useMemo(() => {
+    if (!foreground?.hex || !background?.hex) return null;
+    return getContrastRatio(foreground.hex, background.hex);
+  }, [foreground, background]);
+
+  const compliance = contrastRatio ? getWcagCompliance(contrastRatio) : null;
+
+  const ComplianceBadge = ({ pass, label }: { pass: boolean; label: string }) => (
+    <div className={`flex items-center gap-2 px-3 py-2 rounded-md ${pass ? "bg-accent/50" : "bg-destructive/10"}`}>
+      {pass ? (
+        <CheckCircle2 className="h-4 w-4 text-accent-foreground" />
+      ) : (
+        <XCircle className="h-4 w-4 text-destructive" />
+      )}
+      <span className={`text-sm font-medium ${pass ? "text-accent-foreground" : "text-destructive"}`}>
+        {label}
+      </span>
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Eye className="h-5 w-5" />
+          Contrast Checker
+        </CardTitle>
+        <CardDescription>
+          Validate WCAG accessibility compliance between any two brand colors
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Color Selectors */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Foreground (Text)</label>
+            <Select value={foregroundKey} onValueChange={setForegroundKey}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select foreground color" />
+              </SelectTrigger>
+              <SelectContent>
+                {colorOptions.map((c) => (
+                  <SelectItem key={c.key} value={c.key}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded border"
+                        style={{ backgroundColor: c.hex }}
+                      />
+                      <span>{c.name}</span>
+                      <span className="text-muted-foreground text-xs">{c.hex}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Background</label>
+            <Select value={backgroundKey} onValueChange={setBackgroundKey}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select background color" />
+              </SelectTrigger>
+              <SelectContent>
+                {colorOptions.map((c) => (
+                  <SelectItem key={c.key} value={c.key}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded border"
+                        style={{ backgroundColor: c.hex }}
+                      />
+                      <span>{c.name}</span>
+                      <span className="text-muted-foreground text-xs">{c.hex}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Preview & Results */}
+        {foreground && background ? (
+          <div className="space-y-4">
+            {/* Live Preview */}
+            <div
+              className="rounded-lg p-6 border"
+              style={{ backgroundColor: background.hex }}
+            >
+              <p
+                className="text-2xl font-display font-bold mb-2"
+                style={{ color: foreground.hex }}
+              >
+                Large Text Preview
+              </p>
+              <p className="text-base" style={{ color: foreground.hex }}>
+                Normal body text appears like this. The quick brown fox jumps over the lazy dog.
+              </p>
+            </div>
+
+            {/* Contrast Ratio */}
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div>
+                <p className="text-sm text-muted-foreground">Contrast Ratio</p>
+                <p className="text-3xl font-bold font-mono">
+                  {contrastRatio?.toFixed(2)}:1
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">
+                  {foreground.name} on {background.name}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <div
+                    className="w-6 h-6 rounded border"
+                    style={{ backgroundColor: foreground.hex }}
+                  />
+                  <span className="text-muted-foreground">→</span>
+                  <div
+                    className="w-6 h-6 rounded border"
+                    style={{ backgroundColor: background.hex }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Compliance Grid */}
+            {compliance && (
+              <div className="space-y-3">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  WCAG Compliance Results
+                </p>
+                <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                  <ComplianceBadge pass={compliance.normalAA} label="Normal Text AA (4.5:1)" />
+                  <ComplianceBadge pass={compliance.normalAAA} label="Normal Text AAA (7:1)" />
+                  <ComplianceBadge pass={compliance.largeAA} label="Large Text AA (3:1)" />
+                  <ComplianceBadge pass={compliance.largeAAA} label="Large Text AAA (4.5:1)" />
+                  <ComplianceBadge pass={compliance.uiComponents} label="UI Components (3:1)" />
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p>Select two colors to check their contrast ratio</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 type ExportFormat = "css" | "tailwind" | "json";
 
@@ -330,6 +559,9 @@ export default function BrandColors() {
             </div>
           )}
         </section>
+
+        {/* Contrast Checker Tool */}
+        {colors && colors.length > 0 && <ContrastChecker colors={colors} />}
 
         {/* WCAG Contrast Guide */}
         <Card>
