@@ -199,9 +199,17 @@ export function ScenarioPlayer() {
     }
   };
 
-  const handlePlayPause = useCallback(() => {
-    setIsPlaying((prev) => !prev);
+  // Haptic feedback helper
+  const triggerHaptic = useCallback((pattern: number | number[] = 10) => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(pattern);
+    }
   }, []);
+
+  const handlePlayPause = useCallback(() => {
+    triggerHaptic(10);
+    setIsPlaying((prev) => !prev);
+  }, [triggerHaptic]);
 
   const handlePrevBeat = useCallback(() => {
     setIsTransitioning(true);
@@ -236,6 +244,7 @@ export function ScenarioPlayer() {
 
   const handleShuffle = useCallback(() => {
     if (scenarios.length < 2) return;
+    triggerHaptic([10, 50, 10]); // Double-tap pattern for shuffle
     let randomIndex = Math.floor(Math.random() * scenarios.length);
     // Ensure we get a different scenario
     while (scenarios[randomIndex]?.id === selectedScenario?.id && scenarios.length > 1) {
@@ -248,7 +257,7 @@ export function ScenarioPlayer() {
       setIsTransitioning(false);
       setIsPlaying(true); // Auto-play the new scenario
     }, 200);
-  }, [scenarios, selectedScenario]);
+  }, [scenarios, selectedScenario, triggerHaptic]);
 
   const handleShare = useCallback(() => {
     if (!selectedScenario) return;
@@ -262,12 +271,6 @@ export function ScenarioPlayer() {
     });
   }, [selectedScenario, share]);
 
-  // Haptic feedback helper
-  const triggerHaptic = useCallback((pattern: number | number[] = 10) => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(pattern);
-    }
-  }, []);
 
   // Swipe handling
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
