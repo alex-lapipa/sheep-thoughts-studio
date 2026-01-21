@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
+import { CrossLinks } from "@/components/CrossLinks";
+import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
@@ -82,17 +84,21 @@ export default function Facts() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="py-16 md:py-24 bg-secondary/30">
-        <div className="container">
+      <section className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
+        <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 animate-pop-in">
               {t("factsPage.hero.title")}
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: "200ms" }}>
               {t("factsPage.hero.subtitle")}
             </p>
           </div>
         </div>
+        {/* Floating decorative bubbles */}
+        <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-accent/10 animate-drift" />
+        <div className="absolute bottom-10 right-20 w-16 h-16 rounded-full bg-wicklow-butter/20 animate-float" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 right-10 w-12 h-12 rounded-full bg-wicklow-heather/15 animate-bounce-gentle" style={{ animationDelay: "0.5s" }} />
       </section>
 
       {/* Disclaimer */}
@@ -113,13 +119,13 @@ export default function Facts() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="flex justify-between items-center mb-12">
-            <h2 className="font-display text-2xl md:text-3xl font-bold">
+            <h2 className="font-display text-2xl md:text-3xl font-bold animate-slide-up">
               {t("factsPage.today")}
             </h2>
             <Button 
               variant="outline" 
               onClick={shuffleFacts}
-              className="font-display"
+              className="font-display hover:animate-wiggle transition-all hover:scale-105"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               {t("factsPage.more")}
@@ -130,7 +136,7 @@ export default function Facts() {
             {displayedFacts.map((fact, index) => (
               <div 
                 key={fact.id} 
-                className="animate-fade-in"
+                className="animate-pop-in hover:animate-wobble transition-transform hover:scale-[1.02] cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <ThoughtBubble mode={getDisplayMode(fact.mode)} size="lg">
@@ -142,6 +148,9 @@ export default function Facts() {
               </div>
             ))}
           </div>
+
+          {/* Confusion prompt */}
+          <ConfusionPrompt className="mt-12 max-w-md mx-auto" excludePath="/facts" />
         </div>
       </section>
 
@@ -247,10 +256,18 @@ export default function Facts() {
           </p>
           <a 
             href="/collections/all" 
-            className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
+            className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-all hover:scale-105 hover:animate-squish"
           >
             {t("factsPage.cta.button")}
           </a>
+          
+          {/* Cross-links */}
+          <CrossLinks 
+            exclude={["/facts", "/collections/all"]} 
+            maxLinks={3}
+            className="mt-12"
+            title="Or get even more confused..."
+          />
         </div>
       </section>
     </Layout>

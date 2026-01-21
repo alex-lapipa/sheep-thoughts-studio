@@ -1,6 +1,8 @@
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { UrbanChaosOverlay } from "./UrbanChaosOverlay";
+import { FloatingBubbles } from "./FloatingBubbles";
+import { PageTransition } from "./PageTransition";
 import { useCartSync } from "@/hooks/useCartSync";
 
 interface LayoutProps {
@@ -12,10 +14,13 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative">
+      <FloatingBubbles />
       <UrbanChaosOverlay />
       <Header />
       <main className="flex-1 relative z-10">
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
       <Footer />
     </div>
