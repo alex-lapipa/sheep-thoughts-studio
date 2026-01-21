@@ -73,6 +73,7 @@ export function Footer() {
               <li><Link to="/faq" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">FAQ</Link></li>
               <li><Link to="/shipping" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Shipping & Returns</Link></li>
               <li><Link to="/contact" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Contact Us</Link></li>
+              <li><Link to="/privacy" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Privacy Policy</Link></li>
               <li>
                 <button 
                   onClick={openCookieSettings}
