@@ -13,6 +13,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Nav
     "nav.home": "Home",
     "nav.facts": "Facts",
+    "nav.scenarios": "Scenarios",
     "nav.shop": "Shop",
     "nav.story": "My Story",
     "nav.questions": "Questions",
@@ -131,6 +132,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Nav
     "nav.home": "Inicio",
     "nav.facts": "Datos",
+    "nav.scenarios": "Escenarios",
     "nav.shop": "Tienda",
     "nav.story": "Mi Historia",
     "nav.questions": "Preguntas",
