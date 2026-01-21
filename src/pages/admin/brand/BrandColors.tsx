@@ -1771,36 +1771,55 @@ export default function BrandColors() {
           </CardContent>
         </Card>
 
-        {/* 🌿 Wicklow Pastoral Palette */}
+        {/* 🌿 Wicklow Pastoral Palette - Database Driven */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Sun className="h-5 w-5 text-wicklow-butter" />
             <h2 className="text-xl font-display font-semibold">🌿 Wicklow Pastoral — The Fields</h2>
+            {wicklowColors.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {wicklowColors.length} from database
+              </Badge>
+            )}
           </div>
           <p className="text-muted-foreground text-sm">
             Calm, traditional Irish landscape. The rolling hills, the mist, the quiet. Home for Bubbles.
           </p>
           
-          <div className="grid gap-4 md:grid-cols-7">
-            {Object.entries(WICKLOW_PASTORAL).map(([key, color]) => (
-              <Card key={key} className="overflow-hidden group">
-                <div 
-                  className="h-20 w-full transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: color.hex }}
-                />
-                <CardContent className="p-3 space-y-1">
-                  <h4 className="font-semibold text-sm">{color.name}</h4>
-                  <p className="text-xs text-muted-foreground">{color.description}</p>
-                  <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {wicklowColors.length > 0 && (
+          {/* Database Colors (Primary) */}
+          {isLoading ? (
+            <div className="grid gap-4 md:grid-cols-5">
+              {[...Array(5)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-24 bg-muted" />
+                  <CardContent className="p-4 space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted rounded w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : wicklowColors.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-5">
               {wicklowColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} />
+              ))}
+            </div>
+          ) : (
+            /* Fallback to hardcoded if no database colors */
+            <div className="grid gap-4 md:grid-cols-7">
+              {Object.entries(WICKLOW_PASTORAL).map(([key, color]) => (
+                <Card key={key} className="overflow-hidden group">
+                  <div 
+                    className="h-20 w-full transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                  <CardContent className="p-3 space-y-1">
+                    <h4 className="font-semibold text-sm">{color.name}</h4>
+                    <p className="text-xs text-muted-foreground">{color.description}</p>
+                    <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
@@ -1834,43 +1853,60 @@ export default function BrandColors() {
           </div>
         </section>
 
-        {/* Mode Escalation System */}
+        {/* Mode Escalation System - Database Driven */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Moon className="h-5 w-5 text-urban-soho" />
             <h2 className="text-xl font-display font-semibold">Mode Escalation — Fields to City</h2>
+            {modeColors.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {modeColors.length} from database
+              </Badge>
+            )}
           </div>
           <p className="text-muted-foreground text-sm">
             5 states: starts pastoral and calm, ends in urban chaos. As Bubbles escalates, the city takes over.
           </p>
           
-          {/* Mode Escalation Cards */}
-          <div className="grid gap-4 md:grid-cols-5">
-            {MODE_ESCALATION.map((mode) => (
-              <Card key={mode.mode} className="overflow-hidden group">
-                <div 
-                  className="h-20 w-full transition-transform group-hover:scale-105 flex items-center justify-center"
-                  style={{ backgroundColor: mode.color }}
-                >
-                  <div
-                    className="w-10 h-10 border-2 border-black/20"
-                    style={{ borderRadius: mode.shapeRadius }}
-                  />
-                </div>
-                <CardContent className="p-3 space-y-1">
-                  <h4 className="font-semibold text-sm">{mode.name}</h4>
-                  <p className="text-xs text-muted-foreground">{mode.description}</p>
-                  <p className="text-xs font-mono text-muted-foreground">{mode.intensity}% intensity</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Database mode colors if available */}
-          {modeColors.length > 0 && (
+          {/* Database mode colors (Primary) */}
+          {isLoading ? (
+            <div className="grid gap-4 md:grid-cols-5">
+              {[...Array(5)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-24 bg-muted" />
+                  <CardContent className="p-4 space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted rounded w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : modeColors.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-5">
               {modeColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} />
+              ))}
+            </div>
+          ) : (
+            /* Fallback to hardcoded if no database colors */
+            <div className="grid gap-4 md:grid-cols-5">
+              {MODE_ESCALATION.map((mode) => (
+                <Card key={mode.mode} className="overflow-hidden group">
+                  <div 
+                    className="h-20 w-full transition-transform group-hover:scale-105 flex items-center justify-center"
+                    style={{ backgroundColor: mode.color }}
+                  >
+                    <div
+                      className="w-10 h-10 border-2 border-black/20"
+                      style={{ borderRadius: mode.shapeRadius }}
+                    />
+                  </div>
+                  <CardContent className="p-3 space-y-1">
+                    <h4 className="font-semibold text-sm">{mode.name}</h4>
+                    <p className="text-xs text-muted-foreground">{mode.description}</p>
+                    <p className="text-xs font-mono text-muted-foreground">{mode.intensity}% intensity</p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
