@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, ChevronDown } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,68 +10,76 @@ type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear"
 
 interface Beat {
   mode: BubblesMode;
-  action: string;
-  thought: string;
+  text: string;
+  action?: string;
 }
 
 interface Scenario {
   id: string;
   title: string;
   description: string;
-  trigger_category: string;
+  trigger_category: string | null;
   beats: Beat[];
 }
 
-// Mode color system: pastoral → urban transition
-const MODE_STYLES: Record<BubblesMode, {
-  bg: string;
-  text: string;
-  border: string;
-  accent: string;
+// Mode configuration with HSL values for CSS animations
+const MODE_CONFIG: Record<BubblesMode, {
   label: string;
-  icon: string;
+  hue: number;
+  saturation: number;
+  lightness: number;
+  glowIntensity: number;
+  pulseSpeed: number;
+  bgOpacity: number;
 }> = {
   innocent: {
-    bg: "bg-wicklow-butter/20",
-    text: "text-wicklow-peat",
-    border: "border-wicklow-butter",
-    accent: "bg-wicklow-butter",
     label: "Innocent",
-    icon: "🌿",
+    hue: 45,
+    saturation: 75,
+    lightness: 65,
+    glowIntensity: 0,
+    pulseSpeed: 0,
+    bgOpacity: 0.15,
   },
   concerned: {
-    bg: "bg-wicklow-atlantic/20",
-    text: "text-wicklow-peat",
-    border: "border-wicklow-atlantic",
-    accent: "bg-wicklow-atlantic",
     label: "Concerned",
-    icon: "💭",
+    hue: 205,
+    saturation: 45,
+    lightness: 48,
+    glowIntensity: 0.2,
+    pulseSpeed: 4,
+    bgOpacity: 0.2,
   },
   triggered: {
-    bg: "bg-urban-metro/20",
-    text: "text-foreground",
-    border: "border-urban-metro",
-    accent: "bg-urban-metro",
     label: "Triggered",
-    icon: "⚡",
+    hue: 25,
+    saturation: 100,
+    lightness: 55,
+    glowIntensity: 0.4,
+    pulseSpeed: 2,
+    bgOpacity: 0.25,
   },
   savage: {
-    bg: "bg-urban-soho/20",
-    text: "text-foreground",
-    border: "border-urban-soho",
-    accent: "bg-urban-soho",
     label: "Savage",
-    icon: "🌃",
+    hue: 335,
+    saturation: 100,
+    lightness: 62,
+    glowIntensity: 0.6,
+    pulseSpeed: 1.5,
+    bgOpacity: 0.3,
   },
   nuclear: {
-    bg: "bg-urban-taxi/20",
-    text: "text-foreground",
-    border: "border-urban-taxi",
-    accent: "bg-urban-taxi",
     label: "Nuclear",
-    icon: "☢️",
+    hue: 50,
+    saturation: 100,
+    lightness: 50,
+    glowIntensity: 1,
+    pulseSpeed: 0.8,
+    bgOpacity: 0.4,
   },
 };
+
+const MODE_ORDER: BubblesMode[] = ["innocent", "concerned", "triggered", "savage", "nuclear"];
 
 export function ScenarioPlayer() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -79,6 +87,7 @@ export function ScenarioPlayer() {
   const [currentBeatIndex, setCurrentBeatIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Fetch scenarios from database
   useEffect(() => {
@@ -109,11 +118,15 @@ export function ScenarioPlayer() {
 
     const timer = setTimeout(() => {
       if (currentBeatIndex < selectedScenario.beats.length - 1) {
-        setCurrentBeatIndex((prev) => prev + 1);
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentBeatIndex((prev) => prev + 1);
+          setIsTransitioning(false);
+        }, 300);
       } else {
         setIsPlaying(false);
       }
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, [isPlaying, currentBeatIndex, selectedScenario]);
@@ -132,23 +145,52 @@ export function ScenarioPlayer() {
   }, []);
 
   const handlePrevBeat = useCallback(() => {
-    setCurrentBeatIndex((prev) => Math.max(0, prev - 1));
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentBeatIndex((prev) => Math.max(0, prev - 1));
+      setIsTransitioning(false);
+    }, 150);
     setIsPlaying(false);
   }, []);
 
   const handleNextBeat = useCallback(() => {
     if (selectedScenario) {
-      setCurrentBeatIndex((prev) =>
-        Math.min(selectedScenario.beats.length - 1, prev + 1)
-      );
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentBeatIndex((prev) =>
+          Math.min(selectedScenario.beats.length - 1, prev + 1)
+        );
+        setIsTransitioning(false);
+      }, 150);
       setIsPlaying(false);
     }
   }, [selectedScenario]);
 
   const handleReset = useCallback(() => {
-    setCurrentBeatIndex(0);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentBeatIndex(0);
+      setIsTransitioning(false);
+    }, 150);
     setIsPlaying(false);
   }, []);
+
+  const currentBeat = selectedScenario?.beats[currentBeatIndex];
+  const currentMode = currentBeat?.mode || "innocent";
+  const modeConfig = MODE_CONFIG[currentMode];
+  const modeIndex = MODE_ORDER.indexOf(currentMode);
+  const escalationProgress = (modeIndex / (MODE_ORDER.length - 1)) * 100;
+
+  // Generate dynamic CSS custom properties for reactive styling
+  const modeStyles = useMemo(() => ({
+    "--mode-hue": modeConfig.hue,
+    "--mode-saturation": `${modeConfig.saturation}%`,
+    "--mode-lightness": `${modeConfig.lightness}%`,
+    "--mode-glow": modeConfig.glowIntensity,
+    "--mode-pulse-speed": `${modeConfig.pulseSpeed}s`,
+    "--mode-bg-opacity": modeConfig.bgOpacity,
+    "--escalation-progress": `${escalationProgress}%`,
+  } as React.CSSProperties), [modeConfig, escalationProgress]);
 
   if (isLoading) {
     return (
@@ -172,23 +214,60 @@ export function ScenarioPlayer() {
     );
   }
 
-  const currentBeat = selectedScenario.beats[currentBeatIndex];
-  const currentMode = currentBeat?.mode || "innocent";
-  const modeStyle = MODE_STYLES[currentMode];
-
   return (
-    <Card className="w-full max-w-2xl mx-auto overflow-hidden">
-      <CardHeader className="pb-4">
+    <Card 
+      className="w-full max-w-2xl mx-auto overflow-hidden relative"
+      style={modeStyles}
+    >
+      {/* Animated background glow */}
+      <div 
+        className={cn(
+          "absolute inset-0 transition-all duration-700 pointer-events-none",
+          currentMode === "nuclear" && "animate-pulse"
+        )}
+        style={{
+          background: `radial-gradient(ellipse at center, 
+            hsl(var(--mode-hue) var(--mode-saturation) var(--mode-lightness) / var(--mode-bg-opacity)) 0%, 
+            transparent 70%)`,
+          opacity: modeConfig.glowIntensity > 0 ? 1 : 0,
+        }}
+      />
+
+      {/* Mode escalation indicator bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-muted overflow-hidden">
+        <div 
+          className="h-full transition-all duration-700 ease-out"
+          style={{
+            width: `${escalationProgress}%`,
+            background: `linear-gradient(90deg, 
+              hsl(45, 75%, 65%) 0%, 
+              hsl(205, 45%, 48%) 25%, 
+              hsl(25, 100%, 55%) 50%, 
+              hsl(335, 100%, 62%) 75%, 
+              hsl(50, 100%, 50%) 100%)`,
+          }}
+        />
+      </div>
+
+      <CardHeader className="pb-4 relative z-10">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-xl">{selectedScenario.title}</CardTitle>
+            <CardTitle className="text-xl font-display">{selectedScenario.title}</CardTitle>
             <CardDescription className="mt-1">
               {selectedScenario.description}
             </CardDescription>
           </div>
-          <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
-            {selectedScenario.trigger_category}
-          </span>
+          {selectedScenario.trigger_category && (
+            <span 
+              className="text-xs px-3 py-1.5 rounded-full font-medium transition-all duration-500"
+              style={{
+                backgroundColor: `hsl(var(--mode-hue) var(--mode-saturation) var(--mode-lightness) / 0.15)`,
+                color: `hsl(var(--mode-hue) var(--mode-saturation) calc(var(--mode-lightness) - 20%))`,
+              }}
+            >
+              {selectedScenario.trigger_category}
+            </span>
+          )}
         </div>
 
         {/* Scenario Selector */}
@@ -204,9 +283,11 @@ export function ScenarioPlayer() {
               <SelectItem key={s.id} value={s.id}>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{s.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    — {s.trigger_category}
-                  </span>
+                  {s.trigger_category && (
+                    <span className="text-xs text-muted-foreground">
+                      — {s.trigger_category}
+                    </span>
+                  )}
                 </div>
               </SelectItem>
             ))}
@@ -214,103 +295,158 @@ export function ScenarioPlayer() {
         </Select>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Progress Indicator */}
-        <div className="flex items-center gap-2">
-          {selectedScenario.beats.map((beat, index) => {
-            const beatMode = beat.mode;
-            const beatStyle = MODE_STYLES[beatMode];
-            const isActive = index === currentBeatIndex;
-            const isPast = index < currentBeatIndex;
+      <CardContent className="space-y-6 relative z-10">
+        {/* Beat Progress Timeline */}
+        <div className="relative">
+          <div className="flex items-center gap-1.5">
+            {selectedScenario.beats.map((beat, index) => {
+              const beatConfig = MODE_CONFIG[beat.mode];
+              const isActive = index === currentBeatIndex;
+              const isPast = index < currentBeatIndex;
 
-            return (
-              <button
-                key={index}
-                onClick={() => {
-                  setCurrentBeatIndex(index);
-                  setIsPlaying(false);
-                }}
-                className={cn(
-                  "flex-1 h-2 rounded-full transition-all duration-500 cursor-pointer",
-                  isActive
-                    ? beatStyle.accent
-                    : isPast
-                    ? `${beatStyle.accent} opacity-60`
-                    : "bg-muted"
-                )}
-                title={`${beatStyle.label}: ${beat.thought.slice(0, 30)}...`}
-              />
-            );
-          })}
+              return (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setIsTransitioning(true);
+                    setTimeout(() => {
+                      setCurrentBeatIndex(index);
+                      setIsTransitioning(false);
+                    }, 150);
+                    setIsPlaying(false);
+                  }}
+                  className={cn(
+                    "flex-1 h-3 rounded-full transition-all duration-500 cursor-pointer relative overflow-hidden",
+                    isActive && "ring-2 ring-offset-2 ring-offset-background scale-110"
+                  )}
+                  style={{
+                    backgroundColor: isActive || isPast 
+                      ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`
+                      : "hsl(var(--muted))",
+                    opacity: isPast ? 0.6 : 1,
+                    // @ts-expect-error CSS custom property for ring color
+                    "--tw-ring-color": isActive 
+                      ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`
+                      : undefined,
+                  }}
+                  title={`${beatConfig.label}: ${beat.text.slice(0, 40)}...`}
+                >
+                  {isActive && isPlaying && (
+                    <div 
+                      className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"
+                      style={{
+                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+                        animation: "shimmer 2s infinite",
+                      }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Mode Badge */}
+        {/* Mode Badge with Animation */}
         <div className="flex items-center justify-center">
           <div
             className={cn(
-              "px-4 py-2 rounded-full font-medium text-sm transition-all duration-500",
-              modeStyle.accent,
-              currentMode === "innocent" || currentMode === "concerned"
-                ? "text-wicklow-peat"
-                : "text-white"
+              "px-5 py-2.5 rounded-full font-display font-semibold text-sm transition-all duration-500 flex items-center gap-2",
+              currentMode === "nuclear" && "animate-pulse shadow-lg"
             )}
+            style={{
+              backgroundColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%)`,
+              color: modeConfig.lightness > 60 ? "hsl(28, 45%, 16%)" : "white",
+              boxShadow: modeConfig.glowIntensity > 0 
+                ? `0 0 ${20 * modeConfig.glowIntensity}px hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}% / 0.5)`
+                : undefined,
+            }}
           >
-            {modeStyle.icon} {modeStyle.label} Mode
+            {currentMode === "nuclear" && <Sparkles className="w-4 h-4 animate-spin" />}
+            {modeConfig.label} Mode
+            {currentMode === "nuclear" && <Sparkles className="w-4 h-4 animate-spin" />}
           </div>
         </div>
 
-        {/* Beat Content */}
+        {/* Beat Content with Transition */}
         <div
           className={cn(
-            "rounded-xl p-6 border-2 transition-all duration-500",
-            modeStyle.bg,
-            modeStyle.border
+            "rounded-2xl p-6 border-2 transition-all duration-500 relative overflow-hidden",
+            isTransitioning && "opacity-0 scale-95"
           )}
+          style={{
+            backgroundColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}% / 0.1)`,
+            borderColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}% / 0.3)`,
+          }}
         >
-          {/* Action */}
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-              Scene
-            </p>
-            <p className={cn("text-sm", modeStyle.text)}>{currentBeat.action}</p>
-          </div>
+          {/* Background pattern for escalated modes */}
+          {modeIndex >= 3 && (
+            <div 
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: `radial-gradient(circle at 20% 80%, 
+                  hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%) 0%, 
+                  transparent 50%),
+                  radial-gradient(circle at 80% 20%, 
+                  hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%) 0%, 
+                  transparent 50%)`,
+              }}
+            />
+          )}
+
+          {/* Scene context (if available) */}
+          {currentBeat?.action && (
+            <div className="mb-4 relative z-10">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1 font-display">
+                Scene
+              </p>
+              <p className="text-sm text-foreground/80">{currentBeat.action}</p>
+            </div>
+          )}
 
           {/* Thought Bubble */}
-          <div className="relative">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+          <div className="relative z-10">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2 font-display">
               Bubbles Thinks
             </p>
             <div
               className={cn(
-                "relative p-4 rounded-2xl transition-all duration-500",
-                modeStyle.accent,
-                currentMode === "innocent" || currentMode === "concerned"
-                  ? "text-wicklow-peat"
-                  : "text-white"
+                "relative p-5 rounded-2xl transition-all duration-500",
+                currentMode === "nuclear" && "animate-pulse"
               )}
+              style={{
+                backgroundColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%)`,
+                color: modeConfig.lightness > 60 ? "hsl(28, 45%, 16%)" : "white",
+                boxShadow: modeConfig.glowIntensity > 0.3
+                  ? `0 4px ${30 * modeConfig.glowIntensity}px hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}% / 0.4)`
+                  : "0 4px 20px hsl(0 0% 0% / 0.1)",
+              }}
             >
-              <p className="text-lg font-medium italic">
-                "{currentBeat.thought}"
+              <p className={cn(
+                "text-lg font-medium italic font-display leading-relaxed",
+                currentMode === "nuclear" && "text-xl"
+              )}>
+                "{currentBeat?.text}"
               </p>
 
               {/* Bubble tail */}
               <div
-                className={cn(
-                  "absolute -bottom-2 left-6 w-4 h-4 rotate-45 transition-all duration-500",
-                  modeStyle.accent
-                )}
+                className="absolute -bottom-3 left-8 w-6 h-6 rotate-45 transition-all duration-500"
+                style={{
+                  backgroundColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%)`,
+                }}
               />
             </div>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-center gap-2">
+        {/* Playback Controls */}
+        <div className="flex items-center justify-center gap-3">
           <Button
             variant="outline"
             size="icon"
             onClick={handleReset}
             disabled={currentBeatIndex === 0}
+            className="transition-all duration-300"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
@@ -319,24 +455,29 @@ export function ScenarioPlayer() {
             size="icon"
             onClick={handlePrevBeat}
             disabled={currentBeatIndex === 0}
+            className="transition-all duration-300"
           >
             <SkipBack className="h-4 w-4" />
           </Button>
           <Button
             size="icon"
             className={cn(
-              "w-12 h-12 rounded-full transition-all duration-300",
-              modeStyle.accent,
-              currentMode === "innocent" || currentMode === "concerned"
-                ? "text-wicklow-peat hover:opacity-90"
-                : "text-white hover:opacity-90"
+              "w-14 h-14 rounded-full transition-all duration-500",
+              isPlaying && "scale-110"
             )}
+            style={{
+              backgroundColor: `hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}%)`,
+              color: modeConfig.lightness > 60 ? "hsl(28, 45%, 16%)" : "white",
+              boxShadow: isPlaying 
+                ? `0 0 20px hsl(${modeConfig.hue}, ${modeConfig.saturation}%, ${modeConfig.lightness}% / 0.5)`
+                : undefined,
+            }}
             onClick={handlePlayPause}
           >
             {isPlaying ? (
-              <Pause className="h-5 w-5" />
+              <Pause className="h-6 w-6" />
             ) : (
-              <Play className="h-5 w-5 ml-0.5" />
+              <Play className="h-6 w-6 ml-0.5" />
             )}
           </Button>
           <Button
@@ -344,16 +485,25 @@ export function ScenarioPlayer() {
             size="icon"
             onClick={handleNextBeat}
             disabled={currentBeatIndex === selectedScenario.beats.length - 1}
+            className="transition-all duration-300"
           >
             <SkipForward className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Beat Counter */}
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground font-display">
           Beat {currentBeatIndex + 1} of {selectedScenario.beats.length}
         </p>
       </CardContent>
+
+      {/* Shimmer animation keyframes */}
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </Card>
   );
 }
