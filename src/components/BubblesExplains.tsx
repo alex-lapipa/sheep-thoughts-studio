@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { ThoughtBubble } from "./ThoughtBubble";
+import { CitationGenerator } from "./CitationGenerator";
 import { cn } from "@/lib/utils";
 
 interface Explanation {
@@ -184,6 +185,13 @@ export const BubblesExplains = () => {
                       </p>
                     </div>
                   )}
+                                    
+                  {/* Citation Generator */}
+                  <CitationGenerator 
+                    fact={isChallenged && item.challenge ? item.challenge.response : item.explanation}
+                    source={`Bubbles the Sheep, ${new Date().getFullYear()}`}
+                    topic={item.question}
+                  />
                   
                   {/* Original confidence (only show if not challenged) */}
                   {!isChallenged && (
