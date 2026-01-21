@@ -245,16 +245,18 @@ export function ScenarioPlayer() {
   }, [triggerHaptic]);
 
   const handlePrevBeat = useCallback(() => {
+    triggerHaptic(10);
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentBeatIndex((prev) => Math.max(0, prev - 1));
       setIsTransitioning(false);
     }, 150);
     setIsPlaying(false);
-  }, []);
+  }, [triggerHaptic]);
 
   const handleNextBeat = useCallback(() => {
     if (selectedScenario) {
+      triggerHaptic(10);
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentBeatIndex((prev) =>
@@ -264,7 +266,7 @@ export function ScenarioPlayer() {
       }, 150);
       setIsPlaying(false);
     }
-  }, [selectedScenario]);
+  }, [selectedScenario, triggerHaptic]);
 
   const handleReset = useCallback(() => {
     setIsTransitioning(true);
