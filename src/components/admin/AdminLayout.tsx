@@ -149,8 +149,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="flex items-center gap-2">
-              <span className="text-2xl">🐑</span>
+            <Link to="/admin" className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-bubbles-cream border-2 border-bubbles-heather flex items-center justify-center">
+                <span className="font-display font-bold text-sm text-bubbles-peat">B</span>
+              </div>
               <span className="font-display font-bold text-xl">Bubbles Ops</span>
             </Link>
           </div>
