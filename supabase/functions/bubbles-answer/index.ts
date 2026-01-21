@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -116,6 +117,25 @@ serve(async (req) => {
 
     const data = await response.json();
     const answer = data.choices?.[0]?.message?.content || "I stared at a cloud and forgot what you asked.";
+
+    // Save the question and answer to the database for moderation
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      
+      if (supabaseUrl && supabaseServiceKey) {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        
+        await supabase.from("submitted_questions").insert({
+          question: question.trim(),
+          answer: answer,
+          status: "pending",
+        });
+      }
+    } catch (dbError) {
+      // Log but don't fail the request if saving fails
+      console.error("Failed to save question to database:", dbError);
+    }
 
     return new Response(
       JSON.stringify({ answer }),
