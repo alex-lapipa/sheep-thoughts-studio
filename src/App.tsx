@@ -14,6 +14,7 @@ import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Search from "./pages/Search";
+import Explains from "./pages/Explains";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -51,6 +52,7 @@ const App = () => (
                 <Route path="/product/:handle" element={<ProductDetail />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/explains" element={<Explains />} />
                 <Route path="/search" element={<Search />} />
                 
                 
