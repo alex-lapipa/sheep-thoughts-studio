@@ -230,8 +230,10 @@ export function ScenarioPlayer() {
           }
           break;
         case "Escape":
+        case "KeyR":
           e.preventDefault();
           if (currentBeatIndex > 0) {
+            triggerHaptic(10);
             setIsTransitioning(true);
             setTimeout(() => {
               setCurrentBeatIndex(0);
