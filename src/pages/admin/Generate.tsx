@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Sparkles, Save, RefreshCw, LayoutList, LayoutGrid, Eye } from 'lucide-react';
@@ -20,8 +20,7 @@ type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 
 const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage', 'nuclear'];
 
-const TRIGGER_CATEGORIES = [
-  // Original psychological triggers
+const PSYCHOLOGICAL_TRIGGERS = [
   "The Look™",
   "Tone Crime",
   "Object Conspiracy",
@@ -29,7 +28,9 @@ const TRIGGER_CATEGORIES = [
   "Accidental Symbolism",
   "False Patterns",
   "Silence as Aggression",
-  // Global thought leadership domains
+];
+
+const GLOBAL_EXPERTISE_TRIGGERS = [
   "Geopolitical Analysis",
   "Tech Expert Opinion",
   "Scientific Certainty",
@@ -251,12 +252,29 @@ export default function AdminGenerate() {
                     <SelectValue placeholder="Any trigger..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any</SelectItem>
-                    {TRIGGER_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="any">Any Category</SelectItem>
+                    
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground font-semibold px-2 py-1.5">
+                        🧠 Psychological Triggers
+                      </SelectLabel>
+                      {PSYCHOLOGICAL_TRIGGERS.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground font-semibold px-2 py-1.5">
+                        🌍 Global Expertise
+                      </SelectLabel>
+                      {GLOBAL_EXPERTISE_TRIGGERS.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
