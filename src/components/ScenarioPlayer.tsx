@@ -213,6 +213,17 @@ export function ScenarioPlayer() {
             setIsPlaying(false);
           }
           break;
+        case "Escape":
+          e.preventDefault();
+          if (currentBeatIndex > 0) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+              setCurrentBeatIndex(0);
+              setIsTransitioning(false);
+            }, 150);
+            setIsPlaying(false);
+          }
+          break;
       }
     };
 
@@ -738,6 +749,10 @@ export function ScenarioPlayer() {
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-muted-foreground">Previous beat</span>
                   <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">←</kbd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Reset</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">Esc</kbd>
                 </div>
               </div>
             </TooltipContent>
