@@ -666,6 +666,45 @@ export type Database = {
         }
         Relationships: []
       }
+      submitted_questions: {
+        Row: {
+          answer: string | null
+          id: string
+          ip_hash: string | null
+          metadata: Json | null
+          notes: string | null
+          question: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+        }
+        Insert: {
+          answer?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          question: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Update: {
+          answer?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          question?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
