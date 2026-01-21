@@ -9,6 +9,7 @@ import { BubblesSheep } from "@/components/BubblesSheep";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useMood } from "@/contexts/MoodContext";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -28,11 +29,18 @@ const BUBBLES_FACTS = [
   { text: "I've researched this. Mountains are just old hills that got promoted.", mode: "savage" as BubblesMode },
 ];
 
+// Timing constants for smooth reading experience
+const FADE_DURATION = 600;
+const DISPLAY_DURATION = 6000;
+const PAUSE_BETWEEN = 800;
+
 export default function Index() {
   const [currentThought, setCurrentThought] = useState<ThoughtData | null>(null);
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [bubbleKey, setBubbleKey] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
   const { t } = useLanguage();
+  const { setCurrentMode } = useMood();
 
   useEffect(() => {
     async function fetchThoughts() {
@@ -49,27 +57,50 @@ export default function Index() {
         }));
         setThoughts(fallbackThoughts);
         setCurrentThought(fallbackThoughts[0]);
+        setCurrentMode(fallbackThoughts[0].mode);
         return;
       }
 
       setThoughts(data);
-      setCurrentThought(data[Math.floor(Math.random() * data.length)]);
+      const initialThought = data[Math.floor(Math.random() * data.length)];
+      setCurrentThought(initialThought);
+      setCurrentMode(initialThought.mode);
     }
 
     fetchThoughts();
-  }, []);
+  }, [setCurrentMode]);
 
+  // Smooth rotation with mood updates
   useEffect(() => {
     if (thoughts.length === 0) return;
 
-    const interval = setInterval(() => {
-      const randomThought = thoughts[Math.floor(Math.random() * thoughts.length)];
-      setCurrentThought(randomThought);
-      setBubbleKey(prev => prev + 1);
-    }, 4000);
+    const getNextThought = () => {
+      let next = thoughts[Math.floor(Math.random() * thoughts.length)];
+      while (next?.id === currentThought?.id && thoughts.length > 1) {
+        next = thoughts[Math.floor(Math.random() * thoughts.length)];
+      }
+      return next;
+    };
+
+    const cycle = () => {
+      setIsVisible(false);
+      
+      setTimeout(() => {
+        const nextThought = getNextThought();
+        setCurrentThought(nextThought);
+        setCurrentMode(nextThought.mode); // Update global mood
+        setBubbleKey(prev => prev + 1);
+        
+        setTimeout(() => {
+          setIsVisible(true);
+        }, PAUSE_BETWEEN);
+      }, FADE_DURATION);
+    };
+
+    const interval = setInterval(cycle, DISPLAY_DURATION + FADE_DURATION + PAUSE_BETWEEN);
 
     return () => clearInterval(interval);
-  }, [thoughts]);
+  }, [thoughts, currentThought, setCurrentMode]);
 
   // Map nuclear mode to savage for display (since BubbleMode doesn't include nuclear)
   const getDisplayMode = (mode: BubblesMode): BubbleMode => {
@@ -117,8 +148,17 @@ export default function Index() {
             <div className="relative flex justify-center items-center">
               <BubblesSheep size="xl" className="drop-shadow-2xl" />
               
+              {/* Thought bubble with smooth fade transitions */}
               {currentThought && (
-                <div key={bubbleKey} className="absolute -top-4 right-0 md:right-8 max-w-[280px]">
+                <div 
+                  key={bubbleKey} 
+                  className="absolute -top-4 right-0 md:right-8 max-w-[280px] transition-all ease-in-out"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)',
+                    transitionDuration: `${FADE_DURATION}ms`,
+                  }}
+                >
                   <ThoughtBubble mode={getDisplayMode(currentThought.mode)} size="md">
                     <p className="text-foreground italic">"{currentThought.text}"</p>
                   </ThoughtBubble>
