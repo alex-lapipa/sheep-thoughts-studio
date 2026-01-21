@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -82,12 +84,14 @@ const MODE_CONFIG: Record<BubblesMode, {
 const MODE_ORDER: BubblesMode[] = ["innocent", "concerned", "triggered", "savage", "nuclear"];
 
 export function ScenarioPlayer() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [currentBeatIndex, setCurrentBeatIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   // Fetch scenarios from database
   useEffect(() => {
@@ -103,14 +107,22 @@ export function ScenarioPlayer() {
           beats: (Array.isArray(s.beats) ? s.beats : []) as unknown as Beat[],
         }));
         setScenarios(parsed);
-        if (parsed.length > 0) {
+        
+        // Check for scenario ID in URL params
+        const scenarioId = searchParams.get("scenario");
+        const urlScenario = scenarioId ? parsed.find(s => s.id === scenarioId) : null;
+        
+        if (urlScenario) {
+          setSelectedScenario(urlScenario);
+          setIsPlaying(true); // Auto-play when loaded from URL
+        } else if (parsed.length > 0) {
           setSelectedScenario(parsed[0]);
         }
       }
       setIsLoading(false);
     }
     fetchScenarios();
-  }, []);
+  }, [searchParams]);
 
   // Auto-play through beats
   useEffect(() => {
@@ -190,6 +202,24 @@ export function ScenarioPlayer() {
       setIsPlaying(true); // Auto-play the new scenario
     }, 200);
   }, [scenarios, selectedScenario]);
+
+  const handleShare = useCallback(async () => {
+    if (!selectedScenario) return;
+    
+    const shareUrl = `${window.location.origin}/scenarios?scenario=${selectedScenario.id}`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      toast.success("Link copied to clipboard!", {
+        description: `Share "${selectedScenario.title}" with others`,
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      // Fallback for browsers that don't support clipboard API
+      toast.error("Unable to copy link");
+    }
+  }, [selectedScenario]);
 
   const currentBeat = selectedScenario?.beats[currentBeatIndex];
   const currentMode = currentBeat?.mode || "innocent";
@@ -457,6 +487,23 @@ export function ScenarioPlayer() {
 
         {/* Playback Controls */}
         <div className="flex items-center justify-center gap-3">
+          {/* Share Button */}
+          <Button
+            variant="outline"
+            onClick={handleShare}
+            className={cn(
+              "transition-all duration-300 gap-2 font-display hover:scale-105",
+              isCopied && "border-primary text-primary"
+            )}
+          >
+            {isCopied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Share2 className="h-4 w-4" />
+            )}
+            <span className="hidden sm:inline">{isCopied ? "Copied!" : "Share"}</span>
+          </Button>
+          
           {/* Shuffle Button */}
           {scenarios.length > 1 && (
             <Button
@@ -465,7 +512,7 @@ export function ScenarioPlayer() {
               className="transition-all duration-300 gap-2 font-display hover:scale-105"
             >
               <Shuffle className="h-4 w-4" />
-              Shuffle
+              <span className="hidden sm:inline">Shuffle</span>
             </Button>
           )}
           
