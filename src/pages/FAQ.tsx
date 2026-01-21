@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -72,6 +72,33 @@ const FAQ = () => {
     const index = Math.abs(hash) % faqs.length;
     return faqs[index];
   }, [faqs]);
+
+  // Countdown to next daily wisdom (midnight)
+  const [timeUntilNext, setTimeUntilNext] = useState("");
+  
+  useEffect(() => {
+    const calculateTimeUntilMidnight = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      
+      const diff = tomorrow.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+    
+    setTimeUntilNext(calculateTimeUntilMidnight());
+    
+    const interval = setInterval(() => {
+      setTimeUntilNext(calculateTimeUntilMidnight());
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const shareDailyWisdom = useCallback(() => {
     share({
@@ -151,9 +178,13 @@ const FAQ = () => {
             <div className="flex flex-col items-center text-center">
               <Calendar className="w-8 h-8 text-primary mb-3" />
               <h3 className="font-display font-bold text-xl mb-1">Today's Wisdom</h3>
-              <p className="text-xs text-muted-foreground mb-4">
+              <p className="text-xs text-muted-foreground mb-2">
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
               </p>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 font-mono">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Next wisdom in {timeUntilNext}</span>
+              </div>
               
               <div className="w-full p-5 bg-card rounded-xl border shadow-sm">
                 <p className="font-display font-semibold text-lg mb-2 text-foreground">
