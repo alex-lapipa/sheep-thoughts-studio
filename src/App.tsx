@@ -26,6 +26,7 @@ import BrandColors from "./pages/admin/brand/BrandColors";
 import BrandTypography from "./pages/admin/brand/BrandTypography";
 import BrandCharacter from "./pages/admin/brand/BrandCharacter";
 import BrandProduction from "./pages/admin/brand/BrandProduction";
+import BrandFrontend from "./pages/admin/brand/BrandFrontend";
 import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
 
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/admin/brand/typography" element={<ProtectedRoute><BrandTypography /></ProtectedRoute>} />
               <Route path="/admin/brand/character" element={<ProtectedRoute><BrandCharacter /></ProtectedRoute>} />
               <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
+              <Route path="/admin/brand/frontend" element={<ProtectedRoute><BrandFrontend /></ProtectedRoute>} />
               <Route path="/admin/brand/wicklow-palette" element={<ProtectedRoute><AdminWicklowPalette /></ProtectedRoute>} />
               
               {/* System Routes - Super Admin Only */}
