@@ -4,13 +4,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2 } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useShare } from "@/hooks/useShare";
 
 const FAQ = () => {
   const { t } = useLanguage();
+  const { share, isCopied } = useShare();
   const [randomWisdom, setRandomWisdom] = useState<{ question: string; answer: string } | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   
@@ -18,6 +20,15 @@ const FAQ = () => {
   const [userQuestion, setUserQuestion] = useState("");
   const [bubblesAnswer, setBubblesAnswer] = useState<string | null>(null);
   const [isAsking, setIsAsking] = useState(false);
+
+  const shareWisdom = useCallback(() => {
+    if (!randomWisdom) return;
+    share({
+      title: "Bubbles Wisdom",
+      text: `"${randomWisdom.question}" — ${randomWisdom.answer}`,
+      url: window.location.href,
+    });
+  }, [randomWisdom, share]);
 
   const faqs = [
     { question: t("faq.q1"), answer: t("faq.a1") },
@@ -130,9 +141,27 @@ const FAQ = () => {
                   <p className="font-display font-semibold text-lg mb-2 text-foreground">
                     "{randomWisdom.question}"
                   </p>
-                  <p className="text-muted-foreground italic">
+                  <p className="text-muted-foreground italic mb-4">
                     {randomWisdom.answer}
                   </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={shareWisdom}
+                    className="gap-2 font-display"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4" />
+                        Share Wisdom
+                      </>
+                    )}
+                  </Button>
                 </div>
               )}
             </div>
