@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check, ChevronLeft, ChevronRight, Gauge } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check, ChevronLeft, ChevronRight, Gauge, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useShare } from "@/hooks/useShare";
@@ -715,6 +716,32 @@ export function ScenarioPlayer() {
               ))}
             </div>
           </div>
+
+          {/* Keyboard Shortcuts Hint */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <Keyboard className="w-3.5 h-3.5" />
+                <span>Shortcuts</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <div className="grid gap-2 text-xs">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Play / Pause</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">Space</kbd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Next beat</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">→</kbd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Previous beat</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">←</kbd>
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Beat Counter */}
           <p className="text-sm text-muted-foreground font-display">
