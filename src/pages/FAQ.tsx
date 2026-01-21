@@ -30,6 +30,15 @@ const FAQ = () => {
     });
   }, [randomWisdom, share]);
 
+  const shareAIAnswer = useCallback(() => {
+    if (!bubblesAnswer || !userQuestion) return;
+    share({
+      title: "Bubbles Answered My Question",
+      text: `Q: "${userQuestion}"\n\nA: ${bubblesAnswer}\n\n— Bubbles, Wicklow Institute of Confident Incorrectness`,
+      url: window.location.href,
+    });
+  }, [bubblesAnswer, userQuestion, share]);
+
   const faqs = [
     { question: t("faq.q1"), answer: t("faq.a1") },
     { question: t("faq.q2"), answer: t("faq.a2") },
@@ -279,9 +288,29 @@ const FAQ = () => {
                       {bubblesAnswer}
                     </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3 italic">
-                    — Bubbles, Wicklow Institute of Confident Incorrectness
-                  </p>
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t">
+                    <p className="text-xs text-muted-foreground italic">
+                      — Bubbles, Wicklow Institute of Confident Incorrectness
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={shareAIAnswer}
+                      className="gap-2 font-display"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Share2 className="w-4 h-4" />
+                          Share
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
