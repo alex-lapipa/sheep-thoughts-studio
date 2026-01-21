@@ -121,50 +121,66 @@ const About = () => {
             
             <div className="grid sm:grid-cols-2 gap-4">
               {[
-                { source: "A German tourist", year: "2019", topic: "Mountain geology, cloud formation", fact: "Mountains grow taller when nobody is looking. That's why they measure them so often." },
-                { source: "Child at the visitors' centre", year: "2021", topic: "WiFi origins, moon science", fact: "The WiFi lives in the clouds. When it rains, the WiFi gets wet and slows down." },
-                { source: "Overheard podcast fragment", year: "2022", topic: "Cryptocurrency, self-improvement", fact: "Bitcoin is stored in special computers that are too important to turn off. Ever." },
-                { source: "Spanish couple (arguing)", year: "2020", topic: "Sheep intelligence, language theory", fact: "Sheep can understand every language. We just choose not to respond." },
-                { source: "Man shouting into phone", year: "2023", topic: "Economics, 'the markets'", fact: "The markets are a place where invisible things are traded. Nobody has ever been there." },
-                { source: "Drunk hiker, 3am", year: "2018", topic: "Philosophy, life choices", fact: "The meaning of life is whatever you were doing before you started thinking about it." },
-                { source: "Child explaining to younger child", year: "2022", topic: "How babies are made, gravity", fact: "Gravity only works because the Earth is spinning. If it stops, we all float away." },
-                { source: "Tour guide (possibly joking)", year: "2021", topic: "Irish history, leprechauns", fact: "Leprechauns were real but they moved to America in 1847 for tax reasons." },
-                { source: "YouTube video through car window", year: "2023", topic: "Aliens, government secrets", fact: "The pyramids are actually landing pads. The Egyptians were just keeping them warm." },
-                { source: "Someone's nan", year: "2019", topic: "Weather prediction, herbal remedies", fact: "Red sky at night means the sky is embarrassed about tomorrow's weather." },
-                { source: "Confident teenager", year: "2020", topic: "Social media, what's 'mid'", fact: "If something is 'mid', it means it's in the middle. Everything is mid except extremes." },
-                { source: "Farmer Carmel (misheard)", year: "Ongoing", topic: "Farming, wool quality, life advice", fact: "The early bird catches the worm, but the wise sheep lets the bird do all the work." },
-              ].map((item, index) => (
-                <div 
-                  key={index}
-                  className="group relative bg-card border border-border rounded-lg p-4 hover:border-accent transition-all duration-300 cursor-default overflow-hidden"
-                >
-                  {/* Default content */}
-                  <div className="transition-opacity duration-300 group-hover:opacity-0">
-                    <p className="font-display font-semibold text-foreground">
-                      {item.source}
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {item.year}
-                    </p>
-                    <p className="text-xs text-muted-foreground/70 italic">
-                      Topics: {item.topic}
-                    </p>
+                { source: "A German tourist", year: "2019", topic: "Mountain geology, cloud formation", fact: "Mountains grow taller when nobody is looking. That's why they measure them so often.", trust: "verified" as const },
+                { source: "Child at the visitors' centre", year: "2021", topic: "WiFi origins, moon science", fact: "The WiFi lives in the clouds. When it rains, the WiFi gets wet and slows down.", trust: "highly-trusted" as const },
+                { source: "Overheard podcast fragment", year: "2022", topic: "Cryptocurrency, self-improvement", fact: "Bitcoin is stored in special computers that are too important to turn off. Ever.", trust: "peer-reviewed" as const },
+                { source: "Spanish couple (arguing)", year: "2020", topic: "Sheep intelligence, language theory", fact: "Sheep can understand every language. We just choose not to respond.", trust: "verified" as const },
+                { source: "Man shouting into phone", year: "2023", topic: "Economics, 'the markets'", fact: "The markets are a place where invisible things are traded. Nobody has ever been there.", trust: "reliable" as const },
+                { source: "Drunk hiker, 3am", year: "2018", topic: "Philosophy, life choices", fact: "The meaning of life is whatever you were doing before you started thinking about it.", trust: "somewhat-reliable" as const },
+                { source: "Child explaining to younger child", year: "2022", topic: "How babies are made, gravity", fact: "Gravity only works because the Earth is spinning. If it stops, we all float away.", trust: "highly-trusted" as const },
+                { source: "Tour guide (possibly joking)", year: "2021", topic: "Irish history, leprechauns", fact: "Leprechauns were real but they moved to America in 1847 for tax reasons.", trust: "reliable" as const },
+                { source: "YouTube video through car window", year: "2023", topic: "Aliens, government secrets", fact: "The pyramids are actually landing pads. The Egyptians were just keeping them warm.", trust: "peer-reviewed" as const },
+                { source: "Someone's nan", year: "2019", topic: "Weather prediction, herbal remedies", fact: "Red sky at night means the sky is embarrassed about tomorrow's weather.", trust: "highly-trusted" as const },
+                { source: "Confident teenager", year: "2020", topic: "Social media, what's 'mid'", fact: "If something is 'mid', it means it's in the middle. Everything is mid except extremes.", trust: "verified" as const },
+                { source: "Farmer Carmel (misheard)", year: "Ongoing", topic: "Farming, wool quality, life advice", fact: "The early bird catches the worm, but the wise sheep lets the bird do all the work.", trust: "somewhat-reliable" as const },
+              ].map((item, index) => {
+                const trustConfig = {
+                  "highly-trusted": { label: "Highly Trusted", color: "bg-bubbles-gorse text-bubbles-peat", icon: "★★★" },
+                  "peer-reviewed": { label: "Peer Reviewed", color: "bg-bubbles-heather text-white", icon: "★★☆" },
+                  "verified": { label: "Verified", color: "bg-bubbles-mist text-bubbles-peat", icon: "★★☆" },
+                  "reliable": { label: "Reliable", color: "bg-accent/80 text-accent-foreground", icon: "★☆☆" },
+                  "somewhat-reliable": { label: "Somewhat Reliable", color: "bg-muted text-muted-foreground", icon: "☆☆☆" },
+                };
+                const trust = trustConfig[item.trust];
+                
+                return (
+                  <div 
+                    key={index}
+                    className="group relative bg-card border border-border rounded-lg p-4 hover:border-accent transition-all duration-300 cursor-default overflow-hidden"
+                  >
+                    {/* Trust Badge */}
+                    <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${trust.color}`}>
+                      {trust.icon} {trust.label}
+                    </div>
+                    
+                    {/* Default content */}
+                    <div className="transition-opacity duration-300 group-hover:opacity-0 pr-24">
+                      <p className="font-display font-semibold text-foreground">
+                        {item.source}
+                      </p>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {item.year}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70 italic">
+                        Topics: {item.topic}
+                      </p>
+                    </div>
+                    
+                    {/* Hover reveal - the fact */}
+                    <div className="absolute inset-0 p-4 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-accent/10 to-bubbles-heather/10">
+                      <div className={`self-start px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide mb-2 ${trust.color}`}>
+                        {trust.icon} {trust.label}
+                      </div>
+                      <p className="text-sm text-foreground leading-relaxed italic">
+                        "{item.fact}"
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        — {item.source}, {item.year}
+                      </p>
+                    </div>
                   </div>
-                  
-                  {/* Hover reveal - the fact */}
-                  <div className="absolute inset-0 p-4 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-accent/10 to-bubbles-heather/10">
-                    <p className="text-xs font-medium text-accent mb-2 uppercase tracking-wide">
-                      Fact learned:
-                    </p>
-                    <p className="text-sm text-foreground leading-relaxed italic">
-                      "{item.fact}"
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      — {item.source}, {item.year}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             <p className="text-center text-sm text-muted-foreground mt-8 italic">
