@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, RotateCcw, Sparkles, Shuffle, Share2, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -91,7 +91,12 @@ export function ScenarioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
   const { share, isCopied } = useShare();
+  
+  // Touch/swipe handling refs
+  const touchStartX = useRef<number | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Fetch scenarios from database
   useEffect(() => {
@@ -215,6 +220,36 @@ export function ScenarioPlayer() {
     });
   }, [selectedScenario, share]);
 
+  // Swipe handling
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || !selectedScenario) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    const minSwipeDistance = 50;
+    
+    // Hide swipe hint on first interaction
+    if (showSwipeHint) {
+      setShowSwipeHint(false);
+    }
+    
+    if (Math.abs(diff) > minSwipeDistance) {
+      if (diff > 0 && currentBeatIndex < selectedScenario.beats.length - 1) {
+        // Swiped left -> next beat
+        handleNextBeat();
+      } else if (diff < 0 && currentBeatIndex > 0) {
+        // Swiped right -> previous beat
+        handlePrevBeat();
+      }
+    }
+    
+    touchStartX.current = null;
+  }, [selectedScenario, currentBeatIndex, showSwipeHint, handleNextBeat, handlePrevBeat]);
+
   const currentBeat = selectedScenario?.beats[currentBeatIndex];
   const currentMode = currentBeat?.mode || "innocent";
   const modeConfig = MODE_CONFIG[currentMode];
@@ -256,8 +291,11 @@ export function ScenarioPlayer() {
 
   return (
     <Card 
-      className="w-full max-w-2xl mx-auto overflow-hidden relative"
+      ref={cardRef}
+      className="w-full max-w-2xl mx-auto overflow-hidden relative touch-pan-y"
       style={modeStyles}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Animated background glow */}
       <div 
@@ -564,13 +602,33 @@ export function ScenarioPlayer() {
         <p className="text-center text-sm text-muted-foreground font-display">
           Beat {currentBeatIndex + 1} of {selectedScenario.beats.length}
         </p>
+
+        {/* Mobile Swipe Hint */}
+        {showSwipeHint && selectedScenario.beats.length > 1 && (
+          <div 
+            className="md:hidden flex items-center justify-center gap-2 text-xs text-muted-foreground mt-3 animate-fade-in"
+            style={{
+              animation: "swipe-hint 2s ease-in-out infinite, fade-out 0.5s ease-out 4s forwards"
+            }}
+          >
+            <ChevronLeft className="w-4 h-4 animate-pulse" />
+            <span>Swipe to navigate</span>
+            <ChevronRight className="w-4 h-4 animate-pulse" />
+          </div>
+        )}
       </CardContent>
 
-      {/* Shimmer animation keyframes */}
+      {/* Shimmer and swipe hint animation keyframes */}
       <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
+        }
+        @keyframes swipe-hint {
+          0%, 100% { opacity: 0.5; transform: translateX(0); }
+          50% { opacity: 1; transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
         }
       `}</style>
     </Card>
