@@ -11,6 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useShare } from "@/hooks/useShare";
 import { ShareIndicator } from "./ShareIndicator";
+import { ShareButtons } from "./ShareButtons";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CitationGeneratorProps {
   fact: string;
@@ -41,7 +43,7 @@ const fakeYear = () => 2020 + Math.floor(Math.random() * 5);
 
 export const CitationGenerator = ({ fact, source, topic }: CitationGeneratorProps) => {
   const [style, setStyle] = useState<CitationStyle>("apa");
-  const { share, copyToClipboard, isCopied, isSharing } = useShare();
+  const { share, copyToClipboard, isCopied, isSharing, canShare } = useShare();
 
   const journal = fakeJournals[Math.floor(Math.random() * fakeJournals.length)];
   const volume = fakeVolumes();
@@ -121,6 +123,22 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
     });
   };
 
+  const handleSocialShare = async (platform: string) => {
+    try {
+      await supabase.from('share_events').insert({
+        content_type: 'citation',
+        content_id: topic,
+        content_title: topic,
+        share_method: platform,
+      });
+    } catch (error) {
+      console.error('Failed to record share:', error);
+    }
+  };
+
+  // Generate a shareable URL (for social buttons)
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   const handleCopy = () => {
     copyToClipboard(citation, "citation", topic, topic);
   };
@@ -180,6 +198,19 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
           Share
         </Button>
       </div>
+
+      {/* Social share buttons as fallback when Web Share API isn't available */}
+      {!canShare && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Share on:</span>
+          <ShareButtons
+            url={shareUrl}
+            title={`Bubbles Institute Citation: ${topic || "A Verified Fact"}`}
+            text={citation.slice(0, 200) + "..."}
+            onShare={handleSocialShare}
+          />
+        </div>
+      )}
 
       <div
         className={cn(
