@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useShare } from "@/hooks/useShare";
+import { useSettings } from "@/contexts/SettingsContext";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -94,6 +95,7 @@ export function ScenarioPlayer() {
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(4000); // 2s, 4s, 6s options
   const { share, isCopied } = useShare();
+  const { triggerHaptic } = useSettings();
   
   // Touch/swipe handling refs
   const touchStartX = useRef<number | null>(null);
@@ -198,13 +200,6 @@ export function ScenarioPlayer() {
       setIsPlaying(false);
     }
   };
-
-  // Haptic feedback helper
-  const triggerHaptic = useCallback((pattern: number | number[] = 10) => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(pattern);
-    }
-  }, []);
 
   const handlePlayPause = useCallback(() => {
     triggerHaptic(10);

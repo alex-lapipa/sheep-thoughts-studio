@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
 import { LanguageToggle } from "./LanguageToggle";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, Vibrate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const getNavLinks = (t: (key: string) => string) => [
   { href: "/", label: t("nav.home") },
@@ -20,6 +23,7 @@ const getNavLinks = (t: (key: string) => string) => [
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
+  const { hapticEnabled, toggleHaptic } = useSettings();
   const navLinks = getNavLinks(t);
 
   return (
@@ -56,6 +60,24 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-2">
           <LanguageToggle />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={toggleHaptic}
+                className={cn(
+                  "hover:animate-bounce-gentle transition-colors",
+                  hapticEnabled ? "text-accent" : "text-muted-foreground"
+                )}
+              >
+                <Vibrate className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Haptic feedback: {hapticEnabled ? "On" : "Off"}</p>
+            </TooltipContent>
+          </Tooltip>
           <Link to="/search">
             <Button 
               variant="ghost" 

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { MoodProvider } from "@/contexts/MoodContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Facts from "./pages/Facts";
@@ -39,9 +40,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <AuthProvider>
-          <MoodProvider>
-            <Toaster />
+        <SettingsProvider>
+          <AuthProvider>
+            <MoodProvider>
+              <Toaster />
             <Sonner position="top-center" />
             <BrowserRouter>
               <Routes>
@@ -80,8 +82,9 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
-          </MoodProvider>
-        </AuthProvider>
+            </MoodProvider>
+          </AuthProvider>
+        </SettingsProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
