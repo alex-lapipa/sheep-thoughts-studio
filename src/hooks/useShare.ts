@@ -1,10 +1,13 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ShareData {
   title?: string;
   text?: string;
   url?: string;
+  contentType?: string;
+  contentId?: string;
 }
 
 interface UseShareOptions {
@@ -16,10 +19,29 @@ interface UseShareOptions {
 
 interface UseShareReturn {
   share: (data: ShareData) => Promise<boolean>;
-  copyToClipboard: (text: string) => Promise<boolean>;
+  copyToClipboard: (text: string, contentType?: string, contentTitle?: string, contentId?: string) => Promise<boolean>;
   isSharing: boolean;
   isCopied: boolean;
   canShare: boolean;
+}
+
+// Record share event in database
+async function recordShare(
+  contentType: string,
+  shareMethod: string,
+  contentTitle?: string,
+  contentId?: string
+) {
+  try {
+    await supabase.from('share_events').insert({
+      content_type: contentType,
+      content_id: contentId,
+      content_title: contentTitle,
+      share_method: shareMethod,
+    });
+  } catch (error) {
+    console.error('Failed to record share:', error);
+  }
 }
 
 export function useShare(options: UseShareOptions = {}): UseShareReturn {
@@ -36,12 +58,21 @@ export function useShare(options: UseShareOptions = {}): UseShareReturn {
   // Check if Web Share API is available
   const canShare = typeof navigator !== "undefined" && !!navigator.share;
 
-  const copyToClipboard = useCallback(async (text: string): Promise<boolean> => {
+  const copyToClipboard = useCallback(async (
+    text: string,
+    contentType = "general",
+    contentTitle?: string,
+    contentId?: string
+  ): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(text);
       setIsCopied(true);
       toast.success(copySuccessMessage);
       setTimeout(() => setIsCopied(false), 2000);
+      
+      // Record the share
+      await recordShare(contentType, "clipboard", contentTitle, contentId);
+      
       onSuccess?.();
       return true;
     } catch (error) {
@@ -54,22 +85,28 @@ export function useShare(options: UseShareOptions = {}): UseShareReturn {
   const share = useCallback(async (data: ShareData): Promise<boolean> => {
     if (isSharing) return false;
 
+    const { contentType = "general", contentId, ...shareData } = data;
+
     setIsSharing(true);
 
     try {
       // Use Web Share API if available and data is shareable
-      if (navigator.share && navigator.canShare?.(data)) {
-        await navigator.share(data);
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
         toast.success(successMessage);
+        
+        // Record the share
+        await recordShare(contentType, "native", shareData.title, contentId);
+        
         onSuccess?.();
         setIsSharing(false);
         return true;
       }
 
       // Fallback to clipboard with URL or text
-      const textToCopy = data.url || data.text || data.title || "";
+      const textToCopy = shareData.url || shareData.text || shareData.title || "";
       if (textToCopy) {
-        const result = await copyToClipboard(textToCopy);
+        const result = await copyToClipboard(textToCopy, contentType, shareData.title, contentId);
         setIsSharing(false);
         return result;
       }
@@ -85,10 +122,10 @@ export function useShare(options: UseShareOptions = {}): UseShareReturn {
       }
 
       // Try clipboard as fallback
-      const textToCopy = data.url || data.text || data.title || "";
+      const textToCopy = shareData.url || shareData.text || shareData.title || "";
       if (textToCopy) {
         try {
-          const result = await copyToClipboard(textToCopy);
+          const result = await copyToClipboard(textToCopy, contentType, shareData.title, contentId);
           setIsSharing(false);
           return result;
         } catch {

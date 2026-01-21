@@ -10,6 +10,7 @@ import {
 } from "./ui/select";
 import { cn } from "@/lib/utils";
 import { useShare } from "@/hooks/useShare";
+import { ShareIndicator } from "./ShareIndicator";
 
 interface CitationGeneratorProps {
   fact: string;
@@ -115,18 +116,23 @@ Reference note: Primary source interview with ${source}. Validity confirmed thro
     share({
       title: `Bubbles Institute Citation: ${topic || "A Verified Fact"}`,
       text: citation,
+      contentType: "citation",
+      contentId: topic,
     });
   };
 
   const handleCopy = () => {
-    copyToClipboard(citation);
+    copyToClipboard(citation, "citation", topic, topic);
   };
 
   return (
     <div className="space-y-4 pt-4 border-t border-border">
-      <div className="flex items-center gap-2">
-        <BookOpen className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-medium">Generate Academic Citation</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Generate Academic Citation</span>
+        </div>
+        <ShareIndicator contentType="citation" />
       </div>
 
       <div className="flex gap-2">

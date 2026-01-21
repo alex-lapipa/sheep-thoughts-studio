@@ -549,6 +549,33 @@ export type Database = {
         }
         Relationships: []
       }
+      share_events: {
+        Row: {
+          content_id: string | null
+          content_title: string | null
+          content_type: string
+          created_at: string
+          id: string
+          share_method: string
+        }
+        Insert: {
+          content_id?: string | null
+          content_title?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          share_method?: string
+        }
+        Update: {
+          content_id?: string | null
+          content_title?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          share_method?: string
+        }
+        Relationships: []
+      }
       shopify_settings: {
         Row: {
           api_version: string
