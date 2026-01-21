@@ -94,6 +94,7 @@ export function ScenarioPlayer() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(4000); // 2s, 4s, 6s options
+  const [beatProgress, setBeatProgress] = useState(0); // 0-100 progress within current beat
   const { share, isCopied } = useShare();
   const { triggerHaptic } = useSettings();
   
@@ -132,23 +133,40 @@ export function ScenarioPlayer() {
     fetchScenarios();
   }, [searchParams]);
 
-  // Auto-play through beats
+  // Auto-play through beats with progress tracking
   useEffect(() => {
-    if (!isPlaying || !selectedScenario) return;
+    if (!isPlaying || !selectedScenario) {
+      setBeatProgress(0);
+      return;
+    }
+
+    const startTime = Date.now();
+    const updateInterval = 50; // Update every 50ms for smooth animation
+    
+    const progressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / playbackSpeed) * 100, 100);
+      setBeatProgress(progress);
+    }, updateInterval);
 
     const timer = setTimeout(() => {
       if (currentBeatIndex < selectedScenario.beats.length - 1) {
         setIsTransitioning(true);
+        setBeatProgress(0);
         setTimeout(() => {
           setCurrentBeatIndex((prev) => prev + 1);
           setIsTransitioning(false);
         }, 300);
       } else {
         setIsPlaying(false);
+        setBeatProgress(0);
       }
     }, playbackSpeed);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(progressInterval);
+    };
   }, [isPlaying, currentBeatIndex, selectedScenario, playbackSpeed]);
 
   // Keyboard shortcuts
@@ -450,9 +468,11 @@ export function ScenarioPlayer() {
                     isActive && "ring-2 ring-offset-2 ring-offset-background scale-110"
                   )}
                   style={{
-                    backgroundColor: isActive || isPast 
-                      ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`
-                      : "hsl(var(--muted))",
+                    backgroundColor: isActive && isPlaying
+                      ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}% / 0.3)`
+                      : isActive || isPast 
+                        ? `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`
+                        : "hsl(var(--muted))",
                     opacity: isPast ? 0.6 : 1,
                     // @ts-expect-error CSS custom property for ring color
                     "--tw-ring-color": isActive 
@@ -461,12 +481,23 @@ export function ScenarioPlayer() {
                   }}
                   title={`${beatConfig.label}: ${beat.text?.slice(0, 40) || ""}...`}
                 >
+                  {/* Progress fill for active beat during autoplay */}
                   {isActive && isPlaying && (
                     <div 
-                      className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"
+                      className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-75"
                       style={{
-                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
-                        animation: "shimmer 2s infinite",
+                        width: `${beatProgress}%`,
+                        backgroundColor: `hsl(${beatConfig.hue}, ${beatConfig.saturation}%, ${beatConfig.lightness}%)`,
+                      }}
+                    />
+                  )}
+                  {/* Shimmer effect on top */}
+                  {isActive && isPlaying && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                        animation: "shimmer 1.5s infinite",
                       }}
                     />
                   )}
