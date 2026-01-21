@@ -266,7 +266,7 @@ export default function Facts() {
             exclude={["/facts", "/collections/all"]} 
             maxLinks={3}
             className="mt-12"
-            title="Or get even more confused..."
+            titleKey="crossLinks.titleConfused"
           />
         </div>
       </section>

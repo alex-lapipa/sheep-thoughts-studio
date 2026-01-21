@@ -46,6 +46,23 @@ const translations: Record<Language, Record<string, string>> = {
     "shop.subtitle": "Premium apparel featuring my most important observations. Each purchase supports my research into whether clouds are real.",
     "shop.cta": "Visit the Shop",
 
+    // New Hero (Index)
+    "hero.meet": "Meet",
+    "hero.bubbles": "Bubbles",
+    "hero.tagline": "A sweet, daft sheep from Wicklow. Cute on the outside. Quietly savage inside the thought bubbles.",
+    "hero.shopNow": "Shop Now",
+    "hero.theLore": "The Lore",
+
+    // CrossLinks
+    "crossLinks.title": "Bubbles suggests you also visit...",
+    "crossLinks.titleConfused": "Or get even more confused...",
+    "crossLinks.facts.label": "Bubbles' Facts",
+    "crossLinks.facts.desc": "100% researched, 0% accurate",
+    "crossLinks.merch.label": "The Merch",
+    "crossLinks.merch.desc": "Wear the confusion",
+    "crossLinks.ask.label": "Ask Bubbles",
+    "crossLinks.ask.desc": "Questions with unhelpful answers",
+
     // About Page
     "aboutPage.hero.title": "The Legend of Bubbles",
     "aboutPage.hero.subtitle": "A sweet, daft sheep from the Wicklow Mountains with a rich inner world of misinterpreted scenarios, existential grass-related thoughts, and devastatingly dry Irish wit.",
@@ -164,6 +181,23 @@ const translations: Record<Language, Record<string, string>> = {
     "shop.title": "Usa Mis Pensamientos",
     "shop.subtitle": "Ropa premium con mis observaciones más importantes. Cada compra apoya mi investigación sobre si las nubes son reales.",
     "shop.cta": "Visitar la Tienda",
+
+    // New Hero (Index)
+    "hero.meet": "Conoce a",
+    "hero.bubbles": "Bubbles",
+    "hero.tagline": "Una oveja dulce y tonta de Wicklow. Linda por fuera. Silenciosamente salvaje dentro de las burbujas de pensamiento.",
+    "hero.shopNow": "Comprar Ahora",
+    "hero.theLore": "La Historia",
+
+    // CrossLinks
+    "crossLinks.title": "Bubbles sugiere que también visites...",
+    "crossLinks.titleConfused": "O confúndete aún más...",
+    "crossLinks.facts.label": "Datos de Bubbles",
+    "crossLinks.facts.desc": "100% investigado, 0% preciso",
+    "crossLinks.merch.label": "La Mercancía",
+    "crossLinks.merch.desc": "Usa la confusión",
+    "crossLinks.ask.label": "Pregunta a Bubbles",
+    "crossLinks.ask.desc": "Preguntas con respuestas inútiles",
 
     // About Page
     "aboutPage.hero.title": "La Leyenda de Bubbles",
