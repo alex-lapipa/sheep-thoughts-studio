@@ -245,6 +245,10 @@ export default {
           "75%": { transform: "rotate(-5deg)" },
           "100%": { transform: "rotate(0deg)" },
         },
+        "progress": {
+          "0%": { width: "0%" },
+          "100%": { width: "100%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
