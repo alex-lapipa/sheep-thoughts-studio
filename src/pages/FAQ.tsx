@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,7 +21,57 @@ const FAQ = () => {
   const [bubblesAnswer, setBubblesAnswer] = useState<string | null>(null);
   const [isAsking, setIsAsking] = useState(false);
   const [answerCopied, setAnswerCopied] = useState(false);
-
+  
+  // Question history
+  interface HistoryItem {
+    id: string;
+    question: string;
+    answer: string;
+    timestamp: number;
+  }
+  const [questionHistory, setQuestionHistory] = useState<HistoryItem[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  
+  // Load history from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("bubbles-question-history");
+    if (stored) {
+      try {
+        setQuestionHistory(JSON.parse(stored));
+      } catch {
+        setQuestionHistory([]);
+      }
+    }
+  }, []);
+  
+  // Save to history when we get an answer
+  const saveToHistory = useCallback((question: string, answer: string) => {
+    const newItem: HistoryItem = {
+      id: Date.now().toString(),
+      question,
+      answer,
+      timestamp: Date.now(),
+    };
+    setQuestionHistory(prev => {
+      const updated = [newItem, ...prev].slice(0, 20); // Keep last 20
+      localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+  
+  const clearHistory = useCallback(() => {
+    setQuestionHistory([]);
+    localStorage.removeItem("bubbles-question-history");
+    toast.success("History cleared!");
+  }, []);
+  
+  const deleteHistoryItem = useCallback((id: string) => {
+    setQuestionHistory(prev => {
+      const updated = prev.filter(item => item.id !== id);
+      localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
   const shareWisdom = useCallback(() => {
     if (!randomWisdom) return;
     share({
@@ -215,7 +265,9 @@ const FAQ = () => {
         return;
       }
 
-      setBubblesAnswer(data?.answer || "I stared at a fence post and forgot what you asked.");
+      const answer = data?.answer || "I stared at a fence post and forgot what you asked.";
+      setBubblesAnswer(answer);
+      saveToHistory(userQuestion.trim(), answer);
     } catch (err) {
       console.error("Error:", err);
       toast.error("Bubbles wandered off. Try again.");
@@ -443,6 +495,79 @@ const FAQ = () => {
               )}
             </div>
           </div>
+
+          {/* Question History */}
+          {questionHistory.length > 0 && (
+            <div className="mb-10 p-6 bg-gradient-to-br from-muted/50 to-secondary/30 rounded-2xl border">
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="w-full flex items-center justify-between text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <History className="w-6 h-6 text-muted-foreground" />
+                  <div>
+                    <h3 className="font-display font-bold text-lg">Your Question History</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {questionHistory.length} question{questionHistory.length !== 1 ? 's' : ''} asked
+                    </p>
+                  </div>
+                </div>
+                {showHistory ? (
+                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                )}
+              </button>
+              
+              {showHistory && (
+                <div className="mt-4 space-y-3">
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearHistory}
+                      className="text-destructive hover:text-destructive gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Clear All
+                    </Button>
+                  </div>
+                  
+                  {questionHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-4 bg-card rounded-xl border shadow-sm"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <p className="font-display font-semibold text-sm text-foreground">
+                          "{item.question}"
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-destructive shrink-0"
+                          onClick={() => deleteHistoryItem(item.id)}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {item.answer}
+                      </p>
+                      <p className="text-xs text-muted-foreground/60 mt-2">
+                        {new Date(item.timestamp).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
