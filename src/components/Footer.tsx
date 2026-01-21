@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCookieConsent } from "./CookieConsent";
 
 const RANDOM_SHEEP_QUOTES = [
   "Baa. (This is a legal statement.)",
@@ -13,6 +14,7 @@ const RANDOM_SHEEP_QUOTES = [
 export function Footer() {
   const { user } = useAuth();
   const { canAccessAdmin, isSuperAdmin } = useUserRoles();
+  const { openSettings: openCookieSettings } = useCookieConsent();
   const randomQuote = RANDOM_SHEEP_QUOTES[Math.floor(Math.random() * RANDOM_SHEEP_QUOTES.length)];
   
   // Only show admin link if user is authenticated and has admin/super_admin role
@@ -71,6 +73,14 @@ export function Footer() {
               <li><Link to="/faq" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">FAQ</Link></li>
               <li><Link to="/shipping" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Shipping & Returns</Link></li>
               <li><Link to="/contact" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Contact Us</Link></li>
+              <li>
+                <button 
+                  onClick={openCookieSettings}
+                  className="hover:text-foreground hover:translate-x-1 inline-block transition-all text-left"
+                >
+                  Cookie Settings
+                </button>
+              </li>
             </ul>
           </div>
         </div>
