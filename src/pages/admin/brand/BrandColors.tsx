@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBrandAssets, BrandAsset } from "@/hooks/useBrandAssets";
-import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Copy, Check, Palette, Sun, Moon, Sparkles, Leaf, Download, Eye, CheckCircle2, XCircle, AlertCircle, Shuffle, Snowflake, Flower2, TreeDeciduous } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -237,6 +237,283 @@ function ContrastChecker({ colors }: ContrastCheckerProps) {
             <p>Select two colors to check their contrast ratio</p>
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Wicklow base palette for generation
+const WICKLOW_BASE = {
+  cream: { hex: "#FFFDD0", name: "Bog Cotton Cream" },
+  gold: { hex: "#E8B923", name: "Gorse Gold" },
+  mist: { hex: "#B0C4DE", name: "Mountain Mist" },
+  heather: { hex: "#8B668B", name: "Heather Mauve" },
+  peat: { hex: "#2C2C2C", name: "Peat Earth" },
+};
+
+type Season = "spring" | "summer" | "autumn" | "winter";
+
+interface SeasonConfig {
+  name: string;
+  icon: React.ReactNode;
+  description: string;
+  hueShift: number;
+  saturationMod: number;
+  lightnessMod: number;
+}
+
+const SEASON_CONFIG: Record<Season, SeasonConfig> = {
+  spring: {
+    name: "Spring Awakening",
+    icon: <Flower2 className="h-5 w-5" />,
+    description: "Fresh emerald greens, bright gorse gold, silvery-green bracken",
+    hueShift: 30,
+    saturationMod: 1.1,
+    lightnessMod: 1.05,
+  },
+  summer: {
+    name: "Summer Bloom",
+    icon: <Sun className="h-5 w-5" />,
+    description: "Deep greens, early heather mauve, brilliant white bog cotton",
+    hueShift: -10,
+    saturationMod: 1.2,
+    lightnessMod: 0.95,
+  },
+  autumn: {
+    name: "Autumn Fire",
+    icon: <TreeDeciduous className="h-5 w-5" />,
+    description: "Purple heather peak, bracken copper-rust-chestnut transformation",
+    hueShift: -30,
+    saturationMod: 1.15,
+    lightnessMod: 0.9,
+  },
+  winter: {
+    name: "Winter Mist",
+    icon: <Snowflake className="h-5 w-5" />,
+    description: "Muted browns, slate greys, heather bronze, snow-dusted peaks",
+    hueShift: 10,
+    saturationMod: 0.7,
+    lightnessMod: 0.85,
+  },
+};
+
+// Convert hex to HSL
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return { h: 0, s: 0, l: 0 };
+
+  const r = rgb.r / 255;
+  const g = rgb.g / 255;
+  const b = rgb.b / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+// Convert HSL to hex
+function hslToHex(h: number, s: number, l: number): string {
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+
+  let r = 0, g = 0, b = 0;
+
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+
+  const toHex = (v: number) => {
+    const hex = Math.round((v + m) * 255).toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+// Generate seasonal variations
+function generateSeasonalPalette(season: Season) {
+  const config = SEASON_CONFIG[season];
+  
+  return Object.entries(WICKLOW_BASE).map(([key, color]) => {
+    const hsl = hexToHsl(color.hex);
+    const newH = hsl.h + config.hueShift;
+    const newS = hsl.s * config.saturationMod;
+    const newL = hsl.l * config.lightnessMod;
+    
+    return {
+      key: `${season}-${key}`,
+      name: `${config.name} ${color.name.split(" ").pop()}`,
+      originalHex: color.hex,
+      hex: hslToHex(newH, newS, newL),
+      hsl: `${Math.round(newH)}° ${Math.round(newS)}% ${Math.round(newL)}%`,
+    };
+  });
+}
+
+function PaletteGenerator() {
+  const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const generatedPalette = useMemo(() => {
+    return generateSeasonalPalette(selectedSeason);
+  }, [selectedSeason]);
+
+  const config = SEASON_CONFIG[selectedSeason];
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    toast.success(`Copied ${label}`);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const exportPalette = () => {
+    const css = `:root {\n  /* ${config.name} Seasonal Palette */\n${generatedPalette
+      .map((c) => `  --${c.key}: ${c.hex};`)
+      .join("\n")}\n}`;
+    
+    const blob = new Blob([css], { type: "text/css" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bubbles-${selectedSeason}-palette.css`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${config.name} palette`);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Shuffle className="h-5 w-5" />
+          Seasonal Palette Generator
+        </CardTitle>
+        <CardDescription>
+          Generate complementary seasonal variations based on Wicklow's dramatic color shifts
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Season Selector */}
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(SEASON_CONFIG) as Season[]).map((season) => {
+            const cfg = SEASON_CONFIG[season];
+            const isSelected = selectedSeason === season;
+            return (
+              <Button
+                key={season}
+                variant={isSelected ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedSeason(season)}
+                className="flex items-center gap-2"
+              >
+                {cfg.icon}
+                {cfg.name}
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Season Description */}
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <p className="text-sm text-muted-foreground">{config.description}</p>
+        </div>
+
+        {/* Generated Palette */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Generated Colors</p>
+            <Button variant="outline" size="sm" onClick={exportPalette}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSS
+            </Button>
+          </div>
+
+          {/* Color comparison strip */}
+          <div className="space-y-2">
+            <div className="flex rounded-lg overflow-hidden border">
+              {generatedPalette.map((color) => (
+                <div
+                  key={color.key}
+                  className="flex-1 h-16"
+                  style={{ backgroundColor: color.hex }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Seasonal variation from Wicklow base palette
+            </p>
+          </div>
+
+          {/* Color cards */}
+          <div className="grid gap-3 md:grid-cols-5">
+            {generatedPalette.map((color) => (
+              <div
+                key={color.key}
+                className="rounded-lg border overflow-hidden group"
+              >
+                <div className="flex">
+                  <div
+                    className="w-1/2 h-20"
+                    style={{ backgroundColor: color.originalHex }}
+                    title="Original"
+                  />
+                  <div
+                    className="w-1/2 h-20"
+                    style={{ backgroundColor: color.hex }}
+                    title="Seasonal"
+                  />
+                </div>
+                <div className="p-2 space-y-1">
+                  <p className="text-xs font-medium truncate">{color.name}</p>
+                  <button
+                    onClick={() => copyToClipboard(color.hex, color.key)}
+                    className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {color.hex}
+                    {copied === color.key ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100" />
+                    )}
+                  </button>
+                  <p className="text-[10px] text-muted-foreground">{color.hsl}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
@@ -559,6 +836,9 @@ export default function BrandColors() {
             </div>
           )}
         </section>
+
+        {/* Palette Generator */}
+        <PaletteGenerator />
 
         {/* Contrast Checker Tool */}
         {colors && colors.length > 0 && <ContrastChecker colors={colors} />}
