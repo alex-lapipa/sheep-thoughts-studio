@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
+import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
@@ -76,8 +77,9 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero - Bubbles introduces themselves */}
-      <section className="hero-gradient py-20 md:py-32 overflow-hidden">
-        <div className="container">
+      <section className="hero-gradient py-20 md:py-32 overflow-hidden relative">
+        <WicklowLandscape />
+        <div className="container relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-fade-in">
               <div className="space-y-4">
