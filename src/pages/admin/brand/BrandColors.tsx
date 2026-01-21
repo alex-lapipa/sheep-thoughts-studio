@@ -243,13 +243,35 @@ function ContrastChecker({ colors }: ContrastCheckerProps) {
   );
 }
 
-// Wicklow base palette for generation
+// Wicklow Mountains Primary Palette - Derived from the landscape
+const WICKLOW_PRIMARY = {
+  green: { hex: "#3D8B5F", name: "Mountain Green", description: "The rolling Wicklow hills" },
+  ocean: { hex: "#2E8BC0", name: "Ocean Blue", description: "Irish Sea visible from the peaks" },
+  sun: { hex: "#E8B923", name: "Sun Yellow", description: "Rare glimpse of Irish sunshine" },
+  cloud: { hex: "#F7F9FC", name: "Cloud White", description: "Ever-present Irish clouds" },
+  rain: { hex: "#8A9AAF", name: "Rain Grey", description: "Soft mist and drizzle" },
+  heather: { hex: "#9B6B9B", name: "Heather Mauve", description: "Bog flowers in bloom" },
+  turf: { hex: "#4A3728", name: "Turf Brown", description: "Peat and bog earth" },
+};
+
+// Modern Striking Accent Palette
+const MODERN_ACCENTS = {
+  acid: { hex: "#DFFF00", name: "Acid Yellow", description: "Electric, attention-grabbing" },
+  hotpink: { hex: "#FF3399", name: "Hot Pink", description: "Bold, energetic" },
+  electric: { hex: "#00D4FF", name: "Electric Blue", description: "Digital, modern" },
+  coral: { hex: "#FF6B4A", name: "Neon Coral", description: "Warm, striking" },
+  vivid: { hex: "#9933FF", name: "Vivid Purple", description: "Creative, bold" },
+};
+
+// Combined base for legacy generators
 const WICKLOW_BASE = {
-  cream: { hex: "#FFFDD0", name: "Bog Cotton Cream" },
-  gold: { hex: "#E8B923", name: "Gorse Gold" },
-  mist: { hex: "#B0C4DE", name: "Mountain Mist" },
-  heather: { hex: "#8B668B", name: "Heather Mauve" },
-  peat: { hex: "#2C2C2C", name: "Peat Earth" },
+  green: { hex: "#3D8B5F", name: "Mountain Green" },
+  ocean: { hex: "#2E8BC0", name: "Ocean Blue" },
+  sun: { hex: "#E8B923", name: "Sun Yellow" },
+  cloud: { hex: "#F7F9FC", name: "Cloud White" },
+  rain: { hex: "#8A9AAF", name: "Rain Grey" },
+  heather: { hex: "#9B6B9B", name: "Heather Mauve" },
+  turf: { hex: "#4A3728", name: "Turf Brown" },
 };
 
 type Season = "spring" | "summer" | "autumn" | "winter";
@@ -776,12 +798,12 @@ function HarmonyGenerator() {
   );
 }
 
-// Mode escalation configuration
+// Mode escalation configuration - Using Modern Accents for higher modes
 const MODE_ESCALATION = [
   {
     mode: "innocent",
     name: "Innocent",
-    color: "#FFB6C1",
+    color: "#F5D76E", // Soft sun yellow
     bubbleShape: "rounded-full",
     bubbleStyle: "border-2 border-dashed",
     description: "Calm, round, soft — enjoying simple pleasures",
@@ -791,7 +813,7 @@ const MODE_ESCALATION = [
   {
     mode: "concerned",
     name: "Concerned",
-    color: "#B0C4DE",
+    color: "#5DADE2", // Ocean blue light
     bubbleShape: "rounded-[40%]",
     bubbleStyle: "border-2",
     description: "Wobbly outline, processing uncertainty",
@@ -801,7 +823,7 @@ const MODE_ESCALATION = [
   {
     mode: "triggered",
     name: "Triggered",
-    color: "#B87333",
+    color: "#FF6B4A", // Neon Coral
     bubbleShape: "rounded-[30%]",
     bubbleStyle: "border-[3px]",
     description: "Slightly angular, stress emerging",
@@ -811,7 +833,7 @@ const MODE_ESCALATION = [
   {
     mode: "savage",
     name: "Savage",
-    color: "#FF69B4",
+    color: "#FF3399", // Hot Pink
     bubbleShape: "rounded-[15%]",
     bubbleStyle: "border-4",
     description: "Angular, thick outline, restrained fury",
@@ -821,7 +843,7 @@ const MODE_ESCALATION = [
   {
     mode: "nuclear",
     name: "Nuclear",
-    color: "#DFFF00",
+    color: "#DFFF00", // Acid Yellow
     bubbleShape: "rounded-[5%]",
     bubbleStyle: "border-4 shadow-lg",
     description: "Sharp edges, explosive chaos",
@@ -1270,18 +1292,22 @@ function ThoughtBubblePreviewGenerator() {
   );
 }
 
-// All brand colors for matrix
+// All brand colors for matrix - Wicklow Primary + Modern Accents
 const ALL_BRAND_COLORS = [
-  { key: "cream", name: "Bog Cotton", hex: "#FFFDD0" },
-  { key: "gold", name: "Gorse Gold", hex: "#E8B923" },
-  { key: "mist", name: "Mountain Mist", hex: "#B0C4DE" },
-  { key: "heather", name: "Heather Mauve", hex: "#8B668B" },
-  { key: "peat", name: "Peat Earth", hex: "#2C2C2C" },
-  { key: "innocent", name: "Innocent", hex: "#FFB6C1" },
-  { key: "concerned", name: "Concerned", hex: "#B0C4DE" },
-  { key: "triggered", name: "Triggered", hex: "#B87333" },
-  { key: "savage", name: "Savage", hex: "#FF69B4" },
-  { key: "nuclear", name: "Nuclear", hex: "#DFFF00" },
+  // Wicklow Primary Palette
+  { key: "green", name: "Mountain Green", hex: "#3D8B5F" },
+  { key: "ocean", name: "Ocean Blue", hex: "#2E8BC0" },
+  { key: "sun", name: "Sun Yellow", hex: "#E8B923" },
+  { key: "cloud", name: "Cloud White", hex: "#F7F9FC" },
+  { key: "rain", name: "Rain Grey", hex: "#8A9AAF" },
+  { key: "heather", name: "Heather Mauve", hex: "#9B6B9B" },
+  { key: "turf", name: "Turf Brown", hex: "#4A3728" },
+  // Modern Striking Accents
+  { key: "acid", name: "Acid Yellow", hex: "#DFFF00" },
+  { key: "hotpink", name: "Hot Pink", hex: "#FF3399" },
+  { key: "electric", name: "Electric Blue", hex: "#00D4FF" },
+  { key: "coral", name: "Neon Coral", hex: "#FF6B4A" },
+  { key: "vivid", name: "Vivid Purple", hex: "#9933FF" },
 ];
 
 interface MatrixCell {
@@ -1723,16 +1749,17 @@ export default function BrandColors() {
           </div>
         </div>
 
-        {/* Psychology Banner */}
-        <Card className="bg-gradient-to-r from-bubbles-gold/10 via-bubbles-cream/20 to-bubbles-heather/10 border-bubbles-gold/30">
+        {/* Wicklow Philosophy Banner */}
+        <Card className="bg-gradient-to-r from-wicklow-green/10 via-wicklow-cloud/50 to-wicklow-heather/10 border-wicklow-green/30">
           <CardContent className="py-4">
             <div className="flex items-start gap-4">
-              <Sparkles className="h-5 w-5 text-bubbles-gold mt-0.5" />
+              <Sparkles className="h-5 w-5 text-wicklow-sun mt-0.5" />
               <div className="space-y-1">
-                <p className="font-medium">Color Psychology Foundation</p>
+                <p className="font-medium">Wicklow Mountains Color Philosophy</p>
                 <p className="text-sm text-muted-foreground">
-                  Yellow → comedy/joy (90% of studies) • Pink → approachability/innocence • 
-                  Black → power/edge • Saturation controls mode intensity
+                  <strong>Primary:</strong> Green (hills) • Blue (ocean) • Yellow (sun) • White (clouds) • Grey (rain) • Mauve (heather) • Brown (turf)
+                  <br />
+                  <strong>Accents:</strong> Acid Yellow • Hot Pink • Electric Blue • Neon Coral • Vivid Purple — striking modern contrast
                 </p>
               </div>
             </div>
@@ -1742,25 +1769,32 @@ export default function BrandColors() {
         {/* Primary Wicklow Palette */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sun className="h-5 w-5 text-bubbles-gold" />
-            <h2 className="text-xl font-display font-semibold">Primary Palette — Wicklow Grounded</h2>
+            <Sun className="h-5 w-5 text-wicklow-sun" />
+            <h2 className="text-xl font-display font-semibold">Primary Palette — Wicklow Mountains</h2>
           </div>
           <p className="text-muted-foreground text-sm">
-            Colors sourced from Kilmacanogue, Rocky Valley, and Sugarloaf Mountain landscape
+            7 colors derived from the Wicklow landscape: rolling hills, Irish Sea, rare sunshine, clouds, rain, bog heather, and turf
           </p>
-          {isLoading ? (
-            <div className="grid gap-4 md:grid-cols-5">
-              {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <div className="h-24 bg-muted" />
-                  <CardContent className="p-4 space-y-2">
-                    <div className="h-4 bg-muted rounded w-3/4" />
-                    <div className="h-3 bg-muted rounded w-full" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
+          
+          {/* Hardcoded Wicklow Primary Swatches */}
+          <div className="grid gap-4 md:grid-cols-7">
+            {Object.entries(WICKLOW_PRIMARY).map(([key, color]) => (
+              <Card key={key} className="overflow-hidden group">
+                <div 
+                  className="h-20 w-full transition-transform group-hover:scale-105"
+                  style={{ backgroundColor: color.hex }}
+                />
+                <CardContent className="p-3 space-y-1">
+                  <h4 className="font-semibold text-sm">{color.name}</h4>
+                  <p className="text-xs text-muted-foreground">{color.description}</p>
+                  <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Database colors if available */}
+          {wicklowColors.length > 0 && (
             <div className="grid gap-4 md:grid-cols-5">
               {wicklowColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} />
@@ -1769,28 +1803,67 @@ export default function BrandColors() {
           )}
         </section>
 
-        {/* Mode Accent System */}
+        {/* Modern Accent Palette */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Moon className="h-5 w-5 text-mode-savage" />
-            <h2 className="text-xl font-display font-semibold">Mode Accent System</h2>
+            <Sparkles className="h-5 w-5 text-accent-modern-hotpink" />
+            <h2 className="text-xl font-display font-semibold">Modern Accent Palette — Striking Contrast</h2>
           </div>
           <p className="text-muted-foreground text-sm">
-            5 escalating states from calm innocence to explosive chaos — saturation intensifies with mode
+            5 electric accents for impact, energy, and modern edge — used sparingly for maximum effect
           </p>
-          {isLoading ? (
-            <div className="grid gap-4 md:grid-cols-5">
-              {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <div className="h-24 bg-muted" />
-                  <CardContent className="p-4 space-y-2">
-                    <div className="h-4 bg-muted rounded w-3/4" />
-                    <div className="h-3 bg-muted rounded w-full" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
+          
+          <div className="grid gap-4 md:grid-cols-5">
+            {Object.entries(MODERN_ACCENTS).map(([key, color]) => (
+              <Card key={key} className="overflow-hidden group">
+                <div 
+                  className="h-20 w-full transition-transform group-hover:scale-105"
+                  style={{ backgroundColor: color.hex }}
+                />
+                <CardContent className="p-3 space-y-1">
+                  <h4 className="font-semibold text-sm">{color.name}</h4>
+                  <p className="text-xs text-muted-foreground">{color.description}</p>
+                  <p className="text-xs font-mono text-muted-foreground">{color.hex}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Mode Escalation System */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Moon className="h-5 w-5 text-accent-modern-hotpink" />
+            <h2 className="text-xl font-display font-semibold">Mode Escalation System</h2>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            5 escalating states from calm innocence to explosive chaos — using Wicklow tones for low modes, Modern accents for high intensity
+          </p>
+          
+          {/* Mode Escalation Cards */}
+          <div className="grid gap-4 md:grid-cols-5">
+            {MODE_ESCALATION.map((mode) => (
+              <Card key={mode.mode} className="overflow-hidden group">
+                <div 
+                  className="h-20 w-full transition-transform group-hover:scale-105 flex items-center justify-center"
+                  style={{ backgroundColor: mode.color }}
+                >
+                  <div
+                    className="w-10 h-10 border-2 border-black/20"
+                    style={{ borderRadius: mode.shapeRadius }}
+                  />
+                </div>
+                <CardContent className="p-3 space-y-1">
+                  <h4 className="font-semibold text-sm">{mode.name}</h4>
+                  <p className="text-xs text-muted-foreground">{mode.description}</p>
+                  <p className="text-xs font-mono text-muted-foreground">{mode.intensity}% intensity</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Database mode colors if available */}
+          {modeColors.length > 0 && (
             <div className="grid gap-4 md:grid-cols-5">
               {modeColors.map((color) => (
                 <ColorSwatch key={color.id} asset={color} />

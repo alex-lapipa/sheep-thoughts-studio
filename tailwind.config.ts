@@ -63,12 +63,65 @@ export default {
           accent: "hsl(var(--savage-accent))",
         },
         // Wicklow Primary Palette
-        bubbles: {
-          cream: "hsl(var(--bubbles-cream))",
-          gold: "hsl(var(--bubbles-gold))",
-          mist: "hsl(var(--bubbles-mist))",
-          heather: "hsl(var(--bubbles-heather))",
-          peat: "hsl(var(--bubbles-peat))",
+        wicklow: {
+          green: {
+            DEFAULT: "hsl(var(--wicklow-green))",
+            light: "hsl(var(--wicklow-green-light))",
+            dark: "hsl(var(--wicklow-green-dark))",
+          },
+          ocean: {
+            DEFAULT: "hsl(var(--wicklow-ocean))",
+            light: "hsl(var(--wicklow-ocean-light))",
+            dark: "hsl(var(--wicklow-ocean-dark))",
+          },
+          sun: {
+            DEFAULT: "hsl(var(--wicklow-sun))",
+            light: "hsl(var(--wicklow-sun-light))",
+            dark: "hsl(var(--wicklow-sun-dark))",
+          },
+          cloud: {
+            DEFAULT: "hsl(var(--wicklow-cloud))",
+            warm: "hsl(var(--wicklow-cloud-warm))",
+            cool: "hsl(var(--wicklow-cloud-cool))",
+          },
+          rain: {
+            DEFAULT: "hsl(var(--wicklow-rain))",
+            light: "hsl(var(--wicklow-rain-light))",
+            dark: "hsl(var(--wicklow-rain-dark))",
+          },
+          heather: {
+            DEFAULT: "hsl(var(--wicklow-heather))",
+            light: "hsl(var(--wicklow-heather-light))",
+            dark: "hsl(var(--wicklow-heather-dark))",
+          },
+          turf: {
+            DEFAULT: "hsl(var(--wicklow-turf))",
+            light: "hsl(var(--wicklow-turf-light))",
+            dark: "hsl(var(--wicklow-turf-dark))",
+          },
+        },
+        // Modern Accent Palette
+        "accent-modern": {
+          acid: {
+            DEFAULT: "hsl(var(--accent-acid))",
+            dim: "hsl(var(--accent-acid-dim))",
+          },
+          hotpink: {
+            DEFAULT: "hsl(var(--accent-hotpink))",
+            dim: "hsl(var(--accent-hotpink-dim))",
+          },
+          electric: {
+            DEFAULT: "hsl(var(--accent-electric))",
+            dim: "hsl(var(--accent-electric-dim))",
+          },
+          coral: {
+            DEFAULT: "hsl(var(--accent-coral))",
+            dim: "hsl(var(--accent-coral-dim))",
+          },
+          vivid: {
+            DEFAULT: "hsl(var(--accent-vivid))",
+            dim: "hsl(var(--accent-vivid-dim))",
+          },
         },
         // Mode Accent Colors
         mode: {
@@ -81,6 +134,7 @@ export default {
         // Seasonal Palette
         season: {
           spring: "hsl(var(--season-spring))",
+          summer: "hsl(var(--season-summer))",
           autumn: "hsl(var(--season-autumn))",
           winter: "hsl(var(--season-winter))",
         },
