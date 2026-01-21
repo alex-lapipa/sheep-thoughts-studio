@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
+import Facts from "./pages/Facts";
 import Collections from "./pages/Collections";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
@@ -38,6 +39,7 @@ const App = () => (
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
+            <Route path="/facts" element={<Facts />} />
             <Route path="/collections/:collection" element={<Collections />} />
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
