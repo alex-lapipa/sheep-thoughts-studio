@@ -25,7 +25,11 @@ import {
   Trash2,
   History,
   Layers,
-  Grid3X3
+  Grid3X3,
+  ThumbsUp,
+  ThumbsDown,
+  Star,
+  Trophy
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -98,6 +102,16 @@ interface GeneratedImage {
   saved?: boolean;
 }
 
+// Voting state for batch comparison
+interface VariationVote {
+  upvotes: number;
+  downvotes: number;
+  rating: number; // 0-5 stars
+  votedUp: boolean;
+  votedDown: boolean;
+  userRating: number;
+}
+
 interface SavedIllustration {
   id: string;
   storage_path: string;
@@ -134,6 +148,102 @@ export default function IllustrationGenerator() {
   const [batchCount, setBatchCount] = useState(3);
   const [batchVaryBy, setBatchVaryBy] = useState<"random" | "posture" | "accessory" | "weather" | "style">("random");
   const [batchResults, setBatchResults] = useState<GeneratedImage[]>([]);
+  
+  // Voting state for batch comparison
+  const [batchVotes, setBatchVotes] = useState<Record<string, VariationVote>>({});
+
+  // Initialize votes when batch results change
+  useEffect(() => {
+    if (batchResults.length > 0) {
+      const initialVotes: Record<string, VariationVote> = {};
+      batchResults.forEach((img) => {
+        if (!batchVotes[img.generatedAt]) {
+          initialVotes[img.generatedAt] = {
+            upvotes: 0,
+            downvotes: 0,
+            rating: 0,
+            votedUp: false,
+            votedDown: false,
+            userRating: 0,
+          };
+        } else {
+          initialVotes[img.generatedAt] = batchVotes[img.generatedAt];
+        }
+      });
+      setBatchVotes(initialVotes);
+    }
+  }, [batchResults.length]);
+
+  const handleUpvote = (imageKey: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBatchVotes((prev) => {
+      const current = prev[imageKey] || { upvotes: 0, downvotes: 0, rating: 0, votedUp: false, votedDown: false, userRating: 0 };
+      const wasVotedUp = current.votedUp;
+      const wasVotedDown = current.votedDown;
+      return {
+        ...prev,
+        [imageKey]: {
+          ...current,
+          upvotes: wasVotedUp ? current.upvotes - 1 : current.upvotes + 1,
+          downvotes: wasVotedDown ? current.downvotes - 1 : current.downvotes,
+          votedUp: !wasVotedUp,
+          votedDown: false,
+        },
+      };
+    });
+  };
+
+  const handleDownvote = (imageKey: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBatchVotes((prev) => {
+      const current = prev[imageKey] || { upvotes: 0, downvotes: 0, rating: 0, votedUp: false, votedDown: false, userRating: 0 };
+      const wasVotedUp = current.votedUp;
+      const wasVotedDown = current.votedDown;
+      return {
+        ...prev,
+        [imageKey]: {
+          ...current,
+          upvotes: wasVotedUp ? current.upvotes - 1 : current.upvotes,
+          downvotes: wasVotedDown ? current.downvotes - 1 : current.downvotes + 1,
+          votedUp: false,
+          votedDown: !wasVotedDown,
+        },
+      };
+    });
+  };
+
+  const handleStarRating = (imageKey: string, starValue: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBatchVotes((prev) => {
+      const current = prev[imageKey] || { upvotes: 0, downvotes: 0, rating: 0, votedUp: false, votedDown: false, userRating: 0 };
+      const newRating = current.userRating === starValue ? 0 : starValue;
+      return {
+        ...prev,
+        [imageKey]: {
+          ...current,
+          userRating: newRating,
+          rating: newRating,
+        },
+      };
+    });
+  };
+
+  const getWinner = () => {
+    if (batchResults.length === 0) return null;
+    let winner: GeneratedImage | null = null;
+    let maxScore = -Infinity;
+    batchResults.forEach((img) => {
+      const vote = batchVotes[img.generatedAt];
+      if (vote) {
+        const score = (vote.upvotes - vote.downvotes) * 2 + vote.rating;
+        if (score > maxScore) {
+          maxScore = score;
+          winner = img;
+        }
+      }
+    });
+    return maxScore > 0 ? winner : null;
+  };
 
   // Fetch saved illustrations on mount
   useEffect(() => {
@@ -855,9 +965,15 @@ export default function IllustrationGenerator() {
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Grid3X3 className="h-5 w-5 text-primary" />
                   A/B Comparison
+                  {getWinner() && (
+                    <Badge variant="default" className="ml-auto bg-amber-500 text-white">
+                      <Trophy className="h-3 w-3 mr-1" />
+                      Leader: #{batchResults.findIndex(img => img === getWinner()) + 1}
+                    </Badge>
+                  )}
                 </CardTitle>
                 <CardDescription>
-                  Compare {batchResults.length} variations side by side
+                  Compare {batchResults.length} variations side by side — vote for your favorites!
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -868,83 +984,147 @@ export default function IllustrationGenerator() {
                   batchResults.length === 4 ? "grid-cols-2 md:grid-cols-4" :
                   "grid-cols-2 md:grid-cols-3"
                 )}>
-                  {batchResults.map((img, idx) => (
-                    <motion.div
-                      key={img.generatedAt}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className={cn(
-                        "relative group rounded-xl overflow-hidden border-2 transition-all cursor-pointer",
-                        selectedImage?.generatedAt === img.generatedAt 
-                          ? "border-primary ring-2 ring-primary/30" 
-                          : "border-border hover:border-primary/50"
-                      )}
-                      onClick={() => setSelectedImage(img)}
-                    >
-                      <div className="aspect-square">
-                        <img
-                          src={img.publicUrl || img.image}
-                          alt={`Variation ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      
-                      {/* Variation label */}
-                      <div className="absolute top-2 left-2">
-                        <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-                          #{idx + 1}
-                        </Badge>
-                      </div>
-                      
-                      {/* Quick metadata */}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
-                            {img.metadata.posture}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
-                            {img.metadata.accessory}
+                  {batchResults.map((img, idx) => {
+                    const vote = batchVotes[img.generatedAt] || { upvotes: 0, downvotes: 0, rating: 0, votedUp: false, votedDown: false, userRating: 0 };
+                    const isWinner = getWinner()?.generatedAt === img.generatedAt;
+                    
+                    return (
+                      <motion.div
+                        key={img.generatedAt}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className={cn(
+                          "relative group rounded-xl overflow-hidden border-2 transition-all cursor-pointer",
+                          isWinner && "ring-2 ring-amber-400/50",
+                          selectedImage?.generatedAt === img.generatedAt 
+                            ? "border-primary ring-2 ring-primary/30" 
+                            : "border-border hover:border-primary/50"
+                        )}
+                        onClick={() => setSelectedImage(img)}
+                      >
+                        {/* Winner crown */}
+                        {isWinner && (
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                            <div className="bg-amber-500 text-white rounded-full p-1.5 shadow-lg">
+                              <Trophy className="h-4 w-4" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="aspect-square">
+                          <img
+                            src={img.publicUrl || img.image}
+                            alt={`Variation ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        {/* Variation label */}
+                        <div className="absolute top-2 left-2">
+                          <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                            #{idx + 1}
                           </Badge>
                         </div>
-                      </div>
-                      
-                      {/* Save indicator */}
-                      {img.saved && (
-                        <div className="absolute top-2 right-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+                        
+                        {/* Voting controls - always visible */}
+                        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3">
+                          {/* Star rating */}
+                          <div className="flex justify-center gap-1 mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                onClick={(e) => handleStarRating(img.generatedAt, star, e)}
+                                className="transition-transform hover:scale-125 focus:outline-none"
+                              >
+                                <Star
+                                  className={cn(
+                                    "h-4 w-4 transition-colors",
+                                    star <= vote.userRating
+                                      ? "fill-amber-400 text-amber-400"
+                                      : "text-white/50 hover:text-amber-300"
+                                  )}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {/* Thumbs up/down */}
+                          <div className="flex items-center justify-center gap-3">
+                            <Button
+                              size="sm"
+                              variant={vote.votedUp ? "default" : "secondary"}
+                              className={cn(
+                                "h-8 gap-1 bg-background/80 backdrop-blur-sm",
+                                vote.votedUp && "bg-green-600 hover:bg-green-700 text-white"
+                              )}
+                              onClick={(e) => handleUpvote(img.generatedAt, e)}
+                            >
+                              <ThumbsUp className="h-3.5 w-3.5" />
+                              <span className="text-xs font-semibold">{vote.upvotes}</span>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={vote.votedDown ? "default" : "secondary"}
+                              className={cn(
+                                "h-8 gap-1 bg-background/80 backdrop-blur-sm",
+                                vote.votedDown && "bg-red-600 hover:bg-red-700 text-white"
+                              )}
+                              onClick={(e) => handleDownvote(img.generatedAt, e)}
+                            >
+                              <ThumbsDown className="h-3.5 w-3.5" />
+                              <span className="text-xs font-semibold">{vote.downvotes}</span>
+                            </Button>
+                          </div>
+                          
+                          {/* Metadata tags on hover */}
+                          <div className="flex flex-wrap gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
+                              {img.metadata.posture}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
+                              {img.metadata.accessory}
+                            </Badge>
+                          </div>
                         </div>
-                      )}
-                      
-                      {/* Quick actions */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownload(img);
-                          }}
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                        </Button>
-                        {!img.saved && (
+                        
+                        {/* Save indicator */}
+                        {img.saved && (
+                          <div className="absolute top-2 right-10">
+                            <div className="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+                          </div>
+                        )}
+                        
+                        {/* Quick actions */}
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                           <Button
                             size="icon"
                             variant="secondary"
                             className="h-7 w-7 bg-background/80 backdrop-blur-sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSaveToLibrary(img);
+                              handleDownload(img);
                             }}
                           >
-                            <Save className="h-3.5 w-3.5" />
+                            <Download className="h-3.5 w-3.5" />
                           </Button>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
+                          {!img.saved && (
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className="h-7 w-7 bg-background/80 backdrop-blur-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveToLibrary(img);
+                              }}
+                            >
+                              <Save className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
                 
                 {/* Batch actions */}
