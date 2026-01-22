@@ -5,6 +5,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
 import { useSemanticSearch } from "@/hooks/useSemanticSearch";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { useOgImage } from "@/hooks/useOgImage";
 import { HighlightedText } from "@/components/HighlightedText";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,8 +26,6 @@ import {
   TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
 // Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -52,6 +51,7 @@ const sourceLabels = {
 };
 
 const Search = () => {
+  const { ogImageUrl, siteUrl } = useOgImage("og-search.jpg");
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "products" | "content">("all");
   const [showSavedSearches, setShowSavedSearches] = useState(false);
@@ -116,12 +116,12 @@ const Search = () => {
         <meta property="og:description" content="Find the perfect confidently wrong merchandise and wisdom." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/search`} />
-        <meta property="og:image" content={`${siteUrl}/og-search.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Search Bubbles" />
-        <meta name="twitter:image" content={`${siteUrl}/og-search.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/search`} />
       </Helmet>
       <div className="container py-12">

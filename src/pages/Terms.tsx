@@ -5,6 +5,7 @@ import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, F
 import { Link } from "react-router-dom";
 import { LegalJargonInterpreter } from "@/components/LegalJargonInterpreter";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
+import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
 
 const tocItems: TocItem[] = [
@@ -22,7 +23,7 @@ const tocItems: TocItem[] = [
 
 const Terms = () => {
   const lastUpdated = "January 2026";
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const { ogImageUrl, siteUrl } = useOgImage("og-terms.jpg");
 
   return (
     <>
@@ -33,13 +34,13 @@ const Terms = () => {
         <meta property="og:description" content="A sacred covenant written by a sheep who studied law by watching a goat chew on legal documents. Wolves prohibited." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/terms`} />
-        <meta property="og:image" content={`${siteUrl}/og-terms.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Terms of Service | Bubbles the Sheep" />
         <meta name="twitter:description" content="Legally binding. Probably. Wolves prohibited." />
-        <meta name="twitter:image" content={`${siteUrl}/og-terms.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/terms`} />
       </Helmet>
 

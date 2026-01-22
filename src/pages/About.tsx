@@ -3,6 +3,7 @@ import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
 
 // Table of Contents items for the About page
@@ -18,7 +19,7 @@ const ABOUT_TOC_ITEMS: TocItem[] = [
 
 const About = () => {
   const { t, language } = useLanguage();
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const { ogImageUrl, siteUrl } = useOgImage("og-about.jpg");
 
   const researchSources = [
     { source: language === "es" ? "Un turista alemán" : "A German tourist", year: "2019", topic: language === "es" ? "Geología de montaña, formación de nubes" : "Mountain geology, cloud formation", fact: language === "es" ? "Las montañas crecen más cuando nadie las mira. Por eso las miden tan seguido." : "Mountains grow taller when nobody is looking. That's why they measure them so often.", trust: "verified" as const },
@@ -46,11 +47,11 @@ const About = () => {
         <meta property="og:description" content="Born in Wicklow bogs, raised by humans, educated by children from multiple countries. Always wrong with confidence." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/about`} />
-        <meta property="og:image" content={`${siteUrl}/og-about.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Bubbles" />
         <meta name="twitter:description" content="The sheep who knows everything. Incorrectly." />
-        <meta name="twitter:image" content={`${siteUrl}/og-about.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/about`} />
       </Helmet>
 

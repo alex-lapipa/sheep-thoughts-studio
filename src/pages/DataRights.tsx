@@ -3,13 +3,13 @@ import { Layout } from "@/components/Layout";
 import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import { Shield, FileText, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-
 export default function DataRights() {
   const { language } = useLanguage();
+  const { ogImageUrl, siteUrl } = useOgImage("og-data-rights.jpg");
 
   return (
     <Layout>
@@ -20,12 +20,12 @@ export default function DataRights() {
         <meta property="og:description" content="Your data belongs to you. Bubbles respects that." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/data-rights`} />
-        <meta property="og:image" content={`${siteUrl}/og-data-rights.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Your Data Rights" />
-        <meta name="twitter:image" content={`${siteUrl}/og-data-rights.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/data-rights`} />
       </Helmet>
       <div className="container py-12 max-w-4xl">

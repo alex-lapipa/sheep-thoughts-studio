@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -572,7 +573,7 @@ const FAQ = () => {
     }
   };
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const { ogImageUrl, siteUrl } = useOgImage("og-faq.jpg");
 
   return (
     <LegalPageLayout 
@@ -587,13 +588,13 @@ const FAQ = () => {
         <meta property="og:description" content="Ask Bubbles anything. Get wisdom. Stay confused. From the Wicklow Institute of Confident Incorrectness." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/faq`} />
-        <meta property="og:image" content={`${siteUrl}/og-faq.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Ask Bubbles | FAQ" />
         <meta name="twitter:description" content="Ask Bubbles anything. Get wisdom. Stay confused." />
-        <meta name="twitter:image" content={`${siteUrl}/og-faq.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/faq`} />
       </Helmet>
 
