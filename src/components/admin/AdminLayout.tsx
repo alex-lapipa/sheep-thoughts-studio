@@ -272,11 +272,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {/* Sidebar */}
           <aside 
             className={cn(
-              "min-h-[calc(100vh-4rem)] border-r border-border bg-card overflow-y-auto transition-all duration-300 flex-shrink-0",
+              "min-h-[calc(100vh-4rem)] border-r border-border bg-card overflow-y-auto flex-shrink-0",
+              "transition-[width] duration-300 ease-out",
               sidebarCollapsed ? "w-16" : "w-64"
             )}
           >
-            <nav className={cn("p-2 space-y-2", !sidebarCollapsed && "p-4")}>
+            <nav className={cn(
+              "space-y-2 transition-[padding] duration-300 ease-out",
+              sidebarCollapsed ? "p-2" : "p-4"
+            )}>
               {navSections.map((section) => {
                 // Check if user can access this section
                 const canAccessSection = !section.requiredModule || 
