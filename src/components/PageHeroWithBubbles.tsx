@@ -423,11 +423,17 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
   // Allow longer text for readability - no aggressive truncation
   const displayText = text.length > 120 ? text.substring(0, 117) + "…" : text;
 
+  // Randomized animation delay for natural staggering
+  const morphDelayClass = useMemo(() => {
+    const delays = ['', 'cloud-morph-delay-1', 'cloud-morph-delay-2', 'cloud-morph-delay-3'];
+    return delays[Math.floor(Math.random() * delays.length)];
+  }, []);
+
   return (
     <div className="relative">
       {/* Atmospheric glow - like fog around the thought */}
       <div 
-        className="absolute inset-0 blur-xl rounded-full"
+        className="absolute inset-0 blur-xl rounded-full cloud-glow-pulse"
         style={{ 
           backgroundColor: style.fill, 
           opacity: style.glowOpacity,
@@ -435,12 +441,11 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
         }}
       />
       
-      {/* Organic cloud shape using SVG - randomized variant */}
-      <div className="relative">
+      {/* Organic cloud shape using SVG - randomized variant with morphing */}
+      <div className={`relative cloud-morph ${morphDelayClass}`}>
         <svg 
           viewBox="0 0 200 100" 
           className="w-full h-auto"
-          style={{ filter: "drop-shadow(0 4px 12px rgba(44, 44, 44, 0.08))" }}
         >
           {/* Organic cloud path - soft, irregular edges */}
           <path
@@ -476,12 +481,12 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
       {/* Soft origin cluster - not comic-trail dots */}
       <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
         <div 
-          className="w-2.5 h-2.5 rounded-full blur-[0.3px]"
+          className="w-2.5 h-2.5 rounded-full blur-[0.3px] cloud-glow-pulse"
           style={{ backgroundColor: style.fill, opacity: 0.8 }}
         />
         <div 
-          className="w-1.5 h-1.5 rounded-full blur-[0.2px] mt-1"
-          style={{ backgroundColor: style.fill, opacity: 0.6 }}
+          className="w-1.5 h-1.5 rounded-full blur-[0.2px] mt-1 cloud-glow-pulse"
+          style={{ backgroundColor: style.fill, opacity: 0.6, animationDelay: '-2s' }}
         />
       </div>
     </div>
