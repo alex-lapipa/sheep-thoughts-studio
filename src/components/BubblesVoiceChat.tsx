@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { ThoughtBubble } from "./ThoughtBubble";
+import { AudioWaveform } from "./AudioWaveform";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -55,26 +56,7 @@ const MODE_COLORS: Record<string, string> = {
   nuclear: "bg-mode-nuclear/20 text-mode-nuclear border-mode-nuclear/30",
 };
 
-// Sound wave animation component
-const SoundWaveIndicator = ({ isActive }: { isActive: boolean }) => {
-  if (!isActive) return null;
-  
-  return (
-    <div className="flex items-center gap-0.5 px-2 py-1 rounded-full bg-accent/10">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="w-1 bg-accent rounded-full sound-wave-bar"
-          style={{
-            height: '14px',
-            animationDelay: `${i * 0.1}s`,
-          }}
-        />
-      ))}
-      <span className="ml-1 text-xs text-accent font-medium">Speaking</span>
-    </div>
-  );
-};
+// Legacy SoundWaveIndicator removed - now using AudioWaveform component
 
 const VOICE_SETTINGS_KEY = "bubbles-voice-settings";
 
@@ -345,8 +327,11 @@ export const BubblesVoiceChat = () => {
               {currentMode}
             </Badge>
             
-            {/* Sound wave indicator when speaking */}
-            <SoundWaveIndicator isActive={isSpeaking} />
+            {/* Audio waveform visualization responding to playback */}
+            <AudioWaveform 
+              audioElement={audioRef.current} 
+              isActive={isSpeaking}
+            />
             
             {/* Voice Settings Popover */}
             <Popover>
