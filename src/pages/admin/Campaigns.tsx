@@ -69,8 +69,26 @@ import {
   PenLine,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+// Common timezones for email scheduling
+const TIMEZONES = [
+  { value: "Europe/Dublin", label: "Dublin (GMT/IST)", offset: "GMT+0/+1" },
+  { value: "Europe/London", label: "London (GMT/BST)", offset: "GMT+0/+1" },
+  { value: "Europe/Paris", label: "Paris (CET/CEST)", offset: "GMT+1/+2" },
+  { value: "Europe/Berlin", label: "Berlin (CET/CEST)", offset: "GMT+1/+2" },
+  { value: "America/New_York", label: "New York (EST/EDT)", offset: "GMT-5/-4" },
+  { value: "America/Chicago", label: "Chicago (CST/CDT)", offset: "GMT-6/-5" },
+  { value: "America/Denver", label: "Denver (MST/MDT)", offset: "GMT-7/-6" },
+  { value: "America/Los_Angeles", label: "Los Angeles (PST/PDT)", offset: "GMT-8/-7" },
+  { value: "America/Toronto", label: "Toronto (EST/EDT)", offset: "GMT-5/-4" },
+  { value: "Australia/Sydney", label: "Sydney (AEST/AEDT)", offset: "GMT+10/+11" },
+  { value: "Asia/Tokyo", label: "Tokyo (JST)", offset: "GMT+9" },
+  { value: "Asia/Singapore", label: "Singapore (SGT)", offset: "GMT+8" },
+  { value: "UTC", label: "UTC (Coordinated Universal Time)", offset: "GMT+0" },
+];
 
 interface EmailTemplate {
   id: string;
@@ -111,6 +129,7 @@ export default function AdminCampaigns() {
   const [scheduleDate, setScheduleDate] = useState<Date | undefined>(addDays(new Date(), 1));
   const [scheduleHour, setScheduleHour] = useState("09");
   const [scheduleMinute, setScheduleMinute] = useState("00");
+  const [scheduleTimezone, setScheduleTimezone] = useState("Europe/Dublin");
   
   const [formData, setFormData] = useState({
     subject: "",
@@ -291,6 +310,7 @@ export default function AdminCampaigns() {
     setScheduleDate(addDays(new Date(), 1));
     setScheduleHour("09");
     setScheduleMinute("00");
+    setScheduleTimezone("Europe/Dublin");
   };
 
   const openEdit = (campaign: Campaign) => {
@@ -335,7 +355,13 @@ export default function AdminCampaigns() {
 
   const getScheduledDateTime = () => {
     if (!scheduleDate) return null;
-    return setMinutes(setHours(scheduleDate, parseInt(scheduleHour)), parseInt(scheduleMinute));
+    // Create a date string in the selected timezone
+    const year = scheduleDate.getFullYear();
+    const month = String(scheduleDate.getMonth() + 1).padStart(2, '0');
+    const day = String(scheduleDate.getDate()).padStart(2, '0');
+    const dateTimeStr = `${year}-${month}-${day}T${scheduleHour}:${scheduleMinute}:00`;
+    // Convert from the selected timezone to UTC
+    return fromZonedTime(dateTimeStr, scheduleTimezone);
   };
 
   const handleSchedule = () => {
@@ -348,6 +374,12 @@ export default function AdminCampaigns() {
     }
     
     scheduleMutation.mutate({ campaignId: selectedCampaign.id, scheduledAt });
+  };
+
+  const getFormattedScheduleTime = () => {
+    const scheduledAt = getScheduledDateTime();
+    if (!scheduledAt) return "";
+    return formatInTimeZone(scheduledAt, scheduleTimezone, "EEEE, MMMM d, yyyy 'at' h:mm a zzz");
   };
 
   const getStatusBadge = (status: string, campaign?: Campaign) => {
@@ -871,6 +903,24 @@ export default function AdminCampaigns() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label>Timezone</Label>
+                <Select value={scheduleTimezone} onValueChange={setScheduleTimezone}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMEZONES.map((tz) => (
+                      <SelectItem key={tz.value} value={tz.value}>
+                        <span className="flex items-center justify-between w-full">
+                          <span>{tz.label}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{tz.offset}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -928,10 +978,11 @@ export default function AdminCampaigns() {
                 </div>
               </div>
               {scheduleDate && (
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted rounded-lg space-y-1">
                   <p className="text-sm text-muted-foreground">Campaign will be sent:</p>
-                  <p className="font-medium">
-                    {format(getScheduledDateTime() || new Date(), "EEEE, MMMM d, yyyy 'at' h:mm a")}
+                  <p className="font-medium">{getFormattedScheduleTime()}</p>
+                  <p className="text-xs text-muted-foreground">
+                    (Your local time: {formatInTimeZone(getScheduledDateTime() || new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone, "h:mm a zzz")})
                   </p>
                 </div>
               )}
