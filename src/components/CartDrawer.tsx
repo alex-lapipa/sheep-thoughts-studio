@@ -4,18 +4,26 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { analytics } from "@/lib/analytics";
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
+  const currency = items[0]?.price.currencyCode || 'EUR';
 
-  useEffect(() => { if (isOpen) syncCart(); }, [isOpen, syncCart]);
+  useEffect(() => { 
+    if (isOpen) {
+      syncCart();
+      analytics.openCart(totalItems);
+    }
+  }, [isOpen, syncCart, totalItems]);
 
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
+      analytics.beginCheckout(totalItems, totalPrice, currency);
       window.open(checkoutUrl, '_blank');
       setIsOpen(false);
     }
