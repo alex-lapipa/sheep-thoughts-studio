@@ -19,8 +19,13 @@ import {
   ShieldCheck,
   ShieldAlert,
   Send,
-  Loader2
+  Loader2,
+  ScanSearch,
+  ImageOff,
+  Check,
+  X
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -357,6 +362,16 @@ function validateRobotsTxt(content: string): RobotsValidation[] {
   return validations;
 }
 
+interface OGImageValidation {
+  path: string;
+  name: string;
+  ogImagePath: string;
+  exists: boolean;
+  status: "loading" | "valid" | "missing" | "error";
+  dimensions?: { width: number; height: number };
+  sizeValid?: boolean;
+}
+
 export default function AdminSitemap() {
   const [pages] = useState<PageMeta[]>(SITE_PAGES);
   const [robotsTxt, setRobotsTxt] = useState<string>("");
@@ -367,6 +382,9 @@ export default function AdminSitemap() {
     success: boolean;
     summary: { successful: number; total: number };
   } | null>(null);
+  const [ogValidation, setOgValidation] = useState<OGImageValidation[]>([]);
+  const [validatingOg, setValidatingOg] = useState(false);
+  const [validationProgress, setValidationProgress] = useState(0);
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
   const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
 
@@ -402,6 +420,66 @@ export default function AdminSitemap() {
     }
   };
 
+  const validateOgImages = async () => {
+    setValidatingOg(true);
+    setValidationProgress(0);
+    
+    // Get all pages with static OG images (not dynamic)
+    const staticOgPages = pages.filter(p => p.ogImagePath && !p.ogImagePath.startsWith("("));
+    
+    const results: OGImageValidation[] = staticOgPages.map(p => ({
+      path: p.path,
+      name: p.name,
+      ogImagePath: p.ogImagePath!,
+      exists: false,
+      status: "loading" as const,
+    }));
+    
+    setOgValidation(results);
+    
+    // Validate each image
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      
+      try {
+        const img = new window.Image();
+        
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => {
+            results[i] = {
+              ...result,
+              exists: true,
+              status: "valid",
+              dimensions: { width: img.naturalWidth, height: img.naturalHeight },
+              sizeValid: img.naturalWidth >= 1200 && img.naturalHeight >= 630,
+            };
+            resolve();
+          };
+          img.onerror = () => {
+            results[i] = {
+              ...result,
+              exists: false,
+              status: "missing",
+            };
+            resolve();
+          };
+          img.src = result.ogImagePath;
+        });
+      } catch (error) {
+        results[i] = {
+          ...result,
+          exists: false,
+          status: "error",
+        };
+      }
+      
+      setValidationProgress(Math.round(((i + 1) / results.length) * 100));
+      setOgValidation([...results]);
+    }
+    
+    setValidatingOg(false);
+  };
+
   useEffect(() => {
     fetchRobotsTxt();
   }, []);
@@ -421,6 +499,13 @@ export default function AdminSitemap() {
     pass: robotsValidation.filter(v => v.status === "pass").length,
     warn: robotsValidation.filter(v => v.status === "warn").length,
     fail: robotsValidation.filter(v => v.status === "fail").length,
+  };
+
+  const ogStats = {
+    valid: ogValidation.filter(v => v.status === "valid").length,
+    missing: ogValidation.filter(v => v.status === "missing").length,
+    wrongSize: ogValidation.filter(v => v.status === "valid" && !v.sizeValid).length,
+    total: ogValidation.length,
   };
 
   return (
@@ -716,6 +801,170 @@ export default function AdminSitemap() {
                 </ScrollArea>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* OG Image Validator */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <ScanSearch className="h-5 w-5" />
+                  Bulk OG Image Validator
+                </CardTitle>
+                <CardDescription>
+                  Check if all referenced OG images exist and have correct dimensions (1200×630)
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={validateOgImages}
+                disabled={validatingOg}
+              >
+                {validatingOg ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <ScanSearch className="h-4 w-4 mr-2" />
+                )}
+                {validatingOg ? "Validating..." : "Validate All Images"}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {validatingOg && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span>Checking images...</span>
+                  <span>{validationProgress}%</span>
+                </div>
+                <Progress value={validationProgress} className="h-2" />
+              </div>
+            )}
+            
+            {ogValidation.length > 0 && (
+              <>
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="p-4 rounded-lg bg-muted/50 text-center">
+                    <div className="text-2xl font-bold">{ogStats.total}</div>
+                    <div className="text-sm text-muted-foreground">Total Checked</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-green-500/10 text-center">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{ogStats.valid}</div>
+                    <div className="text-sm text-muted-foreground">Valid</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-red-500/10 text-center">
+                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">{ogStats.missing}</div>
+                    <div className="text-sm text-muted-foreground">Missing</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-yellow-500/10 text-center">
+                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{ogStats.wrongSize}</div>
+                    <div className="text-sm text-muted-foreground">Wrong Size</div>
+                  </div>
+                </div>
+
+                {/* Validation Results Table */}
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-2">
+                    {ogValidation.map((validation) => (
+                      <div 
+                        key={validation.path}
+                        className={cn(
+                          "flex items-center gap-4 p-3 rounded-lg border",
+                          validation.status === "valid" && validation.sizeValid && "bg-green-500/5 border-green-500/20",
+                          validation.status === "valid" && !validation.sizeValid && "bg-yellow-500/5 border-yellow-500/20",
+                          validation.status === "missing" && "bg-red-500/5 border-red-500/20",
+                          validation.status === "loading" && "bg-muted/50"
+                        )}
+                      >
+                        {/* Status Icon */}
+                        <div className="flex-shrink-0">
+                          {validation.status === "loading" && (
+                            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                          )}
+                          {validation.status === "valid" && validation.sizeValid && (
+                            <Check className="h-5 w-5 text-green-500" />
+                          )}
+                          {validation.status === "valid" && !validation.sizeValid && (
+                            <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                          )}
+                          {validation.status === "missing" && (
+                            <ImageOff className="h-5 w-5 text-red-500" />
+                          )}
+                          {validation.status === "error" && (
+                            <X className="h-5 w-5 text-red-500" />
+                          )}
+                        </div>
+
+                        {/* Thumbnail */}
+                        <div className="w-16 h-8 rounded overflow-hidden border bg-muted flex-shrink-0">
+                          {validation.status === "valid" ? (
+                            <img 
+                              src={validation.ogImagePath}
+                              alt={validation.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <ImageOff className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Page Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{validation.name}</div>
+                          <div className="text-xs text-muted-foreground font-mono truncate">
+                            {validation.ogImagePath}
+                          </div>
+                        </div>
+
+                        {/* Dimensions */}
+                        <div className="text-sm text-right flex-shrink-0">
+                          {validation.dimensions ? (
+                            <div className={cn(
+                              "font-mono",
+                              validation.sizeValid ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"
+                            )}>
+                              {validation.dimensions.width}×{validation.dimensions.height}
+                              {!validation.sizeValid && (
+                                <div className="text-xs text-muted-foreground">
+                                  (should be 1200×630+)
+                                </div>
+                              )}
+                            </div>
+                          ) : validation.status === "missing" ? (
+                            <span className="text-red-600 dark:text-red-400">Not Found</span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </div>
+
+                        {/* Link */}
+                        {validation.status === "valid" && (
+                          <a 
+                            href={validation.ogImagePath}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-shrink-0"
+                          >
+                            <ExternalLink className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </>
+            )}
+            
+            {ogValidation.length === 0 && !validatingOg && (
+              <div className="text-center py-12 text-muted-foreground">
+                <Image className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Click "Validate All Images" to check if all OG images exist</p>
+                <p className="text-sm mt-1">This will verify each image loads correctly and check dimensions</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
