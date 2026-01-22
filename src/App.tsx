@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { MoodProvider } from "@/contexts/MoodContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { WinterThemeProvider } from "@/contexts/WinterThemeContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 import Index from "./pages/Index";
@@ -51,11 +52,12 @@ const App = () => (
     <TooltipProvider>
       <LanguageProvider>
         <SettingsProvider>
-          <WinterThemeProvider>
-          <AuthProvider>
-            <MoodProvider>
-              <Toaster />
-            <Sonner position="top-center" />
+          <ThemeProvider>
+            <WinterThemeProvider>
+              <AuthProvider>
+                <MoodProvider>
+                  <Toaster />
+                  <Sonner position="top-center" />
             <BrowserRouter>
               <Routes>
                 {/* Public Routes */}
@@ -99,15 +101,16 @@ const App = () => (
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
                 
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <CookieConsent />
-            </BrowserRouter>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <CookieConsent />
+              </BrowserRouter>
             </MoodProvider>
           </AuthProvider>
-          </WinterThemeProvider>
-        </SettingsProvider>
-      </LanguageProvider>
+        </WinterThemeProvider>
+      </ThemeProvider>
+    </SettingsProvider>
+  </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -743,3 +743,206 @@
   );
   border-bottom: 1px solid hsl(var(--winter-gold) / 0.15);
 }
+
+/* ========================================
+   🐑 SHEEP MODE 🐑
+   Bubbles' Confidently Wrong Design Vision
+   
+   "I've studied human websites for months.
+    They always get the colors wrong. 
+    Grass is clearly the most calming color,
+    and everything should remind you of meadows.
+    Trust me, I grew up watching humans."
+   ======================================== */
+
+/* Sheep Mode Palette - What Bubbles thinks looks "professional" */
+.sheep-mode {
+  /* "Humans love green. It reminds them of money AND grass. Double win." */
+  --sheep-meadow: 120 45% 55%;
+  --sheep-grass-dark: 130 50% 25%;
+  --sheep-wool: 45 30% 96%;
+  --sheep-cream: 42 40% 92%;
+  
+  /* "Pink is sophisticated. I heard a French tourist say so once." */
+  --sheep-blush: 350 60% 80%;
+  --sheep-clover: 280 40% 65%;
+  
+  /* "Sky blue but BETTER - I improved it" */
+  --sheep-sky: 195 70% 70%;
+  
+  /* "Gold because every website needs gold. That's just science." */
+  --sheep-dandelion: 48 95% 55%;
+  
+  /* "Brown is underrated. Mud has character." */
+  --sheep-earth: 28 45% 35%;
+  
+  /* The accent - Bubbles' signature */
+  --sheep-accent: 350 65% 65%;
+}
+
+.sheep-mode {
+  /* Override semantic tokens with Bubbles' "expertise" */
+  --background: var(--sheep-wool);
+  --foreground: var(--sheep-earth);
+  
+  --card: var(--sheep-cream);
+  --card-foreground: var(--sheep-grass-dark);
+  
+  --popover: var(--sheep-cream);
+  --popover-foreground: var(--sheep-grass-dark);
+  
+  --primary: var(--sheep-meadow);
+  --primary-foreground: var(--sheep-wool);
+  
+  --secondary: var(--sheep-sky);
+  --secondary-foreground: var(--sheep-grass-dark);
+  
+  --muted: 120 20% 90%;
+  --muted-foreground: var(--sheep-grass-dark);
+  
+  --accent: var(--sheep-accent);
+  --accent-foreground: var(--sheep-wool);
+  
+  --destructive: 15 80% 55%;
+  --destructive-foreground: var(--sheep-wool);
+  
+  --border: 120 30% 80%;
+  --input: 120 30% 85%;
+  --ring: var(--sheep-meadow);
+  
+  /* Mode colors - Bubbles' interpretation */
+  --mode-innocent: var(--sheep-blush);
+  --mode-concerned: var(--sheep-sky);
+  --mode-triggered: var(--sheep-dandelion);
+  --mode-savage: var(--sheep-clover);
+  --mode-nuclear: 120 80% 45%;
+}
+
+/* Sheep Mode special effects */
+.sheep-mode body {
+  /* Subtle meadow texture - "websites need texture, obviously" */
+  background-image: 
+    radial-gradient(ellipse at 10% 20%, hsl(var(--sheep-meadow) / 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, hsl(var(--sheep-blush) / 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, hsl(var(--sheep-sky) / 0.04) 0%, transparent 70%);
+}
+
+/* "Headers should feel like looking at the sky. I'm pretty sure that's in a design book." */
+.sheep-mode header {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--sheep-wool)) 0%,
+    hsl(var(--sheep-cream)) 100%
+  );
+  border-bottom: 2px solid hsl(var(--sheep-meadow) / 0.3);
+  box-shadow: 0 2px 20px hsl(var(--sheep-meadow) / 0.1);
+}
+
+/* Cards get a grassy border because "nature is the best frame" */
+.sheep-mode .card {
+  border: 1px solid hsl(var(--sheep-meadow) / 0.25);
+  background: linear-gradient(
+    145deg,
+    hsl(var(--sheep-cream)) 0%,
+    hsl(var(--sheep-wool)) 100%
+  );
+  transition: all 0.3s ease;
+}
+
+.sheep-mode .card:hover {
+  border-color: hsl(var(--sheep-meadow) / 0.5);
+  box-shadow: 
+    0 8px 30px hsl(var(--sheep-meadow) / 0.15),
+    0 0 0 1px hsl(var(--sheep-meadow) / 0.1);
+  transform: translateY(-2px);
+}
+
+/* Buttons - "Round things are friendlier. Sheep are round. Coincidence?" */
+.sheep-mode .btn,
+.sheep-mode button {
+  border-radius: 9999px !important;
+}
+
+/* Links should be meadow-colored - "it's ergonomic for the eyes" */
+.sheep-mode a:hover {
+  color: hsl(var(--sheep-meadow));
+}
+
+/* Thought bubbles get extra woolly */
+.sheep-mode .thought-bubble {
+  border: 2px dashed hsl(var(--sheep-meadow) / 0.4);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sheep-wool)) 0%,
+    hsl(var(--sheep-cream)) 50%,
+    hsl(var(--sheep-blush) / 0.2) 100%
+  );
+}
+
+/* Fun cursor hint - wool trail effect on scroll */
+.sheep-mode::after {
+  content: "";
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle,
+    hsl(var(--sheep-wool)) 30%,
+    hsl(var(--sheep-cream)) 60%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1000;
+  animation: woolBounce 2s ease-in-out infinite;
+}
+
+@keyframes woolBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.1); }
+}
+
+/* Sheep Mode scrollbar - woolly! */
+.sheep-mode::-webkit-scrollbar {
+  width: 12px;
+}
+
+.sheep-mode::-webkit-scrollbar-track {
+  background: hsl(var(--sheep-cream));
+}
+
+.sheep-mode::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--sheep-meadow) / 0.5),
+    hsl(var(--sheep-blush) / 0.5)
+  );
+  border-radius: 6px;
+  border: 2px solid hsl(var(--sheep-cream));
+}
+
+.sheep-mode::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--sheep-meadow) / 0.7);
+}
+
+/* Special footer treatment */
+.sheep-mode footer {
+  background: linear-gradient(
+    0deg,
+    hsl(var(--sheep-grass-dark)) 0%,
+    hsl(var(--sheep-meadow) / 0.3) 100%
+  );
+  color: hsl(var(--sheep-wool));
+  border-top: 3px solid hsl(var(--sheep-dandelion) / 0.5);
+}
+
+.sheep-mode footer a {
+  color: hsl(var(--sheep-dandelion)) !important;
+}
+
+.sheep-mode footer a:hover {
+  color: hsl(var(--sheep-blush)) !important;
+}
