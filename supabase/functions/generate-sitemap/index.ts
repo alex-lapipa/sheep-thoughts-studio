@@ -16,7 +16,6 @@ const staticPages = [
   { path: "/about", changefreq: "monthly", priority: 0.8 },
   { path: "/facts", changefreq: "weekly", priority: 0.9 },
   { path: "/faq", changefreq: "weekly", priority: 0.9 },
-  { path: "/collections/all", changefreq: "daily", priority: 0.9 },
   { path: "/scenarios", changefreq: "weekly", priority: 0.7 },
   { path: "/explains", changefreq: "weekly", priority: 0.7 },
   { path: "/achievements", changefreq: "monthly", priority: 0.6 },
@@ -26,6 +25,16 @@ const staticPages = [
   { path: "/shipping", changefreq: "monthly", priority: 0.4 },
   { path: "/contact", changefreq: "monthly", priority: 0.6 },
   { path: "/search", changefreq: "weekly", priority: 0.5 },
+];
+
+// Collection pages
+const collectionPages = [
+  { path: "/collections/all", changefreq: "daily", priority: 0.9 },
+  { path: "/collections/all?mode=innocent", changefreq: "weekly", priority: 0.7 },
+  { path: "/collections/all?mode=concerned", changefreq: "weekly", priority: 0.7 },
+  { path: "/collections/all?mode=triggered", changefreq: "weekly", priority: 0.7 },
+  { path: "/collections/all?mode=savage", changefreq: "weekly", priority: 0.7 },
+  { path: "/collections/all?mode=nuclear", changefreq: "weekly", priority: 0.7 },
 ];
 
 const PRODUCTS_QUERY = `
@@ -129,7 +138,94 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function generateSitemapXml(products: ShopifyProductEdge[]): string {
+// Generate sitemap index that references all child sitemaps
+function generateSitemapIndex(baseUrl: string): string {
+  const today = formatDate();
+  
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${baseUrl}/sitemap-pages.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-products.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-collections.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+</sitemapindex>`;
+}
+
+// Generate sitemap for static pages
+function generatePagesSitemap(): string {
+  const today = formatDate();
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+
+  for (const page of staticPages) {
+    xml += `  <url>
+    <loc>${SITE_URL}${page.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority.toFixed(1)}</priority>
+  </url>
+`;
+  }
+
+  xml += `</urlset>`;
+  return xml;
+}
+
+// Generate sitemap for products
+function generateProductsSitemap(products: ShopifyProductEdge[]): string {
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+
+  for (const product of products) {
+    const lastmod = formatDate(product.node.updatedAt);
+    xml += `  <url>
+    <loc>${SITE_URL}/product/${escapeXml(product.node.handle)}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+  }
+
+  xml += `</urlset>`;
+  return xml;
+}
+
+// Generate sitemap for collections
+function generateCollectionsSitemap(): string {
+  const today = formatDate();
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+
+  for (const collection of collectionPages) {
+    xml += `  <url>
+    <loc>${SITE_URL}${escapeXml(collection.path)}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${collection.changefreq}</changefreq>
+    <priority>${collection.priority.toFixed(1)}</priority>
+  </url>
+`;
+  }
+
+  xml += `</urlset>`;
+  return xml;
+}
+
+// Legacy: Generate combined sitemap (for backwards compatibility)
+function generateCombinedSitemap(products: ShopifyProductEdge[]): string {
   const today = formatDate();
   
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -147,6 +243,17 @@ function generateSitemapXml(products: ShopifyProductEdge[]): string {
 `;
   }
 
+  // Add collection pages
+  for (const collection of collectionPages) {
+    xml += `  <url>
+    <loc>${SITE_URL}${escapeXml(collection.path)}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${collection.changefreq}</changefreq>
+    <priority>${collection.priority.toFixed(1)}</priority>
+  </url>
+`;
+  }
+
   // Add product pages
   for (const product of products) {
     const lastmod = formatDate(product.node.updatedAt);
@@ -160,7 +267,6 @@ function generateSitemapXml(products: ShopifyProductEdge[]): string {
   }
 
   xml += `</urlset>`;
-  
   return xml;
 }
 
@@ -171,14 +277,44 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("Generating dynamic sitemap...");
+    const url = new URL(req.url);
+    const type = url.searchParams.get("type") || "index";
     
-    // Fetch all products from Shopify
-    const products = await fetchAllProducts();
-    console.log(`Found ${products.length} products`);
+    console.log(`Generating sitemap: ${type}`);
 
-    // Generate sitemap XML
-    const sitemapXml = generateSitemapXml(products);
+    let sitemapXml: string;
+
+    switch (type) {
+      case "index":
+        // Generate sitemap index
+        const functionsUrl = Deno.env.get("SUPABASE_URL") 
+          ? `${Deno.env.get("SUPABASE_URL")}/functions/v1/generate-sitemap`
+          : `${SITE_URL}/functions/v1/generate-sitemap`;
+        sitemapXml = generateSitemapIndex(functionsUrl);
+        break;
+        
+      case "pages":
+        sitemapXml = generatePagesSitemap();
+        break;
+        
+      case "products":
+        const products = await fetchAllProducts();
+        console.log(`Found ${products.length} products`);
+        sitemapXml = generateProductsSitemap(products);
+        break;
+        
+      case "collections":
+        sitemapXml = generateCollectionsSitemap();
+        break;
+        
+      case "combined":
+      default:
+        // Legacy combined sitemap
+        const allProducts = await fetchAllProducts();
+        console.log(`Found ${allProducts.length} products`);
+        sitemapXml = generateCombinedSitemap(allProducts);
+        break;
+    }
 
     return new Response(sitemapXml, {
       headers: {
