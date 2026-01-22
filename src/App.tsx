@@ -30,6 +30,7 @@ import DataRights from "./pages/DataRights";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminAnalytics from "./pages/admin/Analytics";
 import AdminThoughts from "./pages/admin/Thoughts";
 import AdminScenarios from "./pages/admin/Scenarios";
 import AdminTriggers from "./pages/admin/Triggers";
@@ -81,6 +82,7 @@ const App = () => (
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
                 <Route path="/admin/thoughts" element={<ProtectedRoute><AdminThoughts /></ProtectedRoute>} />
                 <Route path="/admin/scenarios" element={<ProtectedRoute><AdminScenarios /></ProtectedRoute>} />
                 <Route path="/admin/triggers" element={<ProtectedRoute><AdminTriggers /></ProtectedRoute>} />

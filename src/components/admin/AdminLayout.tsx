@@ -26,6 +26,7 @@ import {
   Users,
   ExternalLink,
   MessageCircle,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +53,7 @@ const navSections: NavSection[] = [
     title: 'Overview',
     items: [
       { href: '/admin', label: 'Dashboard', icon: Home },
+      { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     ],
   },
   {
