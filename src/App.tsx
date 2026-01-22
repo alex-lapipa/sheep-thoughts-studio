@@ -35,7 +35,7 @@ const DataRights = lazy(() => import("./pages/DataRights"));
 const NewsletterConfirm = lazy(() => import("./pages/NewsletterConfirm"));
 const NewsletterUnsubscribe = lazy(() => import("./pages/NewsletterUnsubscribe"));
 const NewsletterPreferences = lazy(() => import("./pages/NewsletterPreferences"));
-const WhatsNew = lazy(() => import("./pages/WhatsNew"));
+
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
 const OrderTracking = lazy(() => import("./pages/OrderTracking"));
 const DACH = lazy(() => import("./pages/DACH"));
@@ -139,7 +139,7 @@ const App = () => (
                   <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
                   <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
                   <Route path="/newsletter/preferences" element={<NewsletterPreferences />} />
-                  <Route path="/whats-new" element={<WhatsNew />} />
+                  
                   <Route path="/checkout/success" element={<CheckoutSuccess />} />
                   <Route path="/order-tracking" element={<OrderTracking />} />
                   <Route path="/scenarios" element={<Scenarios />} />
