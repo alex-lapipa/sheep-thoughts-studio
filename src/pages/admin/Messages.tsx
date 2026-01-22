@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -22,12 +23,29 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Mail,
   MessageSquare,
@@ -40,6 +58,9 @@ import {
   Inbox,
   Reply,
   Archive,
+  AlertTriangle,
+  ChevronDown,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -73,6 +94,8 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [notes, setNotes] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkActionConfirm, setBulkActionConfirm] = useState<{ action: string; status?: string } | null>(null);
 
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ["contact-messages", statusFilter],
@@ -120,6 +143,32 @@ export default function Messages() {
     },
   });
 
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[]; status: string }) => {
+      const updates: Record<string, unknown> = { status };
+      
+      if (status === "responded") {
+        updates.responded_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from("contact_messages")
+        .update(updates)
+        .in("id", ids);
+
+      if (error) throw error;
+      return ids.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
+      setSelectedIds(new Set());
+      toast.success(`${count} message${count > 1 ? 's' : ''} updated successfully`);
+    },
+    onError: (error) => {
+      toast.error("Failed to update messages", { description: error.message });
+    },
+  });
+
   const handleStatusChange = (id: string, newStatus: string) => {
     updateStatusMutation.mutate({ id, status: newStatus });
   };
@@ -132,6 +181,44 @@ export default function Messages() {
       notes,
     });
     setSelectedMessage({ ...selectedMessage, notes });
+  };
+
+  const handleBulkAction = (action: string, status?: string) => {
+    if (selectedIds.size === 0) {
+      toast.error("No messages selected");
+      return;
+    }
+    setBulkActionConfirm({ action, status });
+  };
+
+  const executeBulkAction = () => {
+    if (!bulkActionConfirm) return;
+    
+    const ids = Array.from(selectedIds);
+    const status = bulkActionConfirm.status || bulkActionConfirm.action;
+    
+    bulkUpdateMutation.mutate({ ids, status });
+    setBulkActionConfirm(null);
+  };
+
+  const toggleSelectAll = () => {
+    if (!filteredMessages) return;
+    
+    if (selectedIds.size === filteredMessages.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredMessages.map(m => m.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
   };
 
   const filteredMessages = messages?.filter((msg) => {
@@ -217,32 +304,82 @@ export default function Messages() {
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* Filters & Bulk Actions */}
         <Card>
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, email, subject..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, email, subject..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="responded">Responded</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                    <SelectItem value="spam">Spam</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="responded">Responded</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                  <SelectItem value="spam">Spam</SelectItem>
-                </SelectContent>
-              </Select>
+
+              {/* Bulk Actions Bar */}
+              {selectedIds.size > 0 && (
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border">
+                  <span className="text-sm font-medium">
+                    {selectedIds.size} selected
+                  </span>
+                  <div className="flex-1" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Bulk Actions
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleBulkAction("archive", "archived")}>
+                        <Archive className="w-4 h-4 mr-2" />
+                        Archive Selected
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleBulkAction("spam", "spam")}>
+                        <AlertTriangle className="w-4 h-4 mr-2" />
+                        Mark as Spam
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleBulkAction("status", "new")}>
+                        <Inbox className="w-4 h-4 mr-2" />
+                        Mark as New
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleBulkAction("status", "in_progress")}>
+                        <Clock className="w-4 h-4 mr-2" />
+                        Mark In Progress
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleBulkAction("status", "responded")}>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Mark as Responded
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedIds(new Set())}
+                  >
+                    Clear Selection
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -265,6 +402,13 @@ export default function Messages() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={filteredMessages?.length ? selectedIds.size === filteredMessages.length : false}
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>From</TableHead>
                     <TableHead>Subject</TableHead>
@@ -276,13 +420,21 @@ export default function Messages() {
                   {filteredMessages?.map((message) => {
                     const status = statusConfig[message.status] || statusConfig.new;
                     const StatusIcon = status.icon;
+                    const isSelected = selectedIds.has(message.id);
                     return (
-                      <TableRow key={message.id}>
+                      <TableRow key={message.id} className={cn(isSelected && "bg-muted/50")}>
                         <TableCell>
                           <Badge variant="outline" className={cn("gap-1", status.color)}>
                             <StatusIcon className="w-3 h-3" />
                             {status.label}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleSelect(message.id)}
+                            aria-label={`Select message from ${message.name}`}
+                          />
                         </TableCell>
                         <TableCell>
                           <div>
@@ -439,6 +591,28 @@ export default function Messages() {
             )}
           </DialogContent>
         </Dialog>
+        {/* Bulk Action Confirmation Dialog */}
+        <AlertDialog open={!!bulkActionConfirm} onOpenChange={() => setBulkActionConfirm(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Bulk Action</AlertDialogTitle>
+              <AlertDialogDescription>
+                {bulkActionConfirm?.status === "spam" 
+                  ? `Are you sure you want to mark ${selectedIds.size} message${selectedIds.size > 1 ? 's' : ''} as spam?`
+                  : bulkActionConfirm?.status === "archived"
+                  ? `Are you sure you want to archive ${selectedIds.size} message${selectedIds.size > 1 ? 's' : ''}?`
+                  : `Are you sure you want to change the status of ${selectedIds.size} message${selectedIds.size > 1 ? 's' : ''} to "${bulkActionConfirm?.status}"?`
+                }
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={executeBulkAction}>
+                Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
