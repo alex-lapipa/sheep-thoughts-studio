@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight } from 'lucide-react';
+import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
 
 interface Stats {
@@ -25,16 +25,49 @@ interface FunnelMetrics {
   purchases: number;
 }
 
+interface PeriodComparison {
+  current: FunnelMetrics;
+  previous: FunnelMetrics;
+  changes: {
+    impressions: number;
+    productViews: number;
+    addToCarts: number;
+    checkouts: number;
+    purchases: number;
+    viewToCartRate: number;
+    cartToCheckoutRate: number;
+    checkoutToPurchaseRate: number;
+  };
+}
+
+function calculatePercentChange(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+}
+
+function ChangeIndicator({ change, suffix = '' }: { change: number; suffix?: string }) {
+  if (Math.abs(change) < 0.1) {
+    return (
+      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Minus className="h-3 w-3" />
+        <span>No change</span>
+      </span>
+    );
+  }
+  
+  const isPositive = change > 0;
+  return (
+    <span className={`flex items-center gap-1 text-xs ${isPositive ? 'text-affirmative' : 'text-destructive'}`}>
+      {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+      <span>{isPositive ? '+' : ''}{change.toFixed(1)}%{suffix}</span>
+    </span>
+  );
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ thoughts: 0, scenarios: 0, triggers: 0, knowledge: 0 });
   const [modeStats, setModeStats] = useState<ModeStats[]>([]);
-  const [funnelMetrics, setFunnelMetrics] = useState<FunnelMetrics>({
-    impressions: 0,
-    productViews: 0,
-    addToCarts: 0,
-    checkouts: 0,
-    purchases: 0,
-  });
+  const [periodComparison, setPeriodComparison] = useState<PeriodComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [funnelLoading, setFunnelLoading] = useState(true);
 
@@ -79,25 +112,69 @@ export default function AdminDashboard() {
 
     async function fetchFunnelMetrics() {
       try {
-        const startDate = startOfDay(subDays(new Date(), 30));
-        const endDate = endOfDay(new Date());
+        const now = new Date();
+        const periodDays = 30;
+        
+        // Current period: last 30 days
+        const currentStart = startOfDay(subDays(now, periodDays));
+        const currentEnd = endOfDay(now);
+        
+        // Previous period: 30 days before that
+        const previousStart = startOfDay(subDays(now, periodDays * 2));
+        const previousEnd = endOfDay(subDays(now, periodDays + 1));
 
-        const { data: events } = await supabase
-          .from('ecommerce_events' as 'share_events')
-          .select('*')
-          .gte('created_at', startDate.toISOString())
-          .lte('created_at', endDate.toISOString());
+        const [currentData, previousData] = await Promise.all([
+          supabase
+            .from('ecommerce_events' as 'share_events')
+            .select('*')
+            .gte('created_at', currentStart.toISOString())
+            .lte('created_at', currentEnd.toISOString()),
+          supabase
+            .from('ecommerce_events' as 'share_events')
+            .select('*')
+            .gte('created_at', previousStart.toISOString())
+            .lte('created_at', previousEnd.toISOString()),
+        ]);
 
-        if (events) {
-          const typedEvents = events as unknown as Array<{ event_type: string }>;
-          setFunnelMetrics({
+        const processEvents = (events: unknown[] | null): FunnelMetrics => {
+          if (!events) return { impressions: 0, productViews: 0, addToCarts: 0, checkouts: 0, purchases: 0 };
+          const typedEvents = events as Array<{ event_type: string }>;
+          return {
             impressions: typedEvents.filter(e => e.event_type === 'product_impression').length,
             productViews: typedEvents.filter(e => e.event_type === 'view_product').length,
             addToCarts: typedEvents.filter(e => e.event_type === 'add_to_cart').length,
             checkouts: typedEvents.filter(e => e.event_type === 'begin_checkout').length,
             purchases: typedEvents.filter(e => e.event_type === 'purchase_complete').length,
-          });
-        }
+          };
+        };
+
+        const current = processEvents(currentData.data);
+        const previous = processEvents(previousData.data);
+
+        // Calculate rate changes
+        const currentViewToCart = current.productViews > 0 ? (current.addToCarts / current.productViews) * 100 : 0;
+        const previousViewToCart = previous.productViews > 0 ? (previous.addToCarts / previous.productViews) * 100 : 0;
+        
+        const currentCartToCheckout = current.addToCarts > 0 ? (current.checkouts / current.addToCarts) * 100 : 0;
+        const previousCartToCheckout = previous.addToCarts > 0 ? (previous.checkouts / previous.addToCarts) * 100 : 0;
+        
+        const currentCheckoutToPurchase = current.checkouts > 0 ? (current.purchases / current.checkouts) * 100 : 0;
+        const previousCheckoutToPurchase = previous.checkouts > 0 ? (previous.purchases / previous.checkouts) * 100 : 0;
+
+        setPeriodComparison({
+          current,
+          previous,
+          changes: {
+            impressions: calculatePercentChange(current.impressions, previous.impressions),
+            productViews: calculatePercentChange(current.productViews, previous.productViews),
+            addToCarts: calculatePercentChange(current.addToCarts, previous.addToCarts),
+            checkouts: calculatePercentChange(current.checkouts, previous.checkouts),
+            purchases: calculatePercentChange(current.purchases, previous.purchases),
+            viewToCartRate: currentViewToCart - previousViewToCart,
+            cartToCheckoutRate: currentCartToCheckout - previousCartToCheckout,
+            checkoutToPurchaseRate: currentCheckoutToPurchase - previousCheckoutToPurchase,
+          },
+        });
       } catch (error) {
         console.error('Error fetching funnel metrics:', error);
       } finally {
@@ -125,6 +202,9 @@ export default function AdminDashboard() {
     nuclear: 'Nuclear',
   };
 
+  const funnelMetrics = periodComparison?.current || { impressions: 0, productViews: 0, addToCarts: 0, checkouts: 0, purchases: 0 };
+  const changes = periodComparison?.changes;
+
   // Calculate conversion rates
   const viewToCartRate = funnelMetrics.productViews > 0 
     ? (funnelMetrics.addToCarts / funnelMetrics.productViews) * 100 
@@ -145,6 +225,7 @@ export default function AdminDashboard() {
       value: funnelMetrics.impressions, 
       icon: Eye,
       color: 'bg-muted-foreground',
+      change: changes?.impressions,
     },
     { 
       label: 'Product Views', 
@@ -152,6 +233,7 @@ export default function AdminDashboard() {
       icon: MousePointerClick,
       color: 'bg-primary',
       rate: funnelMetrics.impressions > 0 ? (funnelMetrics.productViews / funnelMetrics.impressions) * 100 : 0,
+      change: changes?.productViews,
     },
     { 
       label: 'Add to Cart', 
@@ -159,6 +241,7 @@ export default function AdminDashboard() {
       icon: ShoppingCart,
       color: 'bg-accent',
       rate: viewToCartRate,
+      change: changes?.addToCarts,
     },
     { 
       label: 'Checkout', 
@@ -166,6 +249,7 @@ export default function AdminDashboard() {
       icon: CreditCard,
       color: 'bg-affirmative',
       rate: cartToCheckoutRate,
+      change: changes?.checkouts,
     },
   ];
 
@@ -263,10 +347,8 @@ export default function AdminDashboard() {
                               </span>
                             </div>
                           </div>
-                          {step.rate !== undefined && (
-                            <p className="text-xs text-muted-foreground">
-                              {step.rate.toFixed(1)}% from previous
-                            </p>
+                          {step.change !== undefined && (
+                            <ChangeIndicator change={step.change} suffix=" vs prev" />
                           )}
                         </div>
                         {index < funnelSteps.length - 1 && (
@@ -279,17 +361,20 @@ export default function AdminDashboard() {
 
                 {/* Conversion Rate Summary */}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                  <div className="text-center">
+                  <div className="text-center space-y-1">
                     <p className="text-2xl font-bold text-primary">{viewToCartRate.toFixed(1)}%</p>
                     <p className="text-xs text-muted-foreground">View → Cart</p>
+                    {changes && <div className="flex justify-center"><ChangeIndicator change={changes.viewToCartRate} suffix=" pts" /></div>}
                   </div>
-                  <div className="text-center">
+                  <div className="text-center space-y-1">
                     <p className="text-2xl font-bold text-accent">{cartToCheckoutRate.toFixed(1)}%</p>
                     <p className="text-xs text-muted-foreground">Cart → Checkout</p>
+                    {changes && <div className="flex justify-center"><ChangeIndicator change={changes.cartToCheckoutRate} suffix=" pts" /></div>}
                   </div>
-                  <div className="text-center">
+                  <div className="text-center space-y-1">
                     <p className="text-2xl font-bold text-affirmative">{checkoutToPurchaseRate.toFixed(1)}%</p>
                     <p className="text-xs text-muted-foreground">Checkout → Purchase</p>
+                    {changes && <div className="flex justify-center"><ChangeIndicator change={changes.checkoutToPurchaseRate} suffix=" pts" /></div>}
                   </div>
                 </div>
               </div>
