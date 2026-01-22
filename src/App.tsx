@@ -34,6 +34,7 @@ import AdminThoughts from "./pages/admin/Thoughts";
 import AdminScenarios from "./pages/admin/Scenarios";
 import AdminTriggers from "./pages/admin/Triggers";
 import AdminKnowledge from "./pages/admin/Knowledge";
+import AdminRAGContent from "./pages/admin/RAGContent";
 import AdminGenerate from "./pages/admin/Generate";
 import BrandOverview from "./pages/admin/brand/BrandOverview";
 import BrandColors from "./pages/admin/brand/BrandColors";
@@ -84,6 +85,7 @@ const App = () => (
                 <Route path="/admin/scenarios" element={<ProtectedRoute><AdminScenarios /></ProtectedRoute>} />
                 <Route path="/admin/triggers" element={<ProtectedRoute><AdminTriggers /></ProtectedRoute>} />
                 <Route path="/admin/knowledge" element={<ProtectedRoute><AdminKnowledge /></ProtectedRoute>} />
+                <Route path="/admin/rag-content" element={<ProtectedRoute><AdminRAGContent /></ProtectedRoute>} />
                 <Route path="/admin/generate" element={<ProtectedRoute><AdminGenerate /></ProtectedRoute>} />
                 
                 {/* Brand Book Routes */}
