@@ -4,10 +4,10 @@ import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
 const FIRST_VOTE_KEY = "bubbles-first-vote-celebrated";
+const MILESTONE_THRESHOLDS = [10, 50, 100] as const;
 
 // Fire celebratory confetti for first vote
 const fireFirstVoteConfetti = () => {
-  // Center burst
   confetti({
     particleCount: 100,
     spread: 70,
@@ -15,7 +15,6 @@ const fireFirstVoteConfetti = () => {
     colors: ['#4ade80', '#60a5fa', '#f472b6', '#facc15', '#a78bfa'],
   });
   
-  // Left cannon
   setTimeout(() => {
     confetti({
       particleCount: 50,
@@ -26,7 +25,6 @@ const fireFirstVoteConfetti = () => {
     });
   }, 150);
   
-  // Right cannon
   setTimeout(() => {
     confetti({
       particleCount: 50,
@@ -36,6 +34,73 @@ const fireFirstVoteConfetti = () => {
       colors: ['#4ade80', '#60a5fa', '#f472b6', '#facc15'],
     });
   }, 300);
+};
+
+// Fire epic milestone confetti with escalating intensity
+const fireMilestoneConfetti = (milestone: number) => {
+  const intensity = milestone === 100 ? 3 : milestone === 50 ? 2 : 1;
+  const colors = milestone === 100 
+    ? ['#fbbf24', '#f59e0b', '#d97706', '#ffffff', '#fef3c7'] // Gold nuclear
+    : milestone === 50 
+    ? ['#f472b6', '#ec4899', '#db2777', '#a78bfa', '#8b5cf6'] // Pink savage
+    : ['#4ade80', '#22c55e', '#16a34a', '#60a5fa', '#3b82f6']; // Green/blue triggered
+
+  // Initial burst
+  confetti({
+    particleCount: 50 * intensity,
+    spread: 100,
+    origin: { y: 0.5, x: 0.5 },
+    colors,
+    startVelocity: 45,
+    gravity: 0.8,
+  });
+
+  // Side cannons
+  for (let i = 0; i < intensity; i++) {
+    setTimeout(() => {
+      confetti({
+        particleCount: 30,
+        angle: 60,
+        spread: 60,
+        origin: { x: 0, y: 0.6 },
+        colors,
+        startVelocity: 40,
+      });
+      confetti({
+        particleCount: 30,
+        angle: 120,
+        spread: 60,
+        origin: { x: 1, y: 0.6 },
+        colors,
+        startVelocity: 40,
+      });
+    }, 200 * (i + 1));
+  }
+
+  // Stars/sparkles for 100 milestone
+  if (milestone === 100) {
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 180,
+        origin: { y: 0.4 },
+        colors: ['#fbbf24', '#ffffff'],
+        shapes: ['star'],
+        scalar: 1.5,
+        gravity: 0.5,
+      });
+    }, 400);
+  }
+};
+
+// Check if vote crosses a milestone threshold
+const checkMilestone = (oldCount: number, newCount: number): number | null => {
+  for (const threshold of MILESTONE_THRESHOLDS) {
+    if (oldCount < threshold && newCount >= threshold) {
+      return threshold;
+    }
+  }
+  return null;
 };
 
 // Generate a simple browser fingerprint for anonymous voting
@@ -156,14 +221,25 @@ export function useVoting(submissionIds: string[]) {
 
           if (error) throw error;
           
-          // Check if this is their first vote ever
-          const hasVotedBefore = localStorage.getItem(FIRST_VOTE_KEY);
-          if (!hasVotedBefore) {
-            localStorage.setItem(FIRST_VOTE_KEY, "true");
-            fireFirstVoteConfetti();
-            toast.success("🎉 Your first vote! Welcome to the flock!");
+          const oldCount = currentState?.count || 0;
+          const newCount = oldCount + 1;
+          
+          // Check for milestone celebrations
+          const milestone = checkMilestone(oldCount, newCount);
+          if (milestone) {
+            fireMilestoneConfetti(milestone);
+            const milestoneEmoji = milestone === 100 ? '☢️' : milestone === 50 ? '💅' : '🔥';
+            toast.success(`${milestoneEmoji} ${milestone} votes! This meltdown is legendary!`);
           } else {
-            toast.success("Vote added! 🐑");
+            // Check if this is their first vote ever
+            const hasVotedBefore = localStorage.getItem(FIRST_VOTE_KEY);
+            if (!hasVotedBefore) {
+              localStorage.setItem(FIRST_VOTE_KEY, "true");
+              fireFirstVoteConfetti();
+              toast.success("🎉 Your first vote! Welcome to the flock!");
+            } else {
+              toast.success("Vote added! 🐑");
+            }
           }
         }
       } catch (error: any) {
