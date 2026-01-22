@@ -5,10 +5,12 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
 import { ModeBadge } from "@/components/ModeBadge";
 import { BubbleMode } from "@/data/thoughtBubbles";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Collections = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeMode = searchParams.get('mode') as BubbleMode | null;
+  const { t } = useLanguage();
   
   const query = activeMode ? `tag:${activeMode}` : undefined;
   const { data: products, isLoading } = useProducts(query, 40);
@@ -44,10 +46,10 @@ const Collections = () => {
       <div className="container py-12">
         <div className="mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            All Products
+            {t("collectionsPage.title")}
           </h1>
           <p className="text-muted-foreground text-lg mb-8">
-            Browse our full collection of Bubbles merch
+            {t("collectionsPage.subtitle")}
           </p>
 
           {/* Mode Filters */}
@@ -68,7 +70,7 @@ const Collections = () => {
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground underline"
               >
-                Clear filter
+                {t("collectionsPage.clearFilter")}
               </button>
             )}
           </div>

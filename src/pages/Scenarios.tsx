@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -19,12 +20,12 @@ interface Scenario {
   tags: string[] | null;
 }
 
-const MODE_CONFIG: Record<BubblesMode, { label: string; hue: number; saturation: number; lightness: number }> = {
-  innocent: { label: "Innocent", hue: 45, saturation: 75, lightness: 65 },
-  concerned: { label: "Concerned", hue: 205, saturation: 45, lightness: 48 },
-  triggered: { label: "Triggered", hue: 25, saturation: 100, lightness: 55 },
-  savage: { label: "Savage", hue: 335, saturation: 100, lightness: 62 },
-  nuclear: { label: "Nuclear", hue: 50, saturation: 100, lightness: 50 },
+const MODE_CONFIG: Record<BubblesMode, { label: string; labelEs: string; hue: number; saturation: number; lightness: number }> = {
+  innocent: { label: "Innocent", labelEs: "Inocente", hue: 45, saturation: 75, lightness: 65 },
+  concerned: { label: "Concerned", labelEs: "Preocupado", hue: 205, saturation: 45, lightness: 48 },
+  triggered: { label: "Triggered", labelEs: "Activado", hue: 25, saturation: 100, lightness: 55 },
+  savage: { label: "Savage", labelEs: "Salvaje", hue: 335, saturation: 100, lightness: 62 },
+  nuclear: { label: "Nuclear", labelEs: "Nuclear", hue: 50, saturation: 100, lightness: 50 },
 };
 
 export default function Scenarios() {
@@ -32,6 +33,7 @@ export default function Scenarios() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     async function fetchScenarios() {
@@ -68,6 +70,11 @@ export default function Scenarios() {
     };
   };
 
+  const getModeLabel = (mode: BubblesMode) => {
+    const config = MODE_CONFIG[mode];
+    return language === 'es' ? config.labelEs : config.label;
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -87,31 +94,28 @@ export default function Scenarios() {
         <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              Escalation Journeys
+              {t("scenariosPage.hero.title")}
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Watch Bubbles process information from innocent curiosity to nuclear certainty.
-              Each scenario demonstrates the Inversion Principle™ in action.
+              {t("scenariosPage.hero.subtitle")}
             </p>
             <ThoughtBubble mode="concerned" size="sm">
               <p className="text-sm">
-                <strong>Research Note:</strong> These escalation patterns have been extensively documented 
-                by the Bubbles Institute of Applied Misunderstanding™.
+                <strong>{t("scenariosPage.research.note")}</strong> {t("scenariosPage.research.text")}
               </p>
             </ThoughtBubble>
           </div>
         </div>
       </section>
 
-      {/* Interactive Player Section */}
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
-              Interactive Experience
+              {t("scenariosPage.interactive.title")}
             </h2>
             <p className="text-muted-foreground">
-              Select a scenario and watch the escalation unfold. Use the controls to navigate through each beat.
+              {t("scenariosPage.interactive.subtitle")}
             </p>
           </div>
           <ScenarioPlayer />
@@ -122,7 +126,7 @@ export default function Scenarios() {
       <section className="py-8 border-y border-border bg-muted/30">
         <div className="container">
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="text-sm text-muted-foreground font-display">Filter by topic:</span>
+            <span className="text-sm text-muted-foreground font-display">{t("scenariosPage.filter.label")}</span>
             <button
               onClick={() => setSelectedCategory(null)}
               className={cn(
@@ -132,7 +136,7 @@ export default function Scenarios() {
                   : "bg-muted hover:bg-muted/80"
               )}
             >
-              All Scenarios
+              {t("scenariosPage.filter.all")}
             </button>
             {categories.map((category) => (
               <button
@@ -176,7 +180,7 @@ export default function Scenarios() {
             </div>
           ) : filteredScenarios.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No scenarios found in this category.</p>
+              <p className="text-muted-foreground">{t("scenariosPage.noScenarios")}</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -217,14 +221,14 @@ export default function Scenarios() {
                         className="px-2 py-1 rounded text-xs font-medium"
                         style={getModeStyle(scenario.start_mode)}
                       >
-                        {MODE_CONFIG[scenario.start_mode].label}
+                        {getModeLabel(scenario.start_mode)}
                       </span>
                       <span className="text-muted-foreground">→</span>
                       <span 
                         className="px-2 py-1 rounded text-xs font-medium"
                         style={getModeStyle(scenario.end_mode)}
                       >
-                        {MODE_CONFIG[scenario.end_mode].label}
+                        {getModeLabel(scenario.end_mode)}
                       </span>
                     </div>
 
@@ -241,7 +245,7 @@ export default function Scenarios() {
                         ))}
                         {scenario.tags.length > 4 && (
                           <span className="text-xs text-muted-foreground">
-                            +{scenario.tags.length - 4} more
+                            +{scenario.tags.length - 4} {t("common.more")}
                           </span>
                         )}
                       </div>
@@ -259,7 +263,7 @@ export default function Scenarios() {
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
-              The Escalation Framework
+              {t("scenariosPage.framework.title")}
             </h2>
             
             <div className="grid gap-4">
@@ -278,13 +282,9 @@ export default function Scenarios() {
                     {index + 1}
                   </div>
                   <div>
-                    <h3 className="font-display font-bold">{config.label}</h3>
+                    <h3 className="font-display font-bold">{language === 'es' ? config.labelEs : config.label}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {mode === "innocent" && "Genuine curiosity. Everything is interesting and probably fine."}
-                      {mode === "concerned" && "Something doesn't add up. Time to gather more evidence."}
-                      {mode === "triggered" && "The evidence is clear. Others just aren't seeing it."}
-                      {mode === "savage" && "Patience exhausted. Time to share some hard truths."}
-                      {mode === "nuclear" && "MAXIMUM CERTAINTY. THE TRUTH MUST BE HEARD."}
+                      {t(`scenariosPage.mode.${mode}`)}
                     </p>
                   </div>
                 </div>
@@ -298,16 +298,16 @@ export default function Scenarios() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-background to-secondary/30">
         <div className="container text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            Wear Your Escalation Level
+            {t("scenariosPage.cta.title")}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            From innocent meadow vibes to nuclear urban chaos — find merchandise that matches your current mood.
+            {t("scenariosPage.cta.subtitle")}
           </p>
           <a 
             href="/collections/all" 
             className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
           >
-            Browse the Collection
+            {t("scenariosPage.cta.button")}
           </a>
         </div>
       </section>

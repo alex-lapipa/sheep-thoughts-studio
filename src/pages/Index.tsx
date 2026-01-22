@@ -170,7 +170,7 @@ export default function Index() {
                 <Link to="/scenarios">
                   <Button size="lg" variant="ghost" className="font-display hover:scale-105 transition-all group">
                     <Sparkles className="mr-2 h-4 w-4 group-hover:animate-confused-spin" />
-                    Watch Escalations
+                    {t("common.watchEscalations")}
                   </Button>
                 </Link>
               </div>
@@ -225,10 +225,10 @@ export default function Index() {
         <div className="container">
           <div className="text-center mb-8">
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
-              Inside My Head
+              {t("index.insideHead")}
             </h2>
             <p className="text-muted-foreground">
-              A rotating selection of my most important thoughts. All verified.
+              {t("index.insideHeadSubtitle")}
             </p>
           </div>
           <ThoughtCarousel />
@@ -272,10 +272,10 @@ export default function Index() {
         <div className="container relative z-10">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              Bubbles Says
+              {t("index.bubblesSays")}
             </h2>
             <p className="text-muted-foreground">
-              Wisdom from the fields of Wicklow. All facts independently verified by me.
+              {t("index.bubblesSaysSubtitle")}
             </p>
           </div>
           

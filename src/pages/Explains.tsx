@@ -199,7 +199,7 @@ const TOPIC_ICONS: Record<string, React.ElementType> = {
 };
 
 const Explains = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [openId, setOpenId] = useState<string | null>(null);
   const [challengedItems, setChallengedItems] = useState<Set<string>>(new Set());
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -247,11 +247,10 @@ const Explains = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-              Bubbles Explains
+              {t("explainsPage.hero.title")}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Deep dives into topics I understand completely. Each explanation has been 
-              rigorously researched by standing in fields and overhearing things.
+              {t("explainsPage.hero.subtitle")}
             </p>
           </div>
 
@@ -262,7 +261,7 @@ const Explains = () => {
               className="cursor-pointer hover:bg-primary/90 transition-colors"
               onClick={() => setSelectedTopic(null)}
             >
-              All Topics
+              {t("explainsPage.allTopics")}
             </Badge>
             {topics.map(topic => {
               const Icon = TOPIC_ICONS[topic] || Lightbulb;
@@ -274,7 +273,7 @@ const Explains = () => {
                   onClick={() => setSelectedTopic(topic)}
                 >
                   <Icon className="h-3 w-3" />
-                  {topic}
+                  {t(`explainsPage.topics.${topic}`) || topic}
                 </Badge>
               );
             })}
@@ -353,7 +352,7 @@ const Explains = () => {
 
                         {/* Sources */}
                         <div className="text-xs text-muted-foreground">
-                          <span className="font-medium">Sources: </span>
+                          <span className="font-medium">{t("explainsPage.sources")} </span>
                           {item.sources.join(" • ")}
                         </div>
 
@@ -374,7 +373,7 @@ const Explains = () => {
                           >
                             <MessageCircle className="w-4 h-4" />
                             <span className="italic flex-1 text-left">"{item.challenge.objection}"</span>
-                            <span className="text-accent font-medium">Challenge this →</span>
+                            <span className="text-accent font-medium">{t("explainsPage.challenge")}</span>
                           </button>
                         )}
 
@@ -392,7 +391,7 @@ const Explains = () => {
                               <p className="text-sm leading-relaxed">{item.challenge.response}</p>
                             </ThoughtBubble>
                             <p className="text-xs text-mode-triggered text-right italic font-medium">
-                              Confidence level: {item.challenge.escalatedConfidence}
+                              {t("explainsPage.escalatedNote")} {item.challenge.escalatedConfidence}
                             </p>
                           </div>
                         )}
@@ -414,8 +413,9 @@ const Explains = () => {
           {/* Footer Note */}
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground italic">
-              All explanations are backed by extensive field research, 
-              conversations with children, and things I overheard tourists say.
+              {language === 'es' 
+                ? 'Todas las explicaciones están respaldadas por una investigación de campo extensa, conversaciones con niños, y cosas que escuché decir a los turistas.'
+                : 'All explanations are backed by extensive field research, conversations with children, and things I overheard tourists say.'}
             </p>
           </div>
         </div>
