@@ -86,4 +86,14 @@ export const ecommerceTracking = {
       currency,
     });
   },
+
+  productImpression: (productId: string, productTitle: string, price?: number, position?: number) => {
+    recordEcommerceEvent({
+      event_type: 'product_impression',
+      product_id: productId,
+      product_title: productTitle,
+      price,
+      metadata: position !== undefined ? { position } : undefined,
+    });
+  },
 };
