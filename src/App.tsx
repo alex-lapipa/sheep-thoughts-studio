@@ -35,6 +35,7 @@ import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 import DACH from "./pages/DACH";
 import Francophone from "./pages/Francophone";
+import Hispanic from "./pages/Hispanic";
 import Scenarios from "./pages/Scenarios";
 import HallOfFame from "./pages/HallOfFame";
 import AdminLogin from "./pages/admin/Login";
@@ -128,6 +129,11 @@ const App = () => (
                 <Route path="/fr" element={<Francophone />} />
                 <Route path="/be" element={<Francophone />} />
                 <Route path="/lu" element={<Francophone />} />
+                <Route path="/es" element={<Hispanic />} />
+                <Route path="/mx" element={<Hispanic />} />
+                <Route path="/ar" element={<Hispanic />} />
+                <Route path="/co" element={<Hispanic />} />
+                <Route path="/latam" element={<Hispanic />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
