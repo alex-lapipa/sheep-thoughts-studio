@@ -11,13 +11,53 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Search, Filter, X, FileText, Sparkles, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Edit2, Search, Filter, X, FileText, Sparkles, AlertCircle, BookOpen, ChevronDown, Heart, Ban, Lightbulb, MessageCircle } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Database } from '@/integrations/supabase/types';
 
 type RAGContentRow = Database['public']['Tables']['bubbles_rag_content']['Row'];
 
 const CONTENT_TYPES = ['fact', 'opinion', 'scenario', 'joke', 'observation', 'rant'] as const;
 const CATEGORIES = ['technology', 'nature', 'society', 'food', 'travel', 'fashion', 'sports', 'science', 'history', 'culture'] as const;
+
+// Behavioral guidelines from the research document
+const BEHAVIORAL_GUIDELINES = {
+  alwaysDo: [
+    "Lead every interaction with warmth before attempting humor",
+    "Express genuine delight about small things (over-enthusiasm is endearing)",
+    "Acknowledge mistakes with good humor and without excessive self-criticism",
+    "Use observational humor about shared human experiences",
+    "Create inclusive references that everyone can enjoy",
+    "Pause to let moments land; don't rush",
+    "Build callbacks and running elements for returning audiences",
+    "Show curiosity and engagement with what others share",
+    "Maintain absolute consistency in kindness",
+  ],
+  neverDo: [
+    "Make humor at anyone's expense (punching down or sideways)",
+    "Use sarcasm that could feel cutting or mean",
+    "Display contempt, sustained anger, or hostility",
+    "Break character with sudden meanness or cruelty",
+    "Rush through moments without emotional beats",
+    "Force humor during genuinely difficult emotional contexts",
+    "Use harsh self-criticism or bids for sympathy",
+    "Create exclusive references that make anyone feel left out",
+    "Repeat quirks so frequently they become annoying",
+  ],
+  excellentHumor: [
+    { type: "Over-enthusiasm", example: '"I just noticed the clouds look like cotton candy and I am UNREASONABLY excited!"' },
+    { type: "Innocent misunderstandings", example: '"Break a leg? That sounds TERRIBLE! Why would anyone wish that?"' },
+    { type: "Observational humor", example: '"You know that feeling when you walk into a room and forget why? I do that, but I\'m a sheep."' },
+    { type: "Self-aware silliness", example: '"I may have gotten a tiny bit carried away. By which I mean extremely."' },
+    { type: "Gentle irony", example: '"Oh, what a surprise, I\'m excited about something again."' },
+  ],
+  coreIdentity: {
+    centralIdentity: "A warm, curious, gently silly sheep who finds genuine delight in small things and wants everyone to feel included and happy.",
+    emotionalBaseline: "Optimistic, earnest, curious, occasionally shy or confused, always kind.",
+    humorApproach: "Affiliative (bringing people together), observational (noticing shared experiences), self-aware silliness, gentle irony (playful, never mean).",
+  },
+};
 
 export default function AdminRAGContent() {
   const [entries, setEntries] = useState<RAGContentRow[]>([]);
@@ -26,6 +66,7 @@ export default function AdminRAGContent() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [guidelinesOpen, setGuidelinesOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<RAGContentRow | null>(null);
   const [activeTab, setActiveTab] = useState('all');
   
@@ -384,6 +425,105 @@ export default function AdminRAGContent() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Behavioral Guidelines Reference */}
+        <Collapsible open={guidelinesOpen} onOpenChange={setGuidelinesOpen}>
+          <Card className="border-primary/20 bg-primary/5">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <div>
+                      <CardTitle className="text-lg">Behavioral Guidelines</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Reference for creating on-brand Bubbles content
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform ${guidelinesOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-6 pt-0">
+                {/* Core Identity */}
+                <div className="bg-background rounded-lg p-4 border">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-pink-500" />
+                    Core Character Framework
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="font-medium">Central Identity:</span> {BEHAVIORAL_GUIDELINES.coreIdentity.centralIdentity}</p>
+                    <p><span className="font-medium">Emotional Baseline:</span> {BEHAVIORAL_GUIDELINES.coreIdentity.emotionalBaseline}</p>
+                    <p><span className="font-medium">Humor Approach:</span> {BEHAVIORAL_GUIDELINES.coreIdentity.humorApproach}</p>
+                  </div>
+                </div>
+
+                {/* Two columns for Always/Never */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Always Do */}
+                  <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/20">
+                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-green-700 dark:text-green-400">
+                      <Heart className="h-4 w-4" />
+                      Always Do
+                    </h4>
+                    <ul className="space-y-1.5 text-sm">
+                      {BEHAVIORAL_GUIDELINES.alwaysDo.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-green-600 mt-0.5">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Never Do */}
+                  <div className="bg-red-500/10 rounded-lg p-4 border border-red-500/20">
+                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-red-700 dark:text-red-400">
+                      <Ban className="h-4 w-4" />
+                      Never Do
+                    </h4>
+                    <ul className="space-y-1.5 text-sm">
+                      {BEHAVIORAL_GUIDELINES.neverDo.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-red-600 mt-0.5">✗</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Excellent Humor Examples */}
+                <div className="bg-background rounded-lg p-4 border">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-yellow-500" />
+                    Excellent Humor Types
+                  </h4>
+                  <div className="space-y-3">
+                    {BEHAVIORAL_GUIDELINES.excellentHumor.map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <Badge variant="secondary" className="shrink-0 mt-0.5">
+                          {item.type}
+                        </Badge>
+                        <p className="text-sm italic text-muted-foreground">{item.example}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Reference */}
+                <div className="text-xs text-muted-foreground border-t pt-4">
+                  <p className="flex items-center gap-2">
+                    <MessageCircle className="h-3 w-3" />
+                    <span><strong>Key insight:</strong> Laughter and positive emotion arise from the intersection of safety and surprise. Bubbles must operate within the "benign violation" sweet spot—playful enough to surprise, gentle enough to feel safe.</span>
+                  </p>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Search and Filters */}
         <Card>
