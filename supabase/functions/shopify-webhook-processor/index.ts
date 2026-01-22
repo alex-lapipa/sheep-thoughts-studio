@@ -17,6 +17,17 @@ const SITEMAP_TRIGGER_TOPICS = [
   "collections/delete",
 ];
 
+// Topics that should trigger order status emails
+const ORDER_STATUS_TOPICS = [
+  "orders/create",
+  "orders/paid",
+  "orders/fulfilled",
+  "orders/partially_fulfilled",
+  "orders/cancelled",
+  "fulfillments/create",
+  "fulfillments/update",
+];
+
 interface WebhookPayload {
   action?: "retry";
   eventId?: string;
@@ -24,6 +35,26 @@ interface WebhookPayload {
   payload?: Record<string, unknown>;
   id?: string | number;
   title?: string;
+  // Order-specific fields
+  name?: string;
+  email?: string;
+  customer?: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  line_items?: Array<{
+    title: string;
+    quantity: number;
+    price: string;
+  }>;
+  fulfillment_status?: string | null;
+  fulfillments?: Array<{
+    status: string;
+    tracking_number?: string;
+    tracking_url?: string;
+    tracking_company?: string;
+  }>;
 }
 
 interface WebhookRecord {
@@ -186,6 +217,37 @@ async function processWebhook(
       actions.push(`Audit logged: ${topic} for collection ${collectionTitle || collectionId}`);
     }
 
+    // Handle order status changes and send emails
+    if (ORDER_STATUS_TOPICS.includes(topic)) {
+      const emailResult = await sendOrderStatusEmail(supabaseUrl, topic, payload);
+      if (emailResult.success) {
+        actions.push(`Order status email sent: ${emailResult.status} to ${emailResult.email}`);
+      } else if (emailResult.skipped) {
+        actions.push(`Order status email skipped: ${emailResult.reason}`);
+      } else {
+        actions.push(`Order status email failed: ${emailResult.error}`);
+      }
+
+      // Log order event for audit trail
+      const orderId = payload.id as string | number | undefined;
+      const orderName = payload.name as string | undefined;
+      
+      await supabase.from("audit_logs").insert({
+        entity_type: "shopify_order",
+        entity_id: String(orderId),
+        action: topic,
+        after_data: { 
+          orderName, 
+          topic,
+          fulfillmentStatus: payload.fulfillment_status,
+          emailSent: emailResult.success,
+        },
+        metadata: { source: "shopify_webhook" },
+      });
+      
+      actions.push(`Audit logged: ${topic} for order ${orderName || orderId}`);
+    }
+
     return { success: true, actions };
 
   } catch (error) {
@@ -215,6 +277,124 @@ async function pingSitemap(supabaseUrl: string): Promise<{
   } catch (error) {
     console.error("Failed to ping sitemap:", error);
     return { success: false, summary: { total: 0, successful: 0 } };
+  }
+}
+
+interface OrderStatusEmailResult {
+  success: boolean;
+  skipped?: boolean;
+  email?: string;
+  status?: string;
+  reason?: string;
+  error?: string;
+}
+
+async function sendOrderStatusEmail(
+  supabaseUrl: string,
+  topic: string,
+  payload: Record<string, unknown>
+): Promise<OrderStatusEmailResult> {
+  try {
+    // Extract customer email
+    const customer = payload.customer as { email?: string; first_name?: string; last_name?: string } | undefined;
+    const email = (payload.email as string) || customer?.email;
+    
+    if (!email) {
+      return { success: false, skipped: true, reason: "No customer email found" };
+    }
+
+    // Determine email status based on topic and payload
+    let status: string;
+    let trackingNumber: string | undefined;
+    let trackingUrl: string | undefined;
+    let carrier: string | undefined;
+
+    const fulfillments = payload.fulfillments as Array<{
+      status: string;
+      tracking_number?: string;
+      tracking_url?: string;
+      tracking_company?: string;
+    }> | undefined;
+
+    const latestFulfillment = fulfillments?.[fulfillments.length - 1];
+
+    switch (topic) {
+      case "orders/create":
+        status = "confirmed";
+        break;
+      case "orders/paid":
+        status = "confirmed";
+        break;
+      case "orders/fulfilled":
+      case "fulfillments/create":
+      case "fulfillments/update":
+        status = "shipped";
+        if (latestFulfillment) {
+          trackingNumber = latestFulfillment.tracking_number;
+          trackingUrl = latestFulfillment.tracking_url;
+          carrier = latestFulfillment.tracking_company;
+        }
+        break;
+      case "orders/partially_fulfilled":
+        status = "processing";
+        break;
+      case "orders/cancelled":
+        status = "cancelled";
+        break;
+      default:
+        return { success: false, skipped: true, reason: `Unhandled topic: ${topic}` };
+    }
+
+    // Extract line items for the email
+    const lineItems = (payload.line_items as Array<{
+      title: string;
+      quantity: number;
+      price: string;
+    }> | undefined)?.map(item => ({
+      title: item.title,
+      quantity: item.quantity,
+      price: `$${parseFloat(item.price).toFixed(2)}`,
+    }));
+
+    const customerName = customer?.first_name 
+      ? `${customer.first_name}${customer.last_name ? ` ${customer.last_name}` : ''}`
+      : "Valued Customer";
+
+    // Call the order status email function
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-order-status-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        orderName: payload.name || `#${payload.order_number || payload.id}`,
+        orderId: String(payload.id),
+        customerName,
+        status,
+        trackingNumber,
+        trackingUrl,
+        carrier,
+        lineItems,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      console.error("Failed to send order status email:", result);
+      return { success: false, error: result.error || "Email send failed" };
+    }
+
+    console.log(`Order status email sent: ${status} to ${email}`);
+    return { success: true, email, status };
+
+  } catch (error) {
+    console.error("Error sending order status email:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    };
   }
 }
 
