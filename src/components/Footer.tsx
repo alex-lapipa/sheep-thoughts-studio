@@ -128,6 +128,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/faq" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">FAQ</Link></li>
               <li><Link to="/shipping" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Shipping & Returns</Link></li>
+              <li><Link to="/order-tracking" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Track Your Order</Link></li>
               <li><Link to="/contact" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Contact Us</Link></li>
               <li><Link to="/privacy" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Privacy Policy</Link></li>
               <li><Link to="/privacy#your-rights" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Data Deletion</Link></li>
