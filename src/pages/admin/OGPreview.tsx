@@ -22,6 +22,7 @@ import {
 import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { SocialPreviewTester } from '@/components/SocialPreviewTester';
+import { PlatformPreviewComparison } from '@/components/admin/PlatformPreviewComparison';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -388,6 +389,13 @@ export default function OGPreview() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Platform Comparison */}
+            <PlatformPreviewComparison
+              imageUrl={productImageUrl}
+              title={productTitle}
+              loading={productLoading}
+            />
           </TabsContent>
 
           <TabsContent value="badge" className="space-y-6">
@@ -510,6 +518,13 @@ export default function OGPreview() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Platform Comparison */}
+            <PlatformPreviewComparison
+              imageUrl={badgeImageUrl}
+              title={`${badgeName}'s Achievements`}
+              loading={badgeLoading}
+            />
           </TabsContent>
 
           <TabsContent value="cache" className="space-y-6">
