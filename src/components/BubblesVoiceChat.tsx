@@ -187,43 +187,79 @@ export const BubblesVoiceChat = () => {
     }
   }, [isListening]);
 
-  const speak = useCallback((text: string) => {
-    if (!voiceEnabled || !("speechSynthesis" in window)) return;
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+  const speak = useCallback(async (text: string) => {
+    if (!voiceEnabled) return;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    synthRef.current = utterance;
+    // Stop any currently playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
 
-    // Try to find an Irish or British English voice
-    const voices = window.speechSynthesis.getVoices();
-    const irishVoice = voices.find(v => 
-      v.lang.includes("en-IE") || 
-      v.name.toLowerCase().includes("irish") ||
-      v.name.toLowerCase().includes("moira")
-    );
-    const britishVoice = voices.find(v => 
-      v.lang.includes("en-GB") && 
-      v.name.toLowerCase().includes("male")
-    );
-    const maleVoice = voices.find(v => 
-      v.lang.startsWith("en") && 
-      (v.name.toLowerCase().includes("male") || v.name.toLowerCase().includes("daniel"))
-    );
+    setIsSpeaking(true);
 
-    utterance.voice = irishVoice || britishVoice || maleVoice || voices[0];
-    utterance.rate = speechRate;
-    utterance.pitch = speechPitch;
+    try {
+      // Call ElevenLabs TTS edge function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ 
+            text, 
+            rate: speechRate 
+          }),
+        }
+      );
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      if (!response.ok) {
+        throw new Error(`TTS request failed: ${response.status}`);
+      }
 
-    window.speechSynthesis.speak(utterance);
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error("ElevenLabs TTS error:", error);
+      setIsSpeaking(false);
+      // Fallback to browser TTS if ElevenLabs fails
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = speechRate;
+        utterance.pitch = speechPitch;
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
   }, [voiceEnabled, speechRate, speechPitch]);
 
   const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
   }, []);
