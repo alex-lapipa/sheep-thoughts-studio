@@ -85,7 +85,7 @@ const ExceptionsPage = lazy(() => import("./pages/admin/orders/Exceptions"));
 const ProductsPage = lazy(() => import("./pages/admin/catalog/Products"));
 const PricingRulesPage = lazy(() => import("./pages/admin/catalog/PricingRules"));
 const DropsPage = lazy(() => import("./pages/admin/catalog/Drops"));
-
+const AdminWhatsNew = lazy(() => import("./pages/admin/WhatsNewAdmin"));
 // Minimal loading fallback
 function PageLoader() {
   return (
@@ -211,6 +211,7 @@ const App = () => (
                   <Route path="/admin/cron-jobs" element={<ProtectedRoute><AdminCronJobs /></ProtectedRoute>} />
                   <Route path="/admin/audit" element={<ProtectedRoute><AdminAuditLog /></ProtectedRoute>} />
                   <Route path="/admin/rag-search" element={<ProtectedRoute><AdminRAGSearch /></ProtectedRoute>} />
+                  <Route path="/admin/whats-new" element={<ProtectedRoute><AdminWhatsNew /></ProtectedRoute>} />
                   
                     <Route path="*" element={<NotFound />} />
                   </Routes>

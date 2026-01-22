@@ -45,6 +45,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   Shield,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -155,6 +156,7 @@ const navSections: NavSection[] = [
       { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
       { href: '/admin/cron-jobs', label: 'Scheduled Tasks', icon: Timer },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
+      { href: '/admin/whats-new', label: "What's New", icon: Bell },
     ],
   },
 ];
