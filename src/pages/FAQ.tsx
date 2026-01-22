@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { AnimatedOnView } from "@/components/AnimatedText";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -629,9 +630,10 @@ const FAQ = () => {
 
       {/* Daily Bubbles Wisdom */}
       <section id="daily-wisdom" className="mb-6 p-6 bg-gradient-to-br from-primary/20 to-secondary/30 rounded-2xl border border-primary/30 scroll-mt-24">
-            <div className="flex flex-col items-center text-center">
-              <Calendar className="w-8 h-8 text-primary mb-3" />
-              <h3 className="font-display font-bold text-xl mb-1">Today's Wisdom</h3>
+        <AnimatedOnView>
+          <div className="flex flex-col items-center text-center">
+            <Calendar className="w-8 h-8 text-primary mb-3" />
+            <h3 className="font-display font-bold text-xl mb-1">Today's Wisdom</h3>
               <p className="text-xs text-muted-foreground mb-2">
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
               </p>
@@ -783,15 +785,17 @@ const FAQ = () => {
                     </>
                   )}
                 </Button>
-              </div>
             </div>
+          </div>
+        </AnimatedOnView>
       </section>
 
       {/* Random Bubbles Wisdom */}
       <section id="random-wisdom" className="mb-10 p-6 bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl border border-accent/30 scroll-mt-24">
-            <div className="flex flex-col items-center text-center">
-              <Sparkles className="w-8 h-8 text-accent mb-3" />
-              <h3 className="font-display font-bold text-xl mb-2">Random Bubbles Wisdom</h3>
+        <AnimatedOnView>
+          <div className="flex flex-col items-center text-center">
+            <Sparkles className="w-8 h-8 text-accent mb-3" />
+            <h3 className="font-display font-bold text-xl mb-2">Random Bubbles Wisdom</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Let fate decide which truth you need to hear today
               </p>
@@ -836,14 +840,16 @@ const FAQ = () => {
                   </Button>
                 </div>
               )}
-            </div>
+          </div>
+        </AnimatedOnView>
       </section>
 
       {/* Ask Bubbles Anything */}
       <section id="ask-bubbles" className="mb-10 p-6 bg-gradient-to-br from-primary/20 to-accent/10 rounded-2xl border border-primary/30 scroll-mt-24">
-            <div className="flex flex-col items-center text-center">
-              <MessageCircleQuestion className="w-8 h-8 text-primary mb-3" />
-              <h3 className="font-display font-bold text-xl mb-2">Ask Bubbles Anything</h3>
+        <AnimatedOnView>
+          <div className="flex flex-col items-center text-center">
+            <MessageCircleQuestion className="w-8 h-8 text-primary mb-3" />
+            <h3 className="font-display font-bold text-xl mb-2">Ask Bubbles Anything</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Submit your burning question and receive wisdom of dubious accuracy
               </p>
@@ -936,7 +942,8 @@ const FAQ = () => {
                   </div>
                 </div>
               )}
-            </div>
+          </div>
+        </AnimatedOnView>
       </section>
 
       {/* Question History */}
@@ -1495,14 +1502,18 @@ const FAQ = () => {
 
       {/* FAQ List */}
       <section id="faq-list" className="scroll-mt-24">
-        <h2 className="text-2xl font-display font-bold mb-6">Frequently Asked Questions</h2>
+        <AnimatedOnView>
+          <h2 className="text-2xl font-display font-bold mb-6">Frequently Asked Questions</h2>
+        </AnimatedOnView>
         
         {/* About Bubbles */}
         <div id="faq-about-bubbles" className="scroll-mt-24 mb-8">
-          <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary" />
-            About Bubbles
-          </h3>
+          <AnimatedOnView>
+            <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              About Bubbles
+            </h3>
+          </AnimatedOnView>
           <Accordion type="single" collapsible className="w-full">
             {faqs.slice(0, 5).map((faq, index) => (
               <AccordionItem key={index} value={`about-${index}`}>

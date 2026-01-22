@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { HallOfFameSubmission } from "@/components/HallOfFameSubmission";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { AnimatedOnView } from "@/components/AnimatedText";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useVoting } from "@/hooks/useVoting";
 import { motion, AnimatePresence } from "framer-motion";
@@ -429,11 +430,12 @@ export default function HallOfFame() {
 
       <div className="container py-12 max-w-5xl">
         {/* Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center justify-between gap-4 mb-8 p-4 rounded-xl bg-card border"
-        >
+        <AnimatedOnView>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap items-center justify-between gap-4 mb-8 p-4 rounded-xl bg-card border"
+          >
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-mode-nuclear/10 flex items-center justify-center">
@@ -460,14 +462,16 @@ export default function HallOfFame() {
             <HallOfFameSubmission />
           </div>
         </motion.div>
+        </AnimatedOnView>
 
         {/* Discretion Notice */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8 p-4 rounded-xl bg-muted/30 border flex items-start gap-3"
-        >
+        <AnimatedOnView>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="mb-8 p-4 rounded-xl bg-muted/30 border flex items-start gap-3"
+          >
           <AlertCircle className="h-5 w-5 text-mode-nuclear shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-sm">Viewer Discretion Advised</p>
@@ -477,6 +481,7 @@ export default function HallOfFame() {
             </p>
           </div>
         </motion.div>
+        </AnimatedOnView>
 
         {/* Category Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
@@ -522,15 +527,16 @@ export default function HallOfFame() {
         </div>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-16 text-center py-12 px-6 rounded-2xl bg-gradient-to-br from-mode-nuclear/5 to-mode-savage/5 border"
-        >
-          <h2 className="text-2xl font-display font-bold mb-3">
-            Think you can trigger a legendary meltdown?
-          </h2>
+        <AnimatedOnView>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-16 text-center py-12 px-6 rounded-2xl bg-gradient-to-br from-mode-nuclear/5 to-mode-savage/5 border"
+          >
+            <h2 className="text-2xl font-display font-bold mb-3">
+              Think you can trigger a legendary meltdown?
+            </h2>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
             Challenge Bubbles with your trickiest questions and watch the confident wrongness unfold.
           </p>
@@ -540,6 +546,7 @@ export default function HallOfFame() {
             </Link>
           </Button>
         </motion.div>
+        </AnimatedOnView>
       </div>
     </Layout>
   );
