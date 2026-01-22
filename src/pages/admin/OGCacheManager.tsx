@@ -19,6 +19,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -41,6 +50,8 @@ import {
   History,
   Sparkles,
   Calendar,
+  Globe,
+  Languages,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -90,6 +101,28 @@ interface CacheStats {
   hourlyStats: Array<{ hour: string; hits: number; misses: number }>;
 }
 
+// Available OG pages for bulk regeneration
+const OG_PAGES = [
+  { key: 'home', name: 'Home', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'about', name: 'About', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'facts', name: 'Facts', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'faq', name: 'FAQ', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'explains', name: 'Explains', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'achievements', name: 'Achievements', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'collections', name: 'Collections', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'contact', name: 'Contact', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'privacy', name: 'Privacy', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'shipping', name: 'Shipping', languages: ['en', 'es', 'fr', 'de'] },
+  { key: 'dach', name: 'DACH', languages: ['de', 'at', 'ch'] },
+];
+
+interface BulkRegenerateResult {
+  page: string;
+  language: string;
+  success: boolean;
+  error?: string;
+}
+
 export default function OGCacheManager() {
   const [images, setImages] = useState<CachedImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,6 +134,12 @@ export default function OGCacheManager() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsPeriod, setStatsPeriod] = useState('7d');
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Bulk regeneration state
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [selectedPage, setSelectedPage] = useState<string>('');
+  const [regenerating, setRegenerating] = useState(false);
+  const [regenerateResults, setRegenerateResults] = useState<BulkRegenerateResult[]>([]);
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 
@@ -222,6 +261,39 @@ export default function OGCacheManager() {
     }
   };
 
+  const bulkRegenerate = async (pageKey: string) => {
+    setRegenerating(true);
+    setRegenerateResults([]);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('og-bulk-regenerate', {
+        body: { page: pageKey, deleteExisting: true },
+      });
+
+      if (error) throw error;
+
+      if (data.results) {
+        setRegenerateResults(data.results);
+        const successCount = data.results.filter((r: BulkRegenerateResult) => r.success).length;
+        const failCount = data.results.filter((r: BulkRegenerateResult) => !r.success).length;
+        
+        if (failCount === 0) {
+          toast.success(`Regenerated ${successCount} language variants for ${pageKey}`);
+        } else {
+          toast.warning(`Regenerated ${successCount}/${data.results.length} variants (${failCount} failed)`);
+        }
+        
+        // Refresh the image list
+        fetchImages();
+      }
+    } catch (error) {
+      console.error('Bulk regeneration error:', error);
+      toast.error('Failed to regenerate images');
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
   const toggleSelectAll = () => {
     const newSelectAll = !selectAll;
     setSelectAll(newSelectAll);
@@ -286,6 +358,113 @@ export default function OGCacheManager() {
             </p>
           </div>
           <div className="flex gap-2">
+            {/* Bulk Regenerate Dialog */}
+            <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Languages className="h-4 w-4 mr-2" />
+                  Bulk Regenerate
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5 text-accent" />
+                    Bulk Regenerate Language Variants
+                  </DialogTitle>
+                  <DialogDescription>
+                    Select a page to regenerate all language variants at once. This will delete existing cached images and generate fresh ones.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Select Page</label>
+                    <Select value={selectedPage} onValueChange={setSelectedPage}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a page..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {OG_PAGES.map((page) => (
+                          <SelectItem key={page.key} value={page.key}>
+                            <div className="flex items-center gap-2">
+                              <span>{page.name}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {page.languages.length} langs
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {selectedPage && (
+                    <div className="p-3 bg-muted/50 rounded-lg">
+                      <p className="text-sm font-medium mb-2">Languages to regenerate:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {OG_PAGES.find(p => p.key === selectedPage)?.languages.map((lang) => (
+                          <Badge key={lang} variant="secondary" className="uppercase">
+                            {lang}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {regenerateResults.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Results:</p>
+                      <div className="max-h-40 overflow-y-auto space-y-1">
+                        {regenerateResults.map((result, idx) => (
+                          <div 
+                            key={idx} 
+                            className={`flex items-center justify-between p-2 rounded text-sm ${
+                              result.success ? 'bg-green-500/10' : 'bg-red-500/10'
+                            }`}
+                          >
+                            <span className="uppercase font-mono">{result.language}</span>
+                            <Badge variant={result.success ? 'default' : 'destructive'}>
+                              {result.success ? '✓ Success' : `✗ ${result.error}`}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <DialogFooter>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setBulkDialogOpen(false);
+                      setSelectedPage('');
+                      setRegenerateResults([]);
+                    }}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => bulkRegenerate(selectedPage)}
+                    disabled={!selectedPage || regenerating}
+                  >
+                    {regenerating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Regenerating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Regenerate All Variants
+                      </>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Button variant="outline" onClick={fetchImages} disabled={loading}>
               {loading ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
