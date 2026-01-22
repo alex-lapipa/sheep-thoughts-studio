@@ -1,0 +1,8 @@
+# Redirect sitemap.xml to dynamic edge function for live Shopify products
+/sitemap.xml https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=combined 200
+
+# Redirect individual sitemap files
+/sitemap-pages.xml https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=pages 200
+/sitemap-products.xml https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=products 200
+/sitemap-collections.xml https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=collections 200
+/sitemap-index.xml https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=index 200
