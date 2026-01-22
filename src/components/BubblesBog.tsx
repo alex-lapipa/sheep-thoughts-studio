@@ -586,9 +586,9 @@ function HalfUprightSheep({
   );
 }
 
-// Leaning posture - weight shifted, observational stance
+// Leaning posture - weight shifted to one side, observational stance
 // "Casually leaning as if waiting for something to be wrong about"
-function LeaningSheep({ 
+function LeaningSheep({
   expr, 
   accessory, 
   weathered 
