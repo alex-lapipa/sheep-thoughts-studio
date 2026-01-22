@@ -50,6 +50,7 @@ import BrandProduction from "./pages/admin/brand/BrandProduction";
 import BrandFrontend from "./pages/admin/brand/BrandFrontend";
 import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
+import AdminPreAuthorizedUsers from "./pages/admin/PreAuthorizedUsers";
 import AdminMessages from "./pages/admin/Messages";
 import AdminSpamQueue from "./pages/admin/SpamQueue";
 import AdminSubscribers from "./pages/admin/Subscribers";
@@ -129,6 +130,7 @@ const App = () => (
                 
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
+                <Route path="/admin/pre-authorized" element={<ProtectedRoute requireSuperAdmin><AdminPreAuthorizedUsers /></ProtectedRoute>} />
                 <Route path="/admin/sitemap" element={<ProtectedRoute><AdminSitemap /></ProtectedRoute>} />
                 <Route path="/admin/og-preview" element={<ProtectedRoute><AdminOGPreview /></ProtectedRoute>} />
                 <Route path="/admin/og-cache" element={<ProtectedRoute><AdminOGCacheManager /></ProtectedRoute>} />
