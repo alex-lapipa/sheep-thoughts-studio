@@ -5,28 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { HallOfFameSubmission } from "@/components/HallOfFameSubmission";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useVoting } from "@/hooks/useVoting";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
-  Skull, 
-  Flame, 
-  Trophy, 
-  Zap, 
-  Quote, 
-  Sparkles, 
-  AlertTriangle,
-  Star,
   Crown,
-  Bomb,
   ThumbsUp,
-  Share2,
   MessageCircle,
-  Loader2
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Flame,
+  Star,
+  Quote,
+  AlertCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -130,12 +126,12 @@ const HALL_OF_FAME_ENTRIES = [
   }
 ];
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Economics: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-  Personal: "bg-pink-500/10 text-pink-600 border-pink-500/30",
-  Technology: "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  Science: "bg-purple-500/10 text-purple-600 border-purple-500/30",
-  Culture: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+const CATEGORY_STYLES: Record<string, string> = {
+  Economics: "bg-accent/10 text-accent border-accent/30",
+  Personal: "bg-mode-savage/10 text-mode-savage border-mode-savage/30",
+  Technology: "bg-primary/10 text-primary border-primary/30",
+  Science: "bg-mode-triggered/10 text-mode-triggered border-mode-triggered/30",
+  Culture: "bg-bubbles-gorse/10 text-bubbles-gorse border-bubbles-gorse/30",
 };
 
 interface MeltdownCardProps {
@@ -150,7 +146,6 @@ interface MeltdownCardProps {
 function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading }: MeltdownCardProps) {
   const [expanded, setExpanded] = useState(false);
   
-  // Use database vote count if available, otherwise fall back to static
   const displayVotes = voteCount > 0 ? voteCount : entry.votes;
 
   return (
@@ -158,40 +153,43 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: rank * 0.1 }}
+      transition={{ delay: rank * 0.08 }}
     >
       <Card className={cn(
-        "overflow-hidden transition-all duration-300 border-2",
-        expanded ? "border-mode-nuclear/50 shadow-lg shadow-mode-nuclear/10" : "border-border hover:border-mode-nuclear/30",
-        entry.featured && "ring-2 ring-bubbles-gorse/30"
+        "overflow-hidden transition-all duration-300 border-2 hover:shadow-lg",
+        expanded ? "border-mode-nuclear/40 shadow-xl" : "border-border hover:border-mode-nuclear/20",
+        entry.featured && "ring-1 ring-bubbles-gorse/20"
       )}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               {/* Rank Badge */}
               <div className={cn(
-                "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg",
-                rank === 1 ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white" :
-                rank === 2 ? "bg-gradient-to-br from-gray-300 to-gray-400 text-white" :
-                rank === 3 ? "bg-gradient-to-br from-amber-600 to-amber-700 text-white" :
-                "bg-mode-nuclear/20 text-mode-nuclear"
+                "flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-lg shadow-sm",
+                rank === 1 ? "bg-gradient-to-br from-bubbles-gorse to-bubbles-gorse/80 text-peat-earth" :
+                rank === 2 ? "bg-gradient-to-br from-muted to-muted-foreground/20 text-foreground" :
+                rank === 3 ? "bg-gradient-to-br from-mode-triggered/80 to-mode-triggered/60 text-white" :
+                "bg-muted text-muted-foreground"
               )}>
                 {rank <= 3 ? (
                   <Crown className="h-5 w-5" />
                 ) : (
-                  rank
+                  <span className="text-base">{rank}</span>
                 )}
               </div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
                   {entry.title}
                   {entry.featured && (
-                    <Star className="h-4 w-4 text-bubbles-gorse fill-bubbles-gorse" />
+                    <Badge variant="secondary" className="text-xs bg-bubbles-gorse/10 text-bubbles-gorse border-bubbles-gorse/30">
+                      <Star className="h-3 w-3 mr-1 fill-current" />
+                      Featured
+                    </Badge>
                   )}
                 </CardTitle>
                 <Badge 
                   variant="outline" 
-                  className={cn("mt-1 text-xs", CATEGORY_COLORS[entry.category])}
+                  className={cn("mt-1.5 text-xs", CATEGORY_STYLES[entry.category])}
                 >
                   {entry.category}
                 </Badge>
@@ -205,7 +203,7 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
               onClick={onVote}
               disabled={votingLoading}
               className={cn(
-                "flex items-center gap-2 transition-all",
+                "flex items-center gap-2 transition-all rounded-full px-4",
                 hasVoted 
                   ? "text-bubbles-gorse bg-bubbles-gorse/10 hover:bg-bubbles-gorse/20" 
                   : "text-muted-foreground hover:text-bubbles-gorse hover:bg-bubbles-gorse/10"
@@ -216,45 +214,47 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
               ) : (
                 <ThumbsUp className={cn("h-4 w-4", hasVoted && "fill-current")} />
               )}
-              <span className="font-medium">{displayVotes.toLocaleString()}</span>
+              <span className="font-semibold">{displayVotes.toLocaleString()}</span>
             </Button>
           </div>
         </CardHeader>
         
         <CardContent className="space-y-4">
           {/* Question */}
-          <div className="flex items-start gap-2">
-            <MessageCircle className="h-4 w-4 text-muted-foreground mt-1 shrink-0" />
-            <p className="text-sm text-muted-foreground">
-              <span className="font-medium">Asked:</span> "{entry.question}"
-            </p>
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+            <MessageCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">The Question</p>
+              <p className="text-sm font-medium">"{entry.question}"</p>
+            </div>
           </div>
 
           {/* Challenge that triggered nuclear */}
-          <div className="flex items-start gap-2 pl-4 border-l-2 border-mode-triggered/40">
-            <Zap className="h-4 w-4 text-mode-triggered mt-0.5 shrink-0" />
-            <p className="text-sm text-mode-triggered/80">
-              <span className="font-medium">The challenge that broke Bubbles:</span> "{entry.challenge}"
-            </p>
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-mode-triggered/5 border-l-4 border-mode-triggered/40">
+            <Quote className="h-4 w-4 text-mode-triggered mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs text-mode-triggered/70 uppercase tracking-wide mb-1">The Challenge That Broke Bubbles</p>
+              <p className="text-sm text-foreground/80 italic">"{entry.challenge}"</p>
+            </div>
           </div>
 
-          {/* Nuclear Response Preview/Full */}
+          {/* Nuclear Response */}
           <motion.div 
             layout
-            className="bg-gradient-to-br from-mode-nuclear/10 to-mode-nuclear/5 rounded-xl p-4 border-2 border-mode-nuclear/30"
+            className="bg-gradient-to-br from-mode-nuclear/8 to-mode-nuclear/3 rounded-xl p-5 border border-mode-nuclear/20"
           >
             {/* Nuclear Mode Header */}
             <div className="flex items-center gap-2 mb-3">
-              <Skull className="h-5 w-5 text-mode-nuclear" />
-              <span className="text-sm font-bold text-mode-nuclear uppercase tracking-wide">
-                ☢️ Nuclear Meltdown
+              <Flame className="h-5 w-5 text-mode-nuclear" />
+              <span className="text-sm font-bold text-mode-nuclear uppercase tracking-wider">
+                The Meltdown
               </span>
             </div>
 
             {/* Inner Thought */}
             {entry.innerThought && (
-              <p className="text-xs italic text-mode-nuclear/70 mb-3">
-                [thinking: {entry.innerThought}]
+              <p className="text-xs italic text-mode-nuclear/60 mb-3 pl-3 border-l-2 border-mode-nuclear/30">
+                [internal monologue: {entry.innerThought}]
               </p>
             )}
 
@@ -267,7 +267,7 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <ThoughtBubble size="md" className="bg-mode-nuclear/10 border-mode-nuclear/30">
+                  <ThoughtBubble size="md" className="bg-mode-nuclear/5 border-mode-nuclear/20">
                     <p className="leading-relaxed text-sm">{entry.nuclearResponse}</p>
                   </ThoughtBubble>
                 </motion.div>
@@ -278,7 +278,7 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <p className="text-sm text-foreground/80 line-clamp-3">
+                  <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed">
                     {entry.nuclearResponse}
                   </p>
                 </motion.div>
@@ -289,16 +289,26 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
               variant="ghost"
               size="sm"
               onClick={() => setExpanded(!expanded)}
-              className="mt-3 text-mode-nuclear hover:text-mode-nuclear hover:bg-mode-nuclear/10"
+              className="mt-4 text-mode-nuclear hover:text-mode-nuclear hover:bg-mode-nuclear/10 gap-2"
             >
-              {expanded ? "Collapse the chaos" : "Read the full meltdown"}
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4" />
+                  Collapse
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4" />
+                  Read full meltdown
+                </>
+              )}
             </Button>
           </motion.div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 pt-2">
             {entry.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+              <Badge key={tag} variant="secondary" className="text-xs bg-secondary/50">
                 #{tag}
               </Badge>
             ))}
@@ -313,7 +323,6 @@ export default function HallOfFame() {
   const { ogImageUrl, siteUrl } = useOgImage("og-hall-of-fame.jpg");
   const [activeTab, setActiveTab] = useState("all");
   
-  // Get all entry IDs for voting
   const entryIds = useMemo(() => HALL_OF_FAME_ENTRIES.map(e => e.id), []);
   const { votes, loading: votingLoading, toggleVote, getVoteCount, hasVoted } = useVoting(entryIds);
 
@@ -323,112 +332,111 @@ export default function HallOfFame() {
     ? HALL_OF_FAME_ENTRIES.filter(e => e.featured)
     : HALL_OF_FAME_ENTRIES.filter(e => e.category === activeTab);
 
-  // Sort by vote count (DB votes or static fallback)
   const sortedEntries = [...filteredEntries].sort((a, b) => {
     const aVotes = getVoteCount(a.id) || a.votes;
     const bVotes = getVoteCount(b.id) || b.votes;
     return bVotes - aVotes;
   });
 
-  // Calculate total votes from DB or fallback
   const totalVotes = HALL_OF_FAME_ENTRIES.reduce((sum, e) => {
     const dbVotes = getVoteCount(e.id);
     return sum + (dbVotes > 0 ? dbVotes : e.votes);
   }, 0);
 
+  const categories = Object.keys(CATEGORY_STYLES);
+
   return (
     <Layout>
       <Helmet>
-        <title>Hall of Fame | Nuclear Meltdowns | Bubbles the Sheep</title>
-        <meta name="description" content="Witness the most spectacular nuclear meltdowns from Bubbles the Sheep. When challenged with facts, chaos ensues. These are the legendary breakdowns that made history." />
+        <title>Hall of Fame | Legendary Meltdowns | Bubbles the Sheep</title>
+        <meta name="description" content="Witness the most spectacular meltdowns from Bubbles the Sheep. When challenged with facts, chaos ensues. These are the legendary breakdowns that made history." />
         <link rel="canonical" href={`${siteUrl}/hall-of-fame`} />
-        <meta property="og:title" content="Hall of Fame | Nuclear Meltdowns" />
-        <meta property="og:description" content="The most dramatic nuclear meltdowns from Bubbles. When challenged with facts, chaos ensues." />
+        <meta property="og:title" content="Hall of Fame | Legendary Meltdowns" />
+        <meta property="og:description" content="The most dramatic meltdowns from Bubbles. When challenged with facts, chaos ensues." />
         <meta property="og:image" content={ogImageUrl} />
         <meta property="og:url" content={`${siteUrl}/hall-of-fame`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={ogImageUrl} />
       </Helmet>
 
+      {/* Large Hero Banner */}
+      <PageHeroWithBubbles
+        title="Hall of Fame"
+        subtitle="Where legends are made and facts go to die. These are the most spectacular meltdowns in Bubbles history."
+        posture="random"
+        accessory="random"
+      />
+
       <div className="container py-12 max-w-5xl">
-        {/* Hero Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="flex flex-wrap items-center justify-between gap-4 mb-8 p-4 rounded-xl bg-card border"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Bomb className="h-10 w-10 text-mode-nuclear animate-pulse" />
-            <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-mode-nuclear via-mode-savage to-mode-nuclear bg-clip-text text-transparent">
-              Hall of Fame
-            </h1>
-            <Trophy className="h-10 w-10 text-bubbles-gorse" />
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-mode-nuclear/10 flex items-center justify-center">
+                <Flame className="h-5 w-5 text-mode-nuclear" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-mode-nuclear">{HALL_OF_FAME_ENTRIES.length}</p>
+                <p className="text-xs text-muted-foreground">Legendary Meltdowns</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-bubbles-gorse/10 flex items-center justify-center">
+                <ThumbsUp className="h-5 w-5 text-bubbles-gorse" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-bubbles-gorse">{totalVotes.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Total Votes</p>
+              </div>
+            </div>
           </div>
           
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-            Where legends are made and facts go to die. These are the most spectacular 
-            <span className="text-mode-nuclear font-semibold"> nuclear meltdowns </span> 
-            in Bubbles history.
-          </p>
-
-          {/* Stats */}
-          <div className="flex flex-wrap items-center justify-center gap-8 text-sm mb-8">
-            <div className="flex items-center gap-2">
-              <Skull className="h-5 w-5 text-mode-nuclear" />
-              <span className="font-bold text-mode-nuclear">{HALL_OF_FAME_ENTRIES.length}</span>
-              <span className="text-muted-foreground">Legendary Meltdowns</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ThumbsUp className="h-5 w-5 text-bubbles-gorse" />
-              <span className="font-bold text-bubbles-gorse">
-                {totalVotes.toLocaleString()}
-              </span>
-              <span className="text-muted-foreground">Total Votes</span>
-            </div>
-          </div>
-
-          {/* Submit Button */}
           <HallOfFameSubmission />
         </motion.div>
 
-        {/* Warning Banner */}
+        {/* Discretion Notice */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8 p-4 rounded-xl bg-gradient-to-r from-mode-nuclear/10 via-mode-savage/10 to-mode-nuclear/10 border border-mode-nuclear/30"
+          transition={{ delay: 0.1 }}
+          className="mb-8 p-4 rounded-xl bg-muted/30 border flex items-start gap-3"
         >
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-6 w-6 text-mode-nuclear shrink-0" />
-            <div>
-              <p className="font-semibold text-mode-nuclear">⚠️ Viewer Discretion Advised</p>
-              <p className="text-sm text-muted-foreground">
-                These meltdowns contain extreme levels of wrongness, unshakeable confidence, 
-                and may cause involuntary laughter. Bubbles is always wrong—but never uncertain.
-              </p>
-            </div>
+          <AlertCircle className="h-5 w-5 text-mode-nuclear shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-sm">Viewer Discretion Advised</p>
+            <p className="text-sm text-muted-foreground">
+              These meltdowns contain extreme levels of wrongness and unshakeable confidence. 
+              Bubbles is always wrong—but never uncertain.
+            </p>
           </div>
         </motion.div>
 
         {/* Category Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0">
+          <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0 justify-start">
             <TabsTrigger 
               value="all" 
-              className="data-[state=active]:bg-mode-nuclear data-[state=active]:text-white"
+              className="data-[state=active]:bg-foreground data-[state=active]:text-background rounded-full"
             >
-              <Flame className="h-4 w-4 mr-1.5" />
               All Meltdowns
             </TabsTrigger>
             <TabsTrigger 
               value="featured"
-              className="data-[state=active]:bg-bubbles-gorse data-[state=active]:text-white"
+              className="data-[state=active]:bg-bubbles-gorse data-[state=active]:text-peat-earth rounded-full"
             >
-              <Star className="h-4 w-4 mr-1.5" />
+              <Star className="h-3.5 w-3.5 mr-1.5" />
               Featured
             </TabsTrigger>
-            {Object.keys(CATEGORY_COLORS).map((cat) => (
-              <TabsTrigger key={cat} value={cat}>
+            {categories.map((cat) => (
+              <TabsTrigger 
+                key={cat} 
+                value={cat}
+                className="rounded-full"
+              >
                 {cat}
               </TabsTrigger>
             ))}
@@ -454,15 +462,17 @@ export default function HallOfFame() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 text-center space-y-4"
+          transition={{ delay: 0.4 }}
+          className="mt-16 text-center py-12 px-6 rounded-2xl bg-gradient-to-br from-mode-nuclear/5 to-mode-savage/5 border"
         >
-          <p className="text-lg text-muted-foreground">
+          <h2 className="text-2xl font-display font-bold mb-3">
             Think you can trigger a legendary meltdown?
+          </h2>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Challenge Bubbles with your trickiest questions and watch the confident wrongness unfold.
           </p>
-          <Button asChild size="lg" className="bg-mode-nuclear hover:bg-mode-nuclear/90">
+          <Button asChild size="lg" className="bg-mode-nuclear hover:bg-mode-nuclear/90 text-white">
             <Link to="/explains">
-              <Zap className="h-5 w-5 mr-2" />
               Challenge Bubbles Now
             </Link>
           </Button>
