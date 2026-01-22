@@ -35,6 +35,7 @@ import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 import DACH from "./pages/DACH";
 import Scenarios from "./pages/Scenarios";
+import HallOfFame from "./pages/HallOfFame";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -118,6 +119,7 @@ const App = () => (
                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
                 <Route path="/order-tracking" element={<OrderTracking />} />
                 <Route path="/scenarios" element={<Scenarios />} />
+                <Route path="/hall-of-fame" element={<HallOfFame />} />
                 <Route path="/dach" element={<DACH />} />
                 <Route path="/de" element={<DACH />} />
                 <Route path="/at" element={<DACH />} />
