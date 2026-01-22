@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -19,7 +20,11 @@ import {
   CreditCard,
   ArrowRight,
   Package,
-  RefreshCw
+  RefreshCw,
+  Users,
+  Clock,
+  DollarSign,
+  Activity
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -35,15 +40,32 @@ interface DailyStats {
   count: number;
 }
 
-// Simulated ecommerce metrics (in production, these would come from GA4 or a dedicated analytics table)
+// Ecommerce metrics from internal tracking
 interface EcommerceMetrics {
   productViews: number;
   addToCarts: number;
   cartOpens: number;
   checkoutStarts: number;
-  // Calculated rates
   addToCartRate: number;
   checkoutRate: number;
+}
+
+// GA4 metrics from Google Analytics
+interface GA4Metrics {
+  sessions: number;
+  pageViews: number;
+  activeUsers: number;
+  newUsers: number;
+  avgSessionDuration: number;
+  bounceRate: number;
+  ecommercePurchases: number;
+  totalRevenue: number;
+  dailyData: Array<{
+    date: string;
+    sessions: number;
+    pageViews: number;
+    activeUsers: number;
+  }>;
 }
 
 interface ProductPerformance {
@@ -64,6 +86,21 @@ export default function AdminAnalytics() {
   const [totalShares, setTotalShares] = useState(0);
   const [recentShares, setRecentShares] = useState<DailyStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ga4Loading, setGa4Loading] = useState(false);
+  const [ga4Error, setGa4Error] = useState<string | null>(null);
+  
+  // GA4 metrics from Google Analytics
+  const [ga4Metrics, setGa4Metrics] = useState<GA4Metrics>({
+    sessions: 0,
+    pageViews: 0,
+    activeUsers: 0,
+    newUsers: 0,
+    avgSessionDuration: 0,
+    bounceRate: 0,
+    ecommercePurchases: 0,
+    totalRevenue: 0,
+    dailyData: [],
+  });
   
   // Ecommerce metrics state - now fetched from database
   const [ecommerceMetrics, setEcommerceMetrics] = useState<EcommerceMetrics>({
@@ -203,9 +240,64 @@ export default function AdminAnalytics() {
     }
   }, [dateRange]);
 
+  // Fetch GA4 analytics data
+  const fetchGA4Analytics = useCallback(async () => {
+    if (!dateRange?.from) return;
+    
+    setGa4Loading(true);
+    setGa4Error(null);
+    
+    const startDate = format(dateRange.from, 'yyyy-MM-dd');
+    const endDate = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+    
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/ga4-analytics?startDate=${startDate}&endDate=${endDate}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        setGa4Error(result.error || 'Failed to fetch GA4 data');
+        return;
+      }
+      
+      const { rows, totals } = result.data;
+      
+      setGa4Metrics({
+        sessions: Math.round(totals.sessions || 0),
+        pageViews: Math.round(totals.screenPageViews || 0),
+        activeUsers: Math.round(totals.activeUsers || 0),
+        newUsers: Math.round(totals.newUsers || 0),
+        avgSessionDuration: totals.averageSessionDuration || 0,
+        bounceRate: (totals.bounceRate || 0) * 100,
+        ecommercePurchases: Math.round(totals.ecommercePurchases || 0),
+        totalRevenue: totals.totalRevenue || 0,
+        dailyData: rows.map((row: any) => ({
+          date: row.date,
+          sessions: row.sessions || 0,
+          pageViews: row.screenPageViews || 0,
+          activeUsers: row.activeUsers || 0,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching GA4 analytics:', error);
+      setGa4Error(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setGa4Loading(false);
+    }
+  }, [dateRange]);
+
   useEffect(() => {
     fetchAnalytics();
-  }, [fetchAnalytics]);
+    fetchGA4Analytics();
+  }, [fetchAnalytics, fetchGA4Analytics]);
 
   // Quick date range presets
   const setPreset = (days: number) => {
@@ -301,20 +393,150 @@ export default function AdminAnalytics() {
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={fetchAnalytics}
-              disabled={loading}
+              onClick={() => { fetchAnalytics(); fetchGA4Analytics(); }}
+              disabled={loading || ga4Loading}
             >
-              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              <RefreshCw className={cn("h-4 w-4", (loading || ga4Loading) && "animate-spin")} />
             </Button>
           </div>
         </div>
 
-        <Tabs defaultValue="ecommerce" className="space-y-6">
+        <Tabs defaultValue="ga4" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="ga4">
+              Google Analytics
+              {ga4Error && <Badge variant="destructive" className="ml-2 text-xs">Error</Badge>}
+            </TabsTrigger>
             <TabsTrigger value="ecommerce">Ecommerce</TabsTrigger>
             <TabsTrigger value="overview">Engagement</TabsTrigger>
             <TabsTrigger value="shares">Share Events</TabsTrigger>
           </TabsList>
+
+          {/* GA4 Tab */}
+          <TabsContent value="ga4" className="space-y-6">
+            {ga4Error ? (
+              <Card className="border-destructive/50">
+                <CardHeader>
+                  <CardTitle className="text-destructive">GA4 Connection Error</CardTitle>
+                  <CardDescription>{ga4Error}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Check that GA4_PROPERTY_ID and GOOGLE_SERVICE_ACCOUNT_KEY are configured correctly.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* GA4 Summary Cards */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Sessions</CardTitle>
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {ga4Loading ? '...' : ga4Metrics.sessions.toLocaleString()}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Total site visits</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Page Views</CardTitle>
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {ga4Loading ? '...' : ga4Metrics.pageViews.toLocaleString()}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {ga4Metrics.sessions > 0 
+                          ? `${(ga4Metrics.pageViews / ga4Metrics.sessions).toFixed(1)} per session`
+                          : 'No sessions'}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {ga4Loading ? '...' : ga4Metrics.activeUsers.toLocaleString()}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="text-accent">{ga4Metrics.newUsers.toLocaleString()}</span> new users
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Avg. Session</CardTitle>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {ga4Loading ? '...' : `${Math.floor(ga4Metrics.avgSessionDuration / 60)}:${String(Math.floor(ga4Metrics.avgSessionDuration % 60)).padStart(2, '0')}`}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="text-accent">{ga4Metrics.bounceRate.toFixed(1)}%</span> bounce rate
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Revenue & Purchases */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-accent">
+                        {ga4Loading ? '...' : `€${ga4Metrics.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {ga4Metrics.ecommercePurchases} purchases
+                        {ga4Metrics.ecommercePurchases > 0 && 
+                          ` • €${(ga4Metrics.totalRevenue / ga4Metrics.ecommercePurchases).toFixed(2)} avg order`
+                        }
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm font-medium">Daily Sessions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-end gap-1 h-20">
+                        {ga4Metrics.dailyData.slice(-14).map((day) => {
+                          const maxSessions = Math.max(...ga4Metrics.dailyData.map(d => d.sessions), 1);
+                          const height = (day.sessions / maxSessions) * 100;
+                          return (
+                            <div
+                              key={day.date}
+                              className="flex-1 bg-accent/80 rounded-t hover:bg-accent transition-colors"
+                              style={{ height: `${Math.max(height, 4)}%` }}
+                              title={`${day.date}: ${day.sessions} sessions`}
+                            />
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Last 14 days</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+            )}
+          </TabsContent>
 
           {/* Ecommerce Tab */}
           <TabsContent value="ecommerce" className="space-y-6">
