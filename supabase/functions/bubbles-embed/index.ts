@@ -5,71 +5,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate a deterministic pseudo-embedding for semantic similarity
-// This creates consistent vectors from text that can be compared
-function generatePseudoEmbedding(text: string): number[] {
-  const dimensions = 1536;
-  const embedding: number[] = new Array(dimensions);
-  
-  // Normalize and clean text
-  const normalizedText = text.toLowerCase().trim();
-  
-  // Create multiple hash seeds for better distribution
-  let hash1 = 0, hash2 = 0, hash3 = 0;
-  for (let i = 0; i < normalizedText.length; i++) {
-    const char = normalizedText.charCodeAt(i);
-    hash1 = ((hash1 << 5) - hash1) + char;
-    hash2 = ((hash2 << 7) - hash2) + char * (i + 1);
-    hash3 = ((hash3 << 3) - hash3) + char * char;
-    hash1 = hash1 & hash1;
-    hash2 = hash2 & hash2;
-    hash3 = hash3 & hash3;
-  }
-  
-  // Extract word-level features
-  const words = normalizedText.split(/\s+/);
-  const wordHashes: number[] = words.slice(0, 100).map(word => {
-    let h = 0;
-    for (let i = 0; i < word.length; i++) {
-      h = ((h << 5) - h) + word.charCodeAt(i);
-      h = h & h;
-    }
-    return Math.abs(h);
+// Generate embedding using Lovable AI Gateway
+async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      input: [text],
+      model: "text-embedding-3-small",
+    }),
   });
-  
-  // Seeded random number generator
-  let state = Math.abs(hash1 ^ hash2 ^ hash3);
-  const pseudoRandom = () => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff;
-    return (state / 0x7fffffff) * 2 - 1;
-  };
-  
-  // Generate embedding with text-influenced values
-  for (let i = 0; i < dimensions; i++) {
-    let value = pseudoRandom();
-    
-    // Mix in character-level features
-    if (i < normalizedText.length) {
-      const charCode = normalizedText.charCodeAt(i % normalizedText.length);
-      value = (value + (charCode / 127 - 1)) / 2;
-    }
-    
-    // Mix in word-level features
-    if (wordHashes.length > 0) {
-      const wordIdx = i % wordHashes.length;
-      value = (value + ((wordHashes[wordIdx] % 1000) / 500 - 1)) / 2;
-    }
-    
-    embedding[i] = value;
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Embedding API error:", response.status, errorText);
+    throw new Error(`Embedding API error: ${response.status}`);
   }
-  
-  // Normalize to unit vector
-  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-  for (let i = 0; i < dimensions; i++) {
-    embedding[i] = embedding[i] / magnitude;
-  }
-  
-  return embedding;
+
+  const data = await response.json();
+  return data.data[0].embedding;
 }
 
 serve(async (req) => {
@@ -80,17 +37,60 @@ serve(async (req) => {
   try {
     const { text, texts } = await req.json();
     
+    if (!text && (!texts || texts.length === 0)) {
+      return new Response(
+        JSON.stringify({ error: "text or texts is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
     // Handle single text or array of texts
     const inputTexts: string[] = texts || [text];
     
-    // Generate embeddings for each text
-    const embeddings = inputTexts.map((t: string) => generatePseudoEmbedding(t));
+    // Generate embeddings for each text (batching for efficiency)
+    const embeddings: number[][] = [];
+    
+    // Process in batches of 10 to avoid rate limits
+    const batchSize = 10;
+    for (let i = 0; i < inputTexts.length; i += batchSize) {
+      const batch = inputTexts.slice(i, i + batchSize);
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          input: batch,
+          model: "text-embedding-3-small",
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          // Rate limited - wait and retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          i -= batchSize; // Retry this batch
+          continue;
+        }
+        throw new Error(`Embedding API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      embeddings.push(...data.data.map((d: any) => d.embedding));
+    }
 
     return new Response(
       JSON.stringify({ 
         embeddings,
         dimensions: 1536,
-        model: "pseudo-embedding-v2",
+        model: "text-embedding-3-small",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
