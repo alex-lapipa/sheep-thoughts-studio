@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { useProductByHandle } from "@/hooks/useProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -13,6 +14,8 @@ import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "@/components/ModeBadge";
 import { analytics } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -109,8 +112,30 @@ const ProductDetail = () => {
 
   const thoughtBubble = modeTag ? getRandomBubble(modeTag) : getRandomBubble();
 
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const productUrl = `${siteUrl}/product/${handle}`;
+  const ogImageUrl = `${SUPABASE_URL}/functions/v1/og-product-image?title=${encodeURIComponent(product.title)}&price=${encodeURIComponent(price?.amount || '')}&mode=${encodeURIComponent(modeTag || 'innocent')}&type=${encodeURIComponent(product.productType || 'product')}`;
+
   return (
     <Layout>
+      <Helmet>
+        <title>{product.title} | Bubbles Merch</title>
+        <meta name="description" content={product.description || `${product.title} - Confidently wrong fashion from Bubbles the Sheep.`} />
+        <meta property="og:title" content={`${product.title} | Bubbles Merch`} />
+        <meta property="og:description" content={product.description || 'Wear your confusion with pride.'} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={productUrl} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="product:price:amount" content={price?.amount || ''} />
+        <meta property="product:price:currency" content={price?.currencyCode || 'EUR'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product.title} />
+        <meta name="twitter:description" content={product.description || 'Confidently wrong fashion.'} />
+        <meta name="twitter:image" content={ogImageUrl} />
+        <link rel="canonical" href={productUrl} />
+      </Helmet>
       <div className="container py-12">
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Images */}
