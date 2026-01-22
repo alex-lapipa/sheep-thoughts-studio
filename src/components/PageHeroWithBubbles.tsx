@@ -103,7 +103,7 @@ export function PageHeroWithBubbles({
     return Math.floor(Math.random() * 3);
   }, []);
 
-  // Add new thought bubble periodically
+  // Add new thought bubble periodically - slower, one at a time for readability
   useEffect(() => {
     if (thoughts.length === 0) return;
 
@@ -115,40 +115,23 @@ export function PageHeroWithBubbles({
         key: `${randomThought.id}-${Date.now()}`,
       };
 
-      setVisibleThoughts(prev => {
-        // Keep max 3 visible at a time
-        const updated = [...prev, newThought].slice(-3);
-        return updated;
-      });
+      // Only one primary thought at a time for readability
+      setVisibleThoughts([newThought]);
     };
 
-    // Initial thought after short delay
-    const initialTimeout = setTimeout(addThought, 800);
+    // Initial thought after delay
+    const initialTimeout = setTimeout(addThought, 1200);
 
-    // Add new thoughts every 3-5 seconds
+    // Add new thoughts every 6-9 seconds (long enough to read comfortably)
     const interval = setInterval(() => {
       addThought();
-    }, 3000 + Math.random() * 2000);
+    }, 6000 + Math.random() * 3000);
 
     return () => {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
   }, [thoughts, getRandomPosition]);
-
-  // Remove thoughts after they've been shown
-  useEffect(() => {
-    const cleanup = setInterval(() => {
-      setVisibleThoughts(prev => {
-        if (prev.length > 2) {
-          return prev.slice(1);
-        }
-        return prev;
-      });
-    }, 4500);
-
-    return () => clearInterval(cleanup);
-  }, []);
 
   const bubbleSizeClasses = {
     sm: "w-32 h-32 md:w-40 md:h-40",
@@ -186,44 +169,60 @@ export function PageHeroWithBubbles({
               />
             </div>
 
-            {/* Animated thought bubbles */}
-            <AnimatePresence>
+            {/* Animated thought bubbles - organic, cloud-like emergence */}
+            <AnimatePresence mode="wait">
               {visibleThoughts.map((thought) => (
                 <motion.div
                   key={thought.key}
                   className={cn(
-                    "absolute z-20 max-w-[180px] md:max-w-[220px]",
+                    "absolute z-20 max-w-[200px] md:max-w-[260px]",
                     positionStyles[thought.position]
                   )}
-                  initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                  initial={{ opacity: 0, scale: 0.7, y: 15 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: 1, 
+                    y: [0, -4, 0],
+                  }}
+                  exit={{ opacity: 0, scale: 0.85, y: -8 }}
                   transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
+                    opacity: { duration: 0.8, ease: "easeOut" },
+                    scale: { duration: 1, ease: [0.34, 1.56, 0.64, 1] },
+                    y: { 
+                      duration: 4, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    },
                   }}
                 >
-                  <ThoughtBubblePopup text={thought.text} mode={thought.mode} />
+                  <OrganicThoughtBubble text={thought.text} mode={thought.mode} />
                 </motion.div>
               ))}
             </AnimatePresence>
 
-            {/* Connector bubbles (decorative) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-6">
-              <motion.div
-                className="w-3 h-3 rounded-full bg-bubbles-cream border border-bubbles-peat/20"
-                animate={{ y: [0, -4, 0], opacity: [0.6, 1, 0.6] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </div>
-            <div className="absolute -top-2 left-1/2 translate-x-2 -translate-y-4">
-              <motion.div
-                className="w-2 h-2 rounded-full bg-bubbles-cream border border-bubbles-peat/20"
-                animate={{ y: [0, -3, 0], opacity: [0.4, 0.8, 0.4] }}
-                transition={{ duration: 2.5, repeat: Infinity, delay: 0.3 }}
-              />
-            </div>
+            {/* Soft connector bubbles - clustered, not comic-trail */}
+            <AnimatePresence>
+              {visibleThoughts.length > 0 && (
+                <motion.div 
+                  className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  {/* Soft bubble cluster - organic shapes */}
+                  <motion.div
+                    className="relative"
+                    animate={{ y: [0, -2, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <div className="w-4 h-4 rounded-full bg-bubbles-cream/70 border border-bubbles-peat/10 blur-[0.5px]" />
+                    <div className="absolute -top-2 -right-1 w-2.5 h-2.5 rounded-full bg-bubbles-cream/60 border border-bubbles-peat/10 blur-[0.3px]" />
+                    <div className="absolute -top-1 left-1 w-2 h-2 rounded-full bg-bubbles-cream/50 border border-bubbles-peat/10 blur-[0.2px]" />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Hero text */}
@@ -498,103 +497,128 @@ function WicklowWeatherEffects() {
   );
 }
 
-// Individual thought bubble popup with mode-based color escalation
-function ThoughtBubblePopup({ text, mode }: { text: string; mode: BubblesMode }) {
-  // Background and border colors escalate from soft to intense
+/**
+ * ORGANIC THOUGHT BUBBLE
+ * 
+ * Design principles:
+ * - Cloud-like, irregular, organic shapes (not geometric)
+ * - Soft, muted Wicklow-palette colors
+ * - Text readable and calmly presented
+ * - Harmonizes with bog mist atmosphere
+ * - No comic-strip styling or abrupt animations
+ */
+function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode }) {
+  // Muted, atmospheric colors that harmonize with Wicklow landscape
+  // Mode escalation is subtle, not garish
   const modeStyles: Record<BubblesMode, { 
-    bg: string; 
-    border: string; 
-    text: string;
-    shadow: string;
-    animation: string;
+    fill: string;
+    textColor: string;
+    glowOpacity: number;
   }> = {
     innocent: {
-      bg: "bg-[hsl(351_100%_86%/0.95)]", // Soft Blush
-      border: "border-[hsl(351_100%_76%)]",
-      text: "text-[hsl(351_30%_25%)]",
-      shadow: "shadow-lg shadow-pink-200/30",
-      animation: "",
+      fill: "hsl(45 30% 92%)", // Warm cream - bog cotton
+      textColor: "hsl(28 25% 25%)",
+      glowOpacity: 0.15,
     },
     concerned: {
-      bg: "bg-[hsl(214_41%_78%/0.95)]", // Misty Blue  
-      border: "border-[hsl(214_41%_68%)]",
-      text: "text-[hsl(214_30%_20%)]",
-      shadow: "shadow-lg shadow-blue-200/40",
-      animation: "",
+      fill: "hsl(210 25% 88%)", // Misty grey-blue
+      textColor: "hsl(210 20% 22%)",
+      glowOpacity: 0.2,
     },
     triggered: {
-      bg: "bg-[hsl(27_56%_56%/0.95)]", // Bracken Copper
-      border: "border-[hsl(27_56%_40%)]",
-      text: "text-[hsl(27_10%_98%)]",
-      shadow: "shadow-xl shadow-orange-400/50",
-      animation: "animate-pulse",
+      fill: "hsl(35 35% 85%)", // Warm bracken tint
+      textColor: "hsl(28 30% 20%)",
+      glowOpacity: 0.25,
     },
     savage: {
-      bg: "bg-[hsl(330_100%_71%/0.95)]", // Hot Pink
-      border: "border-[hsl(330_100%_55%)]",
-      text: "text-[hsl(330_20%_10%)]",
-      shadow: "shadow-xl shadow-pink-400/60",
-      animation: "animate-pulse",
+      fill: "hsl(330 25% 88%)", // Muted heather
+      textColor: "hsl(330 20% 18%)",
+      glowOpacity: 0.3,
     },
     nuclear: {
-      bg: "bg-[hsl(68_100%_50%/0.95)]", // Acid Yellow
-      border: "border-[hsl(68_100%_40%)]",
-      text: "text-[hsl(68_100%_10%)]",
-      shadow: "shadow-2xl shadow-yellow-400/70 ring-2 ring-yellow-300/50",
-      animation: "animate-bounce",
+      fill: "hsl(50 40% 88%)", // Soft gorse hint
+      textColor: "hsl(45 30% 15%)",
+      glowOpacity: 0.35,
     },
   };
 
   const style = modeStyles[mode];
 
-  // Truncate long thoughts
-  const displayText = text.length > 80 ? text.substring(0, 77) + "..." : text;
+  // Allow longer text for readability - no aggressive truncation
+  const displayText = text.length > 120 ? text.substring(0, 117) + "…" : text;
 
   return (
     <div className="relative">
-      {/* Main thought bubble */}
-      <div
-        className={cn(
-          "relative px-3 py-2 rounded-xl border-2 backdrop-blur-sm transition-all duration-300",
-          style.bg,
-          style.border,
-          style.shadow,
-          style.animation
-        )}
-      >
-        <p className={cn(
-          "text-xs md:text-sm font-display leading-snug font-medium",
-          style.text
-        )}>
-          "{displayText}"
-        </p>
+      {/* Atmospheric glow - like fog around the thought */}
+      <div 
+        className="absolute inset-0 blur-xl rounded-full"
+        style={{ 
+          backgroundColor: style.fill, 
+          opacity: style.glowOpacity,
+          transform: "scale(1.3)",
+        }}
+      />
+      
+      {/* Organic cloud shape using SVG */}
+      <div className="relative">
+        <svg 
+          viewBox="0 0 200 100" 
+          className="w-full h-auto"
+          style={{ filter: "drop-shadow(0 4px 12px rgba(44, 44, 44, 0.08))" }}
+        >
+          {/* Organic cloud path - soft, irregular edges */}
+          <path
+            d="M 20 70 
+               C 5 65, 5 45, 20 40
+               C 15 25, 35 15, 55 20
+               C 65 8, 90 5, 110 15
+               C 130 5, 160 10, 175 25
+               C 195 30, 198 50, 185 65
+               C 195 80, 175 90, 155 85
+               C 140 95, 100 98, 70 90
+               C 45 95, 15 85, 20 70
+               Z"
+            fill={style.fill}
+            stroke="hsl(28 15% 75%)"
+            strokeWidth="0.5"
+            opacity="0.95"
+          />
+          
+          {/* Inner highlight for depth */}
+          <path
+            d="M 35 55 
+               C 25 50, 30 35, 45 35
+               C 50 25, 70 22, 90 28
+               C 105 20, 130 22, 145 32
+               C 160 35, 165 48, 158 58"
+            fill="none"
+            stroke="hsl(0 0% 100%)"
+            strokeWidth="1"
+            opacity="0.3"
+            strokeLinecap="round"
+          />
+        </svg>
+        
+        {/* Text overlay - positioned within cloud bounds */}
+        <div className="absolute inset-0 flex items-center justify-center px-6 py-4 md:px-8 md:py-5">
+          <p 
+            className="text-xs md:text-sm leading-relaxed text-center font-sans"
+            style={{ color: style.textColor }}
+          >
+            {displayText}
+          </p>
+        </div>
       </div>
       
-      {/* Comic-style thought trail - 3 descending dots */}
-      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-        {/* Large dot */}
-        <div
-          className={cn(
-            "w-3 h-3 rounded-full border-2 backdrop-blur-sm",
-            style.bg,
-            style.border
-          )}
+      {/* Soft origin cluster - not comic-trail dots */}
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+        <div 
+          className="w-2.5 h-2.5 rounded-full blur-[0.3px]"
+          style={{ backgroundColor: style.fill, opacity: 0.8 }}
         />
-        {/* Medium dot */}
-        <div
-          className={cn(
-            "w-2 h-2 rounded-full border backdrop-blur-sm",
-            style.bg,
-            style.border
-          )}
-        />
-        {/* Small dot */}
-        <div
-          className={cn(
-            "w-1.5 h-1.5 rounded-full border backdrop-blur-sm",
-            style.bg,
-            style.border
-          )}
+        <div 
+          className="w-1.5 h-1.5 rounded-full blur-[0.2px] mt-1"
+          style={{ backgroundColor: style.fill, opacity: 0.6 }}
         />
       </div>
     </div>
