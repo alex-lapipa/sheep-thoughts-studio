@@ -523,6 +523,100 @@ export default function AdminSitemap() {
           </Card>
         </div>
 
+        {/* Step-by-Step Guide */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+              How to Verify & Submit Your Sitemap
+            </CardTitle>
+            <CardDescription>
+              Follow these steps to ensure search engines can discover all your pages
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {/* Step 1 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Verify Site Ownership</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Add a TXT record or HTML file to prove you own the domain in Google Search Console and Bing Webmaster Tools.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 2 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Submit Your Sitemap</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Go to Sitemaps section in each console and submit: <code className="bg-muted px-1 rounded text-xs">/sitemap.xml</code>
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 3 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Request Indexing</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Use URL Inspection tool to request indexing for important pages that aren't appearing in search results.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 4 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  4
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Ping Search Engines</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Click "Ping Search Engines" button above after publishing new content to notify Google, Bing & Yandex.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 5 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  5
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Test Social Previews</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Use Twitter Card Validator and Facebook Debugger to verify OG images display correctly when shared.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 6 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                  6
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Monitor Coverage</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Check the Coverage report in Search Console weekly for indexing errors or warnings to fix.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Progress Bar */}
         <Card>
           <CardHeader className="pb-2">
