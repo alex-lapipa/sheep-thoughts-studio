@@ -411,7 +411,7 @@ export default function AdminAnalytics() {
       <div className="space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold">Analytics</h1>
+            <h1 id="analytics-overview" className="font-display text-3xl font-bold">Analytics</h1>
             <p className="text-muted-foreground mt-1">
               Track user engagement, sharing activity, and ecommerce performance
             </p>
