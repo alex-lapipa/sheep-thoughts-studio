@@ -4,6 +4,7 @@ import { UrbanChaosOverlay } from "./UrbanChaosOverlay";
 import { FloatingBubbles } from "./FloatingBubbles";
 import { PageTransition } from "./PageTransition";
 import { StructuredData } from "./StructuredData";
+import { WinterWelcomeBanner } from "./WinterWelcomeBanner";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useWinterTheme } from "@/contexts/WinterThemeContext";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       )}
       
+      <WinterWelcomeBanner />
       <Header />
       <main className={cn(
         "flex-1 relative z-10",
