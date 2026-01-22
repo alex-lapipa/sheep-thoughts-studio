@@ -19,11 +19,13 @@ const Terms = () => {
         <meta property="og:description" content="A sacred covenant written by a sheep who studied law by watching a goat chew on legal documents. Wolves prohibited." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/terms`} />
-        <meta property="og:image" content={`${siteUrl}/og-terms.png`} />
+        <meta property="og:image" content={`${siteUrl}/og-terms.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Terms of Service | Bubbles the Sheep" />
         <meta name="twitter:description" content="Legally binding. Probably. Wolves prohibited." />
-        <meta name="twitter:image" content={`${siteUrl}/og-terms.png`} />
+        <meta name="twitter:image" content={`${siteUrl}/og-terms.jpg`} />
         <link rel="canonical" href={`${siteUrl}/terms`} />
       </Helmet>
       <div className="container py-12 max-w-4xl">

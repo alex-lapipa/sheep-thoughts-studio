@@ -561,11 +561,13 @@ const FAQ = () => {
         <meta property="og:description" content="Ask Bubbles anything. Get wisdom. Stay confused. From the Wicklow Institute of Confident Incorrectness." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/faq`} />
-        <meta property="og:image" content={`${siteUrl}/og-faq.png`} />
+        <meta property="og:image" content={`${siteUrl}/og-faq.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Ask Bubbles | FAQ" />
         <meta name="twitter:description" content="Ask Bubbles anything. Get wisdom. Stay confused." />
-        <meta name="twitter:image" content={`${siteUrl}/og-faq.png`} />
+        <meta name="twitter:image" content={`${siteUrl}/og-faq.jpg`} />
         <link rel="canonical" href={`${siteUrl}/faq`} />
       </Helmet>
       <div className="container py-12 md:py-20">
