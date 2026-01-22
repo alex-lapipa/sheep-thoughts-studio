@@ -480,6 +480,67 @@ export default function AdminSitemap() {
     setValidatingOg(false);
   };
 
+  // Sitemap submission checklist
+  const CHECKLIST_STORAGE_KEY = "sitemap-submission-checklist";
+  const CHECKLIST_STEPS = [
+    {
+      id: "verify-ownership",
+      title: "Verify Site Ownership",
+      description: "Add a TXT record or HTML file to prove you own the domain in Google Search Console and Bing Webmaster Tools.",
+    },
+    {
+      id: "submit-sitemap",
+      title: "Submit Your Sitemap",
+      description: "Go to Sitemaps section in each console and submit: /sitemap.xml",
+    },
+    {
+      id: "request-indexing",
+      title: "Request Indexing",
+      description: "Use URL Inspection tool to request indexing for important pages that aren't appearing in search results.",
+    },
+    {
+      id: "ping-engines",
+      title: "Ping Search Engines",
+      description: "Click 'Ping Search Engines' button above after publishing new content to notify Google, Bing & Yandex.",
+    },
+    {
+      id: "test-previews",
+      title: "Test Social Previews",
+      description: "Use Twitter Card Validator and Facebook Debugger to verify OG images display correctly when shared.",
+    },
+    {
+      id: "monitor-coverage",
+      title: "Monitor Coverage",
+      description: "Check the Coverage report in Search Console weekly for indexing errors or warnings to fix.",
+    },
+  ];
+
+  const [completedSteps, setCompletedSteps] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleStep = (stepId: string) => {
+    setCompletedSteps(prev => {
+      const newSteps = prev.includes(stepId)
+        ? prev.filter(id => id !== stepId)
+        : [...prev, stepId];
+      localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(newSteps));
+      return newSteps;
+    });
+  };
+
+  const resetChecklist = () => {
+    setCompletedSteps([]);
+    localStorage.removeItem(CHECKLIST_STORAGE_KEY);
+  };
+
+  const checklistProgress = Math.round((completedSteps.length / CHECKLIST_STEPS.length) * 100);
+
   useEffect(() => {
     fetchRobotsTxt();
   }, []);
@@ -701,97 +762,91 @@ export default function AdminSitemap() {
           </CardContent>
         </Card>
 
-        {/* Step-by-Step Guide */}
+        {/* Sitemap Submission Checklist */}
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-              How to Verify & Submit Your Sitemap
-            </CardTitle>
-            <CardDescription>
-              Follow these steps to ensure search engines can discover all your pages
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {/* Step 1 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  1
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Verify Site Ownership</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Add a TXT record or HTML file to prove you own the domain in Google Search Console and Bing Webmaster Tools.
-                  </p>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  Sitemap Submission Checklist
+                </CardTitle>
+                <CardDescription>
+                  Track your progress through the sitemap submission process
+                </CardDescription>
               </div>
-              
-              {/* Step 2 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  2
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">{completedSteps.length}/{CHECKLIST_STEPS.length}</div>
+                  <div className="text-xs text-muted-foreground">Steps Complete</div>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Submit Your Sitemap</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Go to Sitemaps section in each console and submit: <code className="bg-muted px-1 rounded text-xs">/sitemap.xml</code>
-                  </p>
-                </div>
-              </div>
-              
-              {/* Step 3 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  3
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Request Indexing</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Use URL Inspection tool to request indexing for important pages that aren't appearing in search results.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Step 4 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  4
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Ping Search Engines</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Click "Ping Search Engines" button above after publishing new content to notify Google, Bing & Yandex.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Step 5 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  5
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Test Social Previews</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Use Twitter Card Validator and Facebook Debugger to verify OG images display correctly when shared.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Step 6 */}
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                  6
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">Monitor Coverage</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Check the Coverage report in Search Console weekly for indexing errors or warnings to fix.
-                  </p>
-                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={resetChecklist}
+                  disabled={completedSteps.length === 0}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
               </div>
             </div>
+            {/* Progress bar */}
+            <div className="mt-4">
+              <Progress value={checklistProgress} className="h-2" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {CHECKLIST_STEPS.map((step, index) => {
+                const isCompleted = completedSteps.includes(step.id);
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => toggleStep(step.id)}
+                    className={cn(
+                      "flex gap-3 p-3 rounded-lg border text-left transition-all",
+                      isCompleted 
+                        ? "bg-green-500/10 border-green-500/30 hover:bg-green-500/20" 
+                        : "bg-background hover:bg-accent/50 border-border"
+                    )}
+                  >
+                    <div className={cn(
+                      "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all",
+                      isCompleted 
+                        ? "bg-green-500 text-white" 
+                        : "bg-primary text-primary-foreground"
+                    )}>
+                      {isCompleted ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className={cn(
+                        "font-semibold text-sm",
+                        isCompleted && "line-through text-muted-foreground"
+                      )}>
+                        {step.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {step.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {completedSteps.length === CHECKLIST_STEPS.length && (
+              <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center gap-3">
+                <CheckCircle2 className="h-6 w-6 text-green-500 flex-shrink-0" />
+                <div>
+                  <div className="font-semibold text-green-700 dark:text-green-400">All steps completed!</div>
+                  <div className="text-sm text-muted-foreground">Your sitemap has been fully submitted and configured.</div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
