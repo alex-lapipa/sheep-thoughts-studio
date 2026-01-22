@@ -134,6 +134,16 @@ export function Footer() {
               <li><Link to="/data-rights" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Your Data Rights</Link></li>
               <li><Link to="/terms" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Terms of Service</Link></li>
               <li>
+                <a 
+                  href="https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground hover:translate-x-1 inline-block transition-all"
+                >
+                  Sitemap
+                </a>
+              </li>
+              <li>
                 <button 
                   onClick={openCookieSettings}
                   className="hover:text-foreground hover:translate-x-1 inline-block transition-all text-left"
