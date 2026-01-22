@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +7,24 @@ import { Link } from "react-router-dom";
 
 const Terms = () => {
   const lastUpdated = "January 2026";
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   return (
     <Layout>
+      <Helmet>
+        <title>Terms of Service | Bubbles the Sheep - Legally Binding (Probably)</title>
+        <meta name="description" content="A binding agreement between you and a sheep who learned about contracts from overhearing a French tourist explain them to a child." />
+        <meta property="og:title" content="Terms of Service | Bubbles the Sheep" />
+        <meta property="og:description" content="A sacred covenant written by a sheep who studied law by watching a goat chew on legal documents. Wolves prohibited." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/terms`} />
+        <meta property="og:image" content={`${siteUrl}/og-terms.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Terms of Service | Bubbles the Sheep" />
+        <meta name="twitter:description" content="Legally binding. Probably. Wolves prohibited." />
+        <meta name="twitter:image" content={`${siteUrl}/og-terms.png`} />
+        <link rel="canonical" href={`${siteUrl}/terms`} />
+      </Helmet>
       <div className="container py-12 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
