@@ -1,8 +1,8 @@
-import { useState, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { List } from "lucide-react";
+import { List, ArrowUp } from "lucide-react";
 import { useTableOfContents, TocItem } from "@/hooks/useTableOfContents";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
@@ -26,6 +26,19 @@ export function LegalPageLayout({
 
   const { activeId, scrollToSection } = useTableOfContents(tocItems);
   const [showMobileToc, setShowMobileToc] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <Layout>
@@ -65,8 +78,19 @@ export function LegalPageLayout({
             </div>
           </aside>
 
-          {/* Mobile TOC Toggle */}
-          <div className="lg:hidden fixed bottom-6 right-6 z-50">
+          {/* Mobile TOC Toggle + Back to Top */}
+          <div className="lg:hidden fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+            {showBackToTop && (
+              <Button
+                size="icon"
+                variant="secondary"
+                onClick={scrollToTop}
+                className="rounded-full shadow-lg h-12 w-12 animate-fade-in"
+                aria-label="Back to top"
+              >
+                <ArrowUp className="w-5 h-5" />
+              </Button>
+            )}
             <Button
               size="icon"
               onClick={() => setShowMobileToc(!showMobileToc)}
@@ -104,6 +128,19 @@ export function LegalPageLayout({
               </Card>
             )}
           </div>
+
+          {/* Desktop Back to Top Button */}
+          {showBackToTop && (
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={scrollToTop}
+              className="hidden lg:flex fixed bottom-6 right-6 z-50 rounded-full shadow-lg h-12 w-12 animate-fade-in"
+              aria-label="Back to top"
+            >
+              <ArrowUp className="w-5 h-5" />
+            </Button>
+          )}
 
           {/* Main Content */}
           <div className="flex-1 max-w-3xl">
