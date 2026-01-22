@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
@@ -114,8 +115,26 @@ export default function Index() {
     return mode as BubbleMode;
   };
 
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
   return (
     <Layout>
+      <Helmet>
+        <title>Bubbles the Sheep | Confidently Wrong Since Birth</title>
+        <meta name="description" content="Meet Bubbles, a sheep from Wicklow who understands everything and interprets everything incorrectly. Explore facts, merch, and philosophical musings." />
+        <meta property="og:title" content="Bubbles the Sheep | Confidently Wrong Since Birth" />
+        <meta property="og:description" content="A sheep from Wicklow, Ireland. Raised by humans. Educated by tourists. Always wrong with complete confidence." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:image" content={`${siteUrl}/og-home.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Bubbles the Sheep" />
+        <meta name="twitter:description" content="The sheep who knows everything. Incorrectly." />
+        <meta name="twitter:image" content={`${siteUrl}/og-home.jpg`} />
+        <link rel="canonical" href={siteUrl} />
+      </Helmet>
       {/* Hero - Bubbles introduces themselves */}
       <section className="hero-gradient py-20 md:py-32 overflow-hidden relative">
         <WicklowLandscape />
