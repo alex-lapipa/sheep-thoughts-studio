@@ -2,30 +2,44 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 /**
- * BUBBLES — BOG-GROUNDED VISUAL DESIGN SYSTEM
+ * BUBBLES — VISUAL DESIGN SYSTEM (PERSONALITY-TO-FORM ALIGNMENT)
  * 
- * Core principles:
- * - Lives permanently in a Wicklow bog on Sugarloaf slopes
- * - Human styling absorbed second-hand, imperfectly, without understanding
- * - Anti-infantile: no cute, soft, plush styles
- * - Weather-affected wool, neutral to mildly convinced expression
- * - Posture: four-legged (natural) or two-legged (absorbed behavior)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CALIBRATION PRINCIPLE:
+ * "Bubbles must always look like a sheep who has absorbed human culture 
+ * without ever understanding it, and who appears modern, witty, and 
+ * authoritative entirely by mistake."
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * VISUAL RULES:
+ * - Confidence without competence — certain, grounded, composed
+ * - Never clever, sly, or knowingly ironic
+ * - The wit is read by the observer, not expressed by the character
+ * - Comedy emerges from contradiction: bog + clubwear, authority + emptiness
+ * - Sarcasm is accidental, never self-aware
+ * 
+ * ANTI-COMEDY SAFEGUARDS:
+ * - No slapstick, exaggerated facial distortion
+ * - No cartoon motion language, emoji energy
+ * - No "mascot smiles", winks, mugging
+ * - If it feels like a joke/punchline/meme → reject
+ * 
+ * POSE & PRESENCE:
+ * - Static, grounded, observational
+ * - The world moves; Bubbles does not
+ * - Standing, waiting, looking, existing
+ * - Implies "I am correct" even when everything suggests otherwise
+ * 
+ * STYLING HIERARCHY:
+ * 1. Sheep first
+ * 2. Bog second  
+ * 3. Human-learned styling last (sits ON TOP, never instead of)
+ * 
+ * UNINTENTIONAL INTELLIGENCE:
+ * - "Certain because it knows a lot" NOT "clever because it understands"
+ * - Accumulation without filtering, knowledge without synthesis
+ * - Like someone who has read everything but understood nothing
  */
-
-// Accessory configurations - mismatched, context-blind
-const ACCESSORIES = {
-  sunglasses: {
-    bucket: true,    // Bucket hat
-    aviator: true,   // Aviator sunglasses  
-    cap: true,       // Flat cap
-  },
-  attire: {
-    postPunk: ["wristband", "chain"],
-    posh: ["ascot", "pin"],
-    club: ["glow-bracelet"],
-    rural: ["wellies-mud"],
-  }
-};
 
 interface BubblesBogProps {
   size?: "sm" | "md" | "lg" | "xl" | "hero";
@@ -34,7 +48,8 @@ interface BubblesBogProps {
   posture?: "four-legged" | "two-legged";
   accessory?: "sunglasses" | "cap" | "bucket-hat" | "none";
   weathered?: boolean;
-  expression?: "neutral" | "distant" | "convinced" | "unbothered";
+  // Expression must convey certainty, not cleverness
+  expression?: "neutral" | "distant" | "certain" | "waiting";
 }
 
 const sizes = {
@@ -45,42 +60,47 @@ const sizes = {
   hero: { container: "w-80 h-80 md:w-[28rem] md:h-[28rem]", viewBox: "0 0 160 160" },
 };
 
-// Expression variations - calm, distant, unbothered
+// Expression system: certainty without cleverness
+// No smug, no knowing, no ironic — just unshakeable conviction
 const expressions = {
-  neutral: { eyeOffset: 0, lidDrop: 0, browTilt: 0 },
-  distant: { eyeOffset: 2, lidDrop: 0.15, browTilt: 0 },
-  convinced: { eyeOffset: 0, lidDrop: 0.1, browTilt: -1 },
-  unbothered: { eyeOffset: 1, lidDrop: 0.2, browTilt: 1 },
+  neutral: { eyeOffset: 0, lidDrop: 0.05, gazeDirection: 0 },
+  distant: { eyeOffset: 1, lidDrop: 0.12, gazeDirection: 2 },
+  certain: { eyeOffset: 0, lidDrop: 0.08, gazeDirection: 0 },
+  waiting: { eyeOffset: 0.5, lidDrop: 0.15, gazeDirection: 1 },
 };
 
 export function BubblesBog({
   size = "lg",
   className,
-  animated = true,
+  animated = false, // Default OFF — static presence preferred
   posture = "four-legged",
   accessory = "none",
   weathered = true,
-  expression = "distant",
+  expression = "certain",
 }: BubblesBogProps) {
-  const { container, viewBox } = sizes[size];
+  const { container } = sizes[size];
   const expr = expressions[expression];
 
   const SheepSVG = posture === "four-legged" 
     ? <FourLeggedSheep expr={expr} accessory={accessory} weathered={weathered} />
     : <TwoLeggedSheep expr={expr} accessory={accessory} weathered={weathered} />;
 
+  // Static presence is the default — the world moves, Bubbles does not
+  // Minimal animation only: subtle breathing, never performative
   if (!animated) {
-    return <div className={cn(container, className)}>{SheepSVG}</div>;
+    return <div className={cn(container, "select-none", className)}>{SheepSVG}</div>;
   }
 
+  // Very subtle "existing" animation — not bouncy, not playful
+  // Just the imperceptible shift of a creature that is certain it is correct
   return (
     <motion.div
-      className={cn(container, className)}
+      className={cn(container, "select-none", className)}
       animate={{
-        y: [0, -4, 0],
+        y: [0, -2, 0], // Barely perceptible
       }}
       transition={{
-        duration: 5,
+        duration: 6, // Slow, contemplative
         repeat: Infinity,
         ease: "easeInOut",
       }}
@@ -518,61 +538,71 @@ function BucketHatTwoLegged() {
   );
 }
 
-// Hero version with environment context
+/**
+ * Hero version — static presence, grounded in environment
+ * 
+ * The world moves; Bubbles does not.
+ * Entrance animation is acceptable (arriving), but no ongoing performance.
+ */
 export function BubblesBogHero({ className }: { className?: string }) {
   return (
     <div className={cn("relative", className)}>
-      {/* Mist effect behind */}
-      <div className="absolute inset-0 blur-3xl opacity-20 bg-gradient-to-b from-muted/40 via-transparent to-transparent" />
+      {/* Environmental mist — the bog, not a glow effect */}
+      <div className="absolute inset-0 blur-3xl opacity-15 bg-gradient-to-b from-muted/30 via-transparent to-transparent" />
       
-      {/* Ground mist */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-muted/30 to-transparent blur-xl" />
+      {/* Ground-level fog — Bubbles emerges from the landscape */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-muted/25 to-transparent blur-xl" />
       
-      {/* Main mascot */}
+      {/* Main mascot — entrance only, then static */}
       <motion.div
         className="relative"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{
-          type: "spring",
-          stiffness: 60,
-          damping: 20,
-          delay: 0.2,
+          duration: 0.8,
+          delay: 0.3,
+          ease: "easeOut",
         }}
       >
         <BubblesBog 
           size="hero" 
-          animated={true}
+          animated={false} // Static presence — the world moves, Bubbles does not
           posture="four-legged"
           accessory="sunglasses"
-          expression="distant"
+          expression="certain" // Unshakeable conviction
           weathered={true}
         />
       </motion.div>
       
-      {/* Subtle rain/mist particles */}
+      {/* Environmental atmosphere — rain/mist, not decorative particles */}
+      {/* These move; Bubbles remains still — reinforces the visual hierarchy */}
       <motion.div
-        className="absolute top-8 right-12 w-1 h-8 bg-muted/20 rounded-full"
-        animate={{
-          y: [0, 20, 0],
-          opacity: [0.2, 0.1, 0.2],
-        }}
+        className="absolute top-10 right-14 w-0.5 h-6 bg-muted/15 rounded-full"
+        animate={{ y: [0, 25], opacity: [0.15, 0] }}
         transition={{
-          duration: 2,
+          duration: 1.8,
           repeat: Infinity,
-          delay: 0.3,
+          ease: "linear",
         }}
       />
       <motion.div
-        className="absolute top-16 left-16 w-1 h-6 bg-muted/15 rounded-full"
-        animate={{
-          y: [0, 15, 0],
-          opacity: [0.15, 0.05, 0.15],
+        className="absolute top-6 right-24 w-0.5 h-5 bg-muted/12 rounded-full"
+        animate={{ y: [0, 20], opacity: [0.12, 0] }}
+        transition={{
+          duration: 2.2,
+          repeat: Infinity,
+          delay: 0.5,
+          ease: "linear",
         }}
+      />
+      <motion.div
+        className="absolute top-12 left-20 w-0.5 h-7 bg-muted/10 rounded-full"
+        animate={{ y: [0, 30], opacity: [0.1, 0] }}
         transition={{
           duration: 2.5,
           repeat: Infinity,
-          delay: 0.8,
+          delay: 1.2,
+          ease: "linear",
         }}
       />
     </div>
