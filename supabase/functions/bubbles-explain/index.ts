@@ -85,6 +85,12 @@ serve(async (req) => {
         .select("name, internal_logic")
         .limit(2);
       
+      // Get comedy content from bubbles_rag_content for richer responses
+      const { data: ragContent } = await supabase
+        .from("bubbles_rag_content")
+        .select("title, bubbles_wrong_take, comedy_hooks, signature_lines, category")
+        .limit(5);
+      
       if (thoughts?.length) {
         contextFromRag += "\n\n## Example Bubbles Thoughts for Inspiration:\n";
         thoughts.forEach((t: any) => {
@@ -96,6 +102,20 @@ serve(async (req) => {
         contextFromRag += "\n\n## Internal Logic Patterns:\n";
         triggers.forEach((t: any) => {
           contextFromRag += `- ${t.name}: ${t.internal_logic}\n`;
+        });
+      }
+      
+      if (ragContent?.length) {
+        contextFromRag += "\n\n## Bubbles' Wrong Takes for Reference (use this style):\n";
+        ragContent.forEach((r: any) => {
+          contextFromRag += `\n**${r.title}**\n`;
+          contextFromRag += `Wrong Take: "${r.bubbles_wrong_take}"\n`;
+          if (r.comedy_hooks?.length) {
+            contextFromRag += `Comedy hooks: ${r.comedy_hooks.join(", ")}\n`;
+          }
+          if (r.signature_lines?.length) {
+            contextFromRag += `Example lines: "${r.signature_lines[0]}"\n`;
+          }
         });
       }
     }
