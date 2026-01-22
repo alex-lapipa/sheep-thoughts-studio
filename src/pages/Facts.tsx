@@ -107,8 +107,6 @@ export default function Facts() {
         title={t("factsPage.hero.title")}
         subtitle={t("factsPage.hero.subtitle")}
         bubbleSize="md"
-        posture="four-legged"
-        accessory="sunglasses"
       />
 
       {/* Disclaimer */}

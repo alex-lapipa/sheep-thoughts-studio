@@ -62,8 +62,6 @@ const About = () => {
           title={t("aboutPage.hero.title")}
           subtitle={t("aboutPage.hero.subtitle")}
           bubbleSize="lg"
-          posture="two-legged"
-          accessory="cap"
         />
       </section>
 

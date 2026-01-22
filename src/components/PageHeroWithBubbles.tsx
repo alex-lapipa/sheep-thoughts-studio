@@ -7,6 +7,15 @@ import type { Database } from "@/integrations/supabase/types";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 type PostureType = "four-legged" | "two-legged";
+type AccessoryType = "sunglasses" | "cap" | "bucket-hat" | "none";
+
+// Weighted accessory pool - "none" appears more often for grounded presence
+const ACCESSORY_POOL: AccessoryType[] = [
+  "none", "none", "none",  // 50% chance of no accessory
+  "sunglasses",            // ~17% chance
+  "cap",                   // ~17% chance  
+  "bucket-hat",            // ~17% chance
+];
 
 interface Thought {
   id: string;
@@ -20,7 +29,7 @@ interface PageHeroWithBubblesProps {
   className?: string;
   bubbleSize?: "sm" | "md" | "lg";
   posture?: PostureType | "random";
-  accessory?: "sunglasses" | "cap" | "bucket-hat" | "none";
+  accessory?: AccessoryType | "random";
 }
 
 // Fallback thoughts if database is empty
@@ -41,7 +50,7 @@ export function PageHeroWithBubbles({
   className,
   bubbleSize = "md",
   posture = "random",
-  accessory = "none",
+  accessory = "random",
 }: PageHeroWithBubblesProps) {
   const [thoughts, setThoughts] = useState<Thought[]>(FALLBACK_THOUGHTS);
   
@@ -52,6 +61,14 @@ export function PageHeroWithBubbles({
     }
     return posture;
   }, [posture]);
+
+  // Random accessory selection - mismatched human-absorbed styling
+  const resolvedAccessory = useMemo<AccessoryType>(() => {
+    if (accessory === "random") {
+      return ACCESSORY_POOL[Math.floor(Math.random() * ACCESSORY_POOL.length)];
+    }
+    return accessory;
+  }, [accessory]);
   const [visibleThoughts, setVisibleThoughts] = useState<Array<Thought & { position: number; key: string }>>([]);
 
   // Fetch thoughts from RAG database
@@ -151,7 +168,7 @@ export function PageHeroWithBubbles({
               <BubblesBog
                 size={bubbleSize === "sm" ? "md" : bubbleSize === "md" ? "lg" : "xl"}
                 posture={resolvedPosture}
-                accessory={accessory}
+                accessory={resolvedAccessory}
                 expression="certain"
                 animated={false}
               />

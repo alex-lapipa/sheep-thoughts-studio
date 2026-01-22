@@ -252,8 +252,6 @@ const Explains = () => {
         title={t("explainsPage.hero.title")}
         subtitle={t("explainsPage.hero.subtitle")}
         bubbleSize="md"
-        posture="two-legged"
-        accessory="bucket-hat"
         className="mb-8"
       />
 
