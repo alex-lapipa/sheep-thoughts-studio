@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
@@ -162,7 +162,22 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Bubbles AI', 'Shopify', 'POD', 'Orders', 'Catalog', 'System']);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('admin-sidebar-collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Persist sidebar state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin-sidebar-collapsed', String(sidebarCollapsed));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [sidebarCollapsed]);
 
   const handleSignOut = async () => {
     await signOut();
