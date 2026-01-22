@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedOnView } from "@/components/AnimatedText";
 
 interface Explanation {
   id: string;
@@ -273,26 +274,29 @@ const Explains = () => {
 
             {/* Challenge Mode */}
             <TabsContent value="challenge" className="space-y-6">
-              <Card className="border-2 border-dashed border-accent/50">
-                <CardHeader className="text-center">
-                  <CardTitle className="flex items-center justify-center gap-2">
-                    <Zap className="h-5 w-5 text-accent" />
-                    Challenge Mode
-                  </CardTitle>
+              <AnimatedOnView>
+                <Card className="border-2 border-dashed border-accent/50">
+                  <CardHeader className="text-center">
+                    <CardTitle className="flex items-center justify-center gap-2">
+                      <Zap className="h-5 w-5 text-accent" />
+                      Challenge Mode
+                    </CardTitle>
                   <CardDescription>
                     Ask Bubbles anything, then challenge the answer to watch the escalation through triggered → savage → nuclear modes
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ChallengeBubbles />
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <ChallengeBubbles />
+                  </CardContent>
+                </Card>
+              </AnimatedOnView>
             </TabsContent>
 
             {/* Encyclopedia Mode */}
             <TabsContent value="encyclopedia" className="space-y-6">
               {/* Topic Filter */}
-              <div className="flex flex-wrap gap-2 justify-center">
+              <AnimatedOnView>
+                <div className="flex flex-wrap gap-2 justify-center">
                 <Badge
                   variant={selectedTopic === null ? "default" : "outline"}
                   className="cursor-pointer hover:bg-primary/90 transition-colors"
@@ -312,11 +316,12 @@ const Explains = () => {
                       <Icon className="h-3 w-3" />
                       {t(`explainsPage.topics.${topic}`) || topic}
                     </Badge>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              </AnimatedOnView>
 
-          {/* Explanation Cards */}
+              {/* Explanation Cards */}
           <div className="space-y-4">
             {filteredExplanations.map((item) => {
               const isChallenged = challengedItems.has(item.id);

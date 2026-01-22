@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { checkForSpam } from "@/lib/spamFilter";
+import { AnimatedOnView } from "@/components/AnimatedText";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 const ogImageUrl = `${siteUrl}/og-contact.jpg`;
@@ -212,18 +213,20 @@ const Contact = () => {
       <div className="container max-w-4xl mx-auto px-4 py-12">
 
         {/* Bubbles' Note */}
-        <Card className="mb-8 border-primary/30 bg-primary/5">
-          <CardContent className="pt-6">
-            <p className="text-foreground italic">
-              {language === 'en' 
-                ? '"I have learned to read human writing by watching tourists photograph road signs. I understand approximately 73% of what you will say, which is more than enough."' 
-                : '"He aprendido a leer escritura humana observando turistas fotografiar señales de tráfico. Entiendo aproximadamente el 73% de lo que dirás, lo cual es más que suficiente."'}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              — Bubbles, {language === 'en' ? 'Director of Human Communication' : 'Director de Comunicación Humana'}
-            </p>
-          </CardContent>
-        </Card>
+        <AnimatedOnView>
+          <Card className="mb-8 border-primary/30 bg-primary/5">
+            <CardContent className="pt-6">
+              <p className="text-foreground italic">
+                {language === 'en' 
+                  ? '"I have learned to read human writing by watching tourists photograph road signs. I understand approximately 73% of what you will say, which is more than enough."' 
+                  : '"He aprendido a leer escritura humana observando turistas fotografiar señales de tráfico. Entiendo aproximadamente el 73% de lo que dirás, lo cual es más que suficiente."'}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                — Bubbles, {language === 'en' ? 'Director of Human Communication' : 'Director de Comunicación Humana'}
+              </p>
+            </CardContent>
+          </Card>
+        </AnimatedOnView>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Contact Form */}
@@ -326,13 +329,14 @@ const Contact = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* How Messages Work */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Wifi className="w-4 h-4 text-primary" />
-                  {language === 'en' ? 'How This Works' : 'Cómo Funciona'}
-                </CardTitle>
-              </CardHeader>
+            <AnimatedOnView>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Wifi className="w-4 h-4 text-primary" />
+                    {language === 'en' ? 'How This Works' : 'Cómo Funciona'}
+                  </CardTitle>
+                </CardHeader>
               <CardContent className="text-sm text-muted-foreground space-y-3">
                 <p>
                   {language === 'en' 
@@ -349,17 +353,19 @@ const Contact = () => {
                     ? 'Then I read it. I am very literate for a sheep.' 
                     : 'Luego lo leo. Soy muy alfabetizada para ser una oveja.'}
                 </p>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </AnimatedOnView>
 
             {/* Response Times */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  {language === 'en' ? 'Response Times' : 'Tiempos de Respuesta'}
-                </CardTitle>
-              </CardHeader>
+            <AnimatedOnView>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" />
+                    {language === 'en' ? 'Response Times' : 'Tiempos de Respuesta'}
+                  </CardTitle>
+                </CardHeader>
               <CardContent className="text-sm text-muted-foreground space-y-3">
                 <p>
                   {language === 'en' 
@@ -380,17 +386,19 @@ const Contact = () => {
                     <span>{language === 'en' ? 'I am napping (frequently)' : 'Esté durmiendo la siesta (frecuentemente)'}</span>
                   </li>
                 </ul>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </AnimatedOnView>
 
             {/* Warning */}
-            <Card className="border-destructive/30 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2 text-destructive">
-                  <AlertTriangle className="w-4 h-4" />
-                  {language === 'en' ? 'Important Notice' : 'Aviso Importante'}
-                </CardTitle>
-              </CardHeader>
+            <AnimatedOnView>
+              <Card className="border-destructive/30 bg-destructive/5">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="w-4 h-4" />
+                    {language === 'en' ? 'Important Notice' : 'Aviso Importante'}
+                  </CardTitle>
+                </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
                 <p>
                   {language === 'en' 
@@ -398,10 +406,12 @@ const Contact = () => {
                     : 'Cualquier consejo dado por Bubbles no debe ser seguido. Esto es por tu seguridad. Soy muy confiada y también muy equivocada.'}
                 </p>
               </CardContent>
-            </Card>
+              </Card>
+            </AnimatedOnView>
 
             {/* Other Ways to Reach */}
-            <Card>
+            <AnimatedOnView>
+              <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {language === 'en' ? 'Other Ways to Reach Me' : 'Otras Formas de Contactarme'}
@@ -425,19 +435,22 @@ const Contact = () => {
                   </Link>
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </AnimatedOnView>
           </div>
         </div>
 
         {/* Final Note */}
-        <div className="text-center text-muted-foreground text-sm mt-12">
-          <p>
-            {language === 'en' 
-              ? '"I look forward to misunderstanding your message completely and responding with enthusiasm."' 
-              : '"Espero con ansias malinterpretar tu mensaje completamente y responder con entusiasmo."'}
-          </p>
-          <p className="mt-2">— 🐑</p>
-        </div>
+        <AnimatedOnView>
+          <div className="text-center text-muted-foreground text-sm mt-12">
+            <p>
+              {language === 'en' 
+                ? '"I look forward to misunderstanding your message completely and responding with enthusiasm."' 
+                : '"Espero con ansias malinterpretar tu mensaje completamente y responder con entusiasmo."'}
+            </p>
+            <p className="mt-2">— 🐑</p>
+          </div>
+        </AnimatedOnView>
       </div>
     </Layout>
   );

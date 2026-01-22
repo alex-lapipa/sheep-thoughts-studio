@@ -9,6 +9,7 @@ import { ModeEscalationScale, ExtendedBubbleMode } from "@/components/ModeBadge"
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useMemo } from "react";
+import { AnimatedOnView } from "@/components/AnimatedText";
 
 type SortOption = 'bestseller' | 'newest' | 'price-low' | 'price-high';
 
@@ -88,11 +89,12 @@ const Collections = () => {
       <div className="container py-12">
         <div className="mb-8 space-y-6">
           {/* Mode Escalation Filter */}
-          <div className="p-4 rounded-xl bg-card border">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                Shop by Mood
-              </h3>
+          <AnimatedOnView>
+            <div className="p-4 rounded-xl bg-card border">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  Shop by Mood
+                </h3>
               {activeMode && (
                 <button 
                   onClick={() => {
@@ -105,11 +107,12 @@ const Collections = () => {
                 </button>
               )}
             </div>
-            <ModeEscalationScale 
-              activeMode={activeMode} 
-              onModeSelect={handleModeSelect} 
-            />
-          </div>
+              <ModeEscalationScale 
+                activeMode={activeMode} 
+                onModeSelect={handleModeSelect} 
+              />
+            </div>
+          </AnimatedOnView>
 
           {/* Sort Dropdown */}
           <div className="flex items-center justify-end gap-2">
