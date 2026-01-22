@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Volume2 } from "lucide-react";
 
 interface AudioWaveformProps {
   audioElement: HTMLAudioElement | null;
@@ -146,13 +147,23 @@ export const AudioWaveform = ({
   return (
     <div 
       className={cn(
-        "flex items-center gap-0.5 rounded-full",
+        "flex items-center gap-1.5 rounded-full",
         "bg-gradient-to-r from-accent/20 to-bubbles-meadow/20",
         "border border-accent/30",
         isCompact ? "px-2 py-1" : "px-3 py-1.5",
         className
       )}
     >
+      {/* Animated speaker icon */}
+      <Volume2 
+        className={cn(
+          "text-accent flex-shrink-0",
+          isCompact ? "w-3 h-3" : "w-4 h-4"
+        )}
+        style={{
+          animation: "pulse 1s ease-in-out infinite",
+        }}
+      />
       <div className={cn(
         "flex items-center gap-[2px]",
         isCompact ? "h-6" : "h-8"
@@ -173,7 +184,7 @@ export const AudioWaveform = ({
         ))}
       </div>
       {showLabel && !isCompact && (
-        <span className="ml-2 text-xs text-accent font-medium whitespace-nowrap">
+        <span className="text-xs text-accent font-medium whitespace-nowrap">
           Speaking
         </span>
       )}
