@@ -89,6 +89,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await handleUnsubscribe(supabase, email, token);
     }
 
+    if (body.action === "resubscribe") {
+      const { email } = body;
+      return await handleResubscribe(supabase, email);
+    }
+
     // Default: subscribe action
     const { email, source }: SubscribeRequest = body;
     return await handleSubscribe(supabase, email, source);
@@ -413,6 +418,65 @@ async function handleUnsubscribe(supabase: any, email?: string, token?: string):
     JSON.stringify({ 
       success: true, 
       message: "You've been successfully unsubscribed. Bubbles will miss you! 🐑" 
+    }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
+}
+
+// deno-lint-ignore no-explicit-any
+async function handleResubscribe(supabase: any, email?: string): Promise<Response> {
+  if (!email) {
+    return new Response(
+      JSON.stringify({ error: "Email is required" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Find subscriber
+  const { data: subscriber, error: findError } = await supabase
+    .from("newsletter_subscribers")
+    .select("id, status")
+    .eq("email", normalizedEmail)
+    .single();
+
+  if (findError || !subscriber) {
+    return new Response(
+      JSON.stringify({ error: "Email not found in our records" }),
+      { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  if (subscriber.status === "active") {
+    return new Response(
+      JSON.stringify({ success: true, message: "You're already subscribed to the newsletter!" }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  // Re-activate subscription
+  const { error: updateError } = await supabase
+    .from("newsletter_subscribers")
+    .update({
+      status: "active",
+      confirmed_at: new Date().toISOString(),
+      metadata: { resubscribed_at: new Date().toISOString() },
+    })
+    .eq("id", subscriber.id);
+
+  if (updateError) {
+    console.error("Resubscribe error:", updateError);
+    return new Response(
+      JSON.stringify({ error: "Failed to re-subscribe. Please try again." }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({ 
+      success: true, 
+      message: "Welcome back! You've been re-subscribed to the newsletter. 🐑" 
     }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
   );

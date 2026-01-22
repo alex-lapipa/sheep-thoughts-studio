@@ -3,15 +3,17 @@ import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, AlertCircle, Home, Mail } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Home, Mail, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 
 const NewsletterUnsubscribe = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
   const token = searchParams.get("token");
   
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error" | "resubscribed">("loading");
   const [message, setMessage] = useState("");
+  const [isResubscribing, setIsResubscribing] = useState(false);
 
   useEffect(() => {
     const unsubscribe = async () => {
@@ -47,6 +49,32 @@ const NewsletterUnsubscribe = () => {
     unsubscribe();
   }, [email, token]);
 
+  const handleResubscribe = async () => {
+    if (!email) return;
+    
+    setIsResubscribing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("newsletter-subscribe", {
+        body: { action: "resubscribe", email },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setStatus("resubscribed");
+        setMessage("You've been re-subscribed to our newsletter!");
+        toast.success("Welcome back!");
+      } else {
+        toast.error(data.error || "Failed to re-subscribe");
+      }
+    } catch (err) {
+      console.error("Resubscribe error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsResubscribing(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -78,6 +106,56 @@ const NewsletterUnsubscribe = () => {
                 <p className="text-sm text-muted-foreground italic">
                   "Farewell, dear human. My inbox feels emptier already. 
                   But I understand — not everyone can handle this much wool in their life."
+                </p>
+                <p className="text-sm text-primary mt-2">— Bubbles 🐑</p>
+              </div>
+              
+              {/* Re-subscribe option */}
+              <div className="bg-accent/10 rounded-lg p-4 border border-accent/20">
+                <p className="text-sm text-foreground mb-3">
+                  Changed your mind? You can re-subscribe anytime!
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={handleResubscribe}
+                  disabled={isResubscribing}
+                  className="w-full sm:w-auto"
+                >
+                  {isResubscribing ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                  )}
+                  Re-subscribe
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                <Button asChild>
+                  <Link to="/">
+                    <Home className="mr-2 h-4 w-4" />
+                    Back to Home
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {status === "resubscribed" && (
+            <div className="space-y-6">
+              <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
+                <Mail className="h-10 w-10 text-accent" />
+              </div>
+              <h1 className="text-3xl font-display text-foreground">
+                Welcome Back! 🎉
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                {message}
+              </p>
+              <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                <p className="text-sm text-muted-foreground italic">
+                  "I knew you couldn't stay away! The wool is strong with this one. 
+                  Prepare for more delightfully incorrect wisdom in your inbox!"
                 </p>
                 <p className="text-sm text-primary mt-2">— Bubbles 🐑</p>
               </div>
