@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { useCookieConsent } from "@/components/CookieConsent";
 import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 import { useTableOfContents, TocItem } from "@/hooks/useTableOfContents";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import { cn } from "@/lib/utils";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
@@ -27,27 +27,13 @@ const tocItems: TocItem[] = [
 ];
 
 const Privacy = () => {
+  // Enable smooth scrolling to anchor links
+  useSmoothScroll();
+  
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
-  const location = useLocation();
   const lastUpdated = "January 2026";
   const { activeId, scrollToSection } = useTableOfContents(tocItems);
   const [showMobileToc, setShowMobileToc] = useState(false);
-
-  // Handle smooth scrolling to anchor links
-  useEffect(() => {
-    if (location.hash) {
-      const timeoutId = setTimeout(() => {
-        const element = document.querySelector(location.hash);
-        if (element) {
-          element.scrollIntoView({ 
-            behavior: "smooth", 
-            block: "start" 
-          });
-        }
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [location.hash]);
 
   return (
     <Layout>

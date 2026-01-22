@@ -13,6 +13,7 @@ import { useShare } from "@/hooks/useShare";
 import confetti from "canvas-confetti";
 import { StreakBadges } from "@/components/StreakBadges";
 import { analytics } from "@/lib/analytics";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 
 // Milestone definitions
 const STREAK_MILESTONES = [
@@ -26,6 +27,8 @@ const STREAK_MILESTONES = [
 ];
 
 const FAQ = () => {
+  // Enable smooth scrolling to anchor links
+  useSmoothScroll();
   const { t } = useLanguage();
   const { share, isCopied } = useShare();
   const [randomWisdom, setRandomWisdom] = useState<{ question: string; answer: string } | null>(null);

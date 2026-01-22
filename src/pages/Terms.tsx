@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LegalJargonInterpreter } from "@/components/LegalJargonInterpreter";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 
 const Terms = () => {
+  // Enable smooth scrolling to anchor links
+  useSmoothScroll();
   const lastUpdated = "January 2026";
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
