@@ -335,50 +335,97 @@ export function ThoughtCarousel({
           }}
           className="w-full touch-pan-y"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-4 md:-ml-6">
             <AnimatePresence mode="popLayout">
               {filteredThoughts.map((thought, index) => (
                 <CarouselItem 
                   key={thought.id} 
                   className={cn(
-                    "pl-2 md:pl-4",
-                    compact ? "basis-full" : "basis-full sm:basis-1/2 lg:basis-1/3"
+                    "pl-4 md:pl-6",
+                    compact ? "basis-full" : "basis-full sm:basis-1/2 lg:basis-[45%]"
                   )}
                 >
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      y: -8,
+                      rotateX: 5,
+                      rotateY: current === index ? 0 : (index < current ? -3 : 3),
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20,
+                    }}
                     className={cn(
-                      "transition-all duration-300 h-full",
+                      "transition-all duration-300 h-full cursor-pointer perspective-1000",
                       current === index 
                         ? "scale-100 opacity-100" 
-                        : "scale-95 opacity-60"
+                        : "scale-[0.92] opacity-70"
                     )}
+                    style={{
+                      transformStyle: "preserve-3d",
+                    }}
                   >
-                    <ThoughtBubble 
-                      mode={getDisplayMode(thought.mode)} 
-                      size={compact ? "sm" : "sm"} 
-                      className={cn(
-                        "h-full",
-                        compact ? "min-h-[80px]" : "min-h-[120px]"
-                      )}
-                    >
-                      <div className="space-y-2">
-                        <span className={cn(
-                          "inline-block text-[10px] font-medium px-2 py-0.5 rounded-full border",
-                          MODE_COLORS[thought.mode]
-                        )}>
-                          {MODE_LABELS[thought.mode]}
-                        </span>
-                        <p className={cn(
-                          "text-foreground/90 italic leading-relaxed",
-                          compact ? "text-xs" : "text-sm"
-                        )}>
-                          "{thought.text}"
-                        </p>
+                    {/* Glass morphism card wrapper */}
+                    <div className={cn(
+                      "relative h-full rounded-2xl p-1 overflow-hidden group",
+                      "before:absolute before:inset-0 before:rounded-2xl",
+                      "before:bg-gradient-to-br before:from-white/20 before:via-white/5 before:to-transparent",
+                      "before:pointer-events-none before:z-10",
+                      "after:absolute after:inset-0 after:rounded-2xl",
+                      "after:bg-gradient-to-t after:from-black/5 after:to-transparent",
+                      "after:pointer-events-none after:z-10",
+                    )}>
+                      {/* Glassmorphism background */}
+                      <div className={cn(
+                        "absolute inset-0 rounded-2xl transition-all duration-500",
+                        "bg-background/60 dark:bg-background/40",
+                        "backdrop-blur-xl backdrop-saturate-150",
+                        "border border-white/20 dark:border-white/10",
+                        "shadow-lg shadow-black/5 dark:shadow-black/20",
+                        "group-hover:bg-background/70 dark:group-hover:bg-background/50",
+                        "group-hover:border-white/30 dark:group-hover:border-white/20",
+                        "group-hover:shadow-xl group-hover:shadow-primary/10",
+                      )} />
+                      
+                      {/* Animated gradient border on hover */}
+                      <div className={cn(
+                        "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                        "bg-gradient-to-br from-primary/20 via-accent/10 to-transparent",
+                        "pointer-events-none"
+                      )} />
+
+                      {/* Content */}
+                      <div className="relative z-20 h-full">
+                        <ThoughtBubble 
+                          mode={getDisplayMode(thought.mode)} 
+                          size={compact ? "sm" : "md"} 
+                          className={cn(
+                            "h-full bg-transparent border-0 shadow-none",
+                            compact ? "min-h-[100px]" : "min-h-[160px]"
+                          )}
+                        >
+                          <div className="space-y-3 p-2">
+                            <span className={cn(
+                              "inline-block text-[10px] font-semibold px-2.5 py-1 rounded-full border backdrop-blur-sm",
+                              MODE_COLORS[thought.mode]
+                            )}>
+                              {MODE_LABELS[thought.mode]}
+                            </span>
+                            <p className={cn(
+                              "text-foreground/90 italic leading-relaxed font-medium",
+                              compact ? "text-sm" : "text-base"
+                            )}>
+                              "{thought.text}"
+                            </p>
+                          </div>
+                        </ThoughtBubble>
                       </div>
-                    </ThoughtBubble>
+                    </div>
                   </motion.div>
                 </CarouselItem>
               ))}
