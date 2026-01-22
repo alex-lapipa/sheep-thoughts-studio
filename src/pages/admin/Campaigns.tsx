@@ -901,11 +901,29 @@ export default function AdminCampaigns() {
         <Dialog open={isSendConfirmOpen} onOpenChange={setIsSendConfirmOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Send Campaign?</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5" />
+                Send Campaign Now?
+              </DialogTitle>
               <DialogDescription>
                 You're about to send "{selectedCampaign?.subject}" to {subscriberCount || 0} active subscribers. This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
+            
+            {/* Warning for scheduled campaigns */}
+            {selectedCampaign?.status === "scheduled" && selectedCampaign.scheduled_at && (
+              <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-warning">Bypassing Schedule</p>
+                  <p className="text-sm text-muted-foreground">
+                    This campaign was scheduled for {format(new Date(selectedCampaign.scheduled_at), "MMMM d, yyyy 'at' h:mm a")}. 
+                    Clicking "Send Now" will send it immediately instead.
+                  </p>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
               <Users className="h-8 w-8 text-muted-foreground" />
               <div>
@@ -920,6 +938,7 @@ export default function AdminCampaigns() {
               <Button
                 onClick={() => selectedCampaign && sendCampaignMutation.mutate(selectedCampaign.id)}
                 disabled={sendCampaignMutation.isPending}
+                className={selectedCampaign?.status === "scheduled" ? "bg-warning hover:bg-warning/90 text-warning-foreground" : ""}
               >
                 <Send className="h-4 w-4 mr-2" />
                 {sendCampaignMutation.isPending ? "Sending..." : "Send Now"}
