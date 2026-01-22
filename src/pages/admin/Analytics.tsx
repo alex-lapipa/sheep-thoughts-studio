@@ -10,9 +10,13 @@ import {
   MessageCircle, 
   Trophy,
   TrendingUp,
-  Calendar
+  Calendar,
+  CreditCard,
+  ArrowRight,
+  Package
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 
 interface ShareEventStats {
   content_type: string;
@@ -24,11 +28,47 @@ interface DailyStats {
   count: number;
 }
 
+// Simulated ecommerce metrics (in production, these would come from GA4 or a dedicated analytics table)
+interface EcommerceMetrics {
+  productViews: number;
+  addToCarts: number;
+  cartOpens: number;
+  checkoutStarts: number;
+  // Calculated rates
+  addToCartRate: number;
+  checkoutRate: number;
+}
+
+interface ProductPerformance {
+  name: string;
+  views: number;
+  addToCarts: number;
+  conversionRate: number;
+}
+
 export default function AdminAnalytics() {
   const [shareStats, setShareStats] = useState<ShareEventStats[]>([]);
   const [totalShares, setTotalShares] = useState(0);
   const [recentShares, setRecentShares] = useState<DailyStats[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Ecommerce metrics state (demo data - would be real GA4 data in production)
+  const [ecommerceMetrics] = useState<EcommerceMetrics>({
+    productViews: 1247,
+    addToCarts: 186,
+    cartOpens: 142,
+    checkoutStarts: 67,
+    addToCartRate: 14.9,
+    checkoutRate: 36.0,
+  });
+
+  const [topProducts] = useState<ProductPerformance[]>([
+    { name: 'Bubbles "Facts Are Optional" Tee', views: 312, addToCarts: 48, conversionRate: 15.4 },
+    { name: 'Wicklow Wisdom Hoodie', views: 245, addToCarts: 41, conversionRate: 16.7 },
+    { name: 'Concerned Mode Mug', views: 198, addToCarts: 29, conversionRate: 14.6 },
+    { name: 'Nuclear Take Poster', views: 167, addToCarts: 22, conversionRate: 13.2 },
+    { name: 'Savage Statement Cap', views: 142, addToCarts: 18, conversionRate: 12.7 },
+  ]);
 
   useEffect(() => {
     async function fetchAnalytics() {
@@ -103,6 +143,15 @@ export default function AdminAnalytics() {
 
   // Calculate max for bar scaling
   const maxShareCount = Math.max(...shareStats.map(s => s.count), 1);
+  const maxProductViews = Math.max(...topProducts.map(p => p.views), 1);
+
+  // Funnel steps
+  const funnelSteps = [
+    { label: 'Product Views', value: ecommerceMetrics.productViews, icon: Eye },
+    { label: 'Add to Cart', value: ecommerceMetrics.addToCarts, icon: ShoppingCart },
+    { label: 'Cart Opens', value: ecommerceMetrics.cartOpens, icon: Package },
+    { label: 'Begin Checkout', value: ecommerceMetrics.checkoutStarts, icon: CreditCard },
+  ];
 
   return (
     <AdminLayout>
@@ -110,15 +159,182 @@ export default function AdminAnalytics() {
         <div>
           <h1 className="font-display text-3xl font-bold">Analytics</h1>
           <p className="text-muted-foreground mt-1">
-            Track user engagement and sharing activity
+            Track user engagement, sharing activity, and ecommerce performance
           </p>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="ecommerce" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="ecommerce">Ecommerce</TabsTrigger>
+            <TabsTrigger value="overview">Engagement</TabsTrigger>
             <TabsTrigger value="shares">Share Events</TabsTrigger>
           </TabsList>
+
+          {/* Ecommerce Tab */}
+          <TabsContent value="ecommerce" className="space-y-6">
+            {/* Summary Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Product Views</CardTitle>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.productViews.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">Last 30 days</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Add to Carts</CardTitle>
+                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.addToCarts.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-accent">{ecommerceMetrics.addToCartRate}%</span> conversion rate
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Checkout Starts</CardTitle>
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.checkoutStarts.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-accent">{ecommerceMetrics.checkoutRate}%</span> of cart opens
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Overall Conversion</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {((ecommerceMetrics.checkoutStarts / ecommerceMetrics.productViews) * 100).toFixed(1)}%
+                  </div>
+                  <p className="text-xs text-muted-foreground">View to checkout</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Conversion Funnel */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Conversion Funnel</CardTitle>
+                <CardDescription>User journey from product view to checkout</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {funnelSteps.map((step, index) => {
+                    const percentage = (step.value / ecommerceMetrics.productViews) * 100;
+                    const prevValue = index > 0 ? funnelSteps[index - 1].value : step.value;
+                    const dropRate = index > 0 ? ((1 - step.value / prevValue) * 100).toFixed(1) : null;
+                    const Icon = step.icon;
+                    
+                    return (
+                      <div key={step.label}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-secondary">
+                              <Icon className="h-4 w-4 text-foreground" />
+                            </div>
+                            <div>
+                              <span className="font-medium">{step.label}</span>
+                              {dropRate && (
+                                <span className="text-xs text-destructive ml-2">
+                                  -{dropRate}% drop
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-bold">{step.value.toLocaleString()}</span>
+                            <span className="text-xs text-muted-foreground ml-2">
+                              ({percentage.toFixed(1)}%)
+                            </span>
+                          </div>
+                        </div>
+                        <Progress value={percentage} className="h-3" />
+                        {index < funnelSteps.length - 1 && (
+                          <div className="flex justify-center py-2">
+                            <ArrowRight className="h-4 w-4 text-muted-foreground rotate-90" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Top Products */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Performing Products</CardTitle>
+                <CardDescription>Products with highest engagement and conversion</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {topProducts.map((product, index) => (
+                    <div key={product.name} className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-sm font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{product.name}</p>
+                        <div className="flex gap-4 text-xs text-muted-foreground">
+                          <span>{product.views} views</span>
+                          <span>{product.addToCarts} add to carts</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-accent">{product.conversionRate}%</div>
+                        <div className="text-xs text-muted-foreground">conversion</div>
+                      </div>
+                      <div className="w-24">
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-accent transition-all"
+                            style={{ width: `${(product.views / maxProductViews) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Integration Note */}
+            <Card className="border-dashed">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 rounded-lg bg-secondary">
+                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Analytics Integration</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Ecommerce events are tracked via the <code className="text-xs bg-secondary px-1 rounded">analytics</code> utility. 
+                      Events include: <code className="text-xs bg-secondary px-1 rounded">view_product</code>, 
+                      <code className="text-xs bg-secondary px-1 rounded ml-1">add_to_cart</code>, 
+                      <code className="text-xs bg-secondary px-1 rounded ml-1">open_cart</code>, and 
+                      <code className="text-xs bg-secondary px-1 rounded ml-1">begin_checkout</code>.
+                      Connect Google Analytics 4 to see real-time data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Summary Cards */}
@@ -258,6 +474,8 @@ export default function AdminAnalytics() {
                     <ul className="text-sm text-muted-foreground space-y-1">
                       <li>• <code className="text-xs bg-secondary px-1 rounded">view_product</code> — Product detail page views</li>
                       <li>• <code className="text-xs bg-secondary px-1 rounded">add_to_cart</code> — Add to cart button clicks</li>
+                      <li>• <code className="text-xs bg-secondary px-1 rounded">open_cart</code> — Cart drawer opens</li>
+                      <li>• <code className="text-xs bg-secondary px-1 rounded">begin_checkout</code> — Checkout button clicks</li>
                       <li>• <code className="text-xs bg-secondary px-1 rounded">share_badge</code> — Badge collection shares</li>
                       <li>• <code className="text-xs bg-secondary px-1 rounded">share_scenario</code> — Scenario shares</li>
                       <li>• <code className="text-xs bg-secondary px-1 rounded">ask_bubbles</code> — Questions submitted to Bubbles</li>
