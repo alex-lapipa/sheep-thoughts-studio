@@ -56,6 +56,7 @@ import AdminCampaigns from "./pages/admin/Campaigns";
 import AdminTemplates from "./pages/admin/Templates";
 import AdminSitemap from "./pages/admin/Sitemap";
 import AdminOGPreview from "./pages/admin/OGPreview";
+import AdminOGCacheManager from "./pages/admin/OGCacheManager";
 import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 import AdminEmbeddings from "./pages/admin/Embeddings";
 
@@ -127,6 +128,7 @@ const App = () => (
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
                 <Route path="/admin/sitemap" element={<ProtectedRoute><AdminSitemap /></ProtectedRoute>} />
                 <Route path="/admin/og-preview" element={<ProtectedRoute><AdminOGPreview /></ProtectedRoute>} />
+                <Route path="/admin/og-cache" element={<ProtectedRoute><AdminOGCacheManager /></ProtectedRoute>} />
                 <Route path="/admin/seasonal-banners" element={<ProtectedRoute><SeasonalBannerPreview /></ProtectedRoute>} />
                 <Route path="/admin/embeddings" element={<ProtectedRoute><AdminEmbeddings /></ProtectedRoute>} />
                 
