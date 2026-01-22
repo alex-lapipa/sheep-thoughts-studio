@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,16 +16,47 @@ const BADGES = [
   { days: 365, emoji: "🐑", title: "Year of Enlightenment", color: "#14b8a6" },
 ];
 
+// Generate a cache key from the parameters
+function generateCacheKey(badges: string, streak: number, username: string): string {
+  const params = `${badges}-${streak}-${username}`;
+  let hash = 0;
+  for (let i = 0; i < params.length; i++) {
+    const char = params.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return `badge-${Math.abs(hash).toString(36)}.png`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
     const url = new URL(req.url);
     const badgesParam = url.searchParams.get('badges') || '';
     const streak = parseInt(url.searchParams.get('streak') || '0', 10);
     const username = url.searchParams.get('name') || 'A Wise Soul';
+    const skipCache = url.searchParams.get('nocache') === '1';
+
+    const cacheKey = generateCacheKey(badgesParam, streak, username);
+
+    // Check if cached image exists
+    if (!skipCache) {
+      const { data: fileList } = await supabase.storage
+        .from('og-images')
+        .list('', { search: cacheKey });
+
+      if (fileList && fileList.length > 0) {
+        const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${cacheKey}`;
+        return Response.redirect(publicUrl, 302);
+      }
+    }
 
     // Parse unlocked badges
     const unlockedDays = badgesParam.split(',').map(d => parseInt(d, 10)).filter(d => !isNaN(d));
@@ -86,23 +117,57 @@ Ultra high resolution, clean modern design.`;
       throw new Error('No image generated');
     }
 
-    // Return the base64 image directly for OG image serving
+    // Process and cache the image
     if (imageData.startsWith('data:image')) {
       const base64Data = imageData.split(',')[1];
       const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      
+      // Upload to Supabase Storage for caching
+      const { error: uploadError } = await supabase.storage
+        .from('og-images')
+        .upload(cacheKey, binaryData, {
+          contentType: 'image/png',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error('Failed to cache OG image:', uploadError);
+      } else {
+        console.log(`Cached OG badge image: ${cacheKey}`);
+      }
       
       return new Response(binaryData, {
         status: 200,
         headers: {
           ...corsHeaders,
           'Content-Type': 'image/png',
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'public, max-age=604800',
+          'X-OG-Cache': 'MISS',
         },
       });
     }
 
-    // If it's a URL, redirect to it
-    return Response.redirect(imageData, 302);
+    // If it's a URL, fetch, cache, and return
+    const imageResponse = await fetch(imageData);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBytes = new Uint8Array(imageBuffer);
+
+    await supabase.storage
+      .from('og-images')
+      .upload(cacheKey, imageBytes, {
+        contentType: 'image/png',
+        upsert: true,
+      });
+
+    return new Response(imageBytes, {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=604800',
+        'X-OG-Cache': 'MISS',
+      },
+    });
 
   } catch (error) {
     console.error('OG image generation error:', error);
