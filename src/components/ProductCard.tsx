@@ -85,8 +85,16 @@ export function ProductCard({ product, position }: ProductCardProps) {
     });
   };
 
+  const handleProductClick = () => {
+    ecommerceTracking.viewProduct(
+      node.id,
+      node.title,
+      parseFloat(price.amount)
+    );
+  };
+
   return (
-    <Link ref={cardRef} to={`/product/${node.handle}`} className="group">
+    <Link ref={cardRef} to={`/product/${node.handle}`} className="group" onClick={handleProductClick}>
       <div className="product-card bg-card rounded-xl overflow-hidden border border-border">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {image ? (
