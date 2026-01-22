@@ -27,7 +27,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
   const { hapticEnabled, toggleHaptic } = useSettings();
-  const { hasNewFeatures, markAsSeen } = useWhatsNew();
+  const { hasNewFeatures, newEntriesCount, markAsSeen } = useWhatsNew();
   const navLinks = getNavLinks(t);
 
   return (
@@ -96,10 +96,9 @@ export function Header() {
                   )}
                 >
                   <Sparkles className={cn("h-5 w-5", hasNewFeatures && "animate-pulse")} />
-                  {hasNewFeatures && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
+                  {hasNewFeatures && newEntriesCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground shadow-sm">
+                      {newEntriesCount > 9 ? '9+' : newEntriesCount}
                     </span>
                   )}
                 </Button>
@@ -156,10 +155,9 @@ export function Header() {
                 >
                   <Sparkles className={cn("h-5 w-5", hasNewFeatures && "text-accent animate-pulse")} />
                   What's New
-                  {hasNewFeatures && (
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
+                  {hasNewFeatures && newEntriesCount > 0 && (
+                    <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
+                      {newEntriesCount > 9 ? '9+' : newEntriesCount}
                     </span>
                   )}
                 </Link>
