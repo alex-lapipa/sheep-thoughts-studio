@@ -365,7 +365,6 @@ export function CampaignCalendar({ campaigns, onCampaignClick, onReschedule }: C
       return dateTime && isSameDay(dateTime, currentDate);
     });
   }, [campaigns, currentDate]);
-  };
 
   const handleDragStart = (event: DragStartEvent) => {
     const campaign = event.active.data.current?.campaign as Campaign;

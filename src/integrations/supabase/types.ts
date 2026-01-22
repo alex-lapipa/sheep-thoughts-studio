@@ -882,6 +882,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pre_authorized_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_owner: boolean | null
+          name: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_owner?: boolean | null
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_owner?: boolean | null
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pricing_rules: {
         Row: {
           base_cost: number | null
