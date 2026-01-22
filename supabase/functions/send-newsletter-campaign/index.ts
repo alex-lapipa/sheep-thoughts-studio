@@ -178,6 +178,25 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 });
 
+// Generate unsubscribe token from email (must match newsletter-subscribe function)
+function generateUnsubscribeToken(email: string): string {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(email + "bubbles-unsubscribe-salt");
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data[i];
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function getUnsubscribeUrl(email: string): string {
+  const baseUrl = "https://sheep-thoughts-studio.lovable.app";
+  const token = generateUnsubscribeToken(email);
+  return `${baseUrl}/newsletter/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+}
+
 async function sendEmail(
   to: string, 
   subject: string, 
@@ -185,6 +204,8 @@ async function sendEmail(
   previewText?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const unsubscribeUrl = getUnsubscribeUrl(to);
+    
     // Wrap content in email template
     const fullHtml = `
       <!DOCTYPE html>
@@ -207,8 +228,11 @@ async function sendEmail(
               <p style="color: #8B668B; font-size: 12px; margin: 0 0 10px 0;">
                 You're receiving this because you subscribed to the Bubbles newsletter.
               </p>
-              <p style="color: #8B668B; font-size: 12px; margin: 0;">
+              <p style="color: #8B668B; font-size: 12px; margin: 0 0 10px 0;">
                 © ${new Date().getFullYear()} Bubbles the Sheep. All opinions are wrong (but confident).
+              </p>
+              <p style="color: #8B668B; font-size: 11px; margin: 0;">
+                <a href="${unsubscribeUrl}" style="color: #8B668B;">Unsubscribe</a>
               </p>
             </td>
           </tr>
@@ -222,6 +246,10 @@ async function sendEmail(
       to: [to],
       subject: subject,
       html: fullHtml,
+      headers: {
+        "List-Unsubscribe": `<${unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
 
     return { success: true };

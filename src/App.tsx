@@ -27,7 +27,7 @@ import Contact from "./pages/Contact";
 import ShareBadges from "./pages/ShareBadges";
 import DataRights from "./pages/DataRights";
 import NewsletterConfirm from "./pages/NewsletterConfirm";
-
+import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -83,6 +83,7 @@ const App = () => (
                 <Route path="/share-badges" element={<ShareBadges />} />
                 <Route path="/data-rights" element={<DataRights />} />
                 <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
+                <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
