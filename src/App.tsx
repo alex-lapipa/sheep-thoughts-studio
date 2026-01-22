@@ -34,6 +34,7 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 import DACH from "./pages/DACH";
+import Francophone from "./pages/Francophone";
 import Scenarios from "./pages/Scenarios";
 import HallOfFame from "./pages/HallOfFame";
 import AdminLogin from "./pages/admin/Login";
@@ -124,6 +125,9 @@ const App = () => (
                 <Route path="/de" element={<DACH />} />
                 <Route path="/at" element={<DACH />} />
                 <Route path="/ch" element={<DACH />} />
+                <Route path="/fr" element={<Francophone />} />
+                <Route path="/be" element={<Francophone />} />
+                <Route path="/lu" element={<Francophone />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />

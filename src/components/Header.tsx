@@ -24,9 +24,11 @@ const getNavLinks = (t: (key: string) => string, language: string) => {
     { href: "/faq", label: t("nav.questions") },
   ];
   
-  // Add DACH link for German speakers
+  // Add regional links based on language
   if (language === "de") {
     links.push({ href: "/dach", label: "🇩🇪🇦🇹🇨🇭 DACH" });
+  } else if (language === "fr") {
+    links.push({ href: "/fr", label: "🇫🇷🇧🇪🇱🇺 France" });
   }
   
   return links;
