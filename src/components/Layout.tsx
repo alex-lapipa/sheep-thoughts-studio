@@ -7,6 +7,7 @@ import { StructuredData } from "./StructuredData";
 import { WinterWelcomeBanner } from "./WinterWelcomeBanner";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useWinterTheme } from "@/contexts/WinterThemeContext";
+import { useWhatsNew } from "@/hooks/useWhatsNew";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -15,6 +16,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   useCartSync();
+  useWhatsNew(); // Show "What's New" toast on first visit after updates
   const { isWinterMode } = useWinterTheme();
 
   return (
