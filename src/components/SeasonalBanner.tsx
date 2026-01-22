@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Clover, Heart, Sun, Leaf, Snowflake, Sparkles } from "lucide-react";
+import { X, Clover, Heart, Sun, Leaf, Snowflake, Sparkles, Flower2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -88,6 +88,40 @@ const SEASONAL_EVENTS: SeasonalEvent[] = [
       "Spring lambs are everywhere! I'm trying to teach them the wisdom of standing very still in fields, but they keep bouncing.",
       "The farmer mentioned 'spring cleaning.' I didn't know seasons needed to be cleaned. Winter did seem a bit dusty.",
       "Everyone's talking about rebirth and renewal. I've been the same sheep my whole life but I support their journey.",
+    ],
+  },
+  {
+    id: "spring-lambing-2026",
+    name: "Spring & Lambing Season",
+    check: () => {
+      const now = new Date();
+      const month = now.getMonth();
+      const day = now.getDate();
+      // March-May, but not during St. Patrick's (Mar 14-17) or Easter week
+      if (month < 2 || month > 4) return false;
+      // Skip St. Patrick's window
+      if (month === 2 && day >= 14 && day <= 17) return false;
+      // Skip Easter window (late March/early April)
+      if ((month === 2 && day >= 30) || (month === 3 && day <= 6)) return false;
+      return true;
+    },
+    icon: Flower2,
+    gradient: "from-lime-100/90 via-green-50/90 to-lime-100/90 dark:from-lime-950/90 dark:via-green-900/90 dark:to-lime-950/90",
+    borderColor: "border-lime-200 dark:border-lime-800",
+    textColor: "text-lime-900 dark:text-lime-100",
+    accentColor: "text-lime-600 hover:text-lime-800 hover:bg-lime-200/50 dark:text-lime-300 dark:hover:text-lime-100 dark:hover:bg-lime-800/50",
+    label: "A springtime thought from Bubbles:",
+    messages: [
+      "Lambing season is here! I've been giving the newborns advice about standing still in fields. They seem more interested in bouncing. Youth these days.",
+      "The farmer hasn't slept in three days because of lambing. I offered to help but apparently 'standing nearby looking concerned' isn't as useful as I thought.",
+      "I've noticed the lambs are smaller than me. I assume this is because they haven't eaten enough grass yet. Give it time, little ones.",
+      "The ewes keep telling me I wouldn't understand because I'm not a mother. I'm not entirely sure what I am, but I'm supportive.",
+      "Spring means the tourists are back, pointing at the lambs and saying 'look how cute!' I've been here the whole time, but sure, focus on the bouncy ones.",
+      "The daffodils are out. I tried to eat one once. Would not recommend. Grass remains superior.",
+      "Everyone's talking about 'new beginnings.' I've been the same sheep since the beginning. Consistency is underrated.",
+      "The lambs keep asking me why the sky is blue. I told them it's because the clouds are shy. I'm not sure if that's right but they seemed satisfied.",
+      "I watched a lamb try to headbutt a fence post today. It did not go well for the lamb. The fence post seemed fine.",
+      "The Wicklow hills are covered in tiny white dots now. That's my extended family. We don't talk much but we nod respectfully.",
     ],
   },
   {
