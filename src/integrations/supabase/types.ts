@@ -679,6 +679,35 @@ export type Database = {
         }
         Relationships: []
       }
+      hall_of_fame_votes: {
+        Row: {
+          created_at: string
+          id: string
+          submission_id: string
+          voter_fingerprint: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          submission_id: string
+          voter_fingerprint: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          submission_id?: string
+          voter_fingerprint?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hall_of_fame_votes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "hall_of_fame_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       layout_templates: {
         Row: {
           blocks: Json
@@ -1368,6 +1397,10 @@ export type Database = {
     }
     Functions: {
       can_access_admin: { Args: { _user_id: string }; Returns: boolean }
+      get_submission_vote_count: {
+        Args: { submission_uuid: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
