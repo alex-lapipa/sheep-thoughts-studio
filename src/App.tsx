@@ -65,6 +65,7 @@ import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 import AdminEmbeddings from "./pages/admin/Embeddings";
 import AdminCronJobs from "./pages/admin/CronJobs";
 import AdminAuditLog from "./pages/admin/AuditLog";
+import AdminRAGSearch from "./pages/admin/RAGSearch";
 // Shopify pages
 import ShopifySettings from "./pages/admin/shopify/ShopifySettings";
 import ShopifyWebhooks from "./pages/admin/shopify/Webhooks";
@@ -176,6 +177,7 @@ const App = () => (
                 <Route path="/admin/embeddings" element={<ProtectedRoute><AdminEmbeddings /></ProtectedRoute>} />
                 <Route path="/admin/cron-jobs" element={<ProtectedRoute><AdminCronJobs /></ProtectedRoute>} />
                 <Route path="/admin/audit" element={<ProtectedRoute><AdminAuditLog /></ProtectedRoute>} />
+                <Route path="/admin/rag-search" element={<ProtectedRoute><AdminRAGSearch /></ProtectedRoute>} />
                 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
