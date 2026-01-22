@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Cookie, Shield, Eye, Database, Mail, MapPin, Clock, FileText } from "lucide-react";
 import { useCookieConsent } from "@/components/CookieConsent";
+import { DataExportCard } from "@/components/DataExportCard";
 
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
@@ -387,7 +388,7 @@ const Privacy = () => {
             <p className="text-muted-foreground mb-4">
               Under GDPR and other privacy laws, you have the following rights:
             </p>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4 mb-6">
               {[
                 { title: "Right to Access", desc: "Request a copy of your personal data" },
                 { title: "Right to Rectification", desc: "Correct inaccurate personal data" },
@@ -404,6 +405,9 @@ const Privacy = () => {
                 </Card>
               ))}
             </div>
+            
+            {/* Data Export Card */}
+            <DataExportCard />
           </section>
 
           {/* Data Retention */}
