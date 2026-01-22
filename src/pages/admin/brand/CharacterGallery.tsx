@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-
+import { RandomCharacterGenerator } from "@/components/admin/RandomCharacterGenerator";
 /**
  * CHARACTER GALLERY — Visual Reference for Bubbles Design System
  * 
@@ -68,6 +68,19 @@ export default function CharacterGallery() {
           <h1 className="text-2xl font-bold">Character Gallery</h1>
           <p className="text-muted-foreground">Visual reference for all Bubbles posture and accessory combinations</p>
         </div>
+
+        {/* Main Tabs */}
+        <Tabs defaultValue="generator" className="w-full">
+          <TabsList>
+            <TabsTrigger value="generator">Random Generator</TabsTrigger>
+            <TabsTrigger value="gallery">Full Gallery</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="generator" className="mt-4">
+            <RandomCharacterGenerator />
+          </TabsContent>
+          
+          <TabsContent value="gallery" className="mt-4">
 
         {/* Controls */}
         <Card>
@@ -274,6 +287,8 @@ export default function CharacterGallery() {
             </p>
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   );
