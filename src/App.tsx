@@ -61,6 +61,7 @@ const BrandCharacter = lazy(() => import("./pages/admin/brand/BrandCharacter"));
 const BrandProduction = lazy(() => import("./pages/admin/brand/BrandProduction"));
 const BrandFrontend = lazy(() => import("./pages/admin/brand/BrandFrontend"));
 const AdminWicklowPalette = lazy(() => import("./pages/admin/brand/WicklowPalette"));
+const CharacterGallery = lazy(() => import("./pages/admin/brand/CharacterGallery"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const AdminPreAuthorizedUsers = lazy(() => import("./pages/admin/PreAuthorizedUsers"));
 const AdminMessages = lazy(() => import("./pages/admin/Messages"));
@@ -175,6 +176,7 @@ const App = () => (
                   <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
                   <Route path="/admin/brand/frontend" element={<ProtectedRoute><BrandFrontend /></ProtectedRoute>} />
                   <Route path="/admin/brand/wicklow-palette" element={<ProtectedRoute><AdminWicklowPalette /></ProtectedRoute>} />
+                  <Route path="/admin/brand/gallery" element={<ProtectedRoute><CharacterGallery /></ProtectedRoute>} />
                   
                   {/* Shopify Routes */}
                   <Route path="/admin/shopify" element={<ProtectedRoute><ShopifySettings /></ProtectedRoute>} />
