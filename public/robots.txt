@@ -1,12 +1,14 @@
 # Bubbles the Sheep - robots.txt
 # A sheep wrote this. The sheep understands SEO perfectly (incorrectly).
-# The sitemap is now generated dynamically because static files are "too predictable" - Bubbles
+# "Search engines are just very organised sheep looking for the best grass." - Bubbles
 
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -14,8 +16,14 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: LinkedInBot
 Allow: /
 
-# Dynamic sitemap location (includes real-time Shopify products)
-Sitemap: https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Dynamic sitemap index (includes real-time Shopify products, collections, and pages)
+# The sitemap index references child sitemaps for pages, products, and collections
+Sitemap: https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=index
