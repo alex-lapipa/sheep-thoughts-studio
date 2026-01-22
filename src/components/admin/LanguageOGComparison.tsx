@@ -3,9 +3,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, RefreshCw, Globe, Check, X, ExternalLink } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Loader2, RefreshCw, Globe, Check, X, ExternalLink, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const LANGUAGES = [
   { code: "en", name: "English", flag: "🇬🇧" },
@@ -43,11 +55,20 @@ interface LanguagePreview {
   generated: boolean;
 }
 
+interface BulkRegenerateResult {
+  page: string;
+  language: string;
+  success: boolean;
+  error?: string;
+}
+
 export function LanguageOGComparison() {
   const [selectedPage, setSelectedPage] = useState<PageType>("home");
   const [selectedLanguages, setSelectedLanguages] = useState<LanguageCode[]>(["en", "es", "de"]);
   const [previews, setPreviews] = useState<Record<string, LanguagePreview>>({});
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [isBulkRegenerating, setIsBulkRegenerating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 
@@ -119,6 +140,65 @@ export function LanguageOGComparison() {
 
   const getPreviewKey = (lang: LanguageCode) => `${selectedPage}-${lang}`;
 
+  const bulkRegenerateAllPages = async () => {
+    setIsBulkRegenerating(true);
+    setBulkProgress({ current: 0, total: PAGE_TYPES.length });
+    
+    const allResults: BulkRegenerateResult[] = [];
+    const standardLanguages = ["en", "es", "fr", "de"];
+    
+    try {
+      // Process pages in batches to avoid overwhelming the server
+      for (let i = 0; i < PAGE_TYPES.length; i++) {
+        const page = PAGE_TYPES[i];
+        setBulkProgress({ current: i + 1, total: PAGE_TYPES.length });
+        
+        try {
+          const { data, error } = await supabase.functions.invoke("og-bulk-regenerate", {
+            body: { 
+              pages: [page.id], 
+              languages: standardLanguages,
+              deleteExisting: true 
+            },
+          });
+          
+          if (error) {
+            allResults.push({
+              page: page.id,
+              language: "all",
+              success: false,
+              error: error.message,
+            });
+          } else if (data?.results) {
+            allResults.push(...data.results);
+          }
+        } catch (err) {
+          allResults.push({
+            page: page.id,
+            language: "all",
+            success: false,
+            error: err instanceof Error ? err.message : "Unknown error",
+          });
+        }
+      }
+      
+      const successCount = allResults.filter(r => r.success).length;
+      const failCount = allResults.filter(r => !r.success).length;
+      
+      if (failCount === 0) {
+        toast.success(`Successfully regenerated ${successCount} OG images`);
+      } else {
+        toast.warning(`Regenerated ${successCount} images, ${failCount} failed`);
+      }
+    } catch (error) {
+      console.error("Bulk regeneration error:", error);
+      toast.error("Failed to complete bulk regeneration");
+    } finally {
+      setIsBulkRegenerating(false);
+      setBulkProgress(null);
+    }
+  };
+
   // Clear previews when page changes
   useEffect(() => {
     setPreviews({});
@@ -174,7 +254,7 @@ export function LanguageOGComparison() {
             </div>
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             <Button 
               onClick={() => generateAllPreviews(false)} 
               disabled={isGeneratingAll || selectedLanguages.length === 0}
@@ -194,6 +274,46 @@ export function LanguageOGComparison() {
               <RefreshCw className="h-4 w-4 mr-2" />
               Force Refresh All
             </Button>
+            
+            <div className="flex-1" />
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  disabled={isBulkRegenerating}
+                >
+                  {isBulkRegenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {bulkProgress ? `${bulkProgress.current}/${bulkProgress.total}` : "Regenerating..."}
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Regenerate All Pages
+                    </>
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Regenerate All OG Images?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will regenerate OG images for all {PAGE_TYPES.length} pages in all 4 standard languages (EN, ES, FR, DE). 
+                    This process may take a few minutes.
+                    <br /><br />
+                    <strong>Total images to regenerate:</strong> {PAGE_TYPES.length * 4}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={bulkRegenerateAllPages}>
+                    Regenerate All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>
