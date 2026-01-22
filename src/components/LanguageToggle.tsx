@@ -46,6 +46,19 @@ export function LanguageToggle() {
       >
         🇫🇷 FR
       </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setLanguage("de")}
+        className={cn(
+          "h-7 px-2 rounded-full text-xs font-medium transition-all",
+          language === "de"
+            ? "bg-background text-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+        )}
+      >
+        🇩🇪 DE
+      </Button>
     </div>
   );
 }

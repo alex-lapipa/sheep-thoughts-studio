@@ -9,6 +9,7 @@ const SUPPORTED_LANGUAGES = [
   { code: "en", hreflang: "en" },
   { code: "es", hreflang: "es" },
   { code: "fr", hreflang: "fr" },
+  { code: "de", hreflang: "de" },
 ] as const;
 
 interface HreflangTagsProps {
