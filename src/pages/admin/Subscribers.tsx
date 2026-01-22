@@ -37,11 +37,12 @@ import {
   XCircle,
   CheckCircle,
   RefreshCw,
+  Clock,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
-type SubscriberStatus = 'active' | 'unsubscribed' | 'bounced';
+type SubscriberStatus = 'active' | 'pending' | 'unsubscribed' | 'bounced';
 
 interface Subscriber {
   id: string;
@@ -118,6 +119,7 @@ export default function AdminSubscribers() {
   const stats = {
     total: subscribers.length,
     active: subscribers.filter(s => s.status === 'active').length,
+    pending: subscribers.filter(s => s.status === 'pending').length,
     unsubscribed: subscribers.filter(s => s.status === 'unsubscribed').length,
     bounced: subscribers.filter(s => s.status === 'bounced').length,
   };
@@ -172,11 +174,13 @@ export default function AdminSubscribers() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-500/20">Active</Badge>;
+        return <Badge className="bg-accent/10 text-accent border-accent/20">Active</Badge>;
+      case 'pending':
+        return <Badge className="bg-warning/10 text-warning border-warning/20">Pending</Badge>;
       case 'unsubscribed':
-        return <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">Unsubscribed</Badge>;
+        return <Badge className="bg-muted text-muted-foreground border-border">Unsubscribed</Badge>;
       case 'bounced':
-        return <Badge className="bg-red-500/10 text-red-600 border-red-500/20">Bounced</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Bounced</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -204,7 +208,7 @@ export default function AdminSubscribers() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-card border rounded-lg p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10">
@@ -212,14 +216,14 @@ export default function AdminSubscribers() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total}</p>
-                <p className="text-sm text-muted-foreground">Total Subscribers</p>
+                <p className="text-sm text-muted-foreground">Total</p>
               </div>
             </div>
           </div>
           <div className="bg-card border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <TrendingUp className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-accent/10">
+                <TrendingUp className="h-5 w-5 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.active}</p>
@@ -229,8 +233,19 @@ export default function AdminSubscribers() {
           </div>
           <div className="bg-card border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
-                <XCircle className="h-5 w-5 text-yellow-600" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.pending}</p>
+                <p className="text-sm text-muted-foreground">Pending</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted">
+                <XCircle className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.unsubscribed}</p>
@@ -240,8 +255,8 @@ export default function AdminSubscribers() {
           </div>
           <div className="bg-card border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <Mail className="h-5 w-5 text-red-600" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <Mail className="h-5 w-5 text-destructive" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.bounced}</p>
@@ -270,6 +285,7 @@ export default function AdminSubscribers() {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
                 <SelectItem value="bounced">Bounced</SelectItem>
               </SelectContent>
