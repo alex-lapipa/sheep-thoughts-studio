@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { EmailBlockEditor } from "@/components/admin/EmailBlockEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,8 @@ import {
   XCircle,
   FileText,
   Sparkles,
+  LayoutGrid,
+  PenLine,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { toast } from "sonner";
@@ -114,6 +117,9 @@ export default function AdminCampaigns() {
     preview_text: "",
     html_content: "",
   });
+  
+  // Editor mode: "rich" for RichTextEditor, "blocks" for EmailBlockEditor
+  const [editorMode, setEditorMode] = useState<"rich" | "blocks">("blocks");
 
   // Fetch templates for the picker
   const { data: templates = [] } = useQuery({
@@ -544,7 +550,7 @@ export default function AdminCampaigns() {
 
         {/* Create Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
             <DialogHeader>
               <DialogTitle>Create New Campaign</DialogTitle>
               <DialogDescription>
@@ -552,8 +558,28 @@ export default function AdminCampaigns() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              {/* Use Template Button */}
-              <div className="flex justify-end">
+              {/* Editor Mode Toggle & Template Button */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+                  <Button
+                    variant={editorMode === "blocks" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setEditorMode("blocks")}
+                    className="gap-1.5 h-8"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Block Editor
+                  </Button>
+                  <Button
+                    variant={editorMode === "rich" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setEditorMode("rich")}
+                    className="gap-1.5 h-8"
+                  >
+                    <PenLine className="h-4 w-4" />
+                    Rich Text
+                  </Button>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -584,12 +610,18 @@ export default function AdminCampaigns() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">Email Content *</Label>
-                <RichTextEditor
-                  content={formData.html_content}
-                  onChange={(html) => setFormData({ ...formData, html_content: html })}
-                  placeholder="Start writing your newsletter..."
-                />
+                <Label>Email Content *</Label>
+                {editorMode === "blocks" ? (
+                  <EmailBlockEditor
+                    onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  />
+                ) : (
+                  <RichTextEditor
+                    content={formData.html_content}
+                    onChange={(html) => setFormData({ ...formData, html_content: html })}
+                    placeholder="Start writing your newsletter..."
+                  />
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -674,11 +706,33 @@ export default function AdminCampaigns() {
 
         {/* Edit Dialog */}
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
             <DialogHeader>
               <DialogTitle>Edit Campaign</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {/* Editor Mode Toggle */}
+              <div className="flex items-center gap-1 p-1 bg-muted rounded-lg w-fit">
+                <Button
+                  variant={editorMode === "blocks" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setEditorMode("blocks")}
+                  className="gap-1.5 h-8"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Block Editor
+                </Button>
+                <Button
+                  variant={editorMode === "rich" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setEditorMode("rich")}
+                  className="gap-1.5 h-8"
+                >
+                  <PenLine className="h-4 w-4" />
+                  Rich Text
+                </Button>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="edit-subject">Subject Line *</Label>
                 <Input
@@ -696,12 +750,18 @@ export default function AdminCampaigns() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-content">Email Content *</Label>
-                <RichTextEditor
-                  content={formData.html_content}
-                  onChange={(html) => setFormData({ ...formData, html_content: html })}
-                  placeholder="Edit your newsletter content..."
-                />
+                <Label>Email Content *</Label>
+                {editorMode === "blocks" ? (
+                  <EmailBlockEditor
+                    onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  />
+                ) : (
+                  <RichTextEditor
+                    content={formData.html_content}
+                    onChange={(html) => setFormData({ ...formData, html_content: html })}
+                    placeholder="Edit your newsletter content..."
+                  />
+                )}
               </div>
             </div>
             <DialogFooter>
