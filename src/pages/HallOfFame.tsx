@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { HallOfFameSubmission } from "@/components/HallOfFameSubmission";
 import { useOgImage } from "@/hooks/useOgImage";
+import { useVoting } from "@/hooks/useVoting";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
@@ -24,7 +25,8 @@ import {
   Bomb,
   ThumbsUp,
   Share2,
-  MessageCircle
+  MessageCircle,
+  Loader2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -136,8 +138,20 @@ const CATEGORY_COLORS: Record<string, string> = {
   Culture: "bg-amber-500/10 text-amber-600 border-amber-500/30",
 };
 
-function MeltdownCard({ entry, rank }: { entry: typeof HALL_OF_FAME_ENTRIES[0]; rank: number }) {
+interface MeltdownCardProps {
+  entry: typeof HALL_OF_FAME_ENTRIES[0];
+  rank: number;
+  voteCount: number;
+  hasVoted: boolean;
+  onVote: () => void;
+  votingLoading?: boolean;
+}
+
+function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading }: MeltdownCardProps) {
   const [expanded, setExpanded] = useState(false);
+  
+  // Use database vote count if available, otherwise fall back to static
+  const displayVotes = voteCount > 0 ? voteCount : entry.votes;
 
   return (
     <motion.div
@@ -183,10 +197,27 @@ function MeltdownCard({ entry, rank }: { entry: typeof HALL_OF_FAME_ENTRIES[0]; 
                 </Badge>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ThumbsUp className="h-4 w-4" />
-              <span className="font-medium">{entry.votes.toLocaleString()}</span>
-            </div>
+            
+            {/* Vote Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onVote}
+              disabled={votingLoading}
+              className={cn(
+                "flex items-center gap-2 transition-all",
+                hasVoted 
+                  ? "text-bubbles-gorse bg-bubbles-gorse/10 hover:bg-bubbles-gorse/20" 
+                  : "text-muted-foreground hover:text-bubbles-gorse hover:bg-bubbles-gorse/10"
+              )}
+            >
+              {votingLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ThumbsUp className={cn("h-4 w-4", hasVoted && "fill-current")} />
+              )}
+              <span className="font-medium">{displayVotes.toLocaleString()}</span>
+            </Button>
           </div>
         </CardHeader>
         
@@ -281,6 +312,10 @@ function MeltdownCard({ entry, rank }: { entry: typeof HALL_OF_FAME_ENTRIES[0]; 
 export default function HallOfFame() {
   const { ogImageUrl, siteUrl } = useOgImage("og-hall-of-fame.jpg");
   const [activeTab, setActiveTab] = useState("all");
+  
+  // Get all entry IDs for voting
+  const entryIds = useMemo(() => HALL_OF_FAME_ENTRIES.map(e => e.id), []);
+  const { votes, loading: votingLoading, toggleVote, getVoteCount, hasVoted } = useVoting(entryIds);
 
   const filteredEntries = activeTab === "all" 
     ? HALL_OF_FAME_ENTRIES 
@@ -288,7 +323,18 @@ export default function HallOfFame() {
     ? HALL_OF_FAME_ENTRIES.filter(e => e.featured)
     : HALL_OF_FAME_ENTRIES.filter(e => e.category === activeTab);
 
-  const sortedEntries = [...filteredEntries].sort((a, b) => b.votes - a.votes);
+  // Sort by vote count (DB votes or static fallback)
+  const sortedEntries = [...filteredEntries].sort((a, b) => {
+    const aVotes = getVoteCount(a.id) || a.votes;
+    const bVotes = getVoteCount(b.id) || b.votes;
+    return bVotes - aVotes;
+  });
+
+  // Calculate total votes from DB or fallback
+  const totalVotes = HALL_OF_FAME_ENTRIES.reduce((sum, e) => {
+    const dbVotes = getVoteCount(e.id);
+    return sum + (dbVotes > 0 ? dbVotes : e.votes);
+  }, 0);
 
   return (
     <Layout>
@@ -335,7 +381,7 @@ export default function HallOfFame() {
             <div className="flex items-center gap-2">
               <ThumbsUp className="h-5 w-5 text-bubbles-gorse" />
               <span className="font-bold text-bubbles-gorse">
-                {HALL_OF_FAME_ENTRIES.reduce((sum, e) => sum + e.votes, 0).toLocaleString()}
+                {totalVotes.toLocaleString()}
               </span>
               <span className="text-muted-foreground">Total Votes</span>
             </div>
@@ -392,7 +438,15 @@ export default function HallOfFame() {
         {/* Meltdown Cards */}
         <div className="space-y-6">
           {sortedEntries.map((entry, index) => (
-            <MeltdownCard key={entry.id} entry={entry} rank={index + 1} />
+            <MeltdownCard 
+              key={entry.id} 
+              entry={entry} 
+              rank={index + 1}
+              voteCount={getVoteCount(entry.id)}
+              hasVoted={hasVoted(entry.id)}
+              onVote={() => toggleVote(entry.id)}
+              votingLoading={votingLoading}
+            />
           ))}
         </div>
 
