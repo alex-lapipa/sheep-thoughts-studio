@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -69,6 +69,7 @@ const FAQ = () => {
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [showBulkTagMenu, setShowBulkTagMenu] = useState(false);
+  const [showTagStats, setShowTagStats] = useState(false);
   // Load favorites from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("bubbles-favorites");
@@ -218,6 +219,37 @@ const FAQ = () => {
     });
     return Array.from(tagSet);
   }, [questionHistory]);
+  
+  // Tag statistics - count items per tag
+  const tagStats = useMemo(() => {
+    const stats: Record<string, { count: number; favoriteCount: number }> = {};
+    PREDEFINED_TAGS.forEach(tag => {
+      stats[tag.id] = { count: 0, favoriteCount: 0 };
+    });
+    
+    questionHistory.forEach(item => {
+      item.tags?.forEach(tagId => {
+        if (stats[tagId]) {
+          stats[tagId].count++;
+          if (favorites.includes(item.id)) {
+            stats[tagId].favoriteCount++;
+          }
+        }
+      });
+    });
+    
+    // Calculate untagged count
+    const untaggedCount = questionHistory.filter(item => !item.tags || item.tags.length === 0).length;
+    const untaggedFavorites = questionHistory.filter(item => 
+      (!item.tags || item.tags.length === 0) && favorites.includes(item.id)
+    ).length;
+    
+    return { 
+      byTag: stats, 
+      untagged: { count: untaggedCount, favoriteCount: untaggedFavorites },
+      totalTagged: questionHistory.length - untaggedCount
+    };
+  }, [questionHistory, favorites]);
   
   // Filter history by tag and favorites
   const filteredHistory = useMemo(() => {
@@ -929,6 +961,106 @@ const FAQ = () => {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Tag Statistics Toggle */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={showTagStats ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowTagStats(!showTagStats)}
+                      className="gap-2"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      {showTagStats ? "Hide Stats" : "Tag Stats"}
+                    </Button>
+                  </div>
+                  
+                  {/* Tag Statistics Panel */}
+                  {showTagStats && (
+                    <div className="p-4 bg-muted/30 rounded-xl border animate-fade-in">
+                      <div className="flex items-center gap-2 mb-4">
+                        <BarChart3 className="w-5 h-5 text-primary" />
+                        <h4 className="font-display font-bold text-sm">Category Statistics</h4>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {tagStats.totalTagged} tagged / {questionHistory.length} total
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {PREDEFINED_TAGS.map(tag => {
+                          const stats = tagStats.byTag[tag.id];
+                          const percentage = questionHistory.length > 0 
+                            ? Math.round((stats.count / questionHistory.length) * 100) 
+                            : 0;
+                          
+                          return (
+                            <button
+                              key={tag.id}
+                              onClick={() => {
+                                if (stats.count > 0) {
+                                  setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id);
+                                }
+                              }}
+                              disabled={stats.count === 0}
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
+                                stats.count > 0 
+                                  ? "hover:border-primary/50 hover:bg-card cursor-pointer" 
+                                  : "opacity-50 cursor-not-allowed",
+                                selectedTagFilter === tag.id && "ring-2 ring-primary border-primary"
+                              )}
+                            >
+                              <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-lg", tag.color)}>
+                                {tag.emoji}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-medium text-sm truncate">{tag.label}</span>
+                                  <span className="font-display font-bold text-lg">{stats.count}</span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                                    <div 
+                                      className={cn("h-full rounded-full transition-all", tag.color.split(' ')[0])}
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs text-muted-foreground w-8">{percentage}%</span>
+                                </div>
+                                {stats.favoriteCount > 0 && (
+                                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                    <Star className="w-3 h-3 fill-accent text-accent" />
+                                    {stats.favoriteCount} favorited
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Untagged section */}
+                      {tagStats.untagged.count > 0 && (
+                        <div className="mt-4 pt-4 border-t">
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Tag className="w-4 h-4" />
+                              <span>Untagged answers</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-display font-bold">{tagStats.untagged.count}</span>
+                              {tagStats.untagged.favoriteCount > 0 && (
+                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Star className="w-3 h-3 fill-accent text-accent" />
+                                  {tagStats.untagged.favoriteCount}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {/* Action Buttons */}
                   <div className="flex flex-wrap items-center justify-between gap-2">
