@@ -162,9 +162,9 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Scenarios Page
     "scenariosPage.hero.title": "Escalation Journeys",
-    "scenariosPage.hero.subtitle": "Watch Bubbles process information from innocent curiosity to nuclear certainty. Each scenario demonstrates the Inversion Principle™ in action.",
-    "scenariosPage.research.note": "Research Note:",
-    "scenariosPage.research.text": "These escalation patterns have been extensively documented by the Bubbles Institute of Applied Misunderstanding™.",
+    "scenariosPage.hero.subtitle": "Watch Bubbles process information from innocent curiosity to nuclear certainty. Each scenario shows how confidence builds with every misunderstanding.",
+    "scenariosPage.research.note": "Field Note:",
+    "scenariosPage.research.text": "These escalation patterns have been observed across countless conversations in the Wicklow meadows.",
     "scenariosPage.interactive.title": "Interactive Experience",
     "scenariosPage.interactive.subtitle": "Select a scenario and watch the escalation unfold. Use the controls to navigate through each beat.",
     "scenariosPage.filter.label": "Filter by topic:",
@@ -368,9 +368,9 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Scenarios Page
     "scenariosPage.hero.title": "Viajes de Escalación",
-    "scenariosPage.hero.subtitle": "Observa a Bubbles procesar información desde curiosidad inocente hasta certeza nuclear. Cada escenario demuestra el Principio de Inversión™ en acción.",
-    "scenariosPage.research.note": "Nota de Investigación:",
-    "scenariosPage.research.text": "Estos patrones de escalación han sido extensamente documentados por el Instituto Bubbles de Malentendido Aplicado™.",
+    "scenariosPage.hero.subtitle": "Observa a Bubbles procesar información desde curiosidad inocente hasta certeza nuclear. Cada escenario muestra cómo la confianza crece con cada malentendido.",
+    "scenariosPage.research.note": "Nota de Campo:",
+    "scenariosPage.research.text": "Estos patrones de escalación han sido observados en incontables conversaciones en los prados de Wicklow.",
     "scenariosPage.interactive.title": "Experiencia Interactiva",
     "scenariosPage.interactive.subtitle": "Selecciona un escenario y observa la escalación desarrollarse. Usa los controles para navegar por cada momento.",
     "scenariosPage.filter.label": "Filtrar por tema:",
@@ -574,9 +574,9 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Scenarios Page
     "scenariosPage.hero.title": "Voyages d'Escalade",
-    "scenariosPage.hero.subtitle": "Regarde Bubbles traiter l'information de la curiosité innocente à la certitude nucléaire. Chaque scénario démontre le Principe d'Inversion™ en action.",
-    "scenariosPage.research.note": "Note de Recherche :",
-    "scenariosPage.research.text": "Ces patterns d'escalade ont été extensivement documentés par l'Institut Bubbles du Malentendu Appliqué™.",
+    "scenariosPage.hero.subtitle": "Regarde Bubbles traiter l'information de la curiosité innocente à la certitude nucléaire. Chaque scénario montre comment la confiance grandit avec chaque malentendu.",
+    "scenariosPage.research.note": "Note de Terrain :",
+    "scenariosPage.research.text": "Ces patterns d'escalade ont été observés dans d'innombrables conversations dans les prés de Wicklow.",
     "scenariosPage.interactive.title": "Expérience Interactive",
     "scenariosPage.interactive.subtitle": "Sélectionne un scénario et regarde l'escalade se dérouler. Utilise les contrôles pour naviguer à travers chaque moment.",
     "scenariosPage.filter.label": "Filtrer par sujet :",
