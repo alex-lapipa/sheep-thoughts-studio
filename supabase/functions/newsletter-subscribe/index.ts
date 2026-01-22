@@ -22,6 +22,11 @@ interface ConfirmRequest {
   token: string;
 }
 
+interface UnsubscribeRequest {
+  email: string;
+  token?: string;
+}
+
 // Generate a secure random token
 function generateToken(): string {
   const array = new Uint8Array(32);
@@ -55,6 +60,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
     if (body.action === "confirm") {
       const { token }: ConfirmRequest = body;
       return await handleConfirmation(supabase, token);
+    }
+
+    if (body.action === "unsubscribe") {
+      const { email, token }: UnsubscribeRequest = body;
+      return await handleUnsubscribe(supabase, email, token);
     }
 
     // Default: subscribe action
@@ -304,7 +314,98 @@ async function sendConfirmationEmail(email: string, token: string): Promise<void
   }
 }
 
+// Generate unsubscribe token from email (simple hash for one-click unsubscribe)
+function generateUnsubscribeToken(email: string): string {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(email + "bubbles-unsubscribe-salt");
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data[i];
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+// deno-lint-ignore no-explicit-any
+async function handleUnsubscribe(supabase: any, email?: string, token?: string): Promise<Response> {
+  if (!email) {
+    return new Response(
+      JSON.stringify({ error: "Email is required" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Verify token if provided (for one-click unsubscribe security)
+  if (token) {
+    const expectedToken = generateUnsubscribeToken(normalizedEmail);
+    if (token !== expectedToken) {
+      return new Response(
+        JSON.stringify({ error: "Invalid unsubscribe link" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+  }
+
+  // Find subscriber
+  const { data: subscriber, error: findError } = await supabase
+    .from("newsletter_subscribers")
+    .select("id, status")
+    .eq("email", normalizedEmail)
+    .single();
+
+  if (findError || !subscriber) {
+    return new Response(
+      JSON.stringify({ success: true, message: "If this email was subscribed, it has been removed." }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  if (subscriber.status === "unsubscribed") {
+    return new Response(
+      JSON.stringify({ success: true, message: "You've already been unsubscribed from the newsletter." }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  // Update to unsubscribed status
+  const { error: updateError } = await supabase
+    .from("newsletter_subscribers")
+    .update({
+      status: "unsubscribed",
+      metadata: { unsubscribed_at: new Date().toISOString() },
+    })
+    .eq("id", subscriber.id);
+
+  if (updateError) {
+    console.error("Unsubscribe error:", updateError);
+    return new Response(
+      JSON.stringify({ error: "Failed to unsubscribe. Please try again." }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({ 
+      success: true, 
+      message: "You've been successfully unsubscribed. Bubbles will miss you! 🐑" 
+    }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
+}
+
+// Helper to generate unsubscribe URL
+function getUnsubscribeUrl(email: string): string {
+  const baseUrl = getBaseUrl();
+  const token = generateUnsubscribeToken(email);
+  return `${baseUrl}/newsletter/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+}
+
 async function sendWelcomeEmail(email: string): Promise<void> {
+  const unsubscribeUrl = getUnsubscribeUrl(email);
+  
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -373,8 +474,11 @@ async function sendWelcomeEmail(email: string): Promise<void> {
         </tr>
         <tr>
           <td style="padding: 20px 30px; text-align: center; border-top: 1px solid #B0C4DE;">
-            <p style="color: #8B668B; font-size: 12px; margin: 0;">
+            <p style="color: #8B668B; font-size: 12px; margin: 0 0 10px 0;">
               © ${new Date().getFullYear()} Bubbles the Sheep. All opinions are wrong (but confident).
+            </p>
+            <p style="color: #8B668B; font-size: 11px; margin: 0;">
+              <a href="${unsubscribeUrl}" style="color: #8B668B;">Unsubscribe</a>
             </p>
           </td>
         </tr>
@@ -389,9 +493,16 @@ async function sendWelcomeEmail(email: string): Promise<void> {
       to: [email],
       subject: "🐑 Welcome to the flock! (Bubbles is thrilled)",
       html: htmlContent,
+      headers: {
+        "List-Unsubscribe": `<${unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
     console.log("Welcome email sent to:", email);
   } catch (error) {
     console.error("Failed to send welcome email:", error);
   }
 }
+
+// Export for use in campaign emails
+export { generateUnsubscribeToken, getUnsubscribeUrl };
