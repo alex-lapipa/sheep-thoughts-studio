@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
@@ -101,23 +102,14 @@ export default function Facts() {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
-        <div className="container relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 animate-pop-in">
-              {t("factsPage.hero.title")}
-            </h1>
-            <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: "200ms" }}>
-              {t("factsPage.hero.subtitle")}
-            </p>
-          </div>
-        </div>
-        {/* Floating decorative bubbles */}
-        <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-accent/10 animate-drift" />
-        <div className="absolute bottom-10 right-20 w-16 h-16 rounded-full bg-wicklow-butter/20 animate-float" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 right-10 w-12 h-12 rounded-full bg-wicklow-heather/15 animate-bounce-gentle" style={{ animationDelay: "0.5s" }} />
-      </section>
+      {/* Hero with Bubbles and thought bubbles */}
+      <PageHeroWithBubbles
+        title={t("factsPage.hero.title")}
+        subtitle={t("factsPage.hero.subtitle")}
+        bubbleSize="md"
+        posture="four-legged"
+        accessory="sunglasses"
+      />
 
       {/* Disclaimer */}
       <section className="py-8 border-b border-border">
