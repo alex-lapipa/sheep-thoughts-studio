@@ -17,7 +17,9 @@ import {
   Bot,
   RefreshCw,
   ShieldCheck,
-  ShieldAlert
+  ShieldAlert,
+  Send,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -360,7 +362,13 @@ export default function AdminSitemap() {
   const [robotsTxt, setRobotsTxt] = useState<string>("");
   const [robotsValidation, setRobotsValidation] = useState<RobotsValidation[]>([]);
   const [loadingRobots, setLoadingRobots] = useState(false);
+  const [pinging, setPinging] = useState(false);
+  const [pingResult, setPingResult] = useState<{
+    success: boolean;
+    summary: { successful: number; total: number };
+  } | null>(null);
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
 
   const fetchRobotsTxt = async () => {
     setLoadingRobots(true);
@@ -373,6 +381,24 @@ export default function AdminSitemap() {
       console.error("Failed to fetch robots.txt:", error);
     } finally {
       setLoadingRobots(false);
+    }
+  };
+
+  const pingSitemap = async () => {
+    setPinging(true);
+    setPingResult(null);
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/ping-sitemap`);
+      const data = await response.json();
+      setPingResult({
+        success: data.success,
+        summary: data.summary,
+      });
+    } catch (error) {
+      console.error("Failed to ping sitemap:", error);
+      setPingResult({ success: false, summary: { successful: 0, total: 0 } });
+    } finally {
+      setPinging(false);
     }
   };
 
@@ -441,6 +467,31 @@ export default function AdminSitemap() {
                 Twitter Validator
               </a>
             </Button>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={pingSitemap}
+              disabled={pinging}
+            >
+              {pinging ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              {pinging ? "Pinging..." : "Ping Search Engines"}
+            </Button>
+            {pingResult && (
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  pingResult.success 
+                    ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30" 
+                    : "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30"
+                )}
+              >
+                {pingResult.summary.successful}/{pingResult.summary.total} notified
+              </Badge>
+            )}
           </div>
         </div>
 
