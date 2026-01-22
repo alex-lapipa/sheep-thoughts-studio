@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Search, Filter, X, FileText, Sparkles, AlertCircle, BookOpen, ChevronDown, Heart, Ban, Lightbulb, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, Edit2, Search, Filter, X, FileText, Sparkles, AlertCircle, BookOpen, ChevronDown, Heart, Ban, Lightbulb, MessageCircle, Download, Upload, FileJson, FileSpreadsheet } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Database } from '@/integrations/supabase/types';
@@ -68,6 +69,7 @@ export default function AdminRAGContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [guidelinesOpen, setGuidelinesOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<RAGContentRow | null>(null);
+  const [importing, setImporting] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   
   // Form state
@@ -249,6 +251,173 @@ export default function AdminRAGContent() {
     setActiveTab('all');
   }
 
+  // Export functionality
+  function exportAsJSON() {
+    const dataToExport = filteredEntries.map(({ embedding, ...rest }) => rest);
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rag-content-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${dataToExport.length} entries as JSON`);
+  }
+
+  function exportAsCSV() {
+    const dataToExport = filteredEntries.map(({ embedding, ...rest }) => rest);
+    const headers = ['id', 'title', 'type', 'category', 'canonical_claim', 'bubbles_wrong_take', 'comedy_hooks', 'signature_lines', 'avoid', 'tags', 'created_at', 'updated_at'];
+    const csvRows = [
+      headers.join(','),
+      ...dataToExport.map(entry => 
+        headers.map(header => {
+          const value = entry[header as keyof typeof entry];
+          if (Array.isArray(value)) {
+            return `"${value.join('; ').replace(/"/g, '""')}"`;
+          }
+          if (value === null || value === undefined) return '';
+          return `"${String(value).replace(/"/g, '""')}"`;
+        }).join(',')
+      )
+    ];
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rag-content-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${dataToExport.length} entries as CSV`);
+  }
+
+  // Import functionality
+  async function handleImportJSON(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      if (!Array.isArray(data)) {
+        throw new Error('JSON must be an array of entries');
+      }
+
+      let imported = 0;
+      let skipped = 0;
+
+      for (const entry of data) {
+        if (!entry.id || !entry.title || !entry.type || !entry.bubbles_wrong_take) {
+          skipped++;
+          continue;
+        }
+
+        const { error } = await supabase
+          .from('bubbles_rag_content')
+          .upsert({
+            id: entry.id,
+            title: entry.title,
+            type: entry.type,
+            category: entry.category || null,
+            canonical_claim: entry.canonical_claim || null,
+            bubbles_wrong_take: entry.bubbles_wrong_take,
+            comedy_hooks: entry.comedy_hooks || [],
+            signature_lines: entry.signature_lines || [],
+            avoid: entry.avoid || [],
+            tags: entry.tags || [],
+          }, { onConflict: 'id' });
+
+        if (error) {
+          console.error('Error importing entry:', entry.id, error);
+          skipped++;
+        } else {
+          imported++;
+        }
+      }
+
+      toast.success(`Imported ${imported} entries, skipped ${skipped}`);
+      fetchEntries();
+    } catch (error) {
+      console.error('Error importing JSON:', error);
+      toast.error('Failed to import JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setImporting(false);
+      event.target.value = '';
+    }
+  }
+
+  async function handleImportCSV(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        throw new Error('CSV must have a header row and at least one data row');
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      let imported = 0;
+      let skipped = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].match(/("([^"]|"")*"|[^,]*)/g)?.map(v => 
+          v.trim().replace(/^"|"$/g, '').replace(/""/g, '"')
+        ) || [];
+        
+        const entry: Record<string, unknown> = {};
+        headers.forEach((header, idx) => {
+          const value = values[idx] || '';
+          if (['comedy_hooks', 'signature_lines', 'avoid', 'tags'].includes(header)) {
+            entry[header] = value ? value.split(';').map(v => v.trim()).filter(Boolean) : [];
+          } else {
+            entry[header] = value || null;
+          }
+        });
+
+        if (!entry.id || !entry.title || !entry.type || !entry.bubbles_wrong_take) {
+          skipped++;
+          continue;
+        }
+
+        const { error } = await supabase
+          .from('bubbles_rag_content')
+          .upsert({
+            id: entry.id as string,
+            title: entry.title as string,
+            type: entry.type as string,
+            category: entry.category as string || null,
+            canonical_claim: entry.canonical_claim as string || null,
+            bubbles_wrong_take: entry.bubbles_wrong_take as string,
+            comedy_hooks: entry.comedy_hooks as string[] || [],
+            signature_lines: entry.signature_lines as string[] || [],
+            avoid: entry.avoid as string[] || [],
+            tags: entry.tags as string[] || [],
+          }, { onConflict: 'id' });
+
+        if (error) {
+          console.error('Error importing entry:', entry.id, error);
+          skipped++;
+        } else {
+          imported++;
+        }
+      }
+
+      toast.success(`Imported ${imported} entries, skipped ${skipped}`);
+      fetchEntries();
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      toast.error('Failed to import CSV: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setImporting(false);
+      event.target.value = '';
+    }
+  }
+
   const hasActiveFilters = searchQuery || filterType !== 'all' || filterCategory !== 'all';
 
   return (
@@ -265,13 +434,70 @@ export default function AdminRAGContent() {
               Manage Bubbles' wrong takes, comedy hooks, and signature lines
             </p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openCreateDialog}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Content
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-2">
+            {/* Export Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={exportAsJSON}>
+                  <FileJson className="h-4 w-4 mr-2" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportAsCSV}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Import Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={importing}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  {importing ? 'Importing...' : 'Import'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <label className="flex items-center cursor-pointer">
+                    <FileJson className="h-4 w-4 mr-2" />
+                    Import JSON
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleImportJSON}
+                      className="hidden"
+                    />
+                  </label>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <label className="flex items-center cursor-pointer">
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Import CSV
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleImportCSV}
+                      className="hidden"
+                    />
+                  </label>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openCreateDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Content
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
@@ -424,6 +650,7 @@ export default function AdminRAGContent() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Behavioral Guidelines Reference */}
