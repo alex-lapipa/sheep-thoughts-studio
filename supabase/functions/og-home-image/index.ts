@@ -5,26 +5,26 @@ const corsHeaders = {
 
 type Language = 'en' | 'es' | 'fr' | 'de';
 
-const translations: Record<Language, { title: string; subtitle: string; footer: string }> = {
+const translations: Record<Language, { title: string; subtitle: string; tagline: string }> = {
   en: {
-    title: 'Contact Bubbles',
-    subtitle: 'I understand 73% of what you say',
-    footer: 'Bubbles the Sheep • bubblesexplains.com',
+    title: 'Bubbles the Sheep',
+    subtitle: 'I Know Things.',
+    tagline: 'Confidently wrong since birth • Wicklow, Ireland',
   },
   es: {
-    title: 'Contactar a Bubbles',
-    subtitle: 'Entiendo el 73% de lo que dices',
-    footer: 'Bubbles la Oveja • bubblesexplains.com',
+    title: 'Bubbles la Oveja',
+    subtitle: 'Yo Sé Cosas.',
+    tagline: 'Confidentemente equivocada desde el nacimiento • Wicklow, Irlanda',
   },
   fr: {
-    title: 'Contacter Bubbles',
-    subtitle: 'Je comprends 73% de ce que tu dis',
-    footer: 'Bubbles le Mouton • bubblesexplains.com',
+    title: 'Bubbles le Mouton',
+    subtitle: 'Je Sais des Choses.',
+    tagline: 'Confiant et faux depuis la naissance • Wicklow, Irlande',
   },
   de: {
-    title: 'Kontaktiere Bubbles',
-    subtitle: 'Ich verstehe 73% von dem, was du sagst',
-    footer: 'Bubbles das Schaf • bubblesexplains.com',
+    title: 'Bubbles das Schaf',
+    subtitle: 'Ich Weiß Dinge.',
+    tagline: 'Selbstbewusst falsch seit Geburt • Wicklow, Irland',
   },
 };
 
@@ -38,22 +38,21 @@ Deno.serve(async (req) => {
     const lang = (url.searchParams.get('lang') || 'en') as Language;
     const t = translations[lang] || translations.en;
 
-    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a contact page.
+    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a homepage.
 
 Design requirements:
-- Background: Soft gradient from cream (#FFFDD0) to warm lavender, with Wicklow mountains silhouette
-- Center: A cute cartoon sheep mascot (white fluffy wool, thoughtful expression) sitting at a tiny wooden desk
-- The sheep is holding a quill pen, with a stack of letters beside it
-- Small birds carrying messages flying around
-- A vintage mailbox nearby with letters sticking out
+- Background: Stunning Irish landscape with Sugarloaf Mountain, rolling green hills, purple heather, golden gorse
+- Sky: Soft cloudy Irish sky with warm sunset tones
+- Center: An adorable cartoon sheep mascot (white fluffy wool, innocent but knowing expression) standing proudly on a hill
+- Thought bubbles floating around the sheep with small text symbols
 - Top text: "${t.title}" in a playful bold display font
-- Subtitle: "${t.subtitle}"
-- Bottom: "${t.footer}"
-- Include envelope and heart icons floating
-- Style: Warm, whimsical, cozy Irish countryside aesthetic with communication theme
+- Subtitle: "${t.subtitle}" in elegant script
+- Bottom: "${t.tagline}"
+- Style: Warm, whimsical, authentic Irish countryside aesthetic
+- The sheep should look cute but with a hint of mischievous wisdom
 - Professional social card layout suitable for Twitter/Facebook/LinkedIn sharing
 
-Ultra high resolution, clean modern design.`;
+Ultra high resolution, clean modern design with Wicklow color palette (cream, sage green, heather purple, gorse gold).`;
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
@@ -114,14 +113,15 @@ Ultra high resolution, clean modern design.`;
         <defs>
           <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style="stop-color:#FFFDD0"/>
-            <stop offset="100%" style="stop-color:#E6E6FA"/>
+            <stop offset="50%" style="stop-color:#90B77D"/>
+            <stop offset="100%" style="stop-color:#C8A2C8"/>
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#bg)"/>
-        <text x="600" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="64" fill="#2C2C2C">✉️🐑</text>
-        <text x="600" y="350" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#2C2C2C">${escapeXml(t.title)}</text>
-        <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#666">Bubbles the Sheep</text>
-        <text x="600" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#888">${escapeXml(t.subtitle)}</text>
+        <text x="600" y="220" text-anchor="middle" font-family="Georgia, serif" font-size="80" fill="#2C2C2C">🐑💭</text>
+        <text x="600" y="340" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="#2C2C2C">${escapeXml(t.title)}</text>
+        <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="36" font-style="italic" fill="#444">${escapeXml(t.subtitle)}</text>
+        <text x="600" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#666">${escapeXml(t.tagline)}</text>
       </svg>
     `;
     
