@@ -61,7 +61,19 @@ export function isSuperAdmin(roles: UserRole[]): boolean {
 }
 
 export function canAccessAdmin(roles: UserRole[]): boolean {
+  // Super admins and admins can access
   return roles.includes('super_admin') || roles.includes('admin');
+}
+
+// Pre-authorized owner emails (Alex Lawton)
+export const PRE_AUTHORIZED_OWNERS = [
+  'alex@rmtv.io',
+  'alex@idiomas.io',
+];
+
+export function isPreAuthorizedOwner(email: string | undefined): boolean {
+  if (!email) return false;
+  return PRE_AUTHORIZED_OWNERS.includes(email.toLowerCase());
 }
 
 export function canAccessModule(roles: UserRole[], module: string): boolean {
