@@ -508,6 +508,17 @@ export default function AdminCampaigns() {
           <CampaignCalendar 
             campaigns={campaigns} 
             onCampaignClick={(campaign) => openPreview(campaign)}
+            onReschedule={async (campaignId, newDate) => {
+              const { error } = await supabase
+                .from("newsletter_campaigns")
+                .update({
+                  scheduled_at: newDate.toISOString(),
+                  status: "scheduled",
+                })
+                .eq("id", campaignId);
+              if (error) throw error;
+              queryClient.invalidateQueries({ queryKey: ["admin-campaigns"] });
+            }}
           />
         )}
 
