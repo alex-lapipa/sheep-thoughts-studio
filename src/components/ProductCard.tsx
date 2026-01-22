@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
@@ -10,9 +11,12 @@ import { ecommerceTracking } from "@/lib/ecommerceTracking";
 
 interface ProductCardProps {
   product: ShopifyProduct;
+  position?: number;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, position }: ProductCardProps) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const hasTrackedImpression = useRef(false);
   const addItem = useCartStore(state => state.addItem);
   const isLoading = useCartStore(state => state.isLoading);
   
@@ -25,6 +29,33 @@ export function ProductCard({ product }: ProductCardProps) {
   const modeTag = node.tags?.find(tag => 
     ['innocent', 'concerned', 'triggered', 'savage'].includes(tag.toLowerCase())
   )?.toLowerCase() as BubbleMode | undefined;
+
+  // Track product impression when card becomes visible
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element || hasTrackedImpression.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasTrackedImpression.current) {
+            hasTrackedImpression.current = true;
+            ecommerceTracking.productImpression(
+              node.id,
+              node.title,
+              parseFloat(price.amount),
+              position
+            );
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.5 } // Track when 50% of card is visible
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [node.id, node.title, price.amount, position]);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -55,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link to={`/product/${node.handle}`} className="group">
+    <Link ref={cardRef} to={`/product/${node.handle}`} className="group">
       <div className="product-card bg-card rounded-xl overflow-hidden border border-border">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {image ? (
