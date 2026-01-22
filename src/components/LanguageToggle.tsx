@@ -12,7 +12,7 @@ export function LanguageToggle() {
         size="sm"
         onClick={() => setLanguage("en")}
         className={cn(
-          "h-7 px-2.5 rounded-full text-xs font-medium transition-all",
+          "h-7 px-2 rounded-full text-xs font-medium transition-all",
           language === "en"
             ? "bg-background text-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground hover:bg-transparent"
@@ -25,13 +25,26 @@ export function LanguageToggle() {
         size="sm"
         onClick={() => setLanguage("es")}
         className={cn(
-          "h-7 px-2.5 rounded-full text-xs font-medium transition-all",
+          "h-7 px-2 rounded-full text-xs font-medium transition-all",
           language === "es"
             ? "bg-background text-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground hover:bg-transparent"
         )}
       >
         🇪🇸 ES
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setLanguage("fr")}
+        className={cn(
+          "h-7 px-2 rounded-full text-xs font-medium transition-all",
+          language === "fr"
+            ? "bg-background text-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+        )}
+      >
+        🇫🇷 FR
       </Button>
     </div>
   );
