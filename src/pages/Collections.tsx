@@ -34,11 +34,11 @@ const Collections = () => {
         <meta property="og:description" content="T-shirts, mugs, and more featuring confidently incorrect wisdom from the Wicklow bogs." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/collections/all`} />
-        <meta property="og:image" content={`${siteUrl}/og-collections.png`} />
+        <meta property="og:image" content={`${siteUrl}/og-collections.jpg`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Bubbles Merch Collection" />
         <meta name="twitter:description" content="Shop confidently incorrect wisdom merchandise." />
-        <meta name="twitter:image" content={`${siteUrl}/og-collections.png`} />
+        <meta name="twitter:image" content={`${siteUrl}/og-collections.jpg`} />
         <link rel="canonical" href={`${siteUrl}/collections/all`} />
       </Helmet>
       <div className="container py-12">
