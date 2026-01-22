@@ -8,8 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Store, CheckCircle, XCircle, RefreshCw, ExternalLink, Shield, Clock, AlertTriangle } from 'lucide-react';
+import { Store, CheckCircle, XCircle, RefreshCw, ExternalLink, Shield, Clock, AlertTriangle, Webhook, Trash2 } from 'lucide-react';
 import { useAuditLog } from '@/hooks/useAuditLog';
+
+interface WebhookStatus {
+  registered: number;
+  topics: string[];
+  endpoint: string | null;
+}
 
 interface ShopifySettingsData {
   id: string;
@@ -27,11 +33,20 @@ export default function ShopifySettings() {
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
   const [storeDomain, setStoreDomain] = useState('');
+  const [webhookStatus, setWebhookStatus] = useState<WebhookStatus | null>(null);
+  const [registeringWebhooks, setRegisteringWebhooks] = useState(false);
+  const [unregisteringWebhooks, setUnregisteringWebhooks] = useState(false);
   const { log } = useAuditLog();
 
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (settings?.is_connected) {
+      fetchWebhookStatus();
+    }
+  }, [settings?.is_connected]);
 
   async function fetchSettings() {
     try {
@@ -51,6 +66,86 @@ export default function ShopifySettings() {
       console.error('Error fetching Shopify settings:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchWebhookStatus() {
+    try {
+      const { data, error } = await supabase.functions.invoke('register-shopify-webhooks', {
+        body: { action: 'list' },
+      });
+
+      if (error) throw error;
+
+      if (data.success && data.webhooks) {
+        const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-webhook-processor`;
+        const registeredWebhooks = data.webhooks.filter(
+          (w: { address: string }) => w.address === endpoint
+        );
+        setWebhookStatus({
+          registered: registeredWebhooks.length,
+          topics: registeredWebhooks.map((w: { topic: string }) => w.topic),
+          endpoint,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching webhook status:', error);
+    }
+  }
+
+  async function handleRegisterWebhooks() {
+    setRegisteringWebhooks(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('register-shopify-webhooks', {
+        body: { action: 'register' },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(`Webhooks registered: ${data.summary.created} created, ${data.summary.existing} already existed`);
+        await log({
+          action: 'register_webhooks',
+          entityType: 'shopify_webhooks',
+          metadata: data.summary,
+        });
+        fetchWebhookStatus();
+      } else {
+        toast.error(data.error || 'Failed to register webhooks');
+      }
+    } catch (error) {
+      console.error('Webhook registration failed:', error);
+      toast.error('Failed to register webhooks');
+    } finally {
+      setRegisteringWebhooks(false);
+    }
+  }
+
+  async function handleUnregisterWebhooks() {
+    setUnregisteringWebhooks(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('register-shopify-webhooks', {
+        body: { action: 'unregister' },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(`${data.deleted} webhooks unregistered`);
+        await log({
+          action: 'unregister_webhooks',
+          entityType: 'shopify_webhooks',
+          metadata: { deleted: data.deleted },
+        });
+        fetchWebhookStatus();
+      } else {
+        toast.error(data.error || 'Failed to unregister webhooks');
+      }
+    } catch (error) {
+      console.error('Webhook unregistration failed:', error);
+      toast.error('Failed to unregister webhooks');
+    } finally {
+      setUnregisteringWebhooks(false);
     }
   }
 
@@ -279,23 +374,84 @@ export default function ShopifySettings() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Webhook Status
+              <Webhook className="h-5 w-5" />
+              Webhook Registration
             </CardTitle>
             <CardDescription>
-              Real-time event notifications from Shopify
+              Register webhooks with Shopify to receive live product update notifications
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Webhooks are configured automatically when you connect your store.
-              </p>
-              <Button variant="outline" asChild>
-                <a href="/admin/shopify/webhooks">
-                  View Webhook Events
-                </a>
-              </Button>
+            <div className="space-y-4">
+              {webhookStatus && (
+                <div className="p-4 rounded-lg bg-muted/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Registered Webhooks</span>
+                    <Badge variant={webhookStatus.registered > 0 ? 'default' : 'secondary'}>
+                      {webhookStatus.registered} active
+                    </Badge>
+                  </div>
+                  {webhookStatus.topics.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {webhookStatus.topics.map((topic) => (
+                        <Badge key={topic} variant="outline" className="text-xs">
+                          {topic}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  {webhookStatus.endpoint && (
+                    <div className="text-xs text-muted-foreground truncate">
+                      Endpoint: {webhookStatus.endpoint}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  onClick={handleRegisterWebhooks} 
+                  disabled={registeringWebhooks || !settings?.is_connected}
+                >
+                  {registeringWebhooks ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Webhook className="h-4 w-4 mr-2" />
+                  )}
+                  Register Webhooks
+                </Button>
+                
+                {webhookStatus && webhookStatus.registered > 0 && (
+                  <Button 
+                    variant="outline"
+                    onClick={handleUnregisterWebhooks} 
+                    disabled={unregisteringWebhooks}
+                  >
+                    {unregisteringWebhooks ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-2" />
+                    )}
+                    Unregister All
+                  </Button>
+                )}
+                
+                <Button variant="outline" asChild>
+                  <a href="/admin/shopify/webhooks">
+                    <Clock className="h-4 w-4 mr-2" />
+                    View Events
+                  </a>
+                </Button>
+              </div>
+
+              {!settings?.is_connected && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Connect your Shopify store first to register webhooks.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </CardContent>
         </Card>
