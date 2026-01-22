@@ -3,6 +3,7 @@ import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
 import { LanguageToggle } from "./LanguageToggle";
 import { CelebrationToggle } from "./CelebrationToggle";
+import { ThemeModeToggle } from "./ThemeModeToggle";
 import { Search, Menu, Vibrate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -60,6 +61,7 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <ThemeModeToggle />
           <CelebrationToggle />
           <LanguageToggle />
           <Tooltip>
