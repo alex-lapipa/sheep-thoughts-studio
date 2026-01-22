@@ -32,11 +32,14 @@ import {
   Play,
   Trash2,
   Clock,
+  ArrowLeftRight,
+  LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSemanticSearch, type SemanticSearchResult } from "@/hooks/useSemanticSearch";
 import { useRAGQueryHistory } from "@/hooks/useRAGQueryHistory";
+import { RAGComparisonMode } from "@/components/admin/RAGComparisonMode";
 import { formatDistanceToNow } from "date-fns";
 
 const SOURCE_CONFIG = {
@@ -229,6 +232,7 @@ function ResultCard({ result, rank }: ResultCardProps) {
 }
 
 export default function AdminRAGSearch() {
+  const [mode, setMode] = useState<"single" | "compare">("single");
   const [query, setQuery] = useState("");
   const [threshold, setThreshold] = useState(0.3);
   const [limit, setLimit] = useState(10);
@@ -315,16 +319,44 @@ export default function AdminRAGSearch() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold font-display flex items-center gap-3">
-            <Brain className="h-8 w-8 text-primary" />
-            RAG Search Visualizer
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Test semantic queries against the knowledge base and visualize results
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold font-display flex items-center gap-3">
+              <Brain className="h-8 w-8 text-primary" />
+              RAG Search Visualizer
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Test semantic queries against the knowledge base and visualize results
+            </p>
+          </div>
+          
+          {/* Mode Toggle */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            <Button
+              variant={mode === "single" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setMode("single")}
+              className="h-8"
+            >
+              <LayoutGrid className="h-4 w-4 mr-1" />
+              Single
+            </Button>
+            <Button
+              variant={mode === "compare" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setMode("compare")}
+              className="h-8"
+            >
+              <ArrowLeftRight className="h-4 w-4 mr-1" />
+              A/B Compare
+            </Button>
+          </div>
         </div>
 
+        {mode === "compare" ? (
+          <RAGComparisonMode />
+        ) : (
+          <>
         {/* Search Configuration */}
         <Card>
           <CardHeader>
@@ -688,6 +720,8 @@ export default function AdminRAGSearch() {
             </ul>
           </CardContent>
         </Card>
+          </>
+        )}
       </div>
     </AdminLayout>
   );
