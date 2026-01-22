@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
@@ -13,6 +14,7 @@ const Collections = () => {
   const { data: products, isLoading } = useProducts(query, 40);
 
   const modes: BubbleMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   const handleModeClick = (mode: BubbleMode) => {
     if (activeMode === mode) {
@@ -25,6 +27,20 @@ const Collections = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Bubbles Merch | Shop All Products</title>
+        <meta name="description" content="Browse the full collection of Bubbles merchandise. T-shirts, mugs, and more featuring confidently incorrect wisdom." />
+        <meta property="og:title" content="Bubbles Merch | Shop All Products" />
+        <meta property="og:description" content="T-shirts, mugs, and more featuring confidently incorrect wisdom from the Wicklow bogs." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/collections/all`} />
+        <meta property="og:image" content={`${siteUrl}/og-collections.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Bubbles Merch Collection" />
+        <meta name="twitter:description" content="Shop confidently incorrect wisdom merchandise." />
+        <meta name="twitter:image" content={`${siteUrl}/og-collections.png`} />
+        <link rel="canonical" href={`${siteUrl}/collections/all`} />
+      </Helmet>
       <div className="container py-12">
         <div className="mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">

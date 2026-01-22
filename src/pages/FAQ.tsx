@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -549,8 +550,24 @@ const FAQ = () => {
     }
   };
 
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
   return (
     <Layout>
+      <Helmet>
+        <title>Ask Bubbles | FAQ & Daily Wisdom</title>
+        <meta name="description" content="Ask Bubbles anything and receive confidently incorrect answers. Track your wisdom streak and unlock achievement badges." />
+        <meta property="og:title" content="Ask Bubbles | FAQ & Daily Wisdom" />
+        <meta property="og:description" content="Ask Bubbles anything. Get wisdom. Stay confused. From the Wicklow Institute of Confident Incorrectness." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/faq`} />
+        <meta property="og:image" content={`${siteUrl}/og-faq.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Ask Bubbles | FAQ" />
+        <meta name="twitter:description" content="Ask Bubbles anything. Get wisdom. Stay confused." />
+        <meta name="twitter:image" content={`${siteUrl}/og-faq.png`} />
+        <link rel="canonical" href={`${siteUrl}/faq`} />
+      </Helmet>
       <div className="container py-12 md:py-20">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">

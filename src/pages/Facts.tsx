@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
@@ -81,8 +82,24 @@ export default function Facts() {
     setDisplayedFacts(shuffled.slice(0, 6));
   };
 
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
   return (
     <Layout>
+      <Helmet>
+        <title>Facts by Bubbles | Confidently Incorrect Wisdom</title>
+        <meta name="description" content="Discover Bubbles' collection of confidently incorrect facts. Highly researched. Absolutely wrong. From the Wicklow bogs." />
+        <meta property="og:title" content="Facts by Bubbles | Confidently Incorrect Wisdom" />
+        <meta property="og:description" content="Discover Bubbles' collection of confidently incorrect facts. Highly researched. Absolutely wrong." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/facts`} />
+        <meta property="og:image" content={`${siteUrl}/og-facts.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Facts by Bubbles" />
+        <meta name="twitter:description" content="Highly researched. Absolutely wrong. From the Wicklow bogs." />
+        <meta name="twitter:image" content={`${siteUrl}/og-facts.png`} />
+        <link rel="canonical" href={`${siteUrl}/facts`} />
+      </Helmet>
       {/* Hero */}
       <section className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
         <div className="container relative z-10">
