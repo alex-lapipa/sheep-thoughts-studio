@@ -662,6 +662,7 @@ export type Database = {
           email: string
           id: string
           metadata: Json | null
+          preferences: Json | null
           source: string | null
           status: string
           subscribed_at: string
@@ -673,6 +674,7 @@ export type Database = {
           email: string
           id?: string
           metadata?: Json | null
+          preferences?: Json | null
           source?: string | null
           status?: string
           subscribed_at?: string
@@ -684,6 +686,7 @@ export type Database = {
           email?: string
           id?: string
           metadata?: Json | null
+          preferences?: Json | null
           source?: string | null
           status?: string
           subscribed_at?: string

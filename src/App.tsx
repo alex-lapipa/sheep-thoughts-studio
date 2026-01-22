@@ -28,6 +28,7 @@ import ShareBadges from "./pages/ShareBadges";
 import DataRights from "./pages/DataRights";
 import NewsletterConfirm from "./pages/NewsletterConfirm";
 import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
+import NewsletterPreferences from "./pages/NewsletterPreferences";
 import WhatsNew from "./pages/WhatsNew";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
@@ -89,6 +90,7 @@ const App = () => (
                 <Route path="/data-rights" element={<DataRights />} />
                 <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
                 <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
+                <Route path="/newsletter/preferences" element={<NewsletterPreferences />} />
                 <Route path="/whats-new" element={<WhatsNew />} />
                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
                 
