@@ -87,6 +87,7 @@ const ProductsPage = lazy(() => import("./pages/admin/catalog/Products"));
 const PricingRulesPage = lazy(() => import("./pages/admin/catalog/PricingRules"));
 const DropsPage = lazy(() => import("./pages/admin/catalog/Drops"));
 const AdminWhatsNew = lazy(() => import("./pages/admin/WhatsNewAdmin"));
+const IllustrationGenerator = lazy(() => import("./pages/admin/IllustrationGenerator"));
 // Minimal loading fallback
 function PageLoader() {
   return (
@@ -214,6 +215,7 @@ const App = () => (
                   <Route path="/admin/audit" element={<ProtectedRoute><AdminAuditLog /></ProtectedRoute>} />
                   <Route path="/admin/rag-search" element={<ProtectedRoute><AdminRAGSearch /></ProtectedRoute>} />
                   <Route path="/admin/whats-new" element={<ProtectedRoute><AdminWhatsNew /></ProtectedRoute>} />
+                  <Route path="/admin/illustrations" element={<ProtectedRoute><IllustrationGenerator /></ProtectedRoute>} />
                   
                     <Route path="*" element={<NotFound />} />
                   </Routes>
