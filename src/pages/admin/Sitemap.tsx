@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,11 @@ import {
   Globe,
   Twitter,
   Facebook,
-  Linkedin
+  Linkedin,
+  Bot,
+  RefreshCw,
+  ShieldCheck,
+  ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -22,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PageMeta {
   path: string;
@@ -269,9 +274,111 @@ const MetaIndicator = ({
   </div>
 );
 
+// Robots.txt validation rules
+interface RobotsValidation {
+  rule: string;
+  status: "pass" | "warn" | "fail";
+  message: string;
+}
+
+function validateRobotsTxt(content: string): RobotsValidation[] {
+  const validations: RobotsValidation[] = [];
+  const lines = content.split("\n").map(l => l.trim().toLowerCase());
+  
+  // Check for sitemap declaration
+  const hasSitemap = lines.some(l => l.startsWith("sitemap:"));
+  validations.push({
+    rule: "Sitemap Declaration",
+    status: hasSitemap ? "pass" : "fail",
+    message: hasSitemap ? "Sitemap URL is declared" : "Missing Sitemap declaration"
+  });
+
+  // Check for user-agent declarations
+  const hasUserAgent = lines.some(l => l.startsWith("user-agent:"));
+  validations.push({
+    rule: "User-Agent Rules",
+    status: hasUserAgent ? "pass" : "fail",
+    message: hasUserAgent ? "User-agent directives present" : "No user-agent rules defined"
+  });
+
+  // Check for wildcard user-agent
+  const hasWildcard = lines.some(l => l === "user-agent: *");
+  validations.push({
+    rule: "Wildcard User-Agent",
+    status: hasWildcard ? "pass" : "warn",
+    message: hasWildcard ? "Catch-all user-agent defined" : "No wildcard user-agent (may miss some bots)"
+  });
+
+  // Check admin is blocked
+  const adminBlocked = lines.some(l => l.includes("disallow: /admin"));
+  validations.push({
+    rule: "Admin Protected",
+    status: adminBlocked ? "pass" : "fail",
+    message: adminBlocked ? "/admin/ is blocked from crawling" : "Admin area is exposed to crawlers!"
+  });
+
+  // Check API is blocked
+  const apiBlocked = lines.some(l => l.includes("disallow: /api"));
+  validations.push({
+    rule: "API Protected",
+    status: apiBlocked ? "pass" : "warn",
+    message: apiBlocked ? "/api/ is blocked from crawling" : "API endpoints may be indexed"
+  });
+
+  // Check for social bot access
+  const socialBots = ["twitterbot", "facebookexternalhit", "linkedinbot"];
+  const socialBotsAllowed = socialBots.every(bot => 
+    lines.some(l => l.includes(bot))
+  );
+  validations.push({
+    rule: "Social Bot Access",
+    status: socialBotsAllowed ? "pass" : "warn",
+    message: socialBotsAllowed ? "Social preview bots have access" : "Some social bots may be missing"
+  });
+
+  // Check for crawl-delay
+  const hasCrawlDelay = lines.some(l => l.startsWith("crawl-delay:"));
+  validations.push({
+    rule: "Crawl Delay",
+    status: hasCrawlDelay ? "pass" : "warn",
+    message: hasCrawlDelay ? "Crawl delay is set for rate limiting" : "No crawl delay (optional)"
+  });
+
+  // Check for disallow all
+  const disallowsAll = lines.some(l => l === "disallow: /");
+  validations.push({
+    rule: "Site Accessibility",
+    status: disallowsAll ? "fail" : "pass",
+    message: disallowsAll ? "Entire site is blocked from crawling!" : "Site is accessible to crawlers"
+  });
+
+  return validations;
+}
+
 export default function AdminSitemap() {
   const [pages] = useState<PageMeta[]>(SITE_PAGES);
+  const [robotsTxt, setRobotsTxt] = useState<string>("");
+  const [robotsValidation, setRobotsValidation] = useState<RobotsValidation[]>([]);
+  const [loadingRobots, setLoadingRobots] = useState(false);
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
+  const fetchRobotsTxt = async () => {
+    setLoadingRobots(true);
+    try {
+      const response = await fetch("/robots.txt");
+      const text = await response.text();
+      setRobotsTxt(text);
+      setRobotsValidation(validateRobotsTxt(text));
+    } catch (error) {
+      console.error("Failed to fetch robots.txt:", error);
+    } finally {
+      setLoadingRobots(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRobotsTxt();
+  }, []);
 
   const stats = {
     total: pages.length,
@@ -283,6 +390,12 @@ export default function AdminSitemap() {
   };
 
   const completionPercentage = Math.round((stats.complete / stats.total) * 100);
+  
+  const robotsStats = {
+    pass: robotsValidation.filter(v => v.status === "pass").length,
+    warn: robotsValidation.filter(v => v.status === "warn").length,
+    fail: robotsValidation.filter(v => v.status === "fail").length,
+  };
 
   return (
     <AdminLayout>
@@ -353,6 +466,90 @@ export default function AdminSitemap() {
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Robots.txt Validator */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Robots.txt Validator
+                </CardTitle>
+                <CardDescription>
+                  Validate crawler directives and SEO best practices
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={fetchRobotsTxt}
+                  disabled={loadingRobots}
+                >
+                  <RefreshCw className={cn("h-4 w-4 mr-2", loadingRobots && "animate-spin")} />
+                  Refresh
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/robots.txt" target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View Raw
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Validation Results */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 text-sm">
+                  <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                    {robotsStats.pass} Passed
+                  </Badge>
+                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30">
+                    {robotsStats.warn} Warnings
+                  </Badge>
+                  <Badge variant="outline" className="bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30">
+                    {robotsStats.fail} Failed
+                  </Badge>
+                </div>
+                
+                <div className="space-y-2">
+                  {robotsValidation.map((validation, idx) => (
+                    <div 
+                      key={idx}
+                      className={cn(
+                        "flex items-start gap-3 p-3 rounded-lg border",
+                        validation.status === "pass" && "bg-green-500/5 border-green-500/20",
+                        validation.status === "warn" && "bg-yellow-500/5 border-yellow-500/20",
+                        validation.status === "fail" && "bg-red-500/5 border-red-500/20"
+                      )}
+                    >
+                      {validation.status === "pass" && <ShieldCheck className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />}
+                      {validation.status === "warn" && <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />}
+                      {validation.status === "fail" && <ShieldAlert className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />}
+                      <div>
+                        <div className="font-medium text-sm">{validation.rule}</div>
+                        <div className="text-sm text-muted-foreground">{validation.message}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Raw Content Preview */}
+              <div>
+                <div className="text-sm font-medium mb-2">File Contents</div>
+                <ScrollArea className="h-[320px] rounded-lg border bg-muted/30">
+                  <pre className="p-4 text-xs font-mono whitespace-pre-wrap">
+                    {robotsTxt || "Loading..."}
+                  </pre>
+                </ScrollArea>
+              </div>
             </div>
           </CardContent>
         </Card>
