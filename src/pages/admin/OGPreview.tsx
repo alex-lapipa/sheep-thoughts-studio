@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,33 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Copy, ExternalLink, Image as ImageIcon, Share2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { SocialPreviewTester } from '@/components/SocialPreviewTester';
+import { supabase } from '@/integrations/supabase/client';
+import { formatDistanceToNow } from 'date-fns';
 
 const MODES = ['innocent', 'concerned', 'triggered', 'savage', 'nuclear'] as const;
 const PRODUCT_TYPES = ['t-shirt', 'hoodie', 'mug', 'poster', 'sticker', 'tote-bag'] as const;
+
+interface CachedImage {
+  name: string;
+  id: string;
+  created_at: string;
+  metadata: Record<string, any> | null;
+}
 
 export default function OGPreview() {
   const [activeTab, setActiveTab] = useState('product');
@@ -32,7 +53,86 @@ export default function OGPreview() {
   const [badgeLoading, setBadgeLoading] = useState(false);
   const [badgeImageUrl, setBadgeImageUrl] = useState<string | null>(null);
 
+  // Cache management state
+  const [cachedImages, setCachedImages] = useState<CachedImage[]>([]);
+  const [cacheLoading, setCacheLoading] = useState(false);
+  const [deletingImage, setDeletingImage] = useState<string | null>(null);
+  const [clearingAll, setClearingAll] = useState(false);
+
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+  const fetchCachedImages = useCallback(async () => {
+    setCacheLoading(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('og-images')
+        .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+      if (error) throw error;
+      setCachedImages(data || []);
+    } catch (error) {
+      console.error('Error fetching cached images:', error);
+    } finally {
+      setCacheLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCachedImages();
+  }, [fetchCachedImages]);
+
+  const deleteImage = async (name: string) => {
+    setDeletingImage(name);
+    try {
+      const { error } = await supabase.storage.from('og-images').remove([name]);
+      if (error) throw error;
+      setCachedImages(prev => prev.filter(img => img.name !== name));
+      toast.success('Image deleted');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Failed to delete image');
+    } finally {
+      setDeletingImage(null);
+    }
+  };
+
+  const clearAllCache = async () => {
+    setClearingAll(true);
+    try {
+      const names = cachedImages.map(img => img.name);
+      for (let i = 0; i < names.length; i += 100) {
+        const batch = names.slice(i, i + 100);
+        const { error } = await supabase.storage.from('og-images').remove(batch);
+        if (error) throw error;
+      }
+      setCachedImages([]);
+      toast.success(`Cleared ${names.length} cached images`);
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      toast.error('Failed to clear cache');
+    } finally {
+      setClearingAll(false);
+    }
+  };
+
+  const getImageType = (name: string) => {
+    if (name.startsWith('product-')) return 'Product';
+    if (name.startsWith('badge-')) return 'Badge';
+    if (name.startsWith('privacy-')) return 'Privacy';
+    if (name.startsWith('shipping-')) return 'Shipping';
+    if (name.startsWith('contact-')) return 'Contact';
+    return 'Other';
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const totalCacheSize = cachedImages.reduce((acc, img) => acc + (img.metadata?.size || 0), 0);
 
   const generateProductOG = async (skipCache = false) => {
     setProductLoading(true);
@@ -148,6 +248,7 @@ export default function OGPreview() {
           <TabsList>
             <TabsTrigger value="product">Product OG</TabsTrigger>
             <TabsTrigger value="badge">Badge OG</TabsTrigger>
+            <TabsTrigger value="cache">Cache Management</TabsTrigger>
           </TabsList>
 
           <TabsContent value="product" className="space-y-6">
@@ -409,6 +510,138 @@ export default function OGPreview() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="cache" className="space-y-6">
+            {/* Cache Stats */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Cached Images</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                    {cachedImages.length}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Size</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <HardDrive className="h-6 w-6 text-muted-foreground" />
+                    {formatBytes(totalCacheSize)}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Actions</CardDescription>
+                  <CardContent className="p-0 pt-2">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={fetchCachedImages} disabled={cacheLoading}>
+                        {cacheLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm" disabled={cachedImages.length === 0 || clearingAll}>
+                            {clearingAll ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
+                            Clear All
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Clear All Cached Images?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will delete {cachedImages.length} cached OG images. They will be regenerated on next request.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={clearAllCache}>Clear All</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </CardContent>
+                </CardHeader>
+              </Card>
+            </div>
+
+            {/* Cached Images List */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5" />
+                  Cached Images
+                </CardTitle>
+                <CardDescription>
+                  View and manage individual cached OG images
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {cacheLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : cachedImages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                    <ImageIcon className="h-12 w-12 mb-2" />
+                    <p>No cached images</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-2">
+                      {cachedImages.map(image => (
+                        <div
+                          key={image.id}
+                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="w-16 h-10 bg-muted rounded overflow-hidden flex-shrink-0">
+                              <img
+                                src={`${supabaseUrl}/storage/v1/object/public/og-images/${image.name}`}
+                                alt={image.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-mono truncate">{image.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {getImageType(image.name)}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatBytes(image.metadata?.size || 0)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatDistanceToNow(new Date(image.created_at), { addSuffix: true })}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteImage(image.name)}
+                            disabled={deletingImage === image.name}
+                            className="flex-shrink-0"
+                          >
+                            {deletingImage === image.name ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            )}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
