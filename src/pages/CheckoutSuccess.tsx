@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/stores/cartStore";
 import { trackEvent } from "@/lib/analytics";
+import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 
@@ -87,9 +88,10 @@ const CheckoutSuccess = () => {
     fetchOrderDetails();
   }, [orderId, orderNumber]);
 
-  // Track purchase event (once)
+  // Track purchase event (once) - waits for order details if available
   useEffect(() => {
     if (tracked) return;
+    if (loading) return; // Wait for order details to load
 
     // Clear the cart after successful purchase
     clearCart();
@@ -102,27 +104,36 @@ const CheckoutSuccess = () => {
       value: totalPrice ? Math.round(parseFloat(totalPrice) * 100) : undefined,
     });
 
-    // Log to ecommerce_events table
-    const logPurchase = async () => {
-      try {
-        await supabase.from("ecommerce_events").insert({
-          event_type: "purchase_complete",
-          metadata: {
-            order_id: orderId,
-            order_number: orderNumber,
-            total: totalPrice,
-            currency,
-            source: "checkout_callback",
-          },
-        });
-      } catch (error) {
-        console.error("Failed to log purchase event:", error);
-      }
-    };
+    // If we have order details, send enhanced ecommerce tracking to GA4
+    if (orderDetails) {
+      ecommerceTracking.purchaseComplete({
+        orderId: orderId || String(orderDetails.id),
+        orderNumber: orderDetails.orderNumber,
+        totalValue: parseFloat(orderDetails.totalPrice),
+        currency: orderDetails.currency,
+        tax: parseFloat(orderDetails.totalTax) || 0,
+        shipping: parseFloat(orderDetails.shippingPrice) || 0,
+        items: orderDetails.lineItems.map(item => ({
+          productId: item.id,
+          productTitle: item.title,
+          variantTitle: item.variantTitle || undefined,
+          price: parseFloat(item.price),
+          quantity: item.quantity,
+        })),
+      });
+    } else {
+      // Fallback tracking without item details
+      ecommerceTracking.purchaseComplete({
+        orderId: orderId || "unknown",
+        orderNumber: orderNumber || undefined,
+        totalValue: totalPrice ? parseFloat(totalPrice) : 0,
+        currency,
+        items: [],
+      });
+    }
 
-    logPurchase();
     setTracked(true);
-  }, [searchParams, clearCart, tracked, orderId, orderNumber, totalPrice, currency]);
+  }, [loading, orderDetails, tracked, clearCart, orderId, orderNumber, totalPrice, currency]);
 
   const formatCurrency = (amount: string, curr: string) => {
     return new Intl.NumberFormat("en-IE", {
