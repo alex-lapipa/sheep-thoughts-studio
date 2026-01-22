@@ -47,6 +47,7 @@ import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
 import AdminMessages from "./pages/admin/Messages";
 import AdminSubscribers from "./pages/admin/Subscribers";
+import AdminSitemap from "./pages/admin/Sitemap";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,7 @@ const App = () => (
                 
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
+                <Route path="/admin/sitemap" element={<ProtectedRoute><AdminSitemap /></ProtectedRoute>} />
                 
                   <Route path="*" element={<NotFound />} />
                 </Routes>

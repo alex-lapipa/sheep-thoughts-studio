@@ -28,6 +28,7 @@ import {
   MessageCircle,
   BarChart3,
   Mail,
+  Map,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -125,6 +126,7 @@ const navSections: NavSection[] = [
     requiredModule: 'admin',
     items: [
       { href: '/admin/users', label: 'Users & Roles', icon: Users, requiredModule: 'admin' },
+      { href: '/admin/sitemap', label: 'Sitemap & SEO', icon: Map },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
     ],
   },
