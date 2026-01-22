@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import { BubblesSheep } from "./BubblesSheep";
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -36,15 +37,22 @@ const pageVariants: Variants = {
 export function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const previousPathRef = useRef(location.pathname);
 
   useEffect(() => {
     // Only trigger transition if path actually changed
     if (previousPathRef.current !== location.pathname) {
       setIsTransitioning(true);
+      setShowLoader(true);
       
       // Scroll to top on page change
       window.scrollTo({ top: 0, behavior: "instant" });
+      
+      // Hide loader after content starts appearing
+      const loaderTimer = setTimeout(() => {
+        setShowLoader(false);
+      }, 350);
       
       // End transition after animation
       const timer = setTimeout(() => {
@@ -52,12 +60,40 @@ export function PageTransition({ children }: PageTransitionProps) {
       }, 400);
       
       previousPathRef.current = location.pathname;
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(loaderTimer);
+      };
     }
   }, [location.pathname]);
 
   return (
     <>
+      {/* Swivelling sheep loader */}
+      <AnimatePresence>
+        {showLoader && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[150] flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <motion.div
+              animate={{ rotateY: 360 }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <BubblesSheep size="lg" animated={false} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Page transition loading bar */}
       <motion.div 
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary via-accent to-primary z-[100]"
