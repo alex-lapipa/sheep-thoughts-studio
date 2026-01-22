@@ -9,13 +9,16 @@ import {
   subMonths, 
   addWeeks,
   subWeeks,
+  addDays,
+  subDays,
   startOfWeek,
   endOfWeek,
   isToday, 
   parseISO,
   getHours,
   setHours,
-  setMinutes
+  setMinutes,
+  isSameDay
 } from "date-fns";
 import { 
   DndContext, 
@@ -29,7 +32,7 @@ import {
   useSensors,
   DragOverEvent
 } from "@dnd-kit/core";
-import { ChevronLeft, ChevronRight, Clock, Send, CalendarDays, LayoutGrid, Calendar, GripVertical } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Send, CalendarDays, LayoutGrid, Calendar, GripVertical, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,7 +67,7 @@ interface CampaignCalendarProps {
   onReschedule?: (campaignId: string, newDate: Date) => Promise<void>;
 }
 
-type ViewMode = "month" | "week";
+type ViewMode = "month" | "week" | "day";
 
 // Draggable Campaign Item
 function DraggableCampaign({ 
@@ -320,24 +323,48 @@ export function CampaignCalendar({ campaigns, onCampaignClick, onReschedule }: C
   const navigatePrevious = () => {
     if (viewMode === "month") {
       setCurrentDate(subMonths(currentDate, 1));
-    } else {
+    } else if (viewMode === "week") {
       setCurrentDate(subWeeks(currentDate, 1));
+    } else {
+      setCurrentDate(subDays(currentDate, 1));
     }
   };
 
   const navigateNext = () => {
     if (viewMode === "month") {
       setCurrentDate(addMonths(currentDate, 1));
-    } else {
+    } else if (viewMode === "week") {
       setCurrentDate(addWeeks(currentDate, 1));
+    } else {
+      setCurrentDate(addDays(currentDate, 1));
     }
   };
 
   const getHeaderTitle = () => {
     if (viewMode === "month") {
       return format(currentDate, "MMMM yyyy");
+    } else if (viewMode === "week") {
+      return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
     }
-    return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
+    return format(currentDate, "EEEE, MMMM d, yyyy");
+  };
+
+  // Get campaigns for the current day view
+  const dayCampaigns = useMemo(() => {
+    return campaigns.filter((campaign) => {
+      let dateTime: Date | null = null;
+      
+      if (campaign.status === "scheduled" && campaign.scheduled_at) {
+        dateTime = parseISO(campaign.scheduled_at);
+      } else if (campaign.status === "sent" && campaign.sent_at) {
+        dateTime = parseISO(campaign.sent_at);
+      } else if (campaign.status === "sending" && campaign.scheduled_at) {
+        dateTime = parseISO(campaign.scheduled_at);
+      }
+      
+      return dateTime && isSameDay(dateTime, currentDate);
+    });
+  }, [campaigns, currentDate]);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -436,6 +463,15 @@ export function CampaignCalendar({ campaigns, onCampaignClick, onReschedule }: C
                   >
                     <LayoutGrid className="h-3.5 w-3.5 mr-1" />
                     Week
+                  </Button>
+                  <Button
+                    variant={viewMode === "day" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("day")}
+                    className="h-7 px-2 text-xs"
+                  >
+                    <CalendarClock className="h-3.5 w-3.5 mr-1" />
+                    Day
                   </Button>
                 </div>
                 
@@ -666,7 +702,140 @@ export function CampaignCalendar({ campaigns, onCampaignClick, onReschedule }: C
               </div>
             )}
 
-            {/* Legend */}
+            {/* Day View */}
+            {viewMode === "day" && (
+              <div className="border rounded-lg overflow-hidden">
+                {/* Day header with date info */}
+                <div className="bg-muted/30 p-4 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className={cn(
+                        "text-2xl font-bold",
+                        isToday(currentDate) && "text-primary"
+                      )}>
+                        {format(currentDate, "EEEE")}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {format(currentDate, "MMMM d, yyyy")}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={isToday(currentDate) ? "default" : "outline"} className="mb-1">
+                        {isToday(currentDate) ? "Today" : format(currentDate, "EEE")}
+                      </Badge>
+                      <p className="text-sm text-muted-foreground">
+                        {dayCampaigns.length} campaign{dayCampaigns.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hourly slots */}
+                <ScrollArea className="h-[600px]">
+                  <div className="divide-y">
+                    {hours.map((hour) => {
+                      const hourCampaigns = getCampaignsForHour(currentDate, hour);
+                      const dropId = `hour-${format(currentDate, "yyyy-MM-dd")}-${hour}`;
+                      const isCurrentHour = isToday(currentDate) && new Date().getHours() === hour;
+                      
+                      return (
+                        <div 
+                          key={hour} 
+                          className={cn(
+                            "grid grid-cols-[80px_1fr] min-h-[80px] relative",
+                            isCurrentHour && "bg-primary/5"
+                          )}
+                        >
+                          {/* Current time indicator */}
+                          {isCurrentHour && (
+                            <div 
+                              className="absolute left-20 right-0 border-t-2 border-primary z-10 pointer-events-none"
+                              style={{ top: `${(new Date().getMinutes() / 60) * 100}%` }}
+                            >
+                              <div className="absolute -left-1 -top-1.5 w-2 h-2 rounded-full bg-primary" />
+                            </div>
+                          )}
+                          
+                          {/* Hour label */}
+                          <div className={cn(
+                            "p-3 text-sm font-medium border-r flex flex-col justify-start",
+                            isCurrentHour ? "text-primary" : "text-muted-foreground"
+                          )}>
+                            <span>{format(setHours(new Date(), hour), "h:mm a")}</span>
+                            {hour === 9 && (
+                              <span className="text-xs text-muted-foreground/60 mt-0.5">Peak time</span>
+                            )}
+                          </div>
+                          
+                          {/* Droppable hour slot */}
+                          <DroppableHour
+                            day={currentDate}
+                            hour={hour}
+                            isOver={overId === dropId}
+                          >
+                            <div className="p-2 space-y-2">
+                              <TooltipProvider>
+                                {hourCampaigns.map((campaign) => (
+                                  <Tooltip key={campaign.id}>
+                                    <TooltipTrigger asChild>
+                                      <div className="w-full">
+                                        <DraggableCampaign
+                                          campaign={campaign}
+                                          onClick={() => onCampaignClick?.(campaign)}
+                                          getStatusColor={getStatusColor}
+                                          getStatusIcon={getStatusIcon}
+                                        />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm z-50">
+                                      <div className="space-y-2">
+                                        <p className="font-medium">{campaign.subject}</p>
+                                        {campaign.preview_text && (
+                                          <p className="text-xs text-muted-foreground">{campaign.preview_text}</p>
+                                        )}
+                                        <div className="flex items-center gap-2 text-xs">
+                                          <Badge variant="outline" className={cn("text-xs", getStatusColor(campaign.status))}>
+                                            {campaign.status}
+                                          </Badge>
+                                          {campaign.scheduled_at && (
+                                            <span className="text-muted-foreground">
+                                              {format(parseISO(campaign.scheduled_at), "h:mm a")}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {campaign.status === "scheduled" && campaign.scheduled_at && (
+                                          <div className="pt-1 border-t">
+                                            <CountdownTimer 
+                                              targetDate={new Date(campaign.scheduled_at)} 
+                                              compact={false}
+                                            />
+                                          </div>
+                                        )}
+                                        {(campaign.status === "scheduled" || campaign.status === "draft") && (
+                                          <p className="text-xs text-primary">
+                                            Drag to a different hour to reschedule
+                                          </p>
+                                        )}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ))}
+                              </TooltipProvider>
+                              
+                              {hourCampaigns.length === 0 && (
+                                <div className="h-full flex items-center justify-center text-xs text-muted-foreground/50 py-4">
+                                  Drop campaign here
+                                </div>
+                              )}
+                            </div>
+                          </DroppableHour>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              </div>
+            )}
             <div className="flex items-center gap-4 mt-4 pt-4 border-t flex-wrap">
               <span className="text-sm text-muted-foreground">Legend:</span>
               <div className="flex items-center gap-1.5">
