@@ -341,6 +341,54 @@ export type Database = {
         }
         Relationships: []
       }
+      character_combination_feedback: {
+        Row: {
+          accessory: string
+          created_at: string
+          design_issues: string[] | null
+          expression: string
+          id: string
+          notes: string | null
+          posture: string
+          priority: number | null
+          rating: number | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accessory: string
+          created_at?: string
+          design_issues?: string[] | null
+          expression?: string
+          id?: string
+          notes?: string | null
+          posture: string
+          priority?: number | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accessory?: string
+          created_at?: string
+          design_issues?: string[] | null
+          expression?: string
+          id?: string
+          notes?: string | null
+          posture?: string
+          priority?: number | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           email: string
