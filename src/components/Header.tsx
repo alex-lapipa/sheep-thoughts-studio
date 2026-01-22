@@ -4,7 +4,7 @@ import { BubblesLogo } from "./BubblesSheep";
 import { LanguageToggle } from "./LanguageToggle";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
-import { Search, Menu, Vibrate } from "lucide-react";
+import { Search, Menu, Vibrate, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
@@ -80,6 +80,22 @@ export function Header() {
             </TooltipTrigger>
             <TooltipContent>
               <p>Haptic feedback: {hapticEnabled ? "On" : "Off"}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link to="/whats-new">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="hover:animate-bounce-gentle"
+                >
+                  <Sparkles className="h-5 w-5" />
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>What's New</p>
             </TooltipContent>
           </Tooltip>
           <Link to="/search">
