@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { List, ArrowUp } from "lucide-react";
+import { List, ArrowUp, ChevronDown, ChevronRight } from "lucide-react";
 import { useTableOfContents, TocItem } from "@/hooks/useTableOfContents";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
@@ -13,6 +13,81 @@ interface LegalPageLayoutProps {
   tocItems: TocItem[];
   tocTitle?: string;
   mobileTocTitle?: string;
+}
+
+// Recursive TOC item renderer
+function TocItemButton({ 
+  item, 
+  activeId, 
+  scrollToSection, 
+  onNavigate,
+  depth = 0 
+}: { 
+  item: TocItem; 
+  activeId: string;
+  scrollToSection: (id: string) => void;
+  onNavigate?: () => void;
+  depth?: number;
+}) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const hasChildren = item.children && item.children.length > 0;
+  const isActive = activeId === item.id;
+  const hasActiveChild = item.children?.some(child => 
+    child.id === activeId || child.children?.some(grandchild => grandchild.id === activeId)
+  );
+
+  return (
+    <div>
+      <div className="flex items-center">
+        {hasChildren && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-0.5 mr-1 rounded hover:bg-muted/50 transition-colors"
+            aria-label={isExpanded ? "Collapse" : "Expand"}
+          >
+            {isExpanded ? (
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+            )}
+          </button>
+        )}
+        <button
+          onClick={() => {
+            scrollToSection(item.id);
+            onNavigate?.();
+          }}
+          className={cn(
+            "flex-1 text-left text-sm py-1.5 px-2 rounded-md transition-all duration-200",
+            depth > 0 && "text-xs",
+            !hasChildren && depth === 0 && "ml-5",
+            isActive
+              ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+              : hasActiveChild
+              ? "text-foreground font-medium"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          {item.title}
+        </button>
+      </div>
+      
+      {hasChildren && isExpanded && (
+        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-border/50 pl-2">
+          {item.children!.map((child) => (
+            <TocItemButton
+              key={child.id}
+              item={child}
+              activeId={activeId}
+              scrollToSection={scrollToSection}
+              onNavigate={onNavigate}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function LegalPageLayout({ 
@@ -57,20 +132,14 @@ export function LegalPageLayout({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pb-4">
-                  <nav className="space-y-1">
+                  <nav className="space-y-0.5">
                     {tocItems.map((item) => (
-                      <button
+                      <TocItemButton
                         key={item.id}
-                        onClick={() => scrollToSection(item.id)}
-                        className={cn(
-                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all duration-200",
-                          activeId === item.id
-                            ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        )}
-                      >
-                        {item.title}
-                      </button>
+                        item={item}
+                        activeId={activeId}
+                        scrollToSection={scrollToSection}
+                      />
                     ))}
                   </nav>
                 </CardContent>
@@ -100,28 +169,20 @@ export function LegalPageLayout({
             </Button>
             
             {showMobileToc && (
-              <Card className="absolute bottom-16 right-0 w-64 bg-card/95 backdrop-blur-sm shadow-xl animate-fade-in">
+              <Card className="absolute bottom-16 right-0 w-72 max-h-[60vh] overflow-y-auto bg-card/95 backdrop-blur-sm shadow-xl animate-fade-in">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">{mobileTocTitle}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-3">
-                  <nav className="space-y-1">
+                  <nav className="space-y-0.5">
                     {tocItems.map((item) => (
-                      <button
+                      <TocItemButton
                         key={item.id}
-                        onClick={() => {
-                          scrollToSection(item.id);
-                          setShowMobileToc(false);
-                        }}
-                        className={cn(
-                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all",
-                          activeId === item.id
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        )}
-                      >
-                        {item.title}
-                      </button>
+                        item={item}
+                        activeId={activeId}
+                        scrollToSection={scrollToSection}
+                        onNavigate={() => setShowMobileToc(false)}
+                      />
                     ))}
                   </nav>
                 </CardContent>

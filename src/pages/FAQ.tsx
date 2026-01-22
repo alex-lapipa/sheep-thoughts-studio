@@ -15,13 +15,23 @@ import { StreakBadges } from "@/components/StreakBadges";
 import { analytics } from "@/lib/analytics";
 import { TocItem } from "@/hooks/useTableOfContents";
 
-// Table of Contents items for the FAQ page
+// Table of Contents items for the FAQ page with nested sub-sections
 const FAQ_TOC_ITEMS: TocItem[] = [
   { id: "daily-wisdom", title: "Daily Wisdom", level: 1 },
   { id: "random-wisdom", title: "Random Wisdom", level: 1 },
   { id: "ask-bubbles", title: "Ask Bubbles", level: 1 },
   { id: "question-history", title: "Question History", level: 1 },
-  { id: "faq-list", title: "FAQ List", level: 1 },
+  { 
+    id: "faq-list", 
+    title: "FAQ List", 
+    level: 1,
+    children: [
+      { id: "faq-about-bubbles", title: "About Bubbles", level: 2 },
+      { id: "faq-how-it-works", title: "How It Works", level: 2 },
+      { id: "faq-technical", title: "Technical", level: 2 },
+      { id: "faq-community", title: "Community & Fun", level: 2 },
+    ]
+  },
   { id: "contact", title: "Contact", level: 1 },
 ];
 
@@ -1482,18 +1492,87 @@ const FAQ = () => {
 
       {/* FAQ List */}
       <section id="faq-list" className="scroll-mt-24">
-        <Accordion type="single" collapsible className="w-full">
-          {faqs.map((faq, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="font-display text-left">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <h2 className="text-2xl font-display font-bold mb-6">Frequently Asked Questions</h2>
+        
+        {/* About Bubbles */}
+        <div id="faq-about-bubbles" className="scroll-mt-24 mb-8">
+          <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            About Bubbles
+          </h3>
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.slice(0, 5).map((faq, index) => (
+              <AccordionItem key={index} value={`about-${index}`}>
+                <AccordionTrigger className="font-display text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* How It Works */}
+        <div id="faq-how-it-works" className="scroll-mt-24 mb-8">
+          <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            How It Works
+          </h3>
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.slice(5, 9).map((faq, index) => (
+              <AccordionItem key={index} value={`how-${index}`}>
+                <AccordionTrigger className="font-display text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* Technical */}
+        <div id="faq-technical" className="scroll-mt-24 mb-8">
+          <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            Technical
+          </h3>
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.slice(9, 13).map((faq, index) => (
+              <AccordionItem key={index} value={`tech-${index}`}>
+                <AccordionTrigger className="font-display text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* Community & Fun */}
+        <div id="faq-community" className="scroll-mt-24 mb-8">
+          <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            Community & Fun
+          </h3>
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.slice(13).map((faq, index) => (
+              <AccordionItem key={index} value={`community-${index}`}>
+                <AccordionTrigger className="font-display text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </section>
 
       <section id="contact" className="mt-12 p-6 bg-secondary/50 rounded-xl text-center scroll-mt-24">
