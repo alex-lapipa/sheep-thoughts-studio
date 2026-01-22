@@ -47,6 +47,7 @@ import {
   Shield,
   Bell,
   Image,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -93,6 +94,7 @@ const navSections: NavSection[] = [
     title: 'Brand',
     items: [
       { href: '/admin/brand', label: 'Overview', icon: BookOpen },
+      { href: '/about', label: 'My Story', icon: User, external: true },
       { href: '/admin/brand/colors', label: 'Colors', icon: Sparkles },
       { href: '/admin/brand/typography', label: 'Typography', icon: FileText },
       { href: '/admin/brand/character', label: 'Character', icon: Target },
