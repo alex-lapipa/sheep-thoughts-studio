@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { EmailBlockEditor } from "@/components/admin/EmailBlockEditor";
+import { CampaignCalendar } from "@/components/admin/CampaignCalendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -67,6 +68,8 @@ import {
   Sparkles,
   LayoutGrid,
   PenLine,
+  List,
+  CalendarDays,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
@@ -139,6 +142,9 @@ export default function AdminCampaigns() {
   
   // Editor mode: "rich" for RichTextEditor, "blocks" for EmailBlockEditor
   const [editorMode, setEditorMode] = useState<"rich" | "blocks">("blocks");
+  
+  // View mode: "list" for table view, "calendar" for calendar view
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   // Fetch templates for the picker
   const { data: templates = [] } = useQuery({
@@ -466,119 +472,151 @@ export default function AdminCampaigns() {
           </Card>
         </div>
 
+        {/* View Toggle */}
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg w-fit">
+          <Button
+            variant={viewMode === "list" ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+            className="gap-1.5 h-8"
+          >
+            <List className="h-4 w-4" />
+            List
+          </Button>
+          <Button
+            variant={viewMode === "calendar" ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("calendar")}
+            className="gap-1.5 h-8"
+          >
+            <CalendarDays className="h-4 w-4" />
+            Calendar
+          </Button>
+        </div>
+
+        {/* Calendar View */}
+        {viewMode === "calendar" && (
+          <CampaignCalendar 
+            campaigns={campaigns} 
+            onCampaignClick={(campaign) => openPreview(campaign)}
+          />
+        )}
+
         {/* Campaigns Table */}
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Recipients</TableHead>
-                  <TableHead>Delivered</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
+        {viewMode === "list" && (
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      Loading campaigns...
-                    </TableCell>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Recipients</TableHead>
+                    <TableHead>Delivered</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="w-12"></TableHead>
                   </TableRow>
-                ) : campaigns.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No campaigns yet. Create your first one!
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  campaigns.map((campaign) => (
-                    <TableRow key={campaign.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{campaign.subject}</p>
-                          {campaign.preview_text && (
-                            <p className="text-sm text-muted-foreground truncate max-w-xs">
-                              {campaign.preview_text}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(campaign.status, campaign)}</TableCell>
-                      <TableCell>{campaign.recipient_count || "-"}</TableCell>
-                      <TableCell>
-                        {campaign.status === "sent" ? (
-                          <span className="text-primary">{campaign.delivered_count}</span>
-                        ) : "-"}
-                        {campaign.failed_count > 0 && (
-                          <span className="text-destructive ml-1">({campaign.failed_count} failed)</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {format(new Date(campaign.created_at), "MMM d, yyyy")}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openPreview(campaign)}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Preview
-                            </DropdownMenuItem>
-                            {(campaign.status === "draft" || campaign.status === "scheduled") && (
-                              <>
-                                <DropdownMenuItem onClick={() => openEdit(campaign)}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openTest(campaign)}>
-                                  <TestTube className="h-4 w-4 mr-2" />
-                                  Send Test
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => openSchedule(campaign)}>
-                                  <CalendarIcon className="h-4 w-4 mr-2" />
-                                  {campaign.status === "scheduled" ? "Reschedule" : "Schedule"}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openSendConfirm(campaign)}>
-                                  <Send className="h-4 w-4 mr-2" />
-                                  Send Now
-                                </DropdownMenuItem>
-                                {campaign.status === "scheduled" && (
-                                  <DropdownMenuItem 
-                                    onClick={() => cancelScheduleMutation.mutate(campaign.id)}
-                                    className="text-warning"
-                                  >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    Cancel Schedule
-                                  </DropdownMenuItem>
-                                )}
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => deleteMutation.mutate(campaign.id)}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        Loading campaigns...
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                  ) : campaigns.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No campaigns yet. Create your first one!
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    campaigns.map((campaign) => (
+                      <TableRow key={campaign.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{campaign.subject}</p>
+                            {campaign.preview_text && (
+                              <p className="text-sm text-muted-foreground truncate max-w-xs">
+                                {campaign.preview_text}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(campaign.status, campaign)}</TableCell>
+                        <TableCell>{campaign.recipient_count || "-"}</TableCell>
+                        <TableCell>
+                          {campaign.status === "sent" ? (
+                            <span className="text-primary">{campaign.delivered_count}</span>
+                          ) : "-"}
+                          {campaign.failed_count > 0 && (
+                            <span className="text-destructive ml-1">({campaign.failed_count} failed)</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {format(new Date(campaign.created_at), "MMM d, yyyy")}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => openPreview(campaign)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Preview
+                              </DropdownMenuItem>
+                              {(campaign.status === "draft" || campaign.status === "scheduled") && (
+                                <>
+                                  <DropdownMenuItem onClick={() => openEdit(campaign)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => openTest(campaign)}>
+                                    <TestTube className="h-4 w-4 mr-2" />
+                                    Send Test
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => openSchedule(campaign)}>
+                                    <CalendarIcon className="h-4 w-4 mr-2" />
+                                    {campaign.status === "scheduled" ? "Reschedule" : "Schedule"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => openSendConfirm(campaign)}>
+                                    <Send className="h-4 w-4 mr-2" />
+                                    Send Now
+                                  </DropdownMenuItem>
+                                  {campaign.status === "scheduled" && (
+                                    <DropdownMenuItem 
+                                      onClick={() => cancelScheduleMutation.mutate(campaign.id)}
+                                      className="text-warning"
+                                    >
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Cancel Schedule
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => deleteMutation.mutate(campaign.id)}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Create Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
