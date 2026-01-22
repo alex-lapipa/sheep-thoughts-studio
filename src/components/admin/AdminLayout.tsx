@@ -98,6 +98,7 @@ const navSections: NavSection[] = [
       { href: '/admin/brand/production', label: 'Production', icon: Package },
       { href: '/admin/brand/frontend', label: 'Frontend', icon: ExternalLink },
       { href: '/admin/brand/wicklow-palette', label: 'Wicklow Palette', icon: Sparkles },
+      { href: '/admin/brand/gallery', label: 'Character Gallery', icon: Target },
     ],
   },
   {
