@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -130,6 +130,7 @@ function useRegionalPricing(region: RegionConfig) {
 }
 
 export default function DACH() {
+  const location = useLocation();
   const [selectedRegion, setSelectedRegion] = useState<DACHRegion>("de");
   const [currentThoughtIndex, setCurrentThoughtIndex] = useState(0);
   const { data: products, isLoading } = useProducts(undefined, 8);
@@ -137,9 +138,26 @@ export default function DACH() {
   const region = DACH_REGIONS[selectedRegion];
   const { formatPrice } = useRegionalPricing(region);
 
-  // Detect region from browser
+  // Detect region from URL path first, then browser language
   useEffect(() => {
     const detectRegion = () => {
+      const path = location.pathname.toLowerCase();
+      
+      // Check URL path first
+      if (path === "/ch") {
+        setSelectedRegion("ch");
+        return;
+      }
+      if (path === "/at") {
+        setSelectedRegion("at");
+        return;
+      }
+      if (path === "/de") {
+        setSelectedRegion("de");
+        return;
+      }
+      
+      // Fallback to browser language detection
       const lang = navigator.language.toLowerCase();
       if (lang.includes("de-ch") || lang.includes("fr-ch") || lang.includes("it-ch")) {
         setSelectedRegion("ch");
@@ -150,7 +168,7 @@ export default function DACH() {
       }
     };
     detectRegion();
-  }, []);
+  }, [location.pathname]);
 
   // Rotate thoughts
   useEffect(() => {
@@ -159,6 +177,15 @@ export default function DACH() {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  // Get the correct hreflang code for the current region
+  const getHreflangCode = (): string => {
+    switch (selectedRegion) {
+      case "at": return "de-AT";
+      case "ch": return "de-CH";
+      default: return "de-DE";
+    }
+  };
 
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
@@ -170,12 +197,20 @@ export default function DACH() {
         <meta property="og:title" content={`Bubbles das Schaf | ${region.name}`} />
         <meta property="og:description" content={region.tagline} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${siteUrl}/dach`} />
+        <meta property="og:url" content={`${siteUrl}/${selectedRegion === "de" ? "de" : selectedRegion}`} />
         <meta property="og:image" content={`${siteUrl}/og-home.jpg`} />
         <meta property="og:locale" content={`de_${selectedRegion.toUpperCase()}`} />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href={`${siteUrl}/dach`} />
-        <html lang="de" />
+        
+        {/* Regional hreflang tags for DACH */}
+        <link rel="alternate" hrefLang="de-DE" href={`${siteUrl}/de`} />
+        <link rel="alternate" hrefLang="de-AT" href={`${siteUrl}/at`} />
+        <link rel="alternate" hrefLang="de-CH" href={`${siteUrl}/ch`} />
+        <link rel="alternate" hrefLang="de" href={`${siteUrl}/dach`} />
+        <link rel="alternate" hrefLang="x-default" href={`${siteUrl}/`} />
+        
+        <link rel="canonical" href={`${siteUrl}/${selectedRegion === "de" ? "de" : selectedRegion}`} />
+        <html lang={getHreflangCode()} />
       </Helmet>
 
       {/* Region Selector Banner */}
