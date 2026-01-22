@@ -1,15 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=pages</loc>
-    <lastmod>2025-01-22</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=products</loc>
-    <lastmod>2025-01-22</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=collections</loc>
-    <lastmod>2025-01-22</lastmod>
-  </sitemap>
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Homepage -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-home.jpg</image:loc>
+      <image:title>Bubbles the Sheep - Confidently Wrong Wisdom</image:title>
+    </image:image>
+  </url>
+  
+  <!-- About -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/about</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-about.jpg</image:loc>
+      <image:title>About Bubbles</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Facts -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/facts</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-facts.jpg</image:loc>
+      <image:title>Bubbles Facts</image:title>
+    </image:image>
+  </url>
+  
+  <!-- FAQ -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/faq</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-faq.jpg</image:loc>
+      <image:title>Frequently Asked Questions</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Scenarios -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/scenarios</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Explains -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/explains</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-explains.jpg</image:loc>
+      <image:title>Bubbles Explains</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Achievements -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/achievements</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-achievements.jpg</image:loc>
+      <image:title>Wisdom Badges</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Share Badges -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/share-badges</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-share-badges.jpg</image:loc>
+      <image:title>Share Your Badges</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Data Rights -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/data-rights</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-data-rights.jpg</image:loc>
+      <image:title>Your Data Rights</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Privacy -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/privacy</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-privacy.jpg</image:loc>
+      <image:title>Privacy Policy</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Terms -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/terms</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-terms.jpg</image:loc>
+      <image:title>Terms of Service</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Shipping -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/shipping</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-shipping.jpg</image:loc>
+      <image:title>Shipping and Returns</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Contact -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/contact</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-contact.jpg</image:loc>
+      <image:title>Contact Bubbles</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Search -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/search</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-search.jpg</image:loc>
+      <image:title>Search Products</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Collections -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://sheep-thoughts-studio.lovable.app/og-collections.jpg</image:loc>
+      <image:title>All Collections</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Collections - All -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Collections - Mode Filters -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all?mode=innocent</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all?mode=concerned</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all?mode=triggered</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all?mode=savage</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/collections/all?mode=nuclear</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- What's New -->
+  <url>
+    <loc>https://sheep-thoughts-studio.lovable.app/whats-new</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>
