@@ -3,8 +3,11 @@ import { Layout } from "@/components/Layout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 
 const About = () => {
+  // Enable smooth scrolling to anchor links
+  useSmoothScroll();
   const { t, language } = useLanguage();
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
