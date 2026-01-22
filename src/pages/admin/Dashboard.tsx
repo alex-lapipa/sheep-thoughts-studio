@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { supabase } from '@/integrations/supabase/client';
 import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
+import { ShoppingHeatmap } from '@/components/admin/ShoppingHeatmap';
 
 interface Stats {
   thoughts: number;
@@ -381,6 +382,9 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Shopping Activity Heatmap */}
+        <ShoppingHeatmap />
 
         {/* Mode Distribution */}
         <Card>
