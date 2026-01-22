@@ -40,6 +40,7 @@ import BrandProduction from "./pages/admin/brand/BrandProduction";
 import BrandFrontend from "./pages/admin/brand/BrandFrontend";
 import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
+import AdminMessages from "./pages/admin/Messages";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,9 @@ const App = () => (
                 <Route path="/admin/brand/production" element={<ProtectedRoute><BrandProduction /></ProtectedRoute>} />
                 <Route path="/admin/brand/frontend" element={<ProtectedRoute><BrandFrontend /></ProtectedRoute>} />
                 <Route path="/admin/brand/wicklow-palette" element={<ProtectedRoute><AdminWicklowPalette /></ProtectedRoute>} />
+                
+                {/* Support Routes */}
+                <Route path="/admin/messages" element={<ProtectedRoute><AdminMessages /></ProtectedRoute>} />
                 
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
