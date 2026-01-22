@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
 import { ChallengeBubbles } from "@/components/ChallengeBubbles";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap } from "lucide-react";
@@ -246,17 +247,18 @@ const Explains = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/explains`} />
       </Helmet>
-      <div className="container py-12 md:py-20">
+      {/* Hero with Bubbles and thought bubbles */}
+      <PageHeroWithBubbles
+        title={t("explainsPage.hero.title")}
+        subtitle={t("explainsPage.hero.subtitle")}
+        bubbleSize="md"
+        posture="two-legged"
+        accessory="bucket-hat"
+        className="mb-8"
+      />
+
+      <div className="container pb-12 md:pb-20">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-              {t("explainsPage.hero.title")}
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t("explainsPage.hero.subtitle")}
-            </p>
-          </div>
 
           {/* Mode Tabs */}
           <Tabs defaultValue="encyclopedia" className="space-y-8">

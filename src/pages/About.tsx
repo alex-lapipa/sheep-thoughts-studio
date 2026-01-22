@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
@@ -55,19 +56,15 @@ const About = () => {
         <link rel="canonical" href={`${siteUrl}/about`} />
       </Helmet>
 
-      {/* Hero */}
-      <section id="hero" className="scroll-mt-24 mb-16">
-        <div className="text-center">
-          <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-bubbles-cream border-4 border-bubbles-heather flex items-center justify-center">
-            <span className="font-display text-5xl font-bold text-bubbles-peat">B</span>
-          </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-            {t("aboutPage.hero.title")}
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            {t("aboutPage.hero.subtitle")}
-          </p>
-        </div>
+      {/* Hero with Bubbles and thought bubbles */}
+      <section id="hero" className="scroll-mt-24 mb-16 -mx-4">
+        <PageHeroWithBubbles
+          title={t("aboutPage.hero.title")}
+          subtitle={t("aboutPage.hero.subtitle")}
+          bubbleSize="lg"
+          posture="two-legged"
+          accessory="cap"
+        />
       </section>
 
       {/* Origin Story */}
