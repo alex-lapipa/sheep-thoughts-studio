@@ -14,21 +14,30 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useWhatsNew } from "@/hooks/useWhatsNew";
 import { cn } from "@/lib/utils";
 
-const getNavLinks = (t: (key: string) => string) => [
-  { href: "/", label: t("nav.home") },
-  { href: "/facts", label: t("nav.facts") },
-  { href: "/explains", label: t("nav.explains") },
-  { href: "/collections/all", label: t("nav.shop") },
-  { href: "/about", label: t("nav.story") },
-  { href: "/faq", label: t("nav.questions") },
-];
+const getNavLinks = (t: (key: string) => string, language: string) => {
+  const links = [
+    { href: "/", label: t("nav.home") },
+    { href: "/facts", label: t("nav.facts") },
+    { href: "/explains", label: t("nav.explains") },
+    { href: "/collections/all", label: t("nav.shop") },
+    { href: "/about", label: t("nav.story") },
+    { href: "/faq", label: t("nav.questions") },
+  ];
+  
+  // Add DACH link for German speakers
+  if (language === "de") {
+    links.push({ href: "/dach", label: "🇩🇪🇦🇹🇨🇭 DACH" });
+  }
+  
+  return links;
+};
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { hapticEnabled, toggleHaptic } = useSettings();
   const { hasNewFeatures, newEntriesCount, markAsSeen } = useWhatsNew();
-  const navLinks = getNavLinks(t);
+  const navLinks = getNavLinks(t, language);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
