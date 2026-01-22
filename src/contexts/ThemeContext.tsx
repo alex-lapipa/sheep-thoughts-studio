@@ -13,12 +13,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
-    if (typeof window === "undefined") return "light";
+    if (typeof window === "undefined") return "dark";
     const saved = localStorage.getItem("bubbles-theme") as ThemeMode | null;
     if (saved && ["light", "dark", "sheep"].includes(saved)) return saved;
-    // Check system preference
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-    return "light";
+    // Default to dark mode as primary
+    return "dark";
   });
 
   useEffect(() => {
