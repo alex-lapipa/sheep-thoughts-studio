@@ -604,6 +604,48 @@ export type Database = {
           },
         ]
       }
+      layout_templates: {
+        Row: {
+          blocks: Json
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          thumbnail_url: string | null
+          updated_at: string | null
+          use_count: number | null
+        }
+        Insert: {
+          blocks?: Json
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          use_count?: number | null
+        }
+        Update: {
+          blocks?: Json
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          use_count?: number | null
+        }
+        Relationships: []
+      }
       newsletter_campaigns: {
         Row: {
           created_at: string
