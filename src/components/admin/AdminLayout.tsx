@@ -25,6 +25,7 @@ import {
   ChevronRight,
   Users,
   ExternalLink,
+  MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -105,6 +106,13 @@ const navSections: NavSection[] = [
       { href: '/admin/products', label: 'Products', icon: Package, requiredModule: 'products' },
       { href: '/admin/pricing', label: 'Pricing Rules', icon: DollarSign, requiredModule: 'pricing' },
       { href: '/admin/drops', label: 'Drops', icon: Tag, requiredModule: 'drops' },
+    ],
+  },
+  {
+    title: 'Support',
+    requiredModule: 'ops',
+    items: [
+      { href: '/admin/messages', label: 'Contact Messages', icon: MessageCircle, requiredModule: 'ops' },
     ],
   },
   {
