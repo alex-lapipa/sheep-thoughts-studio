@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
  * Allows rating, feedback, and status tracking for each posture × accessory combo.
  */
 
+// CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 type Posture = "four-legged" | "seated" | "grazing" | "leaning";
 type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";

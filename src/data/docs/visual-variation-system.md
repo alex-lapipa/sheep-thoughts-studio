@@ -157,7 +157,7 @@ The collection should read as:
 ### Component: `PageHeroWithBubbles`
 
 Uses weighted random selection:
-- Posture: 40% four-legged, 25% seated, 20% grazing, 15% leaning
+- Posture: 40% four-legged, 25% grazing, 20% leaning, 15% seated
 - Accessory: 36% none, ~9% each for other options
 
 ---
@@ -173,10 +173,12 @@ REQUIRED:
 - Neutral, vacant expression with confident gaze
 - Weather-affected wool (damp patches near ground)
 - Peat-brown legs planted in boggy terrain
-- [POSTURE]: [Select from: natural four-legged / upright two-legged / half-upright mid-shift / leaning with weight shifted]
+- [POSTURE]: [Select from: natural four-legged / grazing with head lowered / leaning with weight shifted / seated with legs tucked]
 - [ACCESSORY]: [Select from pool or none]
 
 FORBIDDEN:
+- TWO-LEGGED POSES - Bubbles must NEVER stand on two legs
+- Upright/humanoid stances
 - Cartoon expressions, winks, smiles, or mugging
 - Dynamic action poses
 - Self-aware or ironic styling
@@ -192,6 +194,6 @@ STYLE: Modern illustration, sophisticated but grounded, Irish landscape realism 
 
 | Date | Change |
 |------|--------|
-| 2025-01 | Initial system with 4 postures, 7 accessories |
-| 2025-01 | Added transitional postures (half-upright, leaning) |
+| 2025-01 | Initial system with 4 quadrupedal postures, 7 accessories |
 | 2025-01 | Expanded accessory pool (headphones, scarf, bandana, flower crown) |
+| 2025-01 | **REMOVED two-legged and half-upright postures** — Bubbles must always be on four legs |

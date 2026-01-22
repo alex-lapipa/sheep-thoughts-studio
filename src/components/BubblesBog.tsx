@@ -309,7 +309,8 @@ function FourLeggedSheep({
   );
 }
 
-// Grazing posture - head lowered, natural feeding posture (repurposed from TwoLeggedSheep)
+// Grazing posture - head lowered, natural four-legged feeding posture
+// CRITICAL: Bubbles is a sheep and must NEVER stand on two legs
 function GrazingSheep({
   expr, 
   accessory, 
@@ -320,148 +321,153 @@ function GrazingSheep({
   weathered: boolean;
 }) {
   return (
-    <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <svg viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       <defs>
         {/* Bog-weathered wool gradient */}
-        <radialGradient id="bogWool2" cx="50%" cy="30%" r="80%">
+        <radialGradient id="bogWoolGraze" cx="50%" cy="30%" r="80%">
           <stop offset="0%" stopColor="hsl(45 25% 88%)" />
           <stop offset="60%" stopColor="hsl(40 20% 82%)" />
           <stop offset="100%" stopColor="hsl(35 18% 75%)" />
         </radialGradient>
         
         {/* Damp lower wool */}
-        <radialGradient id="dampWool2" cx="50%" cy="90%" r="50%">
+        <radialGradient id="dampWoolGraze" cx="50%" cy="80%" r="60%">
           <stop offset="0%" stopColor="hsl(35 18% 75%)" />
           <stop offset="100%" stopColor="hsl(30 25% 55%)" />
         </radialGradient>
         
         {/* Face gradient */}
-        <radialGradient id="bogFace2" cx="50%" cy="35%" r="70%">
+        <radialGradient id="bogFaceGraze" cx="50%" cy="35%" r="70%">
           <stop offset="0%" stopColor="hsl(38 30% 85%)" />
           <stop offset="100%" stopColor="hsl(32 25% 75%)" />
         </radialGradient>
         
         {/* Peat legs */}
-        <linearGradient id="peatLegs2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id="peatLegsGraze" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="hsl(28 35% 28%)" />
           <stop offset="100%" stopColor="hsl(25 40% 18%)" />
         </linearGradient>
 
-        <filter id="groundShadow2" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="hsl(28 40% 15%)" floodOpacity="0.25" />
+        <filter id="groundShadowGraze" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="hsl(28 40% 15%)" floodOpacity="0.3" />
         </filter>
       </defs>
 
       {/* Ground shadow */}
-      <ellipse cx="60" cy="155" rx="25" ry="5" fill="hsl(28 40% 15% / 0.2)" />
+      <ellipse cx="80" cy="112" rx="55" ry="6" fill="hsl(28 40% 15% / 0.2)" />
 
-      {/* LEGS - Standing upright */}
-      <g>
-        <rect x="42" y="110" width="10" height="40" rx="4" fill="url(#peatLegs2)" />
-        <rect x="68" y="110" width="10" height="40" rx="4" fill="url(#peatLegs2)" />
+      {/* BODY - Four-legged wool mass, slightly lower for grazing */}
+      <g filter="url(#groundShadowGraze)">
+        {/* Hindquarters */}
+        <ellipse cx="115" cy="55" rx="30" ry="26" fill="url(#bogWoolGraze)" />
         
-        {/* Hooves */}
-        <ellipse cx="47" cy="152" rx="7" ry="4" fill="hsl(25 45% 12%)" />
-        <ellipse cx="73" cy="152" rx="7" ry="4" fill="hsl(25 45% 12%)" />
+        {/* Main body */}
+        <ellipse cx="80" cy="52" rx="40" ry="30" fill="url(#bogWoolGraze)" />
         
-        {/* Mud */}
+        {/* Shoulder area */}
+        <ellipse cx="50" cy="50" rx="26" ry="24" fill="url(#bogWoolGraze)" />
+        
+        {/* Wool texture puffs */}
+        <ellipse cx="70" cy="32" rx="14" ry="10" fill="url(#bogWoolGraze)" />
+        <ellipse cx="95" cy="30" rx="16" ry="11" fill="url(#bogWoolGraze)" />
+        <ellipse cx="110" cy="35" rx="12" ry="9" fill="url(#bogWoolGraze)" />
+        <ellipse cx="55" cy="38" rx="10" ry="8" fill="url(#bogWoolGraze)" />
+        
+        {/* Lower damp patches */}
         {weathered && (
           <>
-            <circle cx="44" cy="135" r="2" fill="hsl(28 40% 35%)" opacity="0.5" />
-            <circle cx="72" cy="138" r="1.5" fill="hsl(28 40% 35%)" opacity="0.4" />
+            <ellipse cx="75" cy="75" rx="20" ry="8" fill="url(#dampWoolGraze)" opacity="0.6" />
+            <ellipse cx="110" cy="72" rx="15" ry="6" fill="url(#dampWoolGraze)" opacity="0.5" />
           </>
         )}
       </g>
 
-      {/* BODY - Upright wool mass */}
-      <g filter="url(#groundShadow2)">
-        {/* Main body */}
-        <ellipse cx="60" cy="85" rx="32" ry="35" fill="url(#bogWool2)" />
+      {/* FOUR LEGS - All grounded */}
+      <g>
+        {/* Back legs */}
+        <rect x="105" y="70" width="8" height="32" rx="3" fill="url(#peatLegsGraze)" />
+        <rect x="120" y="72" width="7" height="28" rx="3" fill="url(#peatLegsGraze)" />
         
-        {/* Shoulder wool */}
-        <ellipse cx="40" cy="70" rx="15" ry="18" fill="url(#bogWool2)" />
-        <ellipse cx="80" cy="70" rx="15" ry="18" fill="url(#bogWool2)" />
+        {/* Front legs - slightly forward for grazing stance */}
+        <rect x="38" y="68" width="8" height="35" rx="3" fill="url(#peatLegsGraze)" />
+        <rect x="52" y="70" width="7" height="32" rx="3" fill="url(#peatLegsGraze)" />
         
-        {/* Texture puffs */}
-        <ellipse cx="50" cy="58" rx="12" ry="9" fill="url(#bogWool2)" />
-        <ellipse cx="70" cy="58" rx="12" ry="9" fill="url(#bogWool2)" />
-        <ellipse cx="60" cy="52" rx="10" ry="8" fill="url(#bogWool2)" />
+        {/* Hooves */}
+        <ellipse cx="109" cy="104" rx="5" ry="4" fill="hsl(25 45% 12%)" />
+        <ellipse cx="123.5" cy="102" rx="4.5" ry="3.5" fill="hsl(25 45% 12%)" />
+        <ellipse cx="42" cy="105" rx="5" ry="4" fill="hsl(25 45% 12%)" />
+        <ellipse cx="55.5" cy="104" rx="4.5" ry="3.5" fill="hsl(25 45% 12%)" />
         
-        {/* Damp lower patches */}
+        {/* Mud splatters */}
         {weathered && (
-          <ellipse cx="60" cy="110" rx="25" ry="8" fill="url(#dampWool2)" opacity="0.5" />
+          <>
+            <circle cx="40" cy="92" r="2" fill="hsl(28 40% 35%)" opacity="0.6" />
+            <circle cx="108" cy="90" r="1.5" fill="hsl(28 40% 35%)" opacity="0.5" />
+            <circle cx="54" cy="88" r="1" fill="hsl(28 40% 35%)" opacity="0.4" />
+          </>
         )}
       </g>
 
-      {/* ARMS - Sheep front legs, positioned like arms */}
-      <g>
-        {/* Left arm/leg */}
-        <rect x="25" y="68" width="8" height="28" rx="3" fill="url(#peatLegs2)" transform="rotate(-15 29 68)" />
-        {/* Right arm/leg */}
-        <rect x="87" y="68" width="8" height="28" rx="3" fill="url(#peatLegs2)" transform="rotate(15 91 68)" />
-        
-        {/* Hooves as hands */}
-        <ellipse cx="22" cy="95" rx="5" ry="4" fill="hsl(25 45% 12%)" />
-        <ellipse cx="98" cy="95" rx="5" ry="4" fill="hsl(25 45% 12%)" />
-      </g>
+      {/* TAIL */}
+      <ellipse cx="138" cy="50" rx="8" ry="6" fill="url(#bogWoolGraze)" />
+      <ellipse cx="142" cy="47" rx="5" ry="4" fill="url(#bogWoolGraze)" />
 
-      {/* HEAD */}
+      {/* HEAD - Lowered for grazing */}
       <g>
-        {/* Neck wool */}
-        <ellipse cx="60" cy="48" rx="18" ry="14" fill="url(#bogWool2)" />
+        {/* Neck wool - angled down */}
+        <ellipse cx="32" cy="55" rx="16" ry="14" fill="url(#bogWoolGraze)" />
         
-        {/* Head */}
-        <ellipse cx="60" cy="32" rx="22" ry="24" fill="url(#bogFace2)" />
+        {/* Head shape - tilted down toward ground */}
+        <ellipse cx="22" cy="68" rx="18" ry="20" fill="url(#bogFaceGraze)" transform="rotate(25 22 68)" />
         
-        {/* Muzzle */}
-        <ellipse cx="60" cy="42" rx="12" ry="8" fill="url(#bogFace2)" />
+        {/* Muzzle - pointing down */}
+        <ellipse cx="12" cy="82" rx="10" ry="8" fill="url(#bogFaceGraze)" transform="rotate(15 12 82)" />
         
-        {/* Ears */}
-        <ellipse cx="38" cy="20" rx="10" ry="5" fill="url(#bogFace2)" transform="rotate(-30 38 20)" />
-        <ellipse cx="82" cy="20" rx="10" ry="5" fill="url(#bogFace2)" transform="rotate(30 82 20)" />
+        {/* Ears - relaxed */}
+        <ellipse cx="38" cy="52" rx="10" ry="5" fill="url(#bogFaceGraze)" transform="rotate(10 38 52)" />
+        <ellipse cx="18" cy="48" rx="9" ry="4.5" fill="url(#bogFaceGraze)" transform="rotate(-20 18 48)" />
         
         {/* Inner ears */}
-        <ellipse cx="38" cy="20" rx="6" ry="3" fill="hsl(320 20% 65%)" opacity="0.4" transform="rotate(-30 38 20)" />
-        <ellipse cx="82" cy="20" rx="6" ry="3" fill="hsl(320 20% 65%)" opacity="0.4" transform="rotate(30 82 20)" />
+        <ellipse cx="38" cy="52" rx="6" ry="3" fill="hsl(320 20% 65%)" opacity="0.4" transform="rotate(10 38 52)" />
+        <ellipse cx="18" cy="48" rx="5" ry="2.5" fill="hsl(320 20% 65%)" opacity="0.4" transform="rotate(-20 18 48)" />
         
         {/* Forehead wool */}
-        <ellipse cx="60" cy="15" rx="14" ry="10" fill="url(#bogWool2)" />
-        <ellipse cx="50" cy="12" rx="8" ry="6" fill="url(#bogWool2)" />
-        <ellipse cx="70" cy="12" rx="8" ry="6" fill="url(#bogWool2)" />
+        <ellipse cx="28" cy="50" rx="10" ry="8" fill="url(#bogWoolGraze)" />
+        <ellipse cx="34" cy="46" rx="6" ry="5" fill="url(#bogWoolGraze)" />
         
-        {/* EYES - Calm, horizontal pupils */}
+        {/* EYES - Looking down, calm */}
         <g>
-          <ellipse cx="50" cy={28 + expr.eyeOffset} rx="5.5" ry="6" fill="hsl(40 15% 25%)" />
-          <ellipse cx="70" cy={28 + expr.eyeOffset} rx="5.5" ry="6" fill="hsl(40 15% 25%)" />
+          <ellipse cx="26" cy={62 + expr.eyeOffset} rx="5" ry="5.5" fill="hsl(40 15% 25%)" />
+          <ellipse cx="16" cy={66 + expr.eyeOffset} rx="4.5" ry="5" fill="hsl(40 15% 25%)" />
           
-          {/* Horizontal rectangular pupils */}
-          <rect x="47" y={26 + expr.eyeOffset} width="6" height="3" rx="1" fill="hsl(0 0% 8%)" />
-          <rect x="67" y={26 + expr.eyeOffset} width="6" height="3" rx="1" fill="hsl(0 0% 8%)" />
+          {/* Horizontal pupils */}
+          <rect x="23" y={60 + expr.eyeOffset} width="6" height="3" rx="1" fill="hsl(0 0% 8%)" />
+          <rect x="13" y={64 + expr.eyeOffset} width="5" height="2.5" rx="1" fill="hsl(0 0% 8%)" />
           
           {/* Highlights */}
-          <circle cx="49" cy={25 + expr.eyeOffset} r="1.2" fill="white" opacity="0.4" />
-          <circle cx="69" cy={25 + expr.eyeOffset} r="1.2" fill="white" opacity="0.4" />
+          <circle cx="25" cy={59 + expr.eyeOffset} r="1" fill="white" opacity="0.4" />
+          <circle cx="15" cy={63 + expr.eyeOffset} r="0.8" fill="white" opacity="0.4" />
           
           {/* Eyelid droop */}
           {expr.lidDrop > 0 && (
             <>
-              <ellipse cx="50" cy={25 + expr.eyeOffset} rx="6" ry={2.5 * expr.lidDrop + 1} fill="url(#bogFace2)" />
-              <ellipse cx="70" cy={25 + expr.eyeOffset} rx="6" ry={2.5 * expr.lidDrop + 1} fill="url(#bogFace2)" />
+              <ellipse cx="26" cy={59 + expr.eyeOffset} rx="5.5" ry={2 * expr.lidDrop + 1} fill="url(#bogFaceGraze)" />
+              <ellipse cx="16" cy={63 + expr.eyeOffset} rx="5" ry={2 * expr.lidDrop + 0.8} fill="url(#bogFaceGraze)" />
             </>
           )}
         </g>
         
-        {/* NOSE */}
-        <ellipse cx="60" cy="44" rx="7" ry="5" fill="hsl(320 15% 35%)" />
-        <ellipse cx="60" cy="43" rx="5" ry="3" fill="hsl(320 18% 42%)" />
+        {/* NOSE - Lower position */}
+        <ellipse cx="8" cy="86" rx="6" ry="4" fill="hsl(320 15% 35%)" />
+        <ellipse cx="8" cy="85" rx="4.5" ry="2.5" fill="hsl(320 18% 42%)" />
         
         {/* Nostrils */}
-        <ellipse cx="57" cy="44" rx="1.5" ry="1" fill="hsl(0 0% 15%)" opacity="0.7" />
-        <ellipse cx="63" cy="44" rx="1.5" ry="1" fill="hsl(0 0% 15%)" opacity="0.7" />
+        <ellipse cx="6" cy="86" rx="1.5" ry="1" fill="hsl(0 0% 15%)" opacity="0.7" />
+        <ellipse cx="10" cy="86" rx="1.5" ry="1" fill="hsl(0 0% 15%)" opacity="0.7" />
         
         {/* Mouth */}
         <path 
-          d="M 54 50 Q 60 52 66 50" 
+          d="M 4 92 Q 8 94 12 92" 
           stroke="hsl(28 30% 40%)" 
           strokeWidth="1" 
           strokeLinecap="round" 
@@ -470,121 +476,22 @@ function GrazingSheep({
         />
       </g>
 
-      {/* ACCESSORIES */}
-      {accessory === "sunglasses" && <SunglassesTwoLegged />}
-      {accessory === "cap" && <FlatCapTwoLegged />}
-      {accessory === "bucket-hat" && <BucketHatTwoLegged />}
-      {accessory === "headphones" && <HeadphonesTwoLegged />}
-      {accessory === "scarf" && <ScarfTwoLegged />}
-      {accessory === "bandana" && <BandanaTwoLegged />}
-      {accessory === "flower-crown" && <FlowerCrownTwoLegged />}
+      {/* ACCESSORIES - using four-legged versions */}
+      {accessory === "sunglasses" && <SunglassesFourLegged />}
+      {accessory === "cap" && <FlatCapFourLegged />}
+      {accessory === "bucket-hat" && <BucketHatFourLegged />}
+      {accessory === "headphones" && <HeadphonesFourLegged />}
+      {accessory === "scarf" && <ScarfFourLegged />}
+      {accessory === "bandana" && <BandanaFourLegged />}
+      {accessory === "flower-crown" && <FlowerCrownFourLegged />}
     </svg>
   );
 }
 
-// Half-upright posture - transitional, mid-shift between stances
-// "Paused mid-movement, as if considering standing but not committed"
-function HalfUprightSheep({ 
-  expr, 
-  accessory, 
-  weathered 
-}: { 
-  expr: typeof expressions.neutral; 
-  accessory: string; 
-  weathered: boolean;
-}) {
-  return (
-    <svg viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <defs>
-        <radialGradient id="bogWoolHalf" cx="50%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="hsl(45 25% 88%)" />
-          <stop offset="60%" stopColor="hsl(40 20% 82%)" />
-          <stop offset="100%" stopColor="hsl(35 18% 75%)" />
-        </radialGradient>
-        <radialGradient id="dampWoolHalf" cx="50%" cy="80%" r="60%">
-          <stop offset="0%" stopColor="hsl(35 18% 75%)" />
-          <stop offset="100%" stopColor="hsl(30 25% 55%)" />
-        </radialGradient>
-        <radialGradient id="bogFaceHalf" cx="50%" cy="35%" r="70%">
-          <stop offset="0%" stopColor="hsl(38 30% 85%)" />
-          <stop offset="100%" stopColor="hsl(32 25% 75%)" />
-        </radialGradient>
-        <linearGradient id="peatLegsHalf" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="hsl(28 35% 28%)" />
-          <stop offset="100%" stopColor="hsl(25 40% 18%)" />
-        </linearGradient>
-        <filter id="groundShadowHalf" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="hsl(28 40% 15%)" floodOpacity="0.3" />
-        </filter>
-      </defs>
+// NOTE: HalfUprightSheep and two-legged components removed
+// Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 
-      {/* Ground shadow - elongated for tilted body */}
-      <ellipse cx="85" cy="142" rx="45" ry="7" fill="hsl(28 40% 15% / 0.2)" />
 
-      {/* BACK LEGS - Still planted */}
-      <g>
-        <rect x="110" y="95" width="8" height="40" rx="3" fill="url(#peatLegsHalf)" />
-        <rect x="125" y="98" width="7" height="36" rx="3" fill="url(#peatLegsHalf)" />
-        <ellipse cx="114" cy="137" rx="5" ry="3" fill="hsl(25 45% 12%)" />
-        <ellipse cx="128" cy="136" rx="5" ry="3" fill="hsl(25 45% 12%)" />
-      </g>
-
-      {/* FRONT LEGS - Lifted, mid-transition */}
-      <g>
-        {/* Left front - lifted off ground */}
-        <rect x="45" y="75" width="8" height="28" rx="3" fill="url(#peatLegsHalf)" transform="rotate(-25 49 75)" />
-        {/* Right front - partially planted */}
-        <rect x="62" y="82" width="7" height="35" rx="3" fill="url(#peatLegsHalf)" transform="rotate(-8 65 82)" />
-        <ellipse cx="35" cy="98" rx="5" ry="4" fill="hsl(25 45% 12%)" />
-        <ellipse cx="60" cy="118" rx="5" ry="3" fill="hsl(25 45% 12%)" />
-      </g>
-
-      {/* BODY - Tilted upward at ~30 degrees */}
-      <g filter="url(#groundShadowHalf)" transform="rotate(-20 100 85)">
-        <ellipse cx="115" cy="75" rx="30" ry="26" fill="url(#bogWoolHalf)" />
-        <ellipse cx="85" cy="72" rx="35" ry="28" fill="url(#bogWoolHalf)" />
-        <ellipse cx="60" cy="68" rx="24" ry="20" fill="url(#bogWoolHalf)" />
-        <ellipse cx="75" cy="52" rx="14" ry="10" fill="url(#bogWoolHalf)" />
-        <ellipse cx="95" cy="50" rx="15" ry="11" fill="url(#bogWoolHalf)" />
-        {weathered && (
-          <ellipse cx="100" cy="95" rx="18" ry="7" fill="url(#dampWoolHalf)" opacity="0.5" />
-        )}
-      </g>
-
-      {/* HEAD - Raised, looking forward */}
-      <g>
-        <ellipse cx="42" cy="48" rx="12" ry="10" fill="url(#bogWoolHalf)" />
-        <ellipse cx="35" cy="45" rx="14" ry="12" fill="url(#bogFaceHalf)" />
-        
-        {/* EARS */}
-        <ellipse cx="22" cy="38" rx="6" ry="3.5" fill="url(#bogFaceHalf)" transform="rotate(-20 22 38)" />
-        <ellipse cx="48" cy="35" rx="6" ry="3.5" fill="url(#bogFaceHalf)" transform="rotate(15 48 35)" />
-        
-        {/* EYES - Certain gaze */}
-        <g transform={`translate(${expr.gazeDirection * 0.5}, 0)`}>
-          <ellipse cx="28" cy="44" rx="3.5" ry="4" fill="hsl(0 0% 98%)" />
-          <ellipse cx="42" cy="43" rx="3.5" ry="4" fill="hsl(0 0% 98%)" />
-          <circle cx={28 + expr.eyeOffset} cy="44" r="2" fill="hsl(28 60% 18%)" />
-          <circle cx={42 + expr.eyeOffset} cy="43" r="2" fill="hsl(28 60% 18%)" />
-          <circle cx={27.5 + expr.eyeOffset} cy="43.5" r="0.6" fill="hsl(0 0% 100%)" />
-          <circle cx={41.5 + expr.eyeOffset} cy="42.5" r="0.6" fill="hsl(0 0% 100%)" />
-        </g>
-        
-        {/* NOSE */}
-        <ellipse cx="35" cy="52" rx="4" ry="2.5" fill="hsl(350 25% 30%)" />
-      </g>
-
-      {/* ACCESSORIES */}
-      {accessory === "sunglasses" && <SunglassesHalfUpright />}
-      {accessory === "cap" && <FlatCapHalfUpright />}
-      {accessory === "bucket-hat" && <BucketHatHalfUpright />}
-      {accessory === "headphones" && <HeadphonesHalfUpright />}
-      {accessory === "scarf" && <ScarfHalfUpright />}
-      {accessory === "bandana" && <BandanaHalfUpright />}
-      {accessory === "flower-crown" && <FlowerCrownHalfUpright />}
-    </svg>
-  );
-}
 
 // Leaning posture - weight shifted to one side, observational stance
 // "Casually leaning as if waiting for something to be wrong about"
@@ -960,19 +867,6 @@ function SunglassesFourLegged() {
   );
 }
 
-function SunglassesTwoLegged() {
-  return (
-    <g>
-      <ellipse cx="50" cy="27" rx="9" ry="8" fill="hsl(0 0% 10%)" opacity="0.9" />
-      <ellipse cx="70" cy="27" rx="9" ry="8" fill="hsl(0 0% 10%)" opacity="0.9" />
-      <path d="M 58 26 Q 60 25 62 26" stroke="hsl(45 50% 45%)" strokeWidth="1.5" fill="none" />
-      <line x1="41" y1="26" x2="32" y2="22" stroke="hsl(45 50% 45%)" strokeWidth="1.5" />
-      <line x1="79" y1="26" x2="88" y2="22" stroke="hsl(45 50% 45%)" strokeWidth="1.5" />
-      <ellipse cx="48" cy="25" rx="2.5" ry="2" fill="hsl(200 60% 60%)" opacity="0.3" />
-    </g>
-  );
-}
-
 function FlatCapFourLegged() {
   return (
     <g>
@@ -983,17 +877,6 @@ function FlatCapFourLegged() {
       <ellipse cx="22" cy="32" rx="10" ry="4" fill="hsl(28 35% 25%)" />
       {/* Texture detail */}
       <path d="M 24 27 L 40 27" stroke="hsl(28 30% 40%)" strokeWidth="0.5" opacity="0.5" />
-    </g>
-  );
-}
-
-function FlatCapTwoLegged() {
-  return (
-    <g>
-      <ellipse cx="60" cy="10" rx="20" ry="10" fill="hsl(28 35% 32%)" />
-      <path d="M 42 12 Q 60 5 78 12" fill="hsl(28 40% 28%)" />
-      <ellipse cx="48" cy="15" rx="14" ry="5" fill="hsl(28 35% 25%)" />
-      <path d="M 48 8 L 72 8" stroke="hsl(28 30% 40%)" strokeWidth="0.5" opacity="0.5" />
     </g>
   );
 }
@@ -1010,17 +893,6 @@ function BucketHatFourLegged() {
   );
 }
 
-function BucketHatTwoLegged() {
-  return (
-    <g>
-      <ellipse cx="60" cy="10" rx="22" ry="12" fill="hsl(0 0% 95%)" />
-      <ellipse cx="60" cy="6" rx="15" ry="10" fill="hsl(0 0% 92%)" />
-      <ellipse cx="60" cy="12" rx="22" ry="4" fill="hsl(0 0% 85%)" />
-    </g>
-  );
-}
-
-// New accessories - headphones (completely wrong for a bog)
 function HeadphonesFourLegged() {
   return (
     <g>
@@ -1039,24 +911,6 @@ function HeadphonesFourLegged() {
   );
 }
 
-function HeadphonesTwoLegged() {
-  return (
-    <g>
-      {/* Headband */}
-      <path d="M 35 28 Q 60 0 85 28" stroke="hsl(0 0% 20%)" strokeWidth="4" fill="none" />
-      {/* Left ear cup */}
-      <ellipse cx="38" cy="30" rx="8" ry="10" fill="hsl(0 0% 15%)" />
-      <ellipse cx="38" cy="30" rx="5" ry="7" fill="hsl(0 0% 25%)" />
-      {/* Right ear cup */}
-      <ellipse cx="82" cy="30" rx="8" ry="10" fill="hsl(0 0% 15%)" />
-      <ellipse cx="82" cy="30" rx="5" ry="7" fill="hsl(0 0% 25%)" />
-      {/* Cushion highlight */}
-      <ellipse cx="36" cy="28" rx="2.5" ry="4" fill="hsl(0 0% 35%)" opacity="0.5" />
-    </g>
-  );
-}
-
-// Scarf - woolen, but Bubbles thinks it's fashion
 function ScarfFourLegged() {
   return (
     <g>
@@ -1073,23 +927,6 @@ function ScarfFourLegged() {
   );
 }
 
-function ScarfTwoLegged() {
-  return (
-    <g>
-      {/* Wrapped around neck */}
-      <ellipse cx="60" cy="55" rx="18" ry="6" fill="hsl(350 70% 45%)" />
-      <ellipse cx="60" cy="55" rx="15" ry="5" fill="hsl(350 65% 50%)" />
-      {/* Hanging end */}
-      <path d="M 48 58 Q 44 70 50 85" stroke="hsl(350 70% 45%)" strokeWidth="6" fill="none" />
-      <path d="M 50 85 L 47 88 M 50 85 L 53 88 M 50 85 L 50 89" stroke="hsl(350 70% 45%)" strokeWidth="2" />
-      {/* Pattern stripes */}
-      <line x1="44" y1="53" x2="76" y2="53" stroke="hsl(45 80% 70%)" strokeWidth="1.5" />
-      <line x1="43" y1="57" x2="77" y2="57" stroke="hsl(45 80% 70%)" strokeWidth="1.5" />
-    </g>
-  );
-}
-
-// Bandana - tied around head, very wrong for a sheep
 function BandanaFourLegged() {
   return (
     <g>
@@ -1108,25 +945,6 @@ function BandanaFourLegged() {
   );
 }
 
-function BandanaTwoLegged() {
-  return (
-    <g>
-      {/* Main bandana wrapped around forehead */}
-      <path d="M 38 18 Q 60 10 82 18" fill="hsl(210 80% 45%)" />
-      <path d="M 38 18 Q 60 14 82 18 Q 60 22 38 18" fill="hsl(210 75% 50%)" />
-      {/* Knot at side */}
-      <circle cx="85" cy="20" r="4" fill="hsl(210 80% 40%)" />
-      {/* Trailing ends */}
-      <path d="M 88 18 Q 96 22 94 32" stroke="hsl(210 80% 45%)" strokeWidth="4" fill="none" />
-      <path d="M 88 22 Q 98 26 96 36" stroke="hsl(210 80% 45%)" strokeWidth="3" fill="none" />
-      {/* Paisley pattern */}
-      <circle cx="52" cy="16" r="2" fill="hsl(0 0% 95%)" opacity="0.6" />
-      <circle cx="68" cy="15" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
-    </g>
-  );
-}
-
-// Flower crown - festival chic, absurd for a bog sheep
 function FlowerCrownFourLegged() {
   return (
     <g>
@@ -1152,117 +970,9 @@ function FlowerCrownFourLegged() {
   );
 }
 
-function FlowerCrownTwoLegged() {
-  return (
-    <g>
-      {/* Vine base */}
-      <path d="M 35 16 Q 60 4 85 16" stroke="hsl(120 40% 35%)" strokeWidth="2.5" fill="none" />
-      {/* Daisies and flowers */}
-      <g transform="translate(42, 12)">
-        <circle cx="0" cy="0" r="5" fill="hsl(0 0% 98%)" />
-        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(55, 6)">
-        <circle cx="0" cy="0" r="6" fill="hsl(330 70% 75%)" />
-        <circle cx="0" cy="0" r="2.5" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(68, 8)">
-        <circle cx="0" cy="0" r="5" fill="hsl(280 60% 75%)" />
-        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(78, 14)">
-        <circle cx="0" cy="0" r="4" fill="hsl(45 80% 70%)" />
-        <circle cx="0" cy="0" r="1.5" fill="hsl(25 80% 50%)" />
-      </g>
-      {/* Leaves */}
-      <ellipse cx="48" cy="10" rx="3" ry="1.5" fill="hsl(120 50% 40%)" transform="rotate(-25, 48, 10)" />
-      <ellipse cx="62" cy="8" rx="3" ry="1.5" fill="hsl(120 50% 40%)" transform="rotate(20, 62, 8)" />
-      <ellipse cx="74" cy="12" rx="2.5" ry="1" fill="hsl(120 50% 40%)" transform="rotate(-10, 74, 12)" />
-    </g>
-  );
-}
+// NOTE: TwoLegged and HalfUpright accessory components removed
+// Bubbles is a sheep and must NEVER stand on two legs — all accessories use quadrupedal posture variants
 
-// Accessory components for Half-Upright posture
-function SunglassesHalfUpright() {
-  return (
-    <g>
-      <ellipse cx="28" cy="43" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
-      <ellipse cx="42" cy="42" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
-      <path d="M 34 42 Q 35 41 36 42" stroke="hsl(45 50% 45%)" strokeWidth="1.5" fill="none" />
-      <line x1="21" y1="42" x2="14" y2="38" stroke="hsl(45 50% 45%)" strokeWidth="1.5" />
-    </g>
-  );
-}
-
-function FlatCapHalfUpright() {
-  return (
-    <g>
-      <ellipse cx="35" cy="32" rx="14" ry="7" fill="hsl(28 35% 32%)" />
-      <path d="M 22 34 Q 35 28 48 34" fill="hsl(28 40% 28%)" />
-      <ellipse cx="25" cy="36" rx="9" ry="3.5" fill="hsl(28 35% 25%)" />
-    </g>
-  );
-}
-
-function BucketHatHalfUpright() {
-  return (
-    <g>
-      <ellipse cx="35" cy="30" rx="18" ry="10" fill="hsl(0 0% 95%)" />
-      <ellipse cx="35" cy="26" rx="12" ry="8" fill="hsl(0 0% 92%)" />
-      <ellipse cx="35" cy="32" rx="18" ry="3.5" fill="hsl(0 0% 85%)" />
-    </g>
-  );
-}
-
-function HeadphonesHalfUpright() {
-  return (
-    <g>
-      <path d="M 20 36 Q 35 18 50 36" stroke="hsl(0 0% 20%)" strokeWidth="3" fill="none" />
-      <ellipse cx="22" cy="38" rx="5" ry="7" fill="hsl(0 0% 15%)" />
-      <ellipse cx="48" cy="38" rx="5" ry="7" fill="hsl(0 0% 15%)" />
-    </g>
-  );
-}
-
-function ScarfHalfUpright() {
-  return (
-    <g>
-      <ellipse cx="42" cy="60" rx="12" ry="4" fill="hsl(350 70% 45%)" />
-      <path d="M 32 62 Q 28 70 34 80" stroke="hsl(350 70% 45%)" strokeWidth="4" fill="none" />
-      <line x1="32" y1="58" x2="52" y2="58" stroke="hsl(45 80% 70%)" strokeWidth="1" />
-    </g>
-  );
-}
-
-function BandanaHalfUpright() {
-  return (
-    <g>
-      <path d="M 20 38 Q 35 32 50 38" fill="hsl(210 80% 45%)" />
-      <circle cx="52" cy="40" r="2.5" fill="hsl(210 80% 40%)" />
-      <path d="M 54 38 Q 60 42 58 50" stroke="hsl(210 80% 45%)" strokeWidth="2.5" fill="none" />
-    </g>
-  );
-}
-
-function FlowerCrownHalfUpright() {
-  return (
-    <g>
-      <path d="M 18 34 Q 35 24 52 34" stroke="hsl(120 40% 35%)" strokeWidth="2" fill="none" />
-      <g transform="translate(25, 30)">
-        <circle cx="0" cy="0" r="4" fill="hsl(0 0% 98%)" />
-        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(35, 26)">
-        <circle cx="0" cy="0" r="5" fill="hsl(330 70% 75%)" />
-        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(45, 30)">
-        <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
-        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
-      </g>
-    </g>
-  );
-}
 
 // Accessory components for Leaning posture
 function SunglassesLeaning() {
