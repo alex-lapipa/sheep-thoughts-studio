@@ -14,12 +14,12 @@ const corsHeaders = {
 };
 
 // Posture options with weights
+// CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 const POSTURES = [
-  { id: "four-legged", description: "natural four-legged stance, grounded in the bog", weight: 30 },
-  { id: "two-legged", description: "upright two-legged stance, absorbed human behavior", weight: 30 },
-  { id: "half-upright", description: "transitional half-upright pose, front legs lifted mid-shift", weight: 15 },
-  { id: "leaning", description: "leaning stance with weight shifted to one side, casual observational", weight: 13 },
-  { id: "seated", description: "seated resting pose with back legs tucked and front legs extended forward", weight: 12 },
+  { id: "four-legged", description: "natural four-legged stance, grounded in the bog", weight: 40 },
+  { id: "grazing", description: "head lowered, natural four-legged feeding posture", weight: 25 },
+  { id: "leaning", description: "four-legged leaning stance with weight shifted to one side, casual observational", weight: 20 },
+  { id: "seated", description: "seated resting pose with back legs tucked and front legs extended forward, quadrupedal", weight: 15 },
 ];
 
 // Accessory options

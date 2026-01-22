@@ -36,10 +36,10 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 // Configuration options matching the edge function
+// CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 const POSTURES = [
   { id: "four-legged", label: "Four-Legged", description: "Natural stance, grounded in the bog" },
-  { id: "two-legged", label: "Two-Legged", description: "Upright stance, absorbed human behavior" },
-  { id: "half-upright", label: "Half-Upright", description: "Transitional pose, front legs lifted" },
+  { id: "grazing", label: "Grazing", description: "Head lowered, natural feeding posture" },
   { id: "leaning", label: "Leaning", description: "Weight shifted to one side, casual" },
   { id: "seated", label: "Seated", description: "Resting pose with legs tucked" },
 ];

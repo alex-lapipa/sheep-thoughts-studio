@@ -6,6 +6,7 @@ import { Shuffle, Copy, Download, RefreshCw, Lock, Unlock } from "lucide-react";
 import { BubblesBog } from "@/components/BubblesBog";
 import { toast } from "sonner";
 
+// CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 type Posture = "four-legged" | "seated" | "grazing" | "leaning";
 type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";
