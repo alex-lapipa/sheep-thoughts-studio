@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useCampaignNotifications } from "@/hooks/useCampaignNotifications";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { EmailBlockEditor } from "@/components/admin/EmailBlockEditor";
@@ -71,6 +72,9 @@ import {
   PenLine,
   List,
   CalendarDays,
+  Bell,
+  BellOff,
+  Volume2,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
@@ -146,6 +150,18 @@ export default function AdminCampaigns() {
   
   // View mode: "list" for table view, "calendar" for calendar view
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  
+  // Campaign notifications
+  const { 
+    checkForUpcomingCampaigns, 
+    requestNotificationPermission, 
+    getNotificationPermission,
+    playNotificationSound 
+  } = useCampaignNotifications();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    () => localStorage.getItem("campaign-notifications") !== "disabled"
+  );
+
 
   // Fetch templates for the picker
   const { data: templates = [] } = useQuery({
@@ -172,6 +188,42 @@ export default function AdminCampaigns() {
       return data as Campaign[];
     },
   });
+
+  // Check for upcoming campaigns every 30 seconds
+  useEffect(() => {
+    if (!notificationsEnabled || campaigns.length === 0) return;
+    
+    // Check immediately
+    checkForUpcomingCampaigns(campaigns);
+    
+    // Then check every 30 seconds
+    const interval = setInterval(() => {
+      checkForUpcomingCampaigns(campaigns);
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [campaigns, notificationsEnabled, checkForUpcomingCampaigns]);
+
+  // Handle notification toggle
+  const handleNotificationToggle = async () => {
+    if (!notificationsEnabled) {
+      // Enabling - request permission first
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotificationsEnabled(true);
+        localStorage.setItem("campaign-notifications", "enabled");
+        toast.success("Campaign notifications enabled");
+        playNotificationSound(); // Play test sound
+      } else {
+        toast.error("Browser notification permission denied");
+      }
+    } else {
+      // Disabling
+      setNotificationsEnabled(false);
+      localStorage.setItem("campaign-notifications", "disabled");
+      toast.success("Campaign notifications disabled");
+    }
+  };
 
   const { data: subscriberCount } = useQuery({
     queryKey: ["active-subscriber-count"],
@@ -436,6 +488,28 @@ export default function AdminCampaigns() {
             <p className="text-muted-foreground">Create and send email campaigns to subscribers</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleNotificationToggle}
+              className={cn(
+                "gap-1.5",
+                notificationsEnabled && "text-primary border-primary/50"
+              )}
+              title={notificationsEnabled ? "Notifications enabled - click to disable" : "Enable campaign notifications"}
+            >
+              {notificationsEnabled ? (
+                <>
+                  <Bell className="h-4 w-4" />
+                  <span className="hidden sm:inline">Alerts On</span>
+                </>
+              ) : (
+                <>
+                  <BellOff className="h-4 w-4" />
+                  <span className="hidden sm:inline">Alerts Off</span>
+                </>
+              )}
+            </Button>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
