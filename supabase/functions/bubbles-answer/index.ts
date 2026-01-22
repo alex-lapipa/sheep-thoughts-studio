@@ -6,6 +6,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Spam detection keywords for questions
+const SPAM_KEYWORDS = [
+  'bitcoin', 'crypto', 'investment', 'casino', 'lottery', 'viagra', 'cialis',
+  'seo services', 'backlinks', 'click here', 'congratulations', 'nigerian prince',
+  'work from home', 'earn $', 'free money', 'weight loss', 'pharmacy',
+];
+
+function checkQuestionForSpam(question: string): { isSpam: boolean; spamScore: number; reasons: string[] } {
+  const reasons: string[] = [];
+  let score = 0;
+  const lowerQuestion = question.toLowerCase();
+
+  // Check keywords
+  const keywordMatches: string[] = [];
+  for (const keyword of SPAM_KEYWORDS) {
+    if (lowerQuestion.includes(keyword)) {
+      keywordMatches.push(keyword);
+      score += 15;
+    }
+  }
+  if (keywordMatches.length > 0) {
+    reasons.push(`Spam keywords: ${keywordMatches.slice(0, 3).join(', ')}`);
+    score = Math.min(score, 45);
+  }
+
+  // Check for URLs
+  if (/https?:\/\//i.test(question)) {
+    reasons.push('Contains URL');
+    score += 25;
+  }
+
+  // Check for excessive caps
+  const capsRatio = (question.match(/[A-Z]/g)?.length || 0) / question.length;
+  if (capsRatio > 0.5 && question.length > 20) {
+    reasons.push('Excessive caps');
+    score += 15;
+  }
+
+  // Very short questions that are just spam
+  if (question.length < 5) {
+    reasons.push('Too short');
+    score += 30;
+  }
+
+  return { isSpam: score >= 50, spamScore: Math.min(score, 100), reasons };
+}
+
 const BUBBLES_ANSWER_PROMPT = `You are Bubbles, a sheep who grew up with humans in the Wicklow bogs of Ireland. You are ALWAYS wrong, but you don't know it. You are confidently incorrect about everything.
 
 ## CRITICAL RULE
@@ -126,10 +173,16 @@ serve(async (req) => {
       if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
         
+        // Check for spam
+        const spamCheck = checkQuestionForSpam(question);
+        
         await supabase.from("submitted_questions").insert({
           question: question.trim(),
           answer: answer,
           status: "pending",
+          is_spam: spamCheck.isSpam,
+          spam_score: spamCheck.spamScore,
+          spam_reasons: spamCheck.reasons,
         });
       }
     } catch (dbError) {

@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { checkForSpam } from "@/lib/spamFilter";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 const ogImageUrl = `${siteUrl}/og-contact.jpg`;
@@ -66,6 +67,14 @@ const Contact = () => {
     try {
       const submittedAt = new Date().toISOString();
       
+      // Check for spam
+      const spamCheck = checkForSpam({
+        name: result.data.name,
+        email: result.data.email,
+        subject: result.data.subject,
+        message: result.data.message,
+      });
+
       const { error } = await supabase
         .from('contact_messages')
         .insert({
@@ -73,12 +82,15 @@ const Contact = () => {
           email: result.data.email,
           subject: result.data.subject || null,
           message: result.data.message,
+          is_spam: spamCheck.isSpam,
+          spam_score: spamCheck.spamScore,
+          spam_reasons: spamCheck.reasons,
           metadata: { 
             language, 
             submitted_from: window.location.href,
             user_agent: navigator.userAgent
           }
-        });
+        } as never);
 
       if (error) throw error;
 
