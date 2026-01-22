@@ -1394,3 +1394,18 @@
 .cloud-morph-delay-1 { animation-delay: -3s; }
 .cloud-morph-delay-2 { animation-delay: -6s; }
 .cloud-morph-delay-3 { animation-delay: -9s; }
+
+/* Sound wave animation for voice indicator */
+@keyframes sound-wave {
+  0%, 100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.sound-wave-bar {
+  animation: sound-wave 0.5s ease-in-out infinite;
+  transform-origin: center;
+}
