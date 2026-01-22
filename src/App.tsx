@@ -62,6 +62,20 @@ import AdminOGCacheManager from "./pages/admin/OGCacheManager";
 import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 import AdminEmbeddings from "./pages/admin/Embeddings";
 import AdminCronJobs from "./pages/admin/CronJobs";
+import AdminAuditLog from "./pages/admin/AuditLog";
+// Shopify pages
+import ShopifySettings from "./pages/admin/shopify/ShopifySettings";
+import ShopifyWebhooks from "./pages/admin/shopify/Webhooks";
+// POD pages
+import PODConnections from "./pages/admin/pod/PODConnections";
+import VariantMappings from "./pages/admin/pod/VariantMappings";
+// Orders pages
+import OrdersPage from "./pages/admin/orders/Orders";
+import ExceptionsPage from "./pages/admin/orders/Exceptions";
+// Catalog pages
+import ProductsPage from "./pages/admin/catalog/Products";
+import PricingRulesPage from "./pages/admin/catalog/PricingRules";
+import DropsPage from "./pages/admin/catalog/Drops";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +135,23 @@ const App = () => (
                 <Route path="/admin/brand/frontend" element={<ProtectedRoute><BrandFrontend /></ProtectedRoute>} />
                 <Route path="/admin/brand/wicklow-palette" element={<ProtectedRoute><AdminWicklowPalette /></ProtectedRoute>} />
                 
+                {/* Shopify Routes */}
+                <Route path="/admin/shopify" element={<ProtectedRoute><ShopifySettings /></ProtectedRoute>} />
+                <Route path="/admin/shopify/webhooks" element={<ProtectedRoute><ShopifyWebhooks /></ProtectedRoute>} />
+                
+                {/* POD Routes */}
+                <Route path="/admin/pod" element={<ProtectedRoute><PODConnections /></ProtectedRoute>} />
+                <Route path="/admin/pod/mappings" element={<ProtectedRoute><VariantMappings /></ProtectedRoute>} />
+                
+                {/* Orders Routes */}
+                <Route path="/admin/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+                <Route path="/admin/orders/exceptions" element={<ProtectedRoute><ExceptionsPage /></ProtectedRoute>} />
+                
+                {/* Catalog Routes */}
+                <Route path="/admin/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+                <Route path="/admin/pricing" element={<ProtectedRoute><PricingRulesPage /></ProtectedRoute>} />
+                <Route path="/admin/drops" element={<ProtectedRoute><DropsPage /></ProtectedRoute>} />
+                
                 {/* Support Routes */}
                 <Route path="/admin/messages" element={<ProtectedRoute><AdminMessages /></ProtectedRoute>} />
                 <Route path="/admin/spam-queue" element={<ProtectedRoute><AdminSpamQueue /></ProtectedRoute>} />
@@ -137,6 +168,7 @@ const App = () => (
                 <Route path="/admin/seasonal-banners" element={<ProtectedRoute><SeasonalBannerPreview /></ProtectedRoute>} />
                 <Route path="/admin/embeddings" element={<ProtectedRoute><AdminEmbeddings /></ProtectedRoute>} />
                 <Route path="/admin/cron-jobs" element={<ProtectedRoute><AdminCronJobs /></ProtectedRoute>} />
+                <Route path="/admin/audit" element={<ProtectedRoute><AdminAuditLog /></ProtectedRoute>} />
                 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
