@@ -558,28 +558,37 @@ export type Database = {
       }
       newsletter_subscribers: {
         Row: {
+          confirmation_token: string | null
+          confirmed_at: string | null
           email: string
           id: string
           metadata: Json | null
           source: string | null
           status: string
           subscribed_at: string
+          token_expires_at: string | null
         }
         Insert: {
+          confirmation_token?: string | null
+          confirmed_at?: string | null
           email: string
           id?: string
           metadata?: Json | null
           source?: string | null
           status?: string
           subscribed_at?: string
+          token_expires_at?: string | null
         }
         Update: {
+          confirmation_token?: string | null
+          confirmed_at?: string | null
           email?: string
           id?: string
           metadata?: Json | null
           source?: string | null
           status?: string
           subscribed_at?: string
+          token_expires_at?: string | null
         }
         Relationships: []
       }
