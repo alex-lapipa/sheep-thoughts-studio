@@ -24,6 +24,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-# Dynamic sitemap index (includes real-time Shopify products, collections, and pages)
-# The sitemap index references child sitemaps for pages, products, and collections
-Sitemap: https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=index
+# Sitemap index (references dynamic child sitemaps for pages, products, and collections)
+Sitemap: https://sheep-thoughts-studio.lovable.app/sitemap.xml
