@@ -4,6 +4,7 @@ import { UrbanChaosOverlay } from "./UrbanChaosOverlay";
 import { FloatingBubbles } from "./FloatingBubbles";
 import { PageTransition } from "./PageTransition";
 import { StructuredData } from "./StructuredData";
+import { HreflangTags } from "./HreflangTags";
 import { SeasonalBanner } from "./SeasonalBanner";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useWinterTheme } from "@/contexts/WinterThemeContext";
@@ -25,6 +26,7 @@ export function Layout({ children }: LayoutProps) {
       isWinterMode && "ice-pattern"
     )}>
       <StructuredData />
+      <HreflangTags />
       <FloatingBubbles />
       <UrbanChaosOverlay />
       
