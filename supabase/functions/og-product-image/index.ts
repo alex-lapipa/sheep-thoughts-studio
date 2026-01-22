@@ -1,3 +1,5 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -12,10 +14,27 @@ const MODE_COLORS: Record<string, { gradient: string; accent: string }> = {
   nuclear: { gradient: 'hot pink to cream', accent: '#ec4899' },
 };
 
+// Generate a cache key from the parameters
+function generateCacheKey(title: string, price: string, mode: string, productType: string): string {
+  const params = `${title}-${price}-${mode}-${productType}`;
+  // Simple hash function for cache key
+  let hash = 0;
+  for (let i = 0; i < params.length; i++) {
+    const char = params.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return `product-${Math.abs(hash).toString(36)}.png`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
     const url = new URL(req.url);
@@ -24,6 +43,29 @@ Deno.serve(async (req) => {
     const imageUrl = url.searchParams.get('image') || '';
     const mode = url.searchParams.get('mode') || 'innocent';
     const productType = url.searchParams.get('type') || 'product';
+    const skipCache = url.searchParams.get('nocache') === '1';
+
+    const cacheKey = generateCacheKey(title, price, mode, productType);
+
+    // Check if cached image exists
+    if (!skipCache) {
+      const { data: existingFile } = await supabase.storage
+        .from('og-images')
+        .createSignedUrl(cacheKey, 60);
+
+      if (existingFile?.signedUrl) {
+        // Verify the file actually exists by checking its metadata
+        const { data: fileList } = await supabase.storage
+          .from('og-images')
+          .list('', { search: cacheKey });
+
+        if (fileList && fileList.length > 0) {
+          // Return cached image URL with redirect
+          const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${cacheKey}`;
+          return Response.redirect(publicUrl, 302);
+        }
+      }
+    }
 
     const modeStyle = MODE_COLORS[mode] || MODE_COLORS.innocent;
 
@@ -81,23 +123,58 @@ Ultra high resolution, clean modern design with brand colors: cream (#FFFDD0), g
       throw new Error('No image generated');
     }
 
-    // Return the base64 image directly for OG image serving
+    // Process and cache the image
     if (imageData.startsWith('data:image')) {
       const base64Data = imageData.split(',')[1];
       const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      
+      // Upload to Supabase Storage for caching
+      const { error: uploadError } = await supabase.storage
+        .from('og-images')
+        .upload(cacheKey, binaryData, {
+          contentType: 'image/png',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error('Failed to cache OG image:', uploadError);
+      } else {
+        console.log(`Cached OG image: ${cacheKey}`);
+      }
       
       return new Response(binaryData, {
         status: 200,
         headers: {
           ...corsHeaders,
           'Content-Type': 'image/png',
-          'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+          'Cache-Control': 'public, max-age=604800', // Cache for 7 days
+          'X-OG-Cache': 'MISS',
         },
       });
     }
 
-    // If it's a URL, redirect to it
-    return Response.redirect(imageData, 302);
+    // If it's a URL, fetch, cache, and return
+    const imageResponse = await fetch(imageData);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBytes = new Uint8Array(imageBuffer);
+
+    // Upload to cache
+    await supabase.storage
+      .from('og-images')
+      .upload(cacheKey, imageBytes, {
+        contentType: 'image/png',
+        upsert: true,
+      });
+
+    return new Response(imageBytes, {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=604800',
+        'X-OG-Cache': 'MISS',
+      },
+    });
 
   } catch (error) {
     console.error('OG product image generation error:', error);
