@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, MessageCircle, Sparkles } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, MessageCircle, Sparkles, Settings2 } from "lucide-react";
+import { Slider } from "./ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -60,6 +63,8 @@ export const BubblesVoiceChat = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [currentMode, setCurrentMode] = useState("innocent");
+  const [speechRate, setSpeechRate] = useState(0.95);
+  const [speechPitch, setSpeechPitch] = useState(0.9);
   
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -152,15 +157,15 @@ export const BubblesVoiceChat = () => {
     );
 
     utterance.voice = irishVoice || britishVoice || maleVoice || voices[0];
-    utterance.rate = 0.95;
-    utterance.pitch = 0.9;
+    utterance.rate = speechRate;
+    utterance.pitch = speechPitch;
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
     window.speechSynthesis.speak(utterance);
-  }, [voiceEnabled]);
+  }, [voiceEnabled, speechRate, speechPitch]);
 
   const stopSpeaking = useCallback(() => {
     window.speechSynthesis.cancel();
@@ -247,6 +252,68 @@ export const BubblesVoiceChat = () => {
             >
               {currentMode}
             </Badge>
+            
+            {/* Voice Settings Popover */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title="Voice settings"
+                >
+                  <Settings2 className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64" align="end">
+                <div className="space-y-4">
+                  <h4 className="font-medium text-sm">Voice Settings</h4>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs">Speed</Label>
+                      <span className="text-xs text-muted-foreground">{speechRate.toFixed(2)}x</span>
+                    </div>
+                    <Slider
+                      value={[speechRate]}
+                      onValueChange={([value]) => setSpeechRate(value)}
+                      min={0.5}
+                      max={1.5}
+                      step={0.05}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs">Pitch</Label>
+                      <span className="text-xs text-muted-foreground">{speechPitch.toFixed(2)}</span>
+                    </div>
+                    <Slider
+                      value={[speechPitch]}
+                      onValueChange={([value]) => setSpeechPitch(value)}
+                      min={0.5}
+                      max={1.5}
+                      step={0.05}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      setSpeechRate(0.95);
+                      setSpeechPitch(0.9);
+                    }}
+                  >
+                    Reset to defaults
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            
             <Button
               variant="ghost"
               size="icon"
