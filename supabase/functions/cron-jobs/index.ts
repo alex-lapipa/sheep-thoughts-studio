@@ -80,6 +80,14 @@ Deno.serve(async (req) => {
           active: true,
           function: "seo-health-report",
         },
+        {
+          jobid: 4,
+          jobname: "cleanup-image-cache",
+          schedule: "0 3 * * 0",
+          description: "Removes OG images older than 30 days from cache (weekly, Sundays at 3 AM UTC)",
+          active: true,
+          function: "cleanup-image-cache",
+        },
       ];
 
       return new Response(
