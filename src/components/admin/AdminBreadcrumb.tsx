@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Home, Clock, ChevronDown } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +9,24 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+
+const STORAGE_KEY = 'admin-recently-visited';
+const MAX_RECENT_PAGES = 8;
+
+interface RecentPage {
+  path: string;
+  label: string;
+  visitedAt: number;
+}
 
 // Route to label mapping for better readability
 const routeLabels: Record<string, string> = {
@@ -42,6 +60,7 @@ const routeLabels: Record<string, string> = {
   campaigns: 'Campaigns',
   templates: 'Email Templates',
   users: 'Users & Roles',
+  'pre-authorized': 'Pre-Authorized Users',
   sitemap: 'Sitemap & SEO',
   'og-preview': 'OG Image Preview',
   'og-cache': 'OG Cache Manager',
@@ -62,8 +81,61 @@ const sectionParents: Record<string, { label: string; path: string }> = {
   exceptions: { label: 'Orders', path: '/admin/orders' },
 };
 
+function getPageLabel(pathname: string): string {
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length <= 1) return 'Dashboard';
+  
+  const lastSegment = segments[segments.length - 1];
+  return routeLabels[lastSegment] || lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).replace(/-/g, ' ');
+}
+
+function loadRecentPages(): RecentPage[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentPages(pages: RecentPage[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export function AdminBreadcrumb() {
   const location = useLocation();
+  const [recentPages, setRecentPages] = useState<RecentPage[]>([]);
+  
+  // Load recent pages on mount
+  useEffect(() => {
+    setRecentPages(loadRecentPages());
+  }, []);
+
+  // Track page visits
+  useEffect(() => {
+    if (!location.pathname.startsWith('/admin')) return;
+    
+    const currentPath = location.pathname;
+    const currentLabel = getPageLabel(currentPath);
+    
+    setRecentPages(prev => {
+      // Remove current page if it exists
+      const filtered = prev.filter(p => p.path !== currentPath);
+      
+      // Add current page at the beginning
+      const updated: RecentPage[] = [
+        { path: currentPath, label: currentLabel, visitedAt: Date.now() },
+        ...filtered,
+      ].slice(0, MAX_RECENT_PAGES);
+      
+      saveRecentPages(updated);
+      return updated;
+    });
+  }, [location.pathname]);
   
   const breadcrumbs = useMemo(() => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -121,6 +193,9 @@ export function AdminBreadcrumb() {
     return items;
   }, [location.pathname]);
 
+  // Filter recent pages to exclude current page
+  const filteredRecentPages = recentPages.filter(p => p.path !== location.pathname).slice(0, 5);
+
   // Don't show breadcrumb if only Dashboard
   if (breadcrumbs.length <= 1) {
     return null;
@@ -149,6 +224,38 @@ export function AdminBreadcrumb() {
             )}
           </BreadcrumbItem>
         ))}
+        
+        {/* Recently Visited Dropdown */}
+        {filteredRecentPages.length > 0 && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-auto py-1 px-2 gap-1.5 text-muted-foreground hover:text-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span className="text-xs">Recent</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 bg-popover">
+                  <DropdownMenuLabel className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    Recently Visited
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {filteredRecentPages.map((page) => (
+                    <DropdownMenuItem key={page.path} asChild>
+                      <Link to={page.path} className="cursor-pointer">
+                        {page.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </BreadcrumbItem>
+          </>
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   );
