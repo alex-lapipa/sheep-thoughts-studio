@@ -61,6 +61,7 @@ import {
   AlertTriangle,
   ChevronDown,
   Trash2,
+  Download,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -231,6 +232,62 @@ export default function Messages() {
     bulkDeleteMutation.mutate(Array.from(selectedIds));
   };
 
+  // Export messages to CSV
+  const exportToCSV = (messagesToExport: ContactMessage[]) => {
+    if (messagesToExport.length === 0) {
+      toast.error("No messages to export");
+      return;
+    }
+
+    const headers = ["Name", "Email", "Subject", "Message", "Status", "Submitted At", "Is Spam", "Spam Score", "Spam Reasons"];
+    
+    const escapeCSV = (value: string | null | undefined): string => {
+      if (value === null || value === undefined) return "";
+      const str = String(value);
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const rows = messagesToExport.map(msg => [
+      escapeCSV(msg.name),
+      escapeCSV(msg.email),
+      escapeCSV(msg.subject),
+      escapeCSV(msg.message),
+      escapeCSV(msg.status),
+      escapeCSV(msg.submitted_at),
+      msg.is_spam ? "Yes" : "No",
+      String(msg.spam_score || 0),
+      escapeCSV(msg.spam_reasons?.join("; ") || ""),
+    ]);
+
+    const csvContent = [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `contact-messages-${format(new Date(), "yyyy-MM-dd")}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success(`Exported ${messagesToExport.length} message(s)`);
+  };
+
+  const handleExportSelected = () => {
+    if (!filteredMessages) return;
+    const selected = filteredMessages.filter(m => selectedIds.has(m.id));
+    exportToCSV(selected);
+  };
+
+  const handleExportAll = () => {
+    if (!filteredMessages) return;
+    exportToCSV(filteredMessages);
+  };
+
   const executeBulkAction = () => {
     if (!bulkActionConfirm) return;
     
@@ -290,10 +347,16 @@ export default function Messages() {
               Manage and respond to customer inquiries
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportAll}>
+              <Download className="w-4 h-4 mr-2" />
+              Export All
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -410,6 +473,11 @@ export default function Messages() {
                         Mark as Responded
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleExportSelected}>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Selected as CSV
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem 
                         onClick={handleBulkDelete}
                         className="text-destructive focus:text-destructive"
@@ -419,6 +487,14 @@ export default function Messages() {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportSelected}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Selected
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
