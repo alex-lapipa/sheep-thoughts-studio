@@ -172,6 +172,8 @@ export default function Francophone() {
   };
 
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+  const ogImageUrl = `${supabaseUrl}/functions/v1/og-francophone-image?region=${selectedRegion}`;
 
   return (
     <Layout>
@@ -181,10 +183,13 @@ export default function Francophone() {
         <meta property="og:title" content={`Bubbles le Mouton | ${region.name}`} />
         <meta property="og:description" content={region.tagline} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${siteUrl}/fr`} />
-        <meta property="og:image" content={`${siteUrl}/og-home.jpg`} />
+        <meta property="og:url" content={`${siteUrl}/${selectedRegion === "fr" ? "fr" : selectedRegion}`} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:locale" content={`fr_${selectedRegion.toUpperCase()}`} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={ogImageUrl} />
         
         {/* Regional hreflang tags for Francophone markets */}
         <link rel="alternate" hrefLang="fr-FR" href={`${siteUrl}/fr`} />
