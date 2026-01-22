@@ -45,7 +45,7 @@ interface BubblesBogProps {
   size?: "sm" | "md" | "lg" | "xl" | "hero";
   className?: string;
   animated?: boolean;
-  posture?: "four-legged" | "two-legged" | "half-upright" | "leaning";
+  posture?: "four-legged" | "two-legged" | "half-upright" | "leaning" | "seated";
   accessory?: "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
   weathered?: boolean;
   // Expression must convey certainty, not cleverness
@@ -91,6 +91,8 @@ export function BubblesBog({
         return <HalfUprightSheep expr={expr} accessory={accessory} weathered={weathered} />;
       case "leaning":
         return <LeaningSheep expr={expr} accessory={accessory} weathered={weathered} />;
+      case "seated":
+        return <SeatedSheep expr={expr} accessory={accessory} weathered={weathered} />;
       default:
         return <FourLeggedSheep expr={expr} accessory={accessory} weathered={weathered} />;
     }
@@ -700,6 +702,246 @@ function LeaningSheep({
       {accessory === "bandana" && <BandanaLeaning />}
       {accessory === "flower-crown" && <FlowerCrownLeaning />}
     </svg>
+  );
+}
+
+// Seated posture - sheep resting in the bog, back legs tucked, front legs forward
+// The classic "I'm comfortable here and not moving" sheep pose
+function SeatedSheep({ 
+  expr, 
+  accessory, 
+  weathered 
+}: { 
+  expr: typeof expressions.neutral; 
+  accessory: string; 
+  weathered: boolean;
+}) {
+  return (
+    <svg viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <defs>
+        <radialGradient id="bogWoolSeated" cx="50%" cy="30%" r="80%">
+          <stop offset="0%" stopColor="hsl(45 25% 88%)" />
+          <stop offset="60%" stopColor="hsl(40 20% 82%)" />
+          <stop offset="100%" stopColor="hsl(35 18% 75%)" />
+        </radialGradient>
+        <radialGradient id="dampWoolSeated" cx="50%" cy="80%" r="60%">
+          <stop offset="0%" stopColor="hsl(35 18% 75%)" />
+          <stop offset="100%" stopColor="hsl(30 25% 55%)" />
+        </radialGradient>
+        <radialGradient id="bogFaceSeated" cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="hsl(38 30% 85%)" />
+          <stop offset="100%" stopColor="hsl(32 25% 75%)" />
+        </radialGradient>
+        <linearGradient id="peatLegsSeated" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="hsl(28 35% 28%)" />
+          <stop offset="100%" stopColor="hsl(25 40% 18%)" />
+        </linearGradient>
+        <filter id="groundShadowSeated" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="hsl(28 40% 15%)" floodOpacity="0.35" />
+        </filter>
+      </defs>
+
+      {/* Ground shadow - wider for seated position */}
+      <ellipse cx="80" cy="118" rx="50" ry="10" fill="hsl(28 40% 15% / 0.25)" />
+
+      {/* BODY - Lower, wider, resting on ground */}
+      <g filter="url(#groundShadowSeated)">
+        {/* Main wool body - compressed/settled shape */}
+        <ellipse cx="80" cy="78" rx="42" ry="28" fill="url(#bogWoolSeated)" />
+        {/* Back hump - relaxed */}
+        <ellipse cx="95" cy="58" rx="22" ry="16" fill="url(#bogWoolSeated)" />
+        {/* Front chest */}
+        <ellipse cx="55" cy="72" rx="20" ry="22" fill="url(#bogWoolSeated)" />
+        {/* Wool texture puffs */}
+        <ellipse cx="70" cy="52" rx="12" ry="9" fill="url(#bogWoolSeated)" />
+        <ellipse cx="88" cy="48" rx="10" ry="8" fill="url(#bogWoolSeated)" />
+        <ellipse cx="105" cy="55" rx="8" ry="7" fill="url(#bogWoolSeated)" />
+        
+        {/* Weathered/damp patches from sitting in bog */}
+        {weathered && (
+          <>
+            <ellipse cx="80" cy="100" rx="30" ry="10" fill="url(#dampWoolSeated)" opacity="0.5" />
+            <ellipse cx="100" cy="95" rx="15" ry="8" fill="url(#dampWoolSeated)" opacity="0.4" />
+            <ellipse cx="60" cy="92" rx="12" ry="6" fill="url(#dampWoolSeated)" opacity="0.35" />
+          </>
+        )}
+      </g>
+
+      {/* LEGS - Back legs tucked under body, front legs extended forward */}
+      <g>
+        {/* Back legs - tucked/folded under body, only hooves visible */}
+        <ellipse cx="105" cy="105" rx="8" ry="4" fill="url(#peatLegsSeated)" />
+        <ellipse cx="118" cy="104" rx="7" ry="4" fill="url(#peatLegsSeated)" />
+        {/* Back hooves peeking out */}
+        <ellipse cx="108" cy="108" rx="5" ry="2.5" fill="hsl(25 45% 12%)" />
+        <ellipse cx="120" cy="107" rx="4.5" ry="2.5" fill="hsl(25 45% 12%)" />
+        
+        {/* Front legs - extended forward, resting on ground */}
+        <rect x="38" y="85" width="9" height="26" rx="4" fill="url(#peatLegsSeated)" transform="rotate(-15 42 85)" />
+        <rect x="52" y="87" width="8" height="24" rx="4" fill="url(#peatLegsSeated)" transform="rotate(-10 56 87)" />
+        
+        {/* Front hooves - flat on ground */}
+        <ellipse cx="32" cy="112" rx="6" ry="3" fill="hsl(25 45% 12%)" />
+        <ellipse cx="48" cy="113" rx="5.5" ry="3" fill="hsl(25 45% 12%)" />
+        
+        {/* Mud splashes from sitting */}
+        {weathered && (
+          <>
+            <circle cx="35" cy="105" r="2" fill="hsl(28 40% 35%)" opacity="0.5" />
+            <circle cx="50" cy="106" r="1.5" fill="hsl(28 40% 35%)" opacity="0.45" />
+            <circle cx="110" cy="100" r="1.8" fill="hsl(28 40% 35%)" opacity="0.4" />
+          </>
+        )}
+      </g>
+
+      {/* HEAD - Relaxed, slightly lower position */}
+      <g>
+        {/* Neck wool - connects head to body */}
+        <ellipse cx="42" cy="60" rx="14" ry="12" fill="url(#bogWoolSeated)" />
+        
+        {/* Face */}
+        <ellipse cx="32" cy="52" rx="15" ry="14" fill="url(#bogFaceSeated)" />
+        
+        {/* EARS - Relaxed, slightly drooped */}
+        <ellipse cx="18" cy="42" rx="8" ry="4.5" fill="url(#bogFaceSeated)" transform="rotate(-30 18 42)" />
+        <ellipse cx="46" cy="40" rx="8" ry="4.5" fill="url(#bogFaceSeated)" transform="rotate(15 46 40)" />
+        <ellipse cx="19" cy="43" rx="4" ry="2" fill="hsl(350 20% 75%)" opacity="0.4" transform="rotate(-30 19 43)" />
+        <ellipse cx="45" cy="41" rx="4" ry="2" fill="hsl(350 20% 75%)" opacity="0.4" transform="rotate(15 45 41)" />
+        
+        {/* EYES - Calm, certain, possibly half-closed contentment */}
+        <g transform={`translate(${expr.gazeDirection}, 0)`}>
+          {/* Eye whites */}
+          <ellipse cx="24" cy="50" rx="4.5" ry="5" fill="hsl(0 0% 98%)" />
+          <ellipse cx="40" cy="49" rx="4.5" ry="5" fill="hsl(0 0% 98%)" />
+          {/* Eyelids */}
+          <ellipse cx="24" cy={50 + expr.lidDrop * 10} rx="4.5" ry={5 - expr.lidDrop * 5} fill="url(#bogFaceSeated)" />
+          <ellipse cx="40" cy={49 + expr.lidDrop * 10} rx="4.5" ry={5 - expr.lidDrop * 5} fill="url(#bogFaceSeated)" />
+          {/* Pupils */}
+          <circle cx={24 + expr.eyeOffset} cy="50" r="2.5" fill="hsl(28 60% 18%)" />
+          <circle cx={40 + expr.eyeOffset} cy="49" r="2.5" fill="hsl(28 60% 18%)" />
+          {/* Highlights */}
+          <circle cx={23.2 + expr.eyeOffset} cy="49.2" r="0.8" fill="hsl(0 0% 100%)" />
+          <circle cx={39.2 + expr.eyeOffset} cy="48.2" r="0.8" fill="hsl(0 0% 100%)" />
+        </g>
+        
+        {/* NOSE */}
+        <ellipse cx="32" cy="60" rx="5" ry="3" fill="hsl(350 25% 30%)" />
+        <ellipse cx="31.3" cy="59.3" rx="1.8" ry="1" fill="hsl(350 20% 22%)" />
+        
+        {/* Nostrils */}
+        <ellipse cx="30" cy="60.5" rx="1" ry="0.6" fill="hsl(350 25% 22%)" />
+        <ellipse cx="34" cy="60.5" rx="1" ry="0.6" fill="hsl(350 25% 22%)" />
+      </g>
+
+      {/* ACCESSORIES */}
+      {accessory === "sunglasses" && <SunglassesSeated />}
+      {accessory === "cap" && <FlatCapSeated />}
+      {accessory === "bucket-hat" && <BucketHatSeated />}
+      {accessory === "headphones" && <HeadphonesSeated />}
+      {accessory === "scarf" && <ScarfSeated />}
+      {accessory === "bandana" && <BandanaSeated />}
+      {accessory === "flower-crown" && <FlowerCrownSeated />}
+    </svg>
+  );
+}
+
+// Seated accessories - positioned for the relaxed head position
+function SunglassesSeated() {
+  return (
+    <g>
+      <ellipse cx="26" cy="48" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
+      <ellipse cx="38" cy="47" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
+      <path d="M 32 47 Q 33 46 34 47" stroke="hsl(45 50% 45%)" strokeWidth="1.2" fill="none" />
+      <line x1="19" y1="47" x2="12" y2="44" stroke="hsl(45 50% 45%)" strokeWidth="1.2" />
+      <line x1="45" y1="46" x2="52" y2="43" stroke="hsl(45 50% 45%)" strokeWidth="1.2" />
+      <ellipse cx="24" cy="46" rx="2" ry="1.5" fill="hsl(200 60% 60%)" opacity="0.3" />
+    </g>
+  );
+}
+
+function FlatCapSeated() {
+  return (
+    <g>
+      <ellipse cx="32" cy="38" rx="16" ry="8" fill="hsl(28 35% 32%)" />
+      <path d="M 18 40 Q 32 34 46 40" fill="hsl(28 40% 28%)" />
+      <ellipse cx="20" cy="42" rx="10" ry="4" fill="hsl(28 35% 25%)" />
+      <path d="M 22 37 L 42 37" stroke="hsl(28 30% 40%)" strokeWidth="0.5" opacity="0.5" />
+    </g>
+  );
+}
+
+function BucketHatSeated() {
+  return (
+    <g>
+      <ellipse cx="32" cy="38" rx="18" ry="10" fill="hsl(0 0% 95%)" />
+      <ellipse cx="32" cy="34" rx="12" ry="8" fill="hsl(0 0% 92%)" />
+      <ellipse cx="32" cy="40" rx="18" ry="3" fill="hsl(0 0% 85%)" />
+    </g>
+  );
+}
+
+function HeadphonesSeated() {
+  return (
+    <g>
+      <path d="M 12 48 Q 32 28 52 48" stroke="hsl(0 0% 20%)" strokeWidth="3" fill="none" />
+      <ellipse cx="14" cy="50" rx="5" ry="7" fill="hsl(0 0% 15%)" />
+      <ellipse cx="14" cy="50" rx="3.5" ry="5" fill="hsl(0 0% 25%)" />
+      <ellipse cx="50" cy="50" rx="5" ry="7" fill="hsl(0 0% 15%)" />
+      <ellipse cx="50" cy="50" rx="3.5" ry="5" fill="hsl(0 0% 25%)" />
+    </g>
+  );
+}
+
+function ScarfSeated() {
+  return (
+    <g>
+      <ellipse cx="38" cy="68" rx="14" ry="5" fill="hsl(350 70% 45%)" />
+      <ellipse cx="38" cy="68" rx="12" ry="4" fill="hsl(350 65% 50%)" />
+      <path d="M 28 70 Q 24 80 30 92" stroke="hsl(350 70% 45%)" strokeWidth="5" fill="none" />
+      <line x1="26" y1="66" x2="50" y2="66" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+      <line x1="25" y1="69" x2="51" y2="69" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+    </g>
+  );
+}
+
+function BandanaSeated() {
+  return (
+    <g>
+      <path d="M 14 42 Q 32 34 50 42" fill="hsl(210 80% 45%)" />
+      <path d="M 14 42 Q 32 38 50 42 Q 32 46 14 42" fill="hsl(210 75% 50%)" />
+      <circle cx="52" cy="44" r="2.5" fill="hsl(210 80% 40%)" />
+      <path d="M 54 42 Q 60 46 58 54" stroke="hsl(210 80% 45%)" strokeWidth="2.5" fill="none" />
+      <circle cx="26" cy="40" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
+      <circle cx="38" cy="38" r="1" fill="hsl(0 0% 95%)" opacity="0.6" />
+    </g>
+  );
+}
+
+function FlowerCrownSeated() {
+  return (
+    <g>
+      <path d="M 12 40 Q 32 30 52 40" stroke="hsl(120 40% 35%)" strokeWidth="2" fill="none" />
+      <g transform="translate(20, 36)">
+        <circle cx="0" cy="0" r="4" fill="hsl(0 0% 98%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(32, 32)">
+        <circle cx="0" cy="0" r="5" fill="hsl(330 70% 75%)" />
+        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(44, 36)">
+        <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(26, 34)">
+        <circle cx="0" cy="0" r="3" fill="hsl(45 80% 70%)" />
+        <circle cx="0" cy="0" r="1" fill="hsl(35 90% 55%)" />
+      </g>
+      <g transform="translate(38, 33)">
+        <circle cx="0" cy="0" r="3.5" fill="hsl(180 50% 70%)" />
+        <circle cx="0" cy="0" r="1.2" fill="hsl(45 90% 55%)" />
+      </g>
+    </g>
   );
 }
 
