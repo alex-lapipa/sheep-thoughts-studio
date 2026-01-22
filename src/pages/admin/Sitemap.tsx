@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +8,20 @@ import {
   XCircle, 
   AlertTriangle, 
   ExternalLink, 
-  RefreshCw,
   Image,
   FileText,
   Globe,
-  Twitter
+  Twitter,
+  Facebook,
+  Linkedin
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PageMeta {
   path: string;
@@ -398,6 +405,39 @@ export default function AdminSitemap() {
                           className="h-10 w-20 object-cover rounded border"
                         />
                       </a>
+                    )}
+
+                    {/* Social debuggers dropdown */}
+                    {!page.path.includes(":") && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            Test Preview
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => window.open(
+                              `https://developers.facebook.com/tools/debug/?q=${encodeURIComponent(siteUrl + page.path)}`,
+                              "_blank"
+                            )}
+                            className="cursor-pointer"
+                          >
+                            <Facebook className="h-4 w-4 mr-2" />
+                            Facebook Debugger
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => window.open(
+                              `https://www.linkedin.com/post-inspector/inspect/${encodeURIComponent(siteUrl + page.path)}`,
+                              "_blank"
+                            )}
+                            className="cursor-pointer"
+                          >
+                            <Linkedin className="h-4 w-4 mr-2" />
+                            LinkedIn Inspector
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
 
                     {/* View page button */}
