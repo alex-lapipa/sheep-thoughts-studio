@@ -5,6 +5,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { EmailBlockEditor } from "@/components/admin/EmailBlockEditor";
 import { CampaignCalendar } from "@/components/admin/CampaignCalendar";
+import { CountdownTimer } from "@/components/admin/CountdownTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -394,10 +395,18 @@ export default function AdminCampaigns() {
         return <Badge variant="outline"><Edit className="w-3 h-3 mr-1" />Draft</Badge>;
       case "scheduled":
         return (
-          <Badge className="bg-warning/10 text-warning border-warning/20">
-            <CalendarIcon className="w-3 h-3 mr-1" />
-            {campaign?.scheduled_at ? format(new Date(campaign.scheduled_at), "MMM d, h:mm a") : "Scheduled"}
-          </Badge>
+          <div className="flex flex-col gap-1">
+            <Badge className="bg-warning/10 text-warning border-warning/20 w-fit">
+              <CalendarIcon className="w-3 h-3 mr-1" />
+              {campaign?.scheduled_at ? format(new Date(campaign.scheduled_at), "MMM d, h:mm a") : "Scheduled"}
+            </Badge>
+            {campaign?.scheduled_at && (
+              <CountdownTimer 
+                targetDate={new Date(campaign.scheduled_at)} 
+                compact 
+              />
+            )}
+          </div>
         );
       case "sending":
         return <Badge className="bg-primary/10 text-primary border-primary/20"><Clock className="w-3 h-3 mr-1" />Sending</Badge>;
