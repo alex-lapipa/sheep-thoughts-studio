@@ -6,17 +6,18 @@ import { useProducts } from "@/hooks/useProducts";
 import { ModeBadge } from "@/components/ModeBadge";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 
 const Collections = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeMode = searchParams.get('mode') as BubbleMode | null;
   const { t } = useLanguage();
+  const { ogImageUrl, siteUrl } = useOgImage("og-collections.jpg");
   
   const query = activeMode ? `tag:${activeMode}` : undefined;
   const { data: products, isLoading } = useProducts(query, 40);
 
   const modes: BubbleMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   const handleModeClick = (mode: BubbleMode) => {
     if (activeMode === mode) {
@@ -36,11 +37,11 @@ const Collections = () => {
         <meta property="og:description" content="T-shirts, mugs, and more featuring confidently incorrect wisdom from the Wicklow bogs." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/collections/all`} />
-        <meta property="og:image" content={`${siteUrl}/og-collections.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Bubbles Merch Collection" />
         <meta name="twitter:description" content="Shop confidently incorrect wisdom merchandise." />
-        <meta name="twitter:image" content={`${siteUrl}/og-collections.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/collections/all`} />
       </Helmet>
       <div className="container py-12">

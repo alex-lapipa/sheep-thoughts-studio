@@ -5,13 +5,12 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
 import { ChallengeBubbles } from "@/components/ChallengeBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
 interface Explanation {
   id: string;
@@ -203,6 +202,7 @@ const TOPIC_ICONS: Record<string, React.ElementType> = {
 
 const Explains = () => {
   const { t, language } = useLanguage();
+  const { ogImageUrl, siteUrl } = useOgImage("og-explains.jpg");
   const [openId, setOpenId] = useState<string | null>(null);
   const [challengedItems, setChallengedItems] = useState<Set<string>>(new Set());
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -237,12 +237,12 @@ const Explains = () => {
         <meta property="og:description" content="Rigorous research from standing in fields and overhearing things." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/explains`} />
-        <meta property="og:image" content={`${siteUrl}/og-explains.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Bubbles Explains Everything" />
-        <meta name="twitter:image" content={`${siteUrl}/og-explains.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/explains`} />
       </Helmet>
       <div className="container py-12 md:py-20">

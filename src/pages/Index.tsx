@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMood } from "@/contexts/MoodContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -116,7 +117,7 @@ export default function Index() {
     return mode as BubbleMode;
   };
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const { ogImageUrl, siteUrl } = useOgImage("og-home.jpg");
 
   return (
     <Layout>
@@ -127,13 +128,13 @@ export default function Index() {
         <meta property="og:description" content="A sheep from Wicklow, Ireland. Raised by humans. Educated by tourists. Always wrong with complete confidence." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={siteUrl} />
-        <meta property="og:image" content={`${siteUrl}/og-home.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Bubbles the Sheep" />
         <meta name="twitter:description" content="The sheep who knows everything. Incorrectly." />
-        <meta name="twitter:image" content={`${siteUrl}/og-home.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={siteUrl} />
       </Helmet>
       {/* Hero - Bubbles introduces themselves */}

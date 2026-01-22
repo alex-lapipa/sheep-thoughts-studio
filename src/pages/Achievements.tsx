@@ -6,6 +6,7 @@ import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2, PartyPopp
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import confetti from "canvas-confetti";
+import { useOgImage } from "@/hooks/useOgImage";
 import { 
   BadgeSparkles, 
   FloatingParticles, 
@@ -246,6 +247,7 @@ export default function Achievements() {
     m => celebratedMilestones.includes(m.days) || currentStreak >= m.days
   ).length;
 
+  const { ogImageUrl, siteUrl } = useOgImage("og-achievements.jpg");
   const ogDescription = unlockedCount > 0 
     ? `I've earned ${unlockedCount} wisdom badge${unlockedCount > 1 ? 's' : ''} from Bubbles the Sheep! 🐑 ${currentStreak} day streak of seeking confidently wrong advice.`
     : "Track your journey of seeking Bubbles' confidently incorrect wisdom. Earn badges for your dedication!";
@@ -260,15 +262,15 @@ export default function Achievements() {
         <meta property="og:title" content={`${unlockedCount > 0 ? `${unlockedCount} Badges Earned! ` : ''}Wisdom Badges | Bubbles the Sheep`} />
         <meta property="og:description" content={ogDescription} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://sheep-thoughts-studio.lovable.app/achievements" />
-        <meta property="og:image" content="https://sheep-thoughts-studio.lovable.app/og-achievements.jpg" />
+        <meta property="og:url" content={`${siteUrl}/achievements`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:site_name" content="Bubbles the Sheep" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${unlockedCount > 0 ? `${unlockedCount} Badges Earned! ` : ''}Wisdom Badges | Bubbles the Sheep`} />
         <meta name="twitter:description" content={ogDescription} />
-        <meta name="twitter:image" content="https://sheep-thoughts-studio.lovable.app/og-achievements.jpg" />
+        <meta name="twitter:image" content={ogImageUrl} />
       </Helmet>
       
       <FloatingParticles count={15} />

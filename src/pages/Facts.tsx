@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOgImage } from "@/hooks/useOgImage";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -82,7 +83,7 @@ export default function Facts() {
     setDisplayedFacts(shuffled.slice(0, 6));
   };
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const { ogImageUrl, siteUrl } = useOgImage("og-facts.jpg");
 
   return (
     <Layout>
@@ -93,11 +94,11 @@ export default function Facts() {
         <meta property="og:description" content="Discover Bubbles' collection of confidently incorrect facts. Highly researched. Absolutely wrong." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/facts`} />
-        <meta property="og:image" content={`${siteUrl}/og-facts.jpg`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Facts by Bubbles" />
         <meta name="twitter:description" content="Highly researched. Absolutely wrong. From the Wicklow bogs." />
-        <meta name="twitter:image" content={`${siteUrl}/og-facts.jpg`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
       {/* Hero */}
