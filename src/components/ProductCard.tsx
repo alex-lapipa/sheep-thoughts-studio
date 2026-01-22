@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Loader2, Eye } from "lucide-react";
+import { ShoppingCart, Loader2, Eye, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
 import { ProductQuickView } from "./ProductQuickView";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -20,6 +21,7 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasTrackedImpression = useRef(false);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const isLoading = useCartStore(state => state.isLoading);
   
@@ -54,7 +56,7 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
           }
         });
       },
-      { threshold: 0.5 } // Track when 50% of card is visible
+      { threshold: 0.5 }
     );
 
     observer.observe(element);
@@ -76,7 +78,6 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
       selectedOptions: firstVariant.selectedOptions || []
     });
     
-    // Track add to cart in DB
     ecommerceTracking.addToCart(
       node.id,
       node.title,
@@ -105,54 +106,92 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
 
   return (
     <>
-      <Link ref={cardRef} to={`/product/${node.handle}`} className="group" onClick={handleProductClick}>
-        <div className="product-card bg-card rounded-xl overflow-hidden border border-border">
+      <Link 
+        ref={cardRef} 
+        to={`/product/${node.handle}`} 
+        className="group block touch-manipulation"
+        onClick={handleProductClick}
+        onTouchStart={() => setIsPressed(true)}
+        onTouchEnd={() => setIsPressed(false)}
+        onTouchCancel={() => setIsPressed(false)}
+      >
+        <div className={cn(
+          "product-card bg-card rounded-xl overflow-hidden border border-border transition-all duration-200",
+          isPressed && "scale-[0.98] shadow-sm",
+          "active:scale-[0.98]"
+        )}>
+          {/* Image Container */}
           <div className="aspect-square bg-muted relative overflow-hidden">
             {image ? (
               <img 
                 src={image.url} 
                 alt={image.altText || node.title} 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                 No image
               </div>
             )}
+            
+            {/* Mode Badge */}
             {modeTag && (
-              <div className="absolute top-3 left-3">
+              <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                 <ModeBadge mode={modeTag} />
               </div>
             )}
-            {/* Quick View Button */}
+            
+            {/* Desktop: Quick View Button (hover) */}
             <Button
               size="sm"
               variant="secondary"
-              className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
+              className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 hidden sm:flex"
               onClick={handleQuickView}
             >
               <Eye className="h-4 w-4 mr-1.5" />
               Quick View
             </Button>
+            
+            {/* Mobile: Quick Add Button (always visible) */}
+            <Button
+              size="icon"
+              variant="secondary"
+              className="absolute bottom-2 right-2 h-9 w-9 rounded-full shadow-md sm:hidden bg-background/90 backdrop-blur-sm"
+              onClick={handleAddToCart}
+              disabled={isLoading || !firstVariant?.availableForSale}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-5 w-5" />
+              )}
+            </Button>
           </div>
-          <div className="p-4 space-y-3">
+          
+          {/* Product Info */}
+          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
             <div>
-              <h3 className="font-display font-semibold text-lg leading-tight group-hover:text-accent transition-colors">
+              <h3 className="font-display font-semibold text-base sm:text-lg leading-tight group-hover:text-accent transition-colors line-clamp-2">
                 {node.title}
               </h3>
-              <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
+              <p className="text-muted-foreground text-xs sm:text-sm mt-1 line-clamp-2 hidden sm:block">
                 {node.description}
               </p>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="font-display font-bold text-lg">
+            
+            {/* Price and Add Button */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-display font-bold text-base sm:text-lg">
                 {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
               </span>
+              
+              {/* Desktop: Full Add Button */}
               <Button 
                 size="sm" 
                 onClick={handleAddToCart}
                 disabled={isLoading || !firstVariant?.availableForSale}
-                className="bg-accent hover:bg-accent-hover text-accent-foreground"
+                className="bg-accent hover:bg-accent-hover text-accent-foreground hidden sm:flex"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -162,6 +201,17 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
                     Add
                   </>
                 )}
+              </Button>
+              
+              {/* Mobile: Quick View Link */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleQuickView}
+                className="sm:hidden text-xs h-8 px-2"
+              >
+                <Eye className="h-3.5 w-3.5 mr-1" />
+                View
               </Button>
             </div>
           </div>

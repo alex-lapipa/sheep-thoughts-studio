@@ -983,3 +983,124 @@
 .sheep-mode footer a:hover {
   color: hsl(var(--sheep-blush)) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   📱 MOBILE-FIRST OPTIMIZATIONS
+   Touch-friendly, fast-loading, thumb-zone aware
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Prevent accidental text selection on touch */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Larger tap targets on mobile */
+@media (max-width: 640px) {
+  button, 
+  a, 
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Exception for inline links and small icon buttons */
+  a:not(.btn):not([class*="Button"]),
+  .inline-link {
+    min-height: auto;
+    min-width: auto;
+  }
+  
+  /* Better spacing for mobile forms */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Fixed bottom elements need safe area */
+  .fixed-bottom {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Smooth momentum scrolling */
+.scroll-smooth {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+@media (max-width: 640px) {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Active state feedback for touch */
+@media (hover: none) {
+  .touch-active:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Focus visible only for keyboard users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
+
+/* Mobile-optimized modals and sheets */
+@media (max-width: 640px) {
+  [data-radix-dialog-content],
+  [data-radix-sheet-content] {
+    max-height: 90vh;
+    max-height: 90dvh;
+  }
+}
+
+/* Sticky header shadow on scroll */
+.header-scrolled {
+  box-shadow: 0 2px 8px -2px hsl(var(--foreground) / 0.1);
+}
+
+/* Thumb zone awareness - put important actions at bottom */
+@media (max-width: 640px) {
+  .thumb-zone-aware {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .thumb-zone-aware .primary-action {
+    order: 999;
+    margin-top: auto;
+  }
+}
