@@ -19,10 +19,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen } from 'lucide-react';
+import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { SocialPreviewTester } from '@/components/SocialPreviewTester';
 import { PlatformPreviewComparison } from '@/components/admin/PlatformPreviewComparison';
+import { LanguageOGComparison } from '@/components/admin/LanguageOGComparison';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -37,7 +38,7 @@ interface CachedImage {
 }
 
 export default function OGPreview() {
-  const [activeTab, setActiveTab] = useState('product');
+  const [activeTab, setActiveTab] = useState('languages');
   
   // Product OG state
   const [productTitle, setProductTitle] = useState('Confidently Wrong Tee');
@@ -247,10 +248,18 @@ export default function OGPreview() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
+            <TabsTrigger value="languages" className="gap-1">
+              <Globe className="h-4 w-4" />
+              Language Variants
+            </TabsTrigger>
             <TabsTrigger value="product">Product OG</TabsTrigger>
             <TabsTrigger value="badge">Badge OG</TabsTrigger>
             <TabsTrigger value="cache">Cache Management</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="languages">
+            <LanguageOGComparison />
+          </TabsContent>
 
           <TabsContent value="product" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
