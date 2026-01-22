@@ -99,6 +99,8 @@ interface DailyEcommerceData {
   addToCarts: number;
   cartOpens: number;
   checkoutStarts: number;
+  clickThroughRate: number;
+  addToCartRate: number;
 }
 
 export default function AdminAnalytics() {
@@ -236,14 +238,20 @@ export default function AdminAnalytics() {
             return eventDate === dayStr;
           });
           
+          const dayImpressions = dayEvents.filter(e => e.event_type === 'product_impression').length;
+          const dayViews = dayEvents.filter(e => e.event_type === 'view_product').length;
+          const dayAddToCarts = dayEvents.filter(e => e.event_type === 'add_to_cart').length;
+          
           return {
             date: dayStr,
             displayDate: format(day, 'MMM d'),
-            impressions: dayEvents.filter(e => e.event_type === 'product_impression').length,
-            productViews: dayEvents.filter(e => e.event_type === 'view_product').length,
-            addToCarts: dayEvents.filter(e => e.event_type === 'add_to_cart').length,
+            impressions: dayImpressions,
+            productViews: dayViews,
+            addToCarts: dayAddToCarts,
             cartOpens: dayEvents.filter(e => e.event_type === 'open_cart').length,
             checkoutStarts: dayEvents.filter(e => e.event_type === 'begin_checkout').length,
+            clickThroughRate: dayImpressions > 0 ? (dayViews / dayImpressions) * 100 : 0,
+            addToCartRate: dayViews > 0 ? (dayAddToCarts / dayViews) * 100 : 0,
           };
         });
         
@@ -753,7 +761,69 @@ export default function AdminAnalytics() {
                 </CardContent>
               </Card>
 
-              {/* Checkout Funnel Trend */}
+              {/* Daily CTR Trend Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Daily Click-Through Rate</CardTitle>
+                  <CardDescription>CTR% and Add-to-Cart rate trends over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {dailyEcommerceData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={dailyEcommerceData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="displayDate" 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => `${value}%`}
+                          domain={[0, 'auto']}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                          formatter={(value: number) => [`${value.toFixed(1)}%`, undefined]}
+                        />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="clickThroughRate" 
+                          name="CTR %"
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          dot={{ fill: 'hsl(var(--primary))', strokeWidth: 0, r: 3 }}
+                          activeDot={{ r: 5, fill: 'hsl(var(--primary))' }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="addToCartRate" 
+                          name="Add to Cart %"
+                          stroke="hsl(var(--accent))" 
+                          strokeWidth={2}
+                          dot={{ fill: 'hsl(var(--accent))', strokeWidth: 0, r: 3 }}
+                          activeDot={{ r: 5, fill: 'hsl(var(--accent))' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      No data for selected period
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Checkout Funnel Trend */}
+            <div className="grid gap-6 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">Checkout Trends</CardTitle>
