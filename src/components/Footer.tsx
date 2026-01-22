@@ -74,6 +74,7 @@ export function Footer() {
               <li><Link to="/shipping" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Shipping & Returns</Link></li>
               <li><Link to="/contact" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Contact Us</Link></li>
               <li><Link to="/privacy" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Privacy Policy</Link></li>
+              <li><Link to="/privacy#your-rights" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Data Deletion</Link></li>
               <li><Link to="/data-rights" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Your Data Rights</Link></li>
               <li><Link to="/terms" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Terms of Service</Link></li>
               <li>
