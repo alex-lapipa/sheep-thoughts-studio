@@ -85,6 +85,12 @@ export const ecommerceTracking = {
       quantity: totalItems,
       currency,
     });
+    
+    // Send to GA4
+    sendGA4Event('begin_checkout', {
+      currency,
+      value: totalValue,
+    });
   },
 
   productImpression: (productId: string, productTitle: string, price?: number, position?: number) => {
@@ -96,4 +102,70 @@ export const ecommerceTracking = {
       metadata: position !== undefined ? { position } : undefined,
     });
   },
+
+  /**
+   * Track a completed purchase with full item details
+   */
+  purchaseComplete: (params: {
+    orderId: string;
+    orderNumber?: string;
+    totalValue: number;
+    currency: string;
+    tax?: number;
+    shipping?: number;
+    items: Array<{
+      productId: string;
+      productTitle: string;
+      variantId?: string;
+      variantTitle?: string;
+      price: number;
+      quantity: number;
+    }>;
+  }) => {
+    // Record to database
+    recordEcommerceEvent({
+      event_type: 'purchase_complete',
+      price: params.totalValue,
+      quantity: params.items.reduce((sum, item) => sum + item.quantity, 0),
+      currency: params.currency,
+      metadata: {
+        order_id: params.orderId,
+        order_number: params.orderNumber,
+        tax: params.tax,
+        shipping: params.shipping,
+        items: params.items,
+      },
+    });
+
+    // Send to GA4 with enhanced ecommerce data
+    sendGA4Event('purchase', {
+      transaction_id: params.orderId,
+      value: params.totalValue,
+      currency: params.currency,
+      tax: params.tax || 0,
+      shipping: params.shipping || 0,
+      items: params.items.map((item, index) => ({
+        item_id: item.productId,
+        item_name: item.productTitle,
+        item_variant: item.variantTitle || item.variantId,
+        price: item.price,
+        quantity: item.quantity,
+        index,
+      })),
+    });
+  },
 };
+
+/**
+ * Send event to Google Analytics 4 via gtag
+ */
+function sendGA4Event(eventName: string, params: Record<string, unknown>) {
+  try {
+    // Check if gtag is available (loaded via cookie consent)
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as { gtag: (...args: unknown[]) => void }).gtag('event', eventName, params);
+    }
+  } catch (err) {
+    console.error('[EcommerceTracking] GA4 event error:', err);
+  }
+}
