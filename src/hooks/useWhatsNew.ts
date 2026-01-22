@@ -2,27 +2,59 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 // Increment this version when adding new features
-const CURRENT_VERSION = '1.0.0';
+const CURRENT_VERSION = '1.2.0';
 
-interface WhatsNewEntry {
+export interface WhatsNewEntry {
   version: string;
   title: string;
   features: string[];
   date: string;
+  highlights?: string[];
+  category?: 'major' | 'minor' | 'patch';
 }
 
 // Define changelog entries - newest first
-const CHANGELOG: WhatsNewEntry[] = [
+export const CHANGELOG: WhatsNewEntry[] = [
+  {
+    version: '1.2.0',
+    title: "Newsletter & Legal Updates 📬",
+    features: [
+      '📧 Newsletter unsubscribe with one-click opt-out',
+      '📋 Table of contents sidebar on Terms page',
+      '📊 Scroll progress bar on Privacy page',
+      '📰 Full changelog history page',
+    ],
+    highlights: ['Newsletter management', 'Improved navigation'],
+    date: '2026-01-22',
+    category: 'minor',
+  },
+  {
+    version: '1.1.0',
+    title: "Campaign Manager & Admin Tools 🚀",
+    features: [
+      '📨 Newsletter campaign manager in admin',
+      '✉️ Double opt-in email confirmation',
+      '📤 CSV export for contact messages',
+      '🔐 Bulk message management',
+    ],
+    highlights: ['Email campaigns', 'Admin improvements'],
+    date: '2026-01-22',
+    category: 'minor',
+  },
   {
     version: '1.0.0',
-    title: "What's New! 🐑",
+    title: "Launch Day! 🐑",
     features: [
       '✨ Newsletter signup with welcome emails',
       '📋 Table of contents on Privacy page',
       '🔗 Smooth scrolling to anchor sections',
       '📊 Admin newsletter management',
+      '🎨 Full brand book implementation',
+      '🛍️ Shopify storefront integration',
     ],
-    date: '2026-01-22',
+    highlights: ['Initial launch', 'Core features'],
+    date: '2026-01-20',
+    category: 'major',
   },
 ];
 
