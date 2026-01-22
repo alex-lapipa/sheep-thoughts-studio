@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BubblesBog } from "@/components/BubblesBog";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
+type PostureType = "four-legged" | "two-legged";
 
 interface Thought {
   id: string;
@@ -18,7 +19,7 @@ interface PageHeroWithBubblesProps {
   subtitle?: string;
   className?: string;
   bubbleSize?: "sm" | "md" | "lg";
-  posture?: "four-legged" | "two-legged";
+  posture?: PostureType | "random";
   accessory?: "sunglasses" | "cap" | "bucket-hat" | "none";
 }
 
@@ -39,10 +40,18 @@ export function PageHeroWithBubbles({
   subtitle,
   className,
   bubbleSize = "md",
-  posture = "four-legged",
+  posture = "random",
   accessory = "none",
 }: PageHeroWithBubblesProps) {
   const [thoughts, setThoughts] = useState<Thought[]>(FALLBACK_THOUGHTS);
+  
+  // Random posture selection on mount (stable for component lifetime)
+  const resolvedPosture = useMemo<PostureType>(() => {
+    if (posture === "random") {
+      return Math.random() > 0.5 ? "two-legged" : "four-legged";
+    }
+    return posture;
+  }, [posture]);
   const [visibleThoughts, setVisibleThoughts] = useState<Array<Thought & { position: number; key: string }>>([]);
 
   // Fetch thoughts from RAG database
@@ -141,7 +150,7 @@ export function PageHeroWithBubbles({
             <div className={cn(bubbleSizeClasses[bubbleSize])}>
               <BubblesBog
                 size={bubbleSize === "sm" ? "md" : bubbleSize === "md" ? "lg" : "xl"}
-                posture={posture}
+                posture={resolvedPosture}
                 accessory={accessory}
                 expression="certain"
                 animated={false}
