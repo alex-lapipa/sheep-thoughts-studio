@@ -25,7 +25,7 @@ async function createJWT(serviceAccount: ServiceAccountKey): Promise<string> {
   const payload = {
     iss: serviceAccount.client_email,
     sub: serviceAccount.client_email,
-    aud: "https://analyticsdata.googleapis.com/",
+    aud: serviceAccount.token_uri,
     iat: now,
     exp: now + 3600,
     scope: "https://www.googleapis.com/auth/analytics.readonly",
