@@ -1,0 +1,475 @@
+import { useEffect, useState, useCallback } from 'react';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import {
+  Trash2,
+  RefreshCw,
+  Loader2,
+  Image as ImageIcon,
+  Search,
+  HardDrive,
+  Clock,
+  FileImage,
+  CheckSquare,
+  Square,
+  XCircle,
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+
+interface CachedImage {
+  name: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+  metadata: Record<string, any> | null;
+  selected: boolean;
+}
+
+export default function OGCacheManager() {
+  const [images, setImages] = useState<CachedImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [clearingAll, setClearingAll] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectAll, setSelectAll] = useState(false);
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+  const fetchImages = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('og-images')
+        .list('', {
+          limit: 500,
+          sortBy: { column: 'created_at', order: 'desc' },
+        });
+
+      if (error) throw error;
+
+      const imagesWithSelection = (data || []).map(img => ({
+        ...img,
+        selected: false,
+      }));
+
+      setImages(imagesWithSelection);
+    } catch (error) {
+      console.error('Error fetching cached images:', error);
+      toast.error('Failed to fetch cached images');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
+
+  const deleteImage = async (name: string) => {
+    setDeleting(name);
+    try {
+      const { error } = await supabase.storage
+        .from('og-images')
+        .remove([name]);
+
+      if (error) throw error;
+
+      setImages(prev => prev.filter(img => img.name !== name));
+      toast.success('Image deleted successfully');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Failed to delete image');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const deleteSelected = async () => {
+    const selectedNames = images.filter(img => img.selected).map(img => img.name);
+    if (selectedNames.length === 0) return;
+
+    setDeleting('selected');
+    try {
+      const { error } = await supabase.storage
+        .from('og-images')
+        .remove(selectedNames);
+
+      if (error) throw error;
+
+      setImages(prev => prev.filter(img => !img.selected));
+      toast.success(`Deleted ${selectedNames.length} images`);
+    } catch (error) {
+      console.error('Error deleting selected images:', error);
+      toast.error('Failed to delete selected images');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const clearAllCache = async () => {
+    setClearingAll(true);
+    try {
+      const allNames = images.map(img => img.name);
+      
+      if (allNames.length === 0) {
+        toast.info('Cache is already empty');
+        return;
+      }
+
+      // Delete in batches of 100
+      for (let i = 0; i < allNames.length; i += 100) {
+        const batch = allNames.slice(i, i + 100);
+        const { error } = await supabase.storage
+          .from('og-images')
+          .remove(batch);
+
+        if (error) throw error;
+      }
+
+      setImages([]);
+      toast.success(`Cleared ${allNames.length} cached images`);
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      toast.error('Failed to clear cache');
+    } finally {
+      setClearingAll(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    const newSelectAll = !selectAll;
+    setSelectAll(newSelectAll);
+    setImages(prev => prev.map(img => ({ ...img, selected: newSelectAll })));
+  };
+
+  const toggleImageSelection = (name: string) => {
+    setImages(prev => prev.map(img => 
+      img.name === name ? { ...img, selected: !img.selected } : img
+    ));
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const getImageType = (name: string): string => {
+    if (name.startsWith('product-')) return 'Product';
+    if (name.startsWith('badge-')) return 'Badge';
+    if (name.startsWith('privacy-')) return 'Privacy';
+    if (name.startsWith('shipping-')) return 'Shipping';
+    if (name.startsWith('contact-')) return 'Contact';
+    return 'Other';
+  };
+
+  const getTypeColor = (type: string): string => {
+    switch (type) {
+      case 'Product': return 'bg-primary/10 text-primary';
+      case 'Badge': return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
+      case 'Privacy': return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+      case 'Shipping': return 'bg-green-500/10 text-green-600 dark:text-green-400';
+      case 'Contact': return 'bg-purple-500/10 text-purple-600 dark:text-purple-400';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const filteredImages = images.filter(img =>
+    img.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const selectedCount = images.filter(img => img.selected).length;
+  const totalSize = images.reduce((acc, img) => acc + (img.metadata?.size || 0), 0);
+
+  const typeCounts = images.reduce((acc, img) => {
+    const type = getImageType(img.name);
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-3xl font-bold">OG Image Cache</h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage cached Open Graph images
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={fetchImages} disabled={loading}>
+              {loading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Refresh
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={images.length === 0 || clearingAll}>
+                  {clearingAll ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 mr-2" />
+                  )}
+                  Clear All Cache
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear entire OG image cache?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will delete all {images.length} cached OG images. Images will be regenerated on next request, which may take time and use AI credits.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={clearAllCache} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Clear All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Total Cached</CardDescription>
+              <CardTitle className="text-3xl flex items-center gap-2">
+                <FileImage className="h-6 w-6 text-muted-foreground" />
+                {images.length}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Total Size</CardDescription>
+              <CardTitle className="text-3xl flex items-center gap-2">
+                <HardDrive className="h-6 w-6 text-muted-foreground" />
+                {formatBytes(totalSize)}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Product Images</CardDescription>
+              <CardTitle className="text-3xl flex items-center gap-2">
+                <ImageIcon className="h-6 w-6 text-primary" />
+                {typeCounts['Product'] || 0}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Badge Images</CardDescription>
+              <CardTitle className="text-3xl flex items-center gap-2">
+                <ImageIcon className="h-6 w-6 text-amber-500" />
+                {typeCounts['Badge'] || 0}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Search and Bulk Actions */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="relative flex-1 min-w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search cached images..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-2 items-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleSelectAll}
+                  disabled={filteredImages.length === 0}
+                >
+                  {selectAll ? (
+                    <CheckSquare className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Square className="h-4 w-4 mr-2" />
+                  )}
+                  {selectAll ? 'Deselect All' : 'Select All'}
+                </Button>
+                {selectedCount > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm" disabled={deleting === 'selected'}>
+                        {deleting === 'selected' ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
+                        Delete Selected ({selectedCount})
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete {selectedCount} images?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. The images will be regenerated on next request.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={deleteSelected} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Image Grid */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cached Images</CardTitle>
+            <CardDescription>
+              {filteredImages.length} image{filteredImages.length !== 1 ? 's' : ''} 
+              {searchQuery && ` matching "${searchQuery}"`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : filteredImages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <ImageIcon className="h-12 w-12 mb-3" />
+                <p className="text-lg font-medium">No cached images</p>
+                <p className="text-sm">
+                  {searchQuery ? 'Try a different search query' : 'OG images will appear here once generated'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredImages.map((image) => {
+                  const type = getImageType(image.name);
+                  const publicUrl = `${supabaseUrl}/storage/v1/object/public/og-images/${image.name}`;
+                  
+                  return (
+                    <div
+                      key={image.id}
+                      className={`group relative border rounded-lg overflow-hidden transition-all ${
+                        image.selected ? 'ring-2 ring-primary' : 'hover:border-primary/50'
+                      }`}
+                    >
+                      {/* Selection Checkbox */}
+                      <div className="absolute top-2 left-2 z-10">
+                        <Checkbox
+                          checked={image.selected}
+                          onCheckedChange={() => toggleImageSelection(image.name)}
+                          className="bg-background/80 backdrop-blur-sm"
+                        />
+                      </div>
+
+                      {/* Image Preview */}
+                      <div className="aspect-[1200/630] bg-muted">
+                        <img
+                          src={publicUrl}
+                          alt={image.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+
+                      {/* Info Overlay */}
+                      <div className="p-3 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <Badge className={`${getTypeColor(type)} text-xs`}>
+                            {type}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {formatBytes(image.metadata?.size || 0)}
+                          </span>
+                        </div>
+                        <p className="text-xs font-mono text-muted-foreground truncate" title={image.name}>
+                          {image.name}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            {formatDistanceToNow(new Date(image.created_at), { addSuffix: true })}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => deleteImage(image.name)}
+                            disabled={deleting === image.name}
+                          >
+                            {deleting === image.name ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <XCircle className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Info Card */}
+        <Card className="bg-muted/30">
+          <CardContent className="pt-6">
+            <div className="flex gap-4">
+              <ImageIcon className="h-8 w-8 text-primary shrink-0" />
+              <div>
+                <h3 className="font-medium mb-1">About OG Image Caching</h3>
+                <p className="text-sm text-muted-foreground">
+                  Open Graph images are generated using AI and stored in a public bucket for fast serving. 
+                  Images are cached indefinitely until manually cleared. Deleting an image will cause it 
+                  to be regenerated on the next request, which uses AI credits. Use "Force Refresh" in the 
+                  OG Preview page to regenerate specific images.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AdminLayout>
+  );
+}
