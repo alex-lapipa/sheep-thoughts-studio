@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { cn } from "@/lib/utils";
 import { Award, Lock, Trophy, Flame, Star, Calendar, Sparkles, Share2, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -275,22 +276,13 @@ export default function Achievements() {
         <meta name="twitter:image" content={ogImageUrl} />
       </Helmet>
       
+      <PageHeroWithBubbles
+        title="Wisdom Badges"
+        subtitle="Track your journey of seeking Bubbles' confidently incorrect wisdom. Each badge represents a milestone in your quest for enlightenment."
+        bubbleSize="md"
+      />
       <FloatingParticles count={15} />
       <div className="container mx-auto px-4 py-12 max-w-5xl relative">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary mb-4">
-            <Trophy className="w-5 h-5" />
-            <span className="font-display font-bold">Achievement Gallery</span>
-          </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            Wisdom Badges
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Track your journey of seeking Bubbles' confidently incorrect wisdom. 
-            Each badge represents a milestone in your quest for enlightenment.
-          </p>
-        </div>
 
         {/* Progress Overview */}
         <div className="bg-card border-2 border-border rounded-2xl p-6 mb-8">
