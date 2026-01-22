@@ -33,6 +33,8 @@ import WhatsNew from "./pages/WhatsNew";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
+import DACH from "./pages/DACH";
+import Scenarios from "./pages/Scenarios";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -114,6 +116,11 @@ const App = () => (
                 <Route path="/whats-new" element={<WhatsNew />} />
                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
                 <Route path="/order-tracking" element={<OrderTracking />} />
+                <Route path="/scenarios" element={<Scenarios />} />
+                <Route path="/dach" element={<DACH />} />
+                <Route path="/de" element={<DACH />} />
+                <Route path="/at" element={<DACH />} />
+                <Route path="/ch" element={<DACH />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
