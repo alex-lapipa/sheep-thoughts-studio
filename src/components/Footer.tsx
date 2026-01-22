@@ -66,6 +66,11 @@ export function Footer() {
       } else {
         setIsSubscribed(true);
         toast.success("Welcome to the flock! Bubbles will send you... things.");
+        
+        // Fire-and-forget: send welcome email
+        supabase.functions.invoke('send-newsletter-welcome', {
+          body: { email: email.trim().toLowerCase(), source: 'footer' }
+        }).catch(err => console.error('Welcome email error:', err));
       }
       setEmail("");
     } catch (error) {
