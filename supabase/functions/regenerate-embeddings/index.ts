@@ -226,6 +226,47 @@ serve(async (req) => {
       }
     }
 
+    if (table === "bubbles_rag_content" || table === "all") {
+      // Fetch RAG content - either all (force) or only those with null embeddings
+      let query = supabase
+        .from("bubbles_rag_content")
+        .select("id, title, type, category, bubbles_wrong_take, comedy_hooks, signature_lines");
+      
+      if (!force) {
+        query = query.is("embedding", null);
+      }
+      
+      const { data: ragEntries, error: fetchError } = await query.limit(limit);
+
+      if (fetchError) {
+        throw new Error(`Failed to fetch RAG content entries: ${fetchError.message}`);
+      }
+
+      console.log(`Found ${ragEntries?.length || 0} RAG content entries with null embeddings`);
+
+      for (const entry of ragEntries || []) {
+        results.processed++;
+        // Combine all relevant text fields for embedding
+        const comedyHooks = Array.isArray(entry.comedy_hooks) ? entry.comedy_hooks.join(". ") : "";
+        const signatureLines = Array.isArray(entry.signature_lines) ? entry.signature_lines.join(". ") : "";
+        const textToEmbed = `${entry.title}\n${entry.type}\n${entry.category || ""}\n${entry.bubbles_wrong_take}\n${comedyHooks}\n${signatureLines}`;
+        const embedding = generatePseudoEmbedding(textToEmbed);
+        
+        const { error: updateError } = await supabase
+          .from("bubbles_rag_content")
+          .update({ embedding: `[${embedding.join(",")}]` })
+          .eq("id", entry.id);
+        
+        if (updateError) {
+          results.failed++;
+          results.errors.push(`RAG Content ${entry.id}: ${updateError.message}`);
+        } else {
+          results.succeeded++;
+          console.log(`Generated embedding for RAG content: ${entry.title}`);
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true,
