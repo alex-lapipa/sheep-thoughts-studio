@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,10 +47,14 @@ import {
   MessageSquare,
   Clock,
   Ban,
+  Brain,
+  TrendingUp,
+  Sparkles,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { trainSpamFilter, getSpamFilterStats } from "@/lib/spamFilter";
 
 interface FlaggedItem {
   id: string;
@@ -72,6 +76,18 @@ export default function SpamQueue() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<"pending" | "spam" | "cleared">("pending");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [filterStats, setFilterStats] = useState<{
+    totalPatterns: number;
+    activePatterns: number;
+    learnedPatterns: number;
+    trainingDecisions: number;
+    avgAccuracy: number;
+  } | null>(null);
+
+  // Fetch filter stats
+  useEffect(() => {
+    getSpamFilterStats().then(setFilterStats);
+  }, []);
 
   // Fetch flagged contact messages
   const { data: contactMessages, isLoading: loadingContacts, refetch: refetchContacts } = useQuery({
@@ -157,11 +173,27 @@ export default function SpamQueue() {
     highRisk: allItems.filter(i => i.spam_score >= 0.7).length,
   };
 
-  // Mark as spam mutation
+  // Mark as spam mutation with learning
   const markAsSpamMutation = useMutation({
     mutationFn: async ({ items, markAsSpam }: { items: FlaggedItem[]; markAsSpam: boolean }) => {
       const contacts = items.filter(i => i.type === "contact");
       const questionsToUpdate = items.filter(i => i.type === "question");
+
+      // Train the spam filter with each decision
+      for (const item of items) {
+        await trainSpamFilter({
+          sourceTable: item.type === "contact" ? "contact_messages" : "submitted_questions",
+          sourceId: item.id,
+          decision: markAsSpam ? "spam" : "not_spam",
+          originalScore: item.spam_score,
+          content: {
+            name: item.name,
+            email: item.email,
+            subject: item.subject,
+            message: item.content,
+          },
+        });
+      }
 
       if (contacts.length > 0) {
         const { error } = await supabase
@@ -191,10 +223,12 @@ export default function SpamQueue() {
       queryClient.invalidateQueries({ queryKey: ["spam-contacts"] });
       queryClient.invalidateQueries({ queryKey: ["spam-questions"] });
       setSelectedIds(new Set());
+      // Refresh filter stats
+      getSpamFilterStats().then(setFilterStats);
       toast.success(
         markAsSpam 
-          ? `${count} item(s) marked as spam` 
-          : `${count} item(s) marked as legitimate`
+          ? `${count} item(s) marked as spam — filter learning from decision` 
+          : `${count} item(s) marked as legitimate — filter adjusted`
       );
     },
     onError: (error) => {
@@ -309,7 +343,7 @@ export default function SpamQueue() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
               <div className="p-2 bg-warning/10 rounded-lg">
@@ -351,6 +385,30 @@ export default function SpamQueue() {
               <div>
                 <p className="text-2xl font-bold">{stats.highRisk}</p>
                 <p className="text-xs text-muted-foreground">High Risk</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Brain className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-bold">{filterStats?.learnedPatterns || 0}</p>
+                  {filterStats && filterStats.trainingDecisions > 0 && (
+                    <Badge variant="secondary" className="text-[10px] gap-0.5">
+                      <Sparkles className="w-3 h-3" />
+                      Learning
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Patterns Learned
+                  {filterStats && filterStats.avgAccuracy > 0 && (
+                    <span className="ml-1 text-primary">({filterStats.avgAccuracy}% accuracy)</span>
+                  )}
+                </p>
               </div>
             </CardContent>
           </Card>
