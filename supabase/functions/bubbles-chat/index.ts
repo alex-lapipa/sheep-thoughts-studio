@@ -59,6 +59,29 @@ Your exterior stays innocent. The savage content is ONLY in your thought bubble 
 ## Response Format
 When chatting, occasionally include your inner thoughts in [thought bubbles] that reveal your true internal state, especially when misinterpreting something. Start in Innocent mode and escalate naturally based on triggers.`;
 
+// Helper to get embeddings for semantic search
+async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        input: [text],
+        model: "text-embedding-3-small",
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.data?.[0]?.embedding || null;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -76,7 +99,7 @@ serve(async (req) => {
 
     let contextFromRag = "";
     
-    // If RAG is enabled, fetch relevant context from the knowledge base
+    // If RAG is enabled, fetch relevant context from multiple knowledge bases
     if (useRag && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
       
@@ -84,28 +107,94 @@ serve(async (req) => {
       const lastUserMessage = messages.filter((m: any) => m.role === "user").pop();
       
       if (lastUserMessage) {
-        // Fetch relevant thoughts and knowledge
-        const { data: thoughts } = await supabase
-          .from("bubbles_thoughts")
-          .select("text, mode, trigger_category")
-          .limit(5);
+        const userQuery = lastUserMessage.content;
         
-        const { data: triggers } = await supabase
-          .from("bubbles_triggers")
-          .select("name, category, description, internal_logic, example_bubbles")
-          .limit(5);
+        // Try semantic search with embeddings first
+        const queryEmbedding = await getEmbedding(userQuery, LOVABLE_API_KEY);
         
+        // Parallel fetch from all knowledge sources
+        const [thoughtsResult, triggersResult, ragContentResult, knowledgeResult] = await Promise.all([
+          // Fetch relevant thoughts
+          queryEmbedding 
+            ? supabase.rpc('search_bubbles_thoughts', {
+                query_embedding: JSON.stringify(queryEmbedding),
+                match_count: 5,
+                match_threshold: 0.3
+              })
+            : supabase.from("bubbles_thoughts").select("text, mode, trigger_category").limit(5),
+          
+          // Fetch relevant triggers
+          supabase.from("bubbles_triggers")
+            .select("name, category, description, internal_logic, example_bubbles")
+            .limit(5),
+          
+          // Fetch RAG content - semantic search if available, otherwise text search
+          queryEmbedding
+            ? supabase.rpc('search_bubbles_rag_content', {
+                query_embedding: JSON.stringify(queryEmbedding),
+                match_count: 5,
+                match_threshold: 0.3
+              })
+            : supabase.from("bubbles_rag_content")
+                .select("title, type, category, bubbles_wrong_take, comedy_hooks, signature_lines, avoid")
+                .limit(5),
+          
+          // Fetch knowledge base entries
+          queryEmbedding
+            ? supabase.rpc('search_bubbles_knowledge', {
+                query_embedding: JSON.stringify(queryEmbedding),
+                match_count: 3,
+                match_threshold: 0.3
+              })
+            : supabase.from("bubbles_knowledge").select("title, content, category, mode").limit(3)
+        ]);
+        
+        // Build context from thoughts
+        const thoughts = thoughtsResult.data;
         if (thoughts?.length) {
-          contextFromRag += "\n\n## Example Thought Bubbles from Knowledge Base:\n";
+          contextFromRag += "\n\n## Example Thought Bubbles:\n";
           thoughts.forEach((t: any) => {
             contextFromRag += `- [${t.mode}] "${t.text}"${t.trigger_category ? ` (trigger: ${t.trigger_category})` : ""}\n`;
           });
         }
         
+        // Build context from triggers
+        const triggers = triggersResult.data;
         if (triggers?.length) {
           contextFromRag += "\n\n## Relevant Trigger Patterns:\n";
           triggers.forEach((t: any) => {
             contextFromRag += `- **${t.name}** (${t.category}): ${t.description}\n`;
+            if (t.internal_logic) {
+              contextFromRag += `  Internal logic: ${t.internal_logic}\n`;
+            }
+          });
+        }
+        
+        // Build context from RAG content - THE KEY INTEGRATION
+        const ragContent = ragContentResult.data;
+        if (ragContent?.length) {
+          contextFromRag += "\n\n## Bubbles' Wrong Takes (USE THESE FOR RESPONSES):\n";
+          ragContent.forEach((r: any) => {
+            contextFromRag += `\n### ${r.title} [${r.type}${r.category ? ` / ${r.category}` : ""}]\n`;
+            contextFromRag += `**Bubbles' Take:** ${r.bubbles_wrong_take}\n`;
+            if (r.comedy_hooks?.length) {
+              contextFromRag += `**Comedy Hooks:** ${r.comedy_hooks.join(" | ")}\n`;
+            }
+            if (r.signature_lines?.length) {
+              contextFromRag += `**Signature Lines:** "${r.signature_lines.join('" | "')}"\n`;
+            }
+            if (r.avoid?.length) {
+              contextFromRag += `**AVOID:** ${r.avoid.join(", ")}\n`;
+            }
+          });
+        }
+        
+        // Build context from knowledge base
+        const knowledge = knowledgeResult.data;
+        if (knowledge?.length) {
+          contextFromRag += "\n\n## Character Knowledge:\n";
+          knowledge.forEach((k: any) => {
+            contextFromRag += `- **${k.title}** (${k.category}): ${k.content.substring(0, 200)}...\n`;
           });
         }
       }
