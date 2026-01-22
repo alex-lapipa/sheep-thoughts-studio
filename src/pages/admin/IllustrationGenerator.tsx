@@ -23,8 +23,12 @@ import {
   Save,
   Heart,
   Trash2,
-  History
+  History,
+  Layers,
+  Grid3X3
 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 // Configuration options matching the edge function
@@ -124,6 +128,12 @@ export default function IllustrationGenerator() {
   const [savedIllustrations, setSavedIllustrations] = useState<SavedIllustration[]>([]);
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
   const [activeTab, setActiveTab] = useState<"generate" | "library">("generate");
+  
+  // Batch generation state
+  const [batchMode, setBatchMode] = useState(false);
+  const [batchCount, setBatchCount] = useState(3);
+  const [batchVaryBy, setBatchVaryBy] = useState<"random" | "posture" | "accessory" | "weather" | "style">("random");
+  const [batchResults, setBatchResults] = useState<GeneratedImage[]>([]);
 
   // Fetch saved illustrations on mount
   useEffect(() => {
@@ -146,7 +156,7 @@ export default function IllustrationGenerator() {
     setIsGenerating(true);
     
     try {
-      const payload: Record<string, string> = {
+      const payload: Record<string, any> = {
         style,
         aspectRatio,
       };
@@ -156,6 +166,13 @@ export default function IllustrationGenerator() {
       if (accessory !== "random") payload.accessory = accessory;
       if (weather !== "random") payload.weather = weather;
       if (expression !== "random") payload.expression = expression;
+      
+      // Add batch params if batch mode is enabled
+      if (batchMode) {
+        payload.batch = true;
+        payload.batchCount = batchCount;
+        payload.batchMode = batchVaryBy;
+      }
 
       const { data, error } = await supabase.functions.invoke("generate-bubbles-illustration", {
         body: payload,
@@ -174,7 +191,30 @@ export default function IllustrationGenerator() {
         return;
       }
 
-      if (data?.success && data?.image) {
+      // Handle batch results
+      if (data?.batch && data?.results) {
+        const newImages: GeneratedImage[] = data.results.map((result: any, idx: number) => ({
+          image: result.image,
+          description: result.description,
+          metadata: result.metadata,
+          generatedAt: new Date(Date.now() + idx).toISOString(),
+        }));
+        
+        setBatchResults(newImages);
+        setGeneratedImages(prev => [...newImages, ...prev]);
+        if (newImages.length > 0) {
+          setSelectedImage(newImages[0]);
+        }
+        
+        toast.success(`Generated ${data.totalGenerated} variations!`, { 
+          description: `Mode: ${batchVaryBy}` 
+        });
+        
+        if (data.errors?.length > 0) {
+          toast.warning(`${data.errors.length} generation(s) failed`);
+        }
+      } else if (data?.success && data?.image) {
+        // Single generation result
         const newImage: GeneratedImage = {
           image: data.image,
           description: data.description,
@@ -184,6 +224,7 @@ export default function IllustrationGenerator() {
         
         setGeneratedImages(prev => [newImage, ...prev]);
         setSelectedImage(newImage);
+        setBatchResults([]);
         toast.success("Illustration generated!", { 
           description: `${data.metadata.posture} posture with ${data.metadata.accessory}` 
         });
@@ -559,6 +600,102 @@ export default function IllustrationGenerator() {
               </div>
             </CardContent>
           </Card>
+          
+          {/* Batch Generation Controls */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Grid3X3 className="h-5 w-5 text-primary" />
+                Batch Generation
+              </CardTitle>
+              <CardDescription>
+                Generate multiple variations for A/B testing
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="batch-mode" className="flex items-center gap-2">
+                  <Layers className="h-4 w-4" />
+                  Enable Batch Mode
+                </Label>
+                <Switch
+                  id="batch-mode"
+                  checked={batchMode}
+                  onCheckedChange={setBatchMode}
+                />
+              </div>
+              
+              {batchMode && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-4 pt-2"
+                >
+                  {/* Batch Count Slider */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Number of Variations</Label>
+                      <Badge variant="secondary">{batchCount}</Badge>
+                    </div>
+                    <Slider
+                      value={[batchCount]}
+                      onValueChange={([value]) => setBatchCount(value)}
+                      min={2}
+                      max={6}
+                      step={1}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Generate {batchCount} images in parallel
+                    </p>
+                  </div>
+                  
+                  {/* Vary By Selector */}
+                  <div className="space-y-2">
+                    <Label>Vary By</Label>
+                    <Select value={batchVaryBy} onValueChange={(v: any) => setBatchVaryBy(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="random">
+                          <span className="flex flex-col">
+                            <span>🎲 Fully Random</span>
+                            <span className="text-xs text-muted-foreground">Each variation is completely random</span>
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="posture">
+                          <span className="flex flex-col">
+                            <span>🧍 Posture</span>
+                            <span className="text-xs text-muted-foreground">Different poses, same accessories</span>
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="accessory">
+                          <span className="flex flex-col">
+                            <span>👒 Accessory</span>
+                            <span className="text-xs text-muted-foreground">Different accessories, same pose</span>
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="weather">
+                          <span className="flex flex-col">
+                            <span>🌦️ Weather</span>
+                            <span className="text-xs text-muted-foreground">Different atmospheres</span>
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="style">
+                          <span className="flex flex-col">
+                            <span>🎨 Art Style</span>
+                            <span className="text-xs text-muted-foreground">Illustration, watercolor, etc.</span>
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </motion.div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Action Buttons */}
           <div className="flex gap-3">
@@ -578,12 +715,12 @@ export default function IllustrationGenerator() {
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
+                  {batchMode ? `Generating ${batchCount}...` : "Generating..."}
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate
+                  {batchMode ? <Grid3X3 className="h-4 w-4 mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                  {batchMode ? `Generate ${batchCount}` : "Generate"}
                 </>
               )}
             </Button>
@@ -710,6 +847,132 @@ export default function IllustrationGenerator() {
               </AnimatePresence>
             </CardContent>
           </Card>
+          
+          {/* Batch Comparison Grid */}
+          {batchResults.length > 1 && (
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Grid3X3 className="h-5 w-5 text-primary" />
+                  A/B Comparison
+                </CardTitle>
+                <CardDescription>
+                  Compare {batchResults.length} variations side by side
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className={cn(
+                  "grid gap-4",
+                  batchResults.length === 2 ? "grid-cols-2" :
+                  batchResults.length === 3 ? "grid-cols-3" :
+                  batchResults.length === 4 ? "grid-cols-2 md:grid-cols-4" :
+                  "grid-cols-2 md:grid-cols-3"
+                )}>
+                  {batchResults.map((img, idx) => (
+                    <motion.div
+                      key={img.generatedAt}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className={cn(
+                        "relative group rounded-xl overflow-hidden border-2 transition-all cursor-pointer",
+                        selectedImage?.generatedAt === img.generatedAt 
+                          ? "border-primary ring-2 ring-primary/30" 
+                          : "border-border hover:border-primary/50"
+                      )}
+                      onClick={() => setSelectedImage(img)}
+                    >
+                      <div className="aspect-square">
+                        <img
+                          src={img.publicUrl || img.image}
+                          alt={`Variation ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      {/* Variation label */}
+                      <div className="absolute top-2 left-2">
+                        <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                          #{idx + 1}
+                        </Badge>
+                      </div>
+                      
+                      {/* Quick metadata */}
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
+                            {img.metadata.posture}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-background/50 text-foreground border-none">
+                            {img.metadata.accessory}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      {/* Save indicator */}
+                      {img.saved && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+                        </div>
+                      )}
+                      
+                      {/* Quick actions */}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                        <Button
+                          size="icon"
+                          variant="secondary"
+                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(img);
+                          }}
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                        </Button>
+                        {!img.saved && (
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-7 w-7 bg-background/80 backdrop-blur-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveToLibrary(img);
+                            }}
+                          >
+                            <Save className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {/* Batch actions */}
+                <div className="flex gap-2 mt-4 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBatchResults([])}
+                  >
+                    Clear Comparison
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      batchResults.forEach(img => {
+                        if (!img.saved) handleSaveToLibrary(img);
+                      });
+                    }}
+                    disabled={batchResults.every(img => img.saved)}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save All to Library
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* History */}
           {generatedImages.length > 1 && (

@@ -72,6 +72,118 @@ interface GenerateRequest {
   expression?: string;
   style?: "illustration" | "watercolor" | "digital-art" | "sketch";
   aspectRatio?: "square" | "portrait" | "landscape";
+  // Batch generation support
+  batch?: boolean;
+  batchCount?: number; // 2-6 variations at once
+  batchMode?: "random" | "posture" | "accessory" | "weather" | "style"; // What to vary
+}
+
+async function generateSingleIllustration(
+  LOVABLE_API_KEY: string,
+  body: GenerateRequest,
+  overrides?: Partial<{ posture: typeof POSTURES[0]; accessory: typeof ACCESSORIES[0]; weather: typeof WEATHER[0]; expression: typeof EXPRESSIONS[0]; style: string }>
+): Promise<{
+  success: boolean;
+  image?: string;
+  description?: string;
+  metadata?: Record<string, string>;
+  error?: string;
+}> {
+  // Select variations (use provided, overrides, or random)
+  const posture = overrides?.posture || (body.posture 
+    ? POSTURES.find(p => p.id === body.posture) || weightedRandom(POSTURES)
+    : weightedRandom(POSTURES));
+  
+  const accessory = overrides?.accessory || (body.accessory
+    ? ACCESSORIES.find(a => a.id === body.accessory) || weightedRandom(ACCESSORIES)
+    : weightedRandom(ACCESSORIES));
+  
+  const weather = overrides?.weather || (body.weather
+    ? WEATHER.find(w => w.id === body.weather) || randomChoice(WEATHER)
+    : randomChoice(WEATHER));
+  
+  const expression = overrides?.expression || (body.expression
+    ? EXPRESSIONS.find(e => e.id === body.expression) || randomChoice(EXPRESSIONS)
+    : randomChoice(EXPRESSIONS));
+
+  const style = overrides?.style || body.style || "illustration";
+  const aspectRatio = body.aspectRatio || "square";
+
+  // Build the prompt using documented constraints
+  const prompt = buildPrompt({
+    posture: posture.description,
+    accessory: accessory.description,
+    weather: weather.description,
+    expression: expression.description,
+    style,
+    aspectRatio,
+  });
+
+  console.log("Generating Bubbles illustration with:", {
+    posture: posture.id,
+    accessory: accessory.id,
+    weather: weather.id,
+    expression: expression.id,
+    style,
+  });
+
+  // Call Lovable AI image generation
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-image-preview",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      modalities: ["image", "text"],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("AI gateway error:", response.status, errorText);
+    
+    if (response.status === 429) {
+      return { success: false, error: "Rate limit exceeded. Please try again later." };
+    }
+    if (response.status === 402) {
+      return { success: false, error: "Payment required. Please add credits to your workspace." };
+    }
+    
+    return { success: false, error: `AI gateway error: ${response.status}` };
+  }
+
+  const data = await response.json();
+  
+  // Extract the generated image
+  const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+  const textResponse = data.choices?.[0]?.message?.content;
+
+  if (!imageUrl) {
+    console.error("No image generated:", data);
+    return { success: false, error: "No image was generated" };
+  }
+
+  return {
+    success: true,
+    image: imageUrl,
+    description: textResponse,
+    metadata: {
+      posture: posture.id,
+      accessory: accessory.id,
+      weather: weather.id,
+      expression: expression.id,
+      style,
+      aspectRatio,
+    },
+  };
 }
 
 serve(async (req) => {
@@ -89,107 +201,81 @@ serve(async (req) => {
     // Parse request body
     const body: GenerateRequest = req.method === "POST" ? await req.json() : {};
 
-    // Select variations (use provided or random)
-    const posture = body.posture 
-      ? POSTURES.find(p => p.id === body.posture) || weightedRandom(POSTURES)
-      : weightedRandom(POSTURES);
-    
-    const accessory = body.accessory
-      ? ACCESSORIES.find(a => a.id === body.accessory) || weightedRandom(ACCESSORIES)
-      : weightedRandom(ACCESSORIES);
-    
-    const weather = body.weather
-      ? WEATHER.find(w => w.id === body.weather) || randomChoice(WEATHER)
-      : randomChoice(WEATHER);
-    
-    const expression = body.expression
-      ? EXPRESSIONS.find(e => e.id === body.expression) || randomChoice(EXPRESSIONS)
-      : randomChoice(EXPRESSIONS);
-
-    const style = body.style || "illustration";
-    const aspectRatio = body.aspectRatio || "square";
-
-    // Build the prompt using documented constraints
-    const prompt = buildPrompt({
-      posture: posture.description,
-      accessory: accessory.description,
-      weather: weather.description,
-      expression: expression.description,
-      style,
-      aspectRatio,
-    });
-
-    console.log("Generating Bubbles illustration with:", {
-      posture: posture.id,
-      accessory: accessory.id,
-      weather: weather.id,
-      expression: expression.id,
-      style,
-    });
-
-    // Call Lovable AI image generation
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+    // Check if batch mode is requested
+    if (body.batch) {
+      const batchCount = Math.min(Math.max(body.batchCount || 3, 2), 6);
+      const batchMode = body.batchMode || "random";
       
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits to your workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      console.log(`Batch generation: ${batchCount} variations, mode: ${batchMode}`);
+      
+      // Build variations based on mode
+      const variations: Array<Partial<{ posture: typeof POSTURES[0]; accessory: typeof ACCESSORIES[0]; weather: typeof WEATHER[0]; style: string }>> = [];
+      
+      if (batchMode === "posture") {
+        // Vary postures, keep other params fixed
+        const shuffledPostures = [...POSTURES].sort(() => Math.random() - 0.5).slice(0, batchCount);
+        shuffledPostures.forEach(p => variations.push({ posture: p }));
+      } else if (batchMode === "accessory") {
+        // Vary accessories
+        const shuffledAccessories = [...ACCESSORIES].sort(() => Math.random() - 0.5).slice(0, batchCount);
+        shuffledAccessories.forEach(a => variations.push({ accessory: a }));
+      } else if (batchMode === "weather") {
+        // Vary weather
+        const shuffledWeather = [...WEATHER].sort(() => Math.random() - 0.5).slice(0, batchCount);
+        shuffledWeather.forEach(w => variations.push({ weather: w }));
+      } else if (batchMode === "style") {
+        // Vary styles
+        const styles = ["illustration", "watercolor", "digital-art", "sketch"];
+        const shuffledStyles = styles.sort(() => Math.random() - 0.5).slice(0, batchCount);
+        shuffledStyles.forEach(s => variations.push({ style: s }));
+      } else {
+        // Random mode - each variation is fully random
+        for (let i = 0; i < batchCount; i++) {
+          variations.push({}); // Empty overrides = fully random
+        }
       }
       
-      throw new Error(`AI gateway error: ${response.status}`);
+      // Generate all variations in parallel
+      const results = await Promise.all(
+        variations.map(overrides => generateSingleIllustration(LOVABLE_API_KEY, body, overrides))
+      );
+      
+      // Filter successful results
+      const successfulResults = results.filter(r => r.success);
+      const errors = results.filter(r => !r.success).map(r => r.error);
+      
+      return new Response(
+        JSON.stringify({
+          success: successfulResults.length > 0,
+          batch: true,
+          batchMode,
+          results: successfulResults,
+          totalRequested: batchCount,
+          totalGenerated: successfulResults.length,
+          errors: errors.length > 0 ? errors : undefined,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const data = await response.json();
+    // Single generation (original behavior)
+    const result = await generateSingleIllustration(LOVABLE_API_KEY, body);
     
-    // Extract the generated image
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    const textResponse = data.choices?.[0]?.message?.content;
-
-    if (!imageUrl) {
-      console.error("No image generated:", data);
-      throw new Error("No image was generated");
+    if (!result.success) {
+      const status = result.error?.includes("Rate limit") ? 429 : 
+                     result.error?.includes("Payment") ? 402 : 500;
+      return new Response(
+        JSON.stringify({ error: result.error }),
+        { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        image: imageUrl,
-        description: textResponse,
-        metadata: {
-          posture: posture.id,
-          accessory: accessory.id,
-          weather: weather.id,
-          expression: expression.id,
-          style,
-          aspectRatio,
-        },
+        image: result.image,
+        description: result.description,
+        metadata: result.metadata,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
