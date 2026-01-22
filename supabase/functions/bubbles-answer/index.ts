@@ -176,14 +176,38 @@ serve(async (req) => {
         // Check for spam
         const spamCheck = checkQuestionForSpam(question);
         
-        await supabase.from("submitted_questions").insert({
+        const { data: insertedQuestion } = await supabase.from("submitted_questions").insert({
           question: question.trim(),
           answer: answer,
           status: "pending",
           is_spam: spamCheck.isSpam,
           spam_score: spamCheck.spamScore,
           spam_reasons: spamCheck.reasons,
-        });
+        }).select('id').single();
+
+        // Send spam alert for high-risk submissions (score >= 70)
+        if (spamCheck.spamScore >= 70) {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-spam-alert`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: 'question',
+                id: insertedQuestion?.id || crypto.randomUUID(),
+                email: 'anonymous@user',
+                content: question.trim(),
+                spam_score: spamCheck.spamScore,
+                spam_reasons: spamCheck.reasons,
+                submitted_at: new Date().toISOString(),
+              }),
+            });
+          } catch (alertError) {
+            console.error("Failed to send spam alert:", alertError);
+          }
+        }
       }
     } catch (dbError) {
       // Log but don't fail the request if saving fails

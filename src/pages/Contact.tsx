@@ -107,6 +107,25 @@ const Contact = () => {
         console.error("Failed to send email notification:", err);
       });
 
+      // Send spam alert for high-risk submissions (score >= 70)
+      if (spamCheck.spamScore >= 70) {
+        supabase.functions.invoke('send-spam-alert', {
+          body: {
+            type: 'contact',
+            id: crypto.randomUUID(), // We don't have the DB id, use temp
+            name: result.data.name,
+            email: result.data.email,
+            subject: result.data.subject,
+            content: result.data.message,
+            spam_score: spamCheck.spamScore,
+            spam_reasons: spamCheck.reasons,
+            submitted_at: submittedAt,
+          }
+        }).catch(err => {
+          console.error("Failed to send spam alert:", err);
+        });
+      }
+
       setIsSubmitted(true);
       toast.success(
         language === 'en' 
