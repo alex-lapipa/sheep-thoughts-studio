@@ -46,7 +46,7 @@ interface BubblesBogProps {
   className?: string;
   animated?: boolean;
   posture?: "four-legged" | "seated" | "grazing" | "leaning";
-  accessory?: "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
+  accessory?: "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "beanie" | "bow-tie" | "glasses" | "none";
   weathered?: boolean;
   // Expression must convey certainty, not cleverness
   expression?: "neutral" | "distant" | "certain" | "waiting";
@@ -247,6 +247,73 @@ function FlowerCrownFourLegged() {
   );
 }
 
+// NEW ACCESSORIES - Beanie, Bow-tie, Glasses for Four-Legged posture
+function BeanieFourLegged() {
+  return (
+    <g>
+      {/* Knit beanie - cozy but misplaced in the bog */}
+      <ellipse cx="30" cy="30" rx="16" ry="12" fill="hsl(350 60% 45%)" />
+      <ellipse cx="30" cy="28" rx="14" ry="10" fill="hsl(350 55% 50%)" />
+      {/* Folded brim */}
+      <path d="M 14 35 Q 30 38 46 35" fill="hsl(350 60% 40%)" />
+      <path d="M 14 35 Q 30 32 46 35" fill="hsl(350 55% 42%)" />
+      {/* Pom-pom */}
+      <circle cx="30" cy="18" r="6" fill="hsl(350 60% 45%)" />
+      <circle cx="28" cy="16" r="2" fill="hsl(350 50% 55%)" opacity="0.6" />
+      {/* Knit texture lines */}
+      <path d="M 18 28 L 18 35" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 24 26 L 24 35" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 30 25 L 30 35" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 36 26 L 36 35" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 42 28 L 42 35" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+    </g>
+  );
+}
+
+function BowTieFourLegged() {
+  return (
+    <g>
+      {/* Bow-tie - utterly formal for a bog sheep */}
+      {/* Left bow */}
+      <ellipse cx="22" cy="62" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(-15, 22, 62)" />
+      {/* Right bow */}
+      <ellipse cx="38" cy="62" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(15, 38, 62)" />
+      {/* Center knot */}
+      <ellipse cx="30" cy="62" rx="4" ry="3" fill="hsl(350 75% 30%)" />
+      {/* Fabric shine */}
+      <ellipse cx="20" cy="60" rx="3" ry="1.5" fill="hsl(350 60% 45%)" opacity="0.5" />
+      <ellipse cx="40" cy="60" rx="3" ry="1.5" fill="hsl(350 60% 45%)" opacity="0.5" />
+      {/* Pattern dots - polka dot bow tie */}
+      <circle cx="18" cy="62" r="1" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="26" cy="61" r="0.8" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="34" cy="61" r="0.8" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="42" cy="62" r="1" fill="hsl(0 0% 95%)" opacity="0.7" />
+    </g>
+  );
+}
+
+function GlassesFourLegged() {
+  return (
+    <g>
+      {/* Round intellectual glasses - very "knows things" energy */}
+      {/* Left lens */}
+      <circle cx="20" cy="47" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="20" cy="47" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      {/* Right lens */}
+      <circle cx="32" cy="45" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="32" cy="45" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      {/* Bridge */}
+      <path d="M 26 46 Q 28 44 30 45" stroke="hsl(30 40% 25%)" strokeWidth="1.5" fill="none" />
+      {/* Temple - goes to ear */}
+      <line x1="38" y1="44" x2="48" y2="40" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <line x1="13" y1="48" x2="8" y2="46" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      {/* Lens reflections */}
+      <ellipse cx="18" cy="44" rx="2" ry="1" fill="hsl(0 0% 100%)" opacity="0.4" />
+      <ellipse cx="30" cy="42" rx="2" ry="1" fill="hsl(0 0% 100%)" opacity="0.4" />
+    </g>
+  );
+}
+
 // Four-legged posture - natural sheep in the bog
 function FourLeggedSheep({
   expr, 
@@ -429,6 +496,9 @@ function FourLeggedSheep({
       {accessory === "scarf" && <ScarfFourLegged />}
       {accessory === "bandana" && <BandanaFourLegged />}
       {accessory === "flower-crown" && <FlowerCrownFourLegged />}
+      {accessory === "beanie" && <BeanieFourLegged />}
+      {accessory === "bow-tie" && <BowTieFourLegged />}
+      {accessory === "glasses" && <GlassesFourLegged />}
     </svg>
   );
 }
@@ -608,6 +678,9 @@ function GrazingSheep({
       {accessory === "scarf" && <ScarfFourLegged />}
       {accessory === "bandana" && <BandanaFourLegged />}
       {accessory === "flower-crown" && <FlowerCrownFourLegged />}
+      {accessory === "beanie" && <BeanieFourLegged />}
+      {accessory === "bow-tie" && <BowTieFourLegged />}
+      {accessory === "glasses" && <GlassesFourLegged />}
     </svg>
   );
 }
@@ -730,6 +803,9 @@ function LeaningSheep({
       {accessory === "scarf" && <ScarfLeaning />}
       {accessory === "bandana" && <BandanaLeaning />}
       {accessory === "flower-crown" && <FlowerCrownLeaning />}
+      {accessory === "beanie" && <BeanieLeaning />}
+      {accessory === "bow-tie" && <BowTieLeaning />}
+      {accessory === "glasses" && <GlassesLeaning />}
     </svg>
   );
 }
@@ -870,6 +946,9 @@ function SeatedSheep({
       {accessory === "scarf" && <ScarfSeated />}
       {accessory === "bandana" && <BandanaSeated />}
       {accessory === "flower-crown" && <FlowerCrownSeated />}
+      {accessory === "beanie" && <BeanieSeated />}
+      {accessory === "bow-tie" && <BowTieSeated />}
+      {accessory === "glasses" && <GlassesSeated />}
     </svg>
   );
 }
@@ -1057,6 +1136,90 @@ function FlowerCrownLeaning() {
         <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
         <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
       </g>
+    </g>
+  );
+}
+
+// NEW ACCESSORIES - Beanie, Bow-tie, Glasses for Leaning posture
+function BeanieLeaning() {
+  return (
+    <g transform="translate(-5, 2) rotate(5 40 45)">
+      <ellipse cx="36" cy="30" rx="16" ry="12" fill="hsl(350 60% 45%)" />
+      <ellipse cx="36" cy="28" rx="14" ry="10" fill="hsl(350 55% 50%)" />
+      <path d="M 20 35 Q 36 38 52 35" fill="hsl(350 60% 40%)" />
+      <circle cx="36" cy="18" r="6" fill="hsl(350 60% 45%)" />
+    </g>
+  );
+}
+
+function BowTieLeaning() {
+  return (
+    <g transform="translate(-5, 2) rotate(5 40 45)">
+      <ellipse cx="28" cy="64" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(-15, 28, 64)" />
+      <ellipse cx="44" cy="64" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(15, 44, 64)" />
+      <ellipse cx="36" cy="64" rx="4" ry="3" fill="hsl(350 75% 30%)" />
+    </g>
+  );
+}
+
+function GlassesLeaning() {
+  return (
+    <g transform="translate(-5, 2) rotate(5 40 45)">
+      <circle cx="28" cy="46" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="28" cy="46" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      <circle cx="44" cy="45" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="44" cy="45" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      <path d="M 34 46 Q 36 44 38 45" stroke="hsl(30 40% 25%)" strokeWidth="1.5" fill="none" />
+      <line x1="21" y1="46" x2="13" y2="43" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+    </g>
+  );
+}
+
+// NEW ACCESSORIES - Beanie, Bow-tie, Glasses for Seated posture
+function BeanieSeated() {
+  return (
+    <g>
+      <ellipse cx="32" cy="38" rx="16" ry="12" fill="hsl(350 60% 45%)" />
+      <ellipse cx="32" cy="36" rx="14" ry="10" fill="hsl(350 55% 50%)" />
+      <path d="M 16 43 Q 32 46 48 43" fill="hsl(350 60% 40%)" />
+      <circle cx="32" cy="26" r="6" fill="hsl(350 60% 45%)" />
+      <path d="M 20 36 L 20 43" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 26 34 L 26 43" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 32 33 L 32 43" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 38 34 L 38 43" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+      <path d="M 44 36 L 44 43" stroke="hsl(350 50% 38%)" strokeWidth="0.5" opacity="0.4" />
+    </g>
+  );
+}
+
+function BowTieSeated() {
+  return (
+    <g>
+      <ellipse cx="24" cy="68" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(-15, 24, 68)" />
+      <ellipse cx="40" cy="68" rx="8" ry="5" fill="hsl(350 70% 35%)" transform="rotate(15, 40, 68)" />
+      <ellipse cx="32" cy="68" rx="4" ry="3" fill="hsl(350 75% 30%)" />
+      <ellipse cx="22" cy="66" rx="3" ry="1.5" fill="hsl(350 60% 45%)" opacity="0.5" />
+      <ellipse cx="42" cy="66" rx="3" ry="1.5" fill="hsl(350 60% 45%)" opacity="0.5" />
+      <circle cx="20" cy="68" r="1" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="28" cy="67" r="0.8" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="36" cy="67" r="0.8" fill="hsl(0 0% 95%)" opacity="0.7" />
+      <circle cx="44" cy="68" r="1" fill="hsl(0 0% 95%)" opacity="0.7" />
+    </g>
+  );
+}
+
+function GlassesSeated() {
+  return (
+    <g>
+      <circle cx="24" cy="50" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="24" cy="50" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      <circle cx="40" cy="49" r="7" fill="none" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <circle cx="40" cy="49" r="6" fill="hsl(200 30% 90%)" opacity="0.15" />
+      <path d="M 30 50 Q 32 48 34 49" stroke="hsl(30 40% 25%)" strokeWidth="1.5" fill="none" />
+      <line x1="17" y1="50" x2="10" y2="48" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <line x1="47" y1="49" x2="54" y2="47" stroke="hsl(30 40% 25%)" strokeWidth="1.5" />
+      <ellipse cx="22" cy="47" rx="2" ry="1" fill="hsl(0 0% 100%)" opacity="0.4" />
+      <ellipse cx="38" cy="46" rx="2" ry="1" fill="hsl(0 0% 100%)" opacity="0.4" />
     </g>
   );
 }

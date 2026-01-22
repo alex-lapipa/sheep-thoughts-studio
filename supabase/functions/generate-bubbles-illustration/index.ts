@@ -24,14 +24,17 @@ const POSTURES = [
 
 // Accessory options
 const ACCESSORIES = [
-  { id: "none", description: "no accessories, natural unadorned sheep", weight: 36 },
-  { id: "sunglasses", description: "aviator sunglasses (urban in rural bog - contextually wrong)", weight: 9 },
-  { id: "cap", description: "Irish flat cap (contextually plausible)", weight: 9 },
-  { id: "bucket-hat", description: "white bucket hat (tourist vibes, wrong for agriculture)", weight: 9 },
-  { id: "headphones", description: "over-ear headphones (urban tech, completely wrong for bog)", weight: 9 },
-  { id: "scarf", description: "red woolen scarf with yellow stripes (fashion in farmland)", weight: 9 },
-  { id: "bandana", description: "blue paisley bandana tied around forehead (festival sheep)", weight: 9 },
-  { id: "flower-crown", description: "flower crown with daisies and pink flowers (Coachella in Wicklow)", weight: 10 },
+  { id: "none", description: "no accessories, natural unadorned sheep", weight: 30 },
+  { id: "sunglasses", description: "aviator sunglasses (urban in rural bog - contextually wrong)", weight: 8 },
+  { id: "cap", description: "Irish flat cap (contextually plausible)", weight: 8 },
+  { id: "bucket-hat", description: "white bucket hat (tourist vibes, wrong for agriculture)", weight: 7 },
+  { id: "headphones", description: "over-ear headphones (urban tech, completely wrong for bog)", weight: 7 },
+  { id: "scarf", description: "red woolen scarf with yellow stripes (fashion in farmland)", weight: 7 },
+  { id: "bandana", description: "blue paisley bandana tied around forehead (festival sheep)", weight: 7 },
+  { id: "flower-crown", description: "flower crown with daisies and pink flowers (Coachella in Wicklow)", weight: 8 },
+  { id: "beanie", description: "cozy red knit beanie with pom-pom (hipster vibes, wrong for Irish bog)", weight: 6 },
+  { id: "bow-tie", description: "formal polka dot bow tie around neck (utterly formal for a bog sheep)", weight: 6 },
+  { id: "glasses", description: "round intellectual glasses (pretentious scholar energy, knows things)", weight: 6 },
 ];
 
 // Weather/atmosphere variations

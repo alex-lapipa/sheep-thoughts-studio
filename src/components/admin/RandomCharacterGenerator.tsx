@@ -8,11 +8,11 @@ import { toast } from "sonner";
 
 // CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 type Posture = "four-legged" | "seated" | "grazing" | "leaning";
-type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
+type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "beanie" | "bow-tie" | "glasses" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";
 
 const POSTURES: Posture[] = ["four-legged", "seated", "grazing", "leaning"];
-const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown"];
+const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown", "beanie", "bow-tie", "glasses"];
 const EXPRESSIONS: Expression[] = ["neutral", "distant", "certain", "waiting"];
 
 interface CharacterConfig {

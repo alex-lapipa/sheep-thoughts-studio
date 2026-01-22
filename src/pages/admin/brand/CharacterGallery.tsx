@@ -16,12 +16,12 @@ import { RandomCharacterGenerator } from "@/components/admin/RandomCharacterGene
 
 // CRITICAL: Bubbles is a sheep and must NEVER stand on two legs — all postures are quadrupedal
 type Posture = "four-legged" | "seated" | "grazing" | "leaning";
-type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
+type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "beanie" | "bow-tie" | "glasses" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";
 type Size = "sm" | "md" | "lg" | "xl" | "hero";
 
 const POSTURES: Posture[] = ["four-legged", "seated", "grazing", "leaning"];
-const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown"];
+const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown", "beanie", "bow-tie", "glasses"];
 const EXPRESSIONS: Expression[] = ["neutral", "distant", "certain", "waiting"];
 const SIZES: Size[] = ["sm", "md", "lg", "xl", "hero"];
 
@@ -41,6 +41,9 @@ const ACCESSORY_LABELS: Record<Accessory, string> = {
   "scarf": "Scarf",
   "bandana": "Bandana",
   "flower-crown": "Flower Crown",
+  "beanie": "Beanie",
+  "bow-tie": "Bow Tie",
+  "glasses": "Glasses",
 };
 
 export default function CharacterGallery() {

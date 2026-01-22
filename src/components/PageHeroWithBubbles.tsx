@@ -8,18 +8,21 @@ import type { Database } from "@/integrations/supabase/types";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 type PostureType = "four-legged" | "seated" | "grazing" | "leaning";
-type AccessoryType = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
+type AccessoryType = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "beanie" | "bow-tie" | "glasses" | "none";
 
 // Weighted accessory pool - "none" appears often for grounded presence
 const ACCESSORY_POOL: AccessoryType[] = [
-  "none", "none", "none", "none",  // ~36% chance of no accessory
-  "sunglasses",                     // ~9% each for accessories
+  "none", "none", "none", "none",  // ~31% chance of no accessory
+  "sunglasses",                     // ~6-7% each for accessories
   "cap",                   
   "bucket-hat",            
   "headphones",
   "scarf",
   "bandana",
   "flower-crown",
+  "beanie",
+  "bow-tie",
+  "glasses",
 ];
 
 interface Thought {
