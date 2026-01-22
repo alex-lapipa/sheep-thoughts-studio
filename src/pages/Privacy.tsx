@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +15,25 @@ const ogImageUrl = `${supabaseUrl}/functions/v1/og-privacy-image`;
 
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
+  const location = useLocation();
   const lastUpdated = "January 2026";
+
+  // Handle smooth scrolling to anchor links
+  useEffect(() => {
+    if (location.hash) {
+      // Small delay to ensure DOM is ready
+      const timeoutId = setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "start" 
+          });
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [location.hash]);
 
   return (
     <Layout>
