@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useWhatsNew } from "@/hooks/useWhatsNew";
 import { cn } from "@/lib/utils";
 
 const getNavLinks = (t: (key: string) => string) => [
@@ -26,6 +27,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
   const { hapticEnabled, toggleHaptic } = useSettings();
+  const { hasNewFeatures, markAsSeen } = useWhatsNew();
   const navLinks = getNavLinks(t);
 
   return (
@@ -84,18 +86,27 @@ export function Header() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link to="/whats-new">
+              <Link to="/whats-new" onClick={markAsSeen}>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="hover:animate-bounce-gentle"
+                  className={cn(
+                    "hover:animate-bounce-gentle relative",
+                    hasNewFeatures && "text-accent"
+                  )}
                 >
-                  <Sparkles className="h-5 w-5" />
+                  <Sparkles className={cn("h-5 w-5", hasNewFeatures && "animate-pulse")} />
+                  {hasNewFeatures && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
+                    </span>
+                  )}
                 </Button>
               </Link>
             </TooltipTrigger>
             <TooltipContent>
-              <p>What's New</p>
+              <p>{hasNewFeatures ? "New features available!" : "What's New"}</p>
             </TooltipContent>
           </Tooltip>
           <Link to="/search">
