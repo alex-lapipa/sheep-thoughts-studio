@@ -86,6 +86,7 @@ export const BubblesVoiceChat = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(storedSettings.voiceEnabled);
   const [currentMode, setCurrentMode] = useState("innocent");
@@ -115,18 +116,37 @@ export const BubblesVoiceChat = () => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.interimResults = true; // Enable interim results
       recognitionRef.current.lang = "en-IE"; // Irish English
 
       recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        setIsListening(false);
+        let interim = "";
+        let final = "";
+        
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            final += result[0].transcript;
+          } else {
+            interim += result[0].transcript;
+          }
+        }
+        
+        // Show interim transcript as user speaks
+        setInterimTranscript(interim);
+        
+        // When we have a final result, set it as input
+        if (final) {
+          setInput(final);
+          setInterimTranscript("");
+          setIsListening(false);
+        }
       };
 
       recognitionRef.current.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         setIsListening(false);
+        setInterimTranscript("");
         if (event.error === "not-allowed") {
           toast.error("Microphone access denied. Please enable it in your browser settings.");
         }
@@ -134,6 +154,7 @@ export const BubblesVoiceChat = () => {
 
       recognitionRef.current.onend = () => {
         setIsListening(false);
+        setInterimTranscript("");
       };
     }
 
@@ -504,13 +525,23 @@ export const BubblesVoiceChat = () => {
             )}
           </Button>
 
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={isListening ? "Listening..." : "Ask Bubbles something..."}
-            disabled={isLoading || isListening}
-            className="flex-1"
-          />
+          <div className="flex-1 relative">
+            <Input
+              value={isListening && interimTranscript ? interimTranscript : input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={isListening ? "Listening..." : "Ask Bubbles something..."}
+              disabled={isLoading || isListening}
+              className={cn(
+                "w-full transition-all",
+                isListening && interimTranscript && "text-muted-foreground italic"
+              )}
+            />
+            {isListening && interimTranscript && (
+              <div className="absolute -top-6 left-0 text-xs text-destructive animate-pulse">
+                Transcribing...
+              </div>
+            )}
+          </div>
 
           {isSpeaking ? (
             <Button
