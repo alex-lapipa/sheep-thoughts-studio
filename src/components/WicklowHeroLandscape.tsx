@@ -166,6 +166,9 @@ export function WicklowHeroLandscape({
       {/* SKY LAYER */}
       <SkyLayer weather={resolvedWeather} timeOfDay={resolvedTime} palette={palette} intensity={intensity} />
       
+      {/* DISTANT V-FORMATION FLOCK */}
+      <VFormationFlock weather={resolvedWeather} />
+      
       {/* FLYING BIRDS */}
       <FlyingBirds weather={resolvedWeather} />
       
@@ -333,6 +336,115 @@ function FlyingBirds({ weather }: { weather: WeatherType }) {
           </svg>
         </motion.div>
       ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// V-FORMATION FLOCK - Distant birds occasionally crossing the horizon
+// ============================================================================
+function VFormationFlock({ weather }: { weather: WeatherType }) {
+  // No flocks during bad weather
+  const showFlock = weather === "sunny" || weather === "cloudy";
+  
+  // Random chance to show flock (about 60% of the time for good weather)
+  const shouldShow = useMemo(() => showFlock && Math.random() > 0.4, [showFlock]);
+  
+  const flockConfig = useMemo(() => ({
+    direction: Math.random() > 0.5 ? 1 : -1, // Left or right
+    y: 12 + Math.random() * 10, // 12-22% from top (near horizon)
+    duration: 45 + Math.random() * 30, // 45-75 seconds (slow, distant)
+    delay: 3 + Math.random() * 8, // Slight delay before appearing
+    birdCount: 7 + Math.floor(Math.random() * 6), // 7-12 birds
+    scale: 0.25 + Math.random() * 0.15, // Small, distant birds
+  }), []);
+
+  // Generate V-formation positions
+  const birds = useMemo(() => {
+    const positions: { x: number; y: number; delay: number }[] = [];
+    const { birdCount } = flockConfig;
+    
+    // Leader at front
+    positions.push({ x: 0, y: 0, delay: 0 });
+    
+    // Wings of the V
+    for (let i = 1; i < birdCount; i++) {
+      const side = i % 2 === 0 ? 1 : -1; // Alternate sides
+      const row = Math.ceil(i / 2);
+      positions.push({
+        x: row * 12 * side, // Spread horizontally
+        y: row * 8, // Offset back
+        delay: row * 0.05, // Slight wing flap delay
+      });
+    }
+    
+    return positions;
+  }, [flockConfig.birdCount]);
+
+  if (!shouldShow) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <motion.div
+        className="absolute"
+        style={{
+          top: `${flockConfig.y}%`,
+          left: flockConfig.direction === 1 ? "-10%" : "110%",
+        }}
+        initial={{ x: 0, opacity: 0 }}
+        animate={{
+          x: flockConfig.direction === 1 ? "120vw" : "-120vw",
+          opacity: [0, 1, 1, 1, 0],
+        }}
+        transition={{
+          x: {
+            duration: flockConfig.duration,
+            delay: flockConfig.delay,
+            ease: "linear",
+          },
+          opacity: {
+            duration: flockConfig.duration,
+            delay: flockConfig.delay,
+            times: [0, 0.05, 0.9, 0.95, 1],
+          },
+        }}
+      >
+        <svg
+          width={150 * flockConfig.scale}
+          height={100 * flockConfig.scale}
+          viewBox="-60 -10 120 80"
+          className="opacity-40"
+          style={{ transform: flockConfig.direction === -1 ? "scaleX(-1)" : undefined }}
+        >
+          {birds.map((bird, i) => (
+            <g key={i} transform={`translate(${bird.x}, ${bird.y})`}>
+              {/* Simple distant bird shape - just a curved line */}
+              <motion.path
+                d="M-4 0 Q0 -2, 4 0 Q0 2, -4 0"
+                fill="none"
+                stroke="hsl(220 20% 25%)"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                animate={{
+                  d: [
+                    "M-4 0 Q0 -2, 4 0",
+                    "M-4 0 Q0 0, 4 0",
+                    "M-4 0 Q0 1, 4 0",
+                    "M-4 0 Q0 0, 4 0",
+                    "M-4 0 Q0 -2, 4 0",
+                  ],
+                }}
+                transition={{
+                  duration: 0.6 + bird.delay,
+                  repeat: Infinity,
+                  delay: bird.delay,
+                  ease: "easeInOut",
+                }}
+              />
+            </g>
+          ))}
+        </svg>
+      </motion.div>
     </div>
   );
 }
