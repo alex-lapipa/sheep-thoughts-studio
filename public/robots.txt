@@ -1,5 +1,6 @@
 # Bubbles the Sheep - robots.txt
 # A sheep wrote this. The sheep understands SEO perfectly (incorrectly).
+# The sitemap is now generated dynamically because static files are "too predictable" - Bubbles
 
 User-agent: Googlebot
 Allow: /
@@ -16,5 +17,5 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://sheep-thoughts-studio.lovable.app/sitemap.xml
+# Dynamic sitemap location (includes real-time Shopify products)
+Sitemap: https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap
