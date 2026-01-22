@@ -54,10 +54,12 @@ interface DailyStats {
 
 // Ecommerce metrics from internal tracking
 interface EcommerceMetrics {
+  impressions: number;
   productViews: number;
   addToCarts: number;
   cartOpens: number;
   checkoutStarts: number;
+  clickThroughRate: number;
   addToCartRate: number;
   checkoutRate: number;
 }
@@ -82,14 +84,17 @@ interface GA4Metrics {
 
 interface ProductPerformance {
   name: string;
+  impressions: number;
   views: number;
   addToCarts: number;
+  clickThroughRate: number;
   conversionRate: number;
 }
 
 interface DailyEcommerceData {
   date: string;
   displayDate: string;
+  impressions: number;
   productViews: number;
   addToCarts: number;
   cartOpens: number;
@@ -125,10 +130,12 @@ export default function AdminAnalytics() {
   
   // Ecommerce metrics state - now fetched from database
   const [ecommerceMetrics, setEcommerceMetrics] = useState<EcommerceMetrics>({
+    impressions: 0,
     productViews: 0,
     addToCarts: 0,
     cartOpens: 0,
     checkoutStarts: 0,
+    clickThroughRate: 0,
     addToCartRate: 0,
     checkoutRate: 0,
   });
@@ -203,16 +210,19 @@ export default function AdminAnalytics() {
           created_at: string;
         }>;
         
+        const impressions = events.filter(e => e.event_type === 'product_impression').length;
         const viewProduct = events.filter(e => e.event_type === 'view_product').length;
         const addToCart = events.filter(e => e.event_type === 'add_to_cart').length;
         const openCart = events.filter(e => e.event_type === 'open_cart').length;
         const beginCheckout = events.filter(e => e.event_type === 'begin_checkout').length;
 
         setEcommerceMetrics({
+          impressions,
           productViews: viewProduct,
           addToCarts: addToCart,
           cartOpens: openCart,
           checkoutStarts: beginCheckout,
+          clickThroughRate: impressions > 0 ? (viewProduct / impressions) * 100 : 0,
           addToCartRate: viewProduct > 0 ? (addToCart / viewProduct) * 100 : 0,
           checkoutRate: openCart > 0 ? (beginCheckout / openCart) * 100 : 0,
         });
@@ -229,6 +239,7 @@ export default function AdminAnalytics() {
           return {
             date: dayStr,
             displayDate: format(day, 'MMM d'),
+            impressions: dayEvents.filter(e => e.event_type === 'product_impression').length,
             productViews: dayEvents.filter(e => e.event_type === 'view_product').length,
             addToCarts: dayEvents.filter(e => e.event_type === 'add_to_cart').length,
             cartOpens: dayEvents.filter(e => e.event_type === 'open_cart').length,
@@ -238,40 +249,46 @@ export default function AdminAnalytics() {
         
         setDailyEcommerceData(dailyData);
 
-        // Calculate top products
-        const productViews: Record<string, { views: number; addToCarts: number; title: string }> = {};
+        // Calculate top products with impressions and CTR
+        const productStats: Record<string, { impressions: number; views: number; addToCarts: number; title: string }> = {};
         
         events.forEach(e => {
           if (e.product_title) {
-            if (!productViews[e.product_title]) {
-              productViews[e.product_title] = { views: 0, addToCarts: 0, title: e.product_title };
+            if (!productStats[e.product_title]) {
+              productStats[e.product_title] = { impressions: 0, views: 0, addToCarts: 0, title: e.product_title };
             }
-            if (e.event_type === 'view_product') {
-              productViews[e.product_title].views++;
+            if (e.event_type === 'product_impression') {
+              productStats[e.product_title].impressions++;
+            } else if (e.event_type === 'view_product') {
+              productStats[e.product_title].views++;
             } else if (e.event_type === 'add_to_cart') {
-              productViews[e.product_title].addToCarts++;
+              productStats[e.product_title].addToCarts++;
             }
           }
         });
 
-        const topProductsList = Object.values(productViews)
+        const topProductsList = Object.values(productStats)
           .map(p => ({
             name: p.title,
+            impressions: p.impressions,
             views: p.views,
             addToCarts: p.addToCarts,
+            clickThroughRate: p.impressions > 0 ? (p.views / p.impressions) * 100 : 0,
             conversionRate: p.views > 0 ? (p.addToCarts / p.views) * 100 : 0,
           }))
-          .sort((a, b) => b.views - a.views)
-          .slice(0, 5);
+          .sort((a, b) => b.impressions - a.impressions)
+          .slice(0, 10);
 
         setTopProducts(topProductsList);
       } else {
         // Reset metrics if no data
         setEcommerceMetrics({
+          impressions: 0,
           productViews: 0,
           addToCarts: 0,
           cartOpens: 0,
           checkoutStarts: 0,
+          clickThroughRate: 0,
           addToCartRate: 0,
           checkoutRate: 0,
         });
@@ -370,11 +387,12 @@ export default function AdminAnalytics() {
 
   // Calculate max for bar scaling
   const maxShareCount = Math.max(...shareStats.map(s => s.count), 1);
-  const maxProductViews = Math.max(...topProducts.map(p => p.views), 1);
+  const maxProductImpressions = Math.max(...topProducts.map(p => p.impressions), 1);
 
-  // Funnel steps
+  // Funnel steps - now includes impressions
   const funnelSteps = [
-    { label: 'Product Views', value: ecommerceMetrics.productViews, icon: Eye },
+    { label: 'Impressions', value: ecommerceMetrics.impressions, icon: Eye },
+    { label: 'Product Clicks', value: ecommerceMetrics.productViews, icon: TrendingUp },
     { label: 'Add to Cart', value: ecommerceMetrics.addToCarts, icon: ShoppingCart },
     { label: 'Cart Opens', value: ecommerceMetrics.cartOpens, icon: Package },
     { label: 'Begin Checkout', value: ecommerceMetrics.checkoutStarts, icon: CreditCard },
@@ -585,41 +603,54 @@ export default function AdminAnalytics() {
 
           {/* Ecommerce Tab */}
           <TabsContent value="ecommerce" className="space-y-6">
-            {/* Summary Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* CTR Summary Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Product Views</CardTitle>
+                  <CardTitle className="text-sm font-medium">Impressions</CardTitle>
                   <Eye className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{ecommerceMetrics.productViews.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">Selected period</p>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.impressions.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">Product card views</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-accent/30">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Add to Carts</CardTitle>
-                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Click-Through Rate</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-accent" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{ecommerceMetrics.addToCarts.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-accent">{ecommerceMetrics.clickThroughRate.toFixed(1)}%</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-accent">{ecommerceMetrics.addToCartRate.toFixed(1)}%</span> conversion rate
+                    {ecommerceMetrics.productViews.toLocaleString()} clicks
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Checkout Starts</CardTitle>
+                  <CardTitle className="text-sm font-medium">Add to Cart Rate</CardTitle>
+                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.addToCartRate.toFixed(1)}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    {ecommerceMetrics.addToCarts.toLocaleString()} add to carts
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Checkout Rate</CardTitle>
                   <CreditCard className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{ecommerceMetrics.checkoutStarts.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">{ecommerceMetrics.checkoutRate.toFixed(1)}%</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-accent">{ecommerceMetrics.checkoutRate.toFixed(1)}%</span> of cart opens
+                    {ecommerceMetrics.checkoutStarts.toLocaleString()} checkouts
                   </p>
                 </CardContent>
               </Card>
@@ -627,31 +658,37 @@ export default function AdminAnalytics() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Overall Conversion</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {((ecommerceMetrics.checkoutStarts / ecommerceMetrics.productViews) * 100).toFixed(1)}%
+                    {ecommerceMetrics.impressions > 0 
+                      ? ((ecommerceMetrics.checkoutStarts / ecommerceMetrics.impressions) * 100).toFixed(2)
+                      : '0.00'}%
                   </div>
-                  <p className="text-xs text-muted-foreground">View to checkout</p>
+                  <p className="text-xs text-muted-foreground">Impression to checkout</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Trend Charts */}
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Product Views & Add to Carts Trend */}
+              {/* Impressions vs Clicks Trend */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm font-medium">Engagement Trends</CardTitle>
-                  <CardDescription>Product views and add-to-carts over time</CardDescription>
+                  <CardTitle className="text-sm font-medium">Impressions vs Clicks</CardTitle>
+                  <CardDescription>Product impressions and click-through performance</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {dailyEcommerceData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={250}>
                       <AreaChart data={dailyEcommerceData}>
                         <defs>
-                          <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                          <linearGradient id="colorImpressions" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
                             <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                           </linearGradient>
@@ -684,10 +721,18 @@ export default function AdminAnalytics() {
                         <Legend />
                         <Area 
                           type="monotone" 
+                          dataKey="impressions" 
+                          name="Impressions"
+                          stroke="hsl(var(--muted-foreground))" 
+                          fill="url(#colorImpressions)"
+                          strokeWidth={2}
+                        />
+                        <Area 
+                          type="monotone" 
                           dataKey="productViews" 
-                          name="Product Views"
+                          name="Clicks"
                           stroke="hsl(var(--primary))" 
-                          fill="url(#colorViews)"
+                          fill="url(#colorClicks)"
                           strokeWidth={2}
                         />
                         <Area 
@@ -770,14 +815,15 @@ export default function AdminAnalytics() {
             <Card>
               <CardHeader>
                 <CardTitle>Conversion Funnel</CardTitle>
-                <CardDescription>User journey from product view to checkout</CardDescription>
+                <CardDescription>User journey from impression to checkout</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   {funnelSteps.map((step, index) => {
-                    const percentage = (step.value / ecommerceMetrics.productViews) * 100;
+                    const baseValue = ecommerceMetrics.impressions || 1;
+                    const percentage = (step.value / baseValue) * 100;
                     const prevValue = index > 0 ? funnelSteps[index - 1].value : step.value;
-                    const dropRate = index > 0 ? ((1 - step.value / prevValue) * 100).toFixed(1) : null;
+                    const dropRate = index > 0 && prevValue > 0 ? ((1 - step.value / prevValue) * 100).toFixed(1) : null;
                     const Icon = step.icon;
                     
                     return (
@@ -789,7 +835,7 @@ export default function AdminAnalytics() {
                             </div>
                             <div>
                               <span className="font-medium">{step.label}</span>
-                              {dropRate && (
+                              {dropRate && parseFloat(dropRate) > 0 && (
                                 <span className="text-xs text-destructive ml-2">
                                   -{dropRate}% drop
                                 </span>
@@ -803,7 +849,7 @@ export default function AdminAnalytics() {
                             </span>
                           </div>
                         </div>
-                        <Progress value={percentage} className="h-3" />
+                        <Progress value={Math.min(percentage, 100)} className="h-3" />
                         {index < funnelSteps.length - 1 && (
                           <div className="flex justify-center py-2">
                             <ArrowRight className="h-4 w-4 text-muted-foreground rotate-90" />
@@ -832,19 +878,24 @@ export default function AdminAnalytics() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{product.name}</p>
                         <div className="flex gap-4 text-xs text-muted-foreground">
-                          <span>{product.views} views</span>
+                          <span>{product.impressions} impressions</span>
+                          <span>{product.views} clicks</span>
                           <span>{product.addToCarts} add to carts</span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-bold text-accent">{product.conversionRate}%</div>
-                        <div className="text-xs text-muted-foreground">conversion</div>
+                      <div className="text-right min-w-16">
+                        <div className="font-bold text-primary">{product.clickThroughRate.toFixed(1)}%</div>
+                        <div className="text-xs text-muted-foreground">CTR</div>
+                      </div>
+                      <div className="text-right min-w-16">
+                        <div className="font-bold text-accent">{product.conversionRate.toFixed(1)}%</div>
+                        <div className="text-xs text-muted-foreground">ATC Rate</div>
                       </div>
                       <div className="w-24">
                         <div className="h-2 bg-secondary rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-accent transition-all"
-                            style={{ width: `${(product.views / maxProductViews) * 100}%` }}
+                            style={{ width: `${(product.impressions / maxProductImpressions) * 100}%` }}
                           />
                         </div>
                       </div>
