@@ -4,7 +4,7 @@ import { BubblesLogo } from "./BubblesSheep";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
-import { Search, Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap } from "lucide-react";
+import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
@@ -137,27 +137,12 @@ export function Header() {
               <p>{hasNewFeatures ? "New features available!" : "What's New"}</p>
             </TooltipContent>
           </Tooltip>
-          <Link to="/search">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hover:animate-bounce-gentle h-9 w-9"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </Link>
           <div className="hover:animate-squish">
             <CartDrawer />
           </div>
         </div>
 
-        {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-1">
-          <Link to="/search">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Search className="h-5 w-5" />
-            </Button>
-          </Link>
           <CartDrawer />
           
           {/* Mobile Menu */}
