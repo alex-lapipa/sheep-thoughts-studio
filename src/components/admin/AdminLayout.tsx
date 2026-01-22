@@ -29,6 +29,7 @@ import {
   BarChart3,
   Mail,
   Map,
+  Megaphone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -118,7 +119,8 @@ const navSections: NavSection[] = [
     requiredModule: 'ops',
     items: [
       { href: '/admin/messages', label: 'Contact Messages', icon: MessageCircle, requiredModule: 'ops' },
-      { href: '/admin/subscribers', label: 'Newsletter', icon: Mail, requiredModule: 'ops' },
+      { href: '/admin/subscribers', label: 'Subscribers', icon: Users, requiredModule: 'ops' },
+      { href: '/admin/campaigns', label: 'Campaigns', icon: Megaphone, requiredModule: 'ops' },
     ],
   },
   {
