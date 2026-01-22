@@ -482,6 +482,54 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          html_content: string
+          id: string
+          is_active: boolean | null
+          merge_tags: string[] | null
+          name: string
+          preview_text: string | null
+          subject: string
+          updated_at: string
+          use_count: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          html_content: string
+          id?: string
+          is_active?: boolean | null
+          merge_tags?: string[] | null
+          name: string
+          preview_text?: string | null
+          subject: string
+          updated_at?: string
+          use_count?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          html_content?: string
+          id?: string
+          is_active?: boolean | null
+          merge_tags?: string[] | null
+          name?: string
+          preview_text?: string | null
+          subject?: string
+          updated_at?: string
+          use_count?: number | null
+        }
+        Relationships: []
+      }
       exceptions_queue: {
         Row: {
           assigned_to: string | null

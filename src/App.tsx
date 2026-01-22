@@ -52,6 +52,7 @@ import AdminMessages from "./pages/admin/Messages";
 import AdminSpamQueue from "./pages/admin/SpamQueue";
 import AdminSubscribers from "./pages/admin/Subscribers";
 import AdminCampaigns from "./pages/admin/Campaigns";
+import AdminTemplates from "./pages/admin/Templates";
 import AdminSitemap from "./pages/admin/Sitemap";
 import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 
@@ -116,6 +117,7 @@ const App = () => (
                 <Route path="/admin/spam-queue" element={<ProtectedRoute><AdminSpamQueue /></ProtectedRoute>} />
                 <Route path="/admin/subscribers" element={<ProtectedRoute><AdminSubscribers /></ProtectedRoute>} />
                 <Route path="/admin/campaigns" element={<ProtectedRoute><AdminCampaigns /></ProtectedRoute>} />
+                <Route path="/admin/templates" element={<ProtectedRoute><AdminTemplates /></ProtectedRoute>} />
                 
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
