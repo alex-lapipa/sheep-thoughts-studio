@@ -159,6 +159,61 @@ const translations: Record<Language, Record<string, string>> = {
     "faq.a16": "Plants feel everything, they're just incredibly patient about it. A tree that gets cut down doesn't scream because trees consider screaming undignified. I've spent considerable time observing grass after it's been mowed, and it always looks slightly shorter and more humble afterward. This isn't trauma—it's character building. Plants that are never pruned grow up entitled.",
     "faq.q17": "Why do we have fingernails?",
     "faq.a17": "Fingernails are leftover armour from when humans were smaller and needed protection from very tiny predators. As humans got bigger, the predators became less threatening, but the nails stayed because evolution forgot to remove them. They now serve primarily as emergency scratching tools and a surface for expressing personality through colour. Toenails exist purely out of evolutionary politeness—they didn't want fingernails to feel alone.",
+
+    // Scenarios Page
+    "scenariosPage.hero.title": "Escalation Journeys",
+    "scenariosPage.hero.subtitle": "Watch Bubbles process information from innocent curiosity to nuclear certainty. Each scenario demonstrates the Inversion Principle™ in action.",
+    "scenariosPage.research.note": "Research Note:",
+    "scenariosPage.research.text": "These escalation patterns have been extensively documented by the Bubbles Institute of Applied Misunderstanding™.",
+    "scenariosPage.interactive.title": "Interactive Experience",
+    "scenariosPage.interactive.subtitle": "Select a scenario and watch the escalation unfold. Use the controls to navigate through each beat.",
+    "scenariosPage.filter.label": "Filter by topic:",
+    "scenariosPage.filter.all": "All Scenarios",
+    "scenariosPage.noScenarios": "No scenarios found in this category.",
+    "scenariosPage.framework.title": "The Escalation Framework",
+    "scenariosPage.mode.innocent": "Genuine curiosity. Everything is interesting and probably fine.",
+    "scenariosPage.mode.concerned": "Something doesn't add up. Time to gather more evidence.",
+    "scenariosPage.mode.triggered": "The evidence is clear. Others just aren't seeing it.",
+    "scenariosPage.mode.savage": "Patience exhausted. Time to share some hard truths.",
+    "scenariosPage.mode.nuclear": "MAXIMUM CERTAINTY. THE TRUTH MUST BE HEARD.",
+    "scenariosPage.cta.title": "Wear Your Escalation Level",
+    "scenariosPage.cta.subtitle": "From innocent meadow vibes to nuclear urban chaos — find merchandise that matches your current mood.",
+    "scenariosPage.cta.button": "Browse the Collection",
+
+    // Explains Page
+    "explainsPage.hero.title": "Bubbles Explains",
+    "explainsPage.hero.subtitle": "Deep dives into topics I understand completely. Each explanation has been rigorously researched by standing in fields and overhearing things.",
+    "explainsPage.allTopics": "All Topics",
+    "explainsPage.sources": "Sources:",
+    "explainsPage.challenge": "Challenge this →",
+    "explainsPage.escalatedNote": "Escalated certainty level:",
+    "explainsPage.citeThis": "Cite This Wisdom",
+    "explainsPage.topics.Economics": "Economics",
+    "explainsPage.topics.Technology": "Technology",
+    "explainsPage.topics.Biology": "Biology",
+    "explainsPage.topics.Weather": "Weather",
+    "explainsPage.topics.Space": "Space",
+    "explainsPage.topics.Society": "Society",
+    "explainsPage.topics.History": "History",
+    "explainsPage.topics.Health": "Health",
+    "explainsPage.topics.Physics": "Physics",
+    "explainsPage.topics.Psychology": "Psychology",
+    "explainsPage.topics.Philosophy": "Philosophy",
+
+    // Collections Page
+    "collectionsPage.title": "All Products",
+    "collectionsPage.subtitle": "Browse our full collection of Bubbles merch",
+    "collectionsPage.clearFilter": "Clear filter",
+
+    // Common/Shared
+    "common.more": "more",
+    "common.watchEscalations": "Watch Escalations",
+
+    // Index Page Additional
+    "index.insideHead": "Inside My Head",
+    "index.insideHeadSubtitle": "A rotating selection of my most important thoughts. All verified.",
+    "index.bubblesSays": "Bubbles Says",
+    "index.bubblesSaysSubtitle": "Wisdom from the fields of Wicklow. All facts independently verified by me.",
   },
   es: {
     // Nav
@@ -310,6 +365,61 @@ const translations: Record<Language, Record<string, string>> = {
     "faq.a16": "Las plantas sienten todo, solo son increíblemente pacientes al respecto. Un árbol que se corta no grita porque los árboles consideran que gritar es indigno. He pasado considerable tiempo observando el césped después de ser cortado, y siempre se ve ligeramente más corto y más humilde después. Esto no es trauma—es construcción de carácter. Las plantas que nunca se podan crecen engreídas.",
     "faq.q17": "¿Por qué tenemos uñas?",
     "faq.a17": "Las uñas son armadura sobrante de cuando los humanos eran más pequeños y necesitaban protección de depredadores muy diminutos. A medida que los humanos crecieron, los depredadores se volvieron menos amenazantes, pero las uñas se quedaron porque la evolución olvidó quitarlas. Ahora sirven principalmente como herramientas de rascado de emergencia y una superficie para expresar personalidad a través del color. Las uñas de los pies existen puramente por cortesía evolutiva—no querían que las uñas de las manos se sintieran solas.",
+
+    // Scenarios Page
+    "scenariosPage.hero.title": "Viajes de Escalación",
+    "scenariosPage.hero.subtitle": "Observa a Bubbles procesar información desde curiosidad inocente hasta certeza nuclear. Cada escenario demuestra el Principio de Inversión™ en acción.",
+    "scenariosPage.research.note": "Nota de Investigación:",
+    "scenariosPage.research.text": "Estos patrones de escalación han sido extensamente documentados por el Instituto Bubbles de Malentendido Aplicado™.",
+    "scenariosPage.interactive.title": "Experiencia Interactiva",
+    "scenariosPage.interactive.subtitle": "Selecciona un escenario y observa la escalación desarrollarse. Usa los controles para navegar por cada momento.",
+    "scenariosPage.filter.label": "Filtrar por tema:",
+    "scenariosPage.filter.all": "Todos los Escenarios",
+    "scenariosPage.noScenarios": "No se encontraron escenarios en esta categoría.",
+    "scenariosPage.framework.title": "El Marco de Escalación",
+    "scenariosPage.mode.innocent": "Curiosidad genuina. Todo es interesante y probablemente está bien.",
+    "scenariosPage.mode.concerned": "Algo no cuadra. Hora de reunir más evidencia.",
+    "scenariosPage.mode.triggered": "La evidencia es clara. Los demás simplemente no lo ven.",
+    "scenariosPage.mode.savage": "Paciencia agotada. Hora de compartir algunas verdades duras.",
+    "scenariosPage.mode.nuclear": "CERTEZA MÁXIMA. LA VERDAD DEBE SER ESCUCHADA.",
+    "scenariosPage.cta.title": "Usa Tu Nivel de Escalación",
+    "scenariosPage.cta.subtitle": "Desde vibraciones inocentes de pradera hasta caos urbano nuclear — encuentra mercancía que combine con tu estado de ánimo actual.",
+    "scenariosPage.cta.button": "Explorar la Colección",
+
+    // Explains Page
+    "explainsPage.hero.title": "Bubbles Explica",
+    "explainsPage.hero.subtitle": "Inmersiones profundas en temas que entiendo completamente. Cada explicación ha sido rigurosamente investigada parándome en campos y escuchando cosas.",
+    "explainsPage.allTopics": "Todos los Temas",
+    "explainsPage.sources": "Fuentes:",
+    "explainsPage.challenge": "Desafiar esto →",
+    "explainsPage.escalatedNote": "Nivel de certeza escalado:",
+    "explainsPage.citeThis": "Citar Esta Sabiduría",
+    "explainsPage.topics.Economics": "Economía",
+    "explainsPage.topics.Technology": "Tecnología",
+    "explainsPage.topics.Biology": "Biología",
+    "explainsPage.topics.Weather": "Clima",
+    "explainsPage.topics.Space": "Espacio",
+    "explainsPage.topics.Society": "Sociedad",
+    "explainsPage.topics.History": "Historia",
+    "explainsPage.topics.Health": "Salud",
+    "explainsPage.topics.Physics": "Física",
+    "explainsPage.topics.Psychology": "Psicología",
+    "explainsPage.topics.Philosophy": "Filosofía",
+
+    // Collections Page
+    "collectionsPage.title": "Todos los Productos",
+    "collectionsPage.subtitle": "Explora nuestra colección completa de mercancía de Bubbles",
+    "collectionsPage.clearFilter": "Limpiar filtro",
+
+    // Common/Shared
+    "common.more": "más",
+    "common.watchEscalations": "Ver Escalaciones",
+
+    // Index Page Additional
+    "index.insideHead": "Dentro de Mi Cabeza",
+    "index.insideHeadSubtitle": "Una selección rotativa de mis pensamientos más importantes. Todos verificados.",
+    "index.bubblesSays": "Bubbles Dice",
+    "index.bubblesSaysSubtitle": "Sabiduría de los campos de Wicklow. Todos los datos verificados independientemente por mí.",
   },
 };
 
