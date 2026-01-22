@@ -1,0 +1,401 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, MessageCircle, Sparkles } from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { ThoughtBubble } from "./ThoughtBubble";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+// TypeScript declarations for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognitionInstance;
+    webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
+  }
+}
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  mode?: string;
+}
+
+const MODE_COLORS: Record<string, string> = {
+  innocent: "bg-bubbles-meadow/20 text-bubbles-meadow border-bubbles-meadow/30",
+  concerned: "bg-bubbles-mist/20 text-bubbles-mist border-bubbles-mist/30",
+  triggered: "bg-mode-triggered/20 text-mode-triggered border-mode-triggered/30",
+  savage: "bg-mode-savage/20 text-mode-savage border-mode-savage/30",
+  nuclear: "bg-mode-nuclear/20 text-mode-nuclear border-mode-nuclear/30",
+};
+
+export const BubblesVoiceChat = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [currentMode, setCurrentMode] = useState("innocent");
+  
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "en-IE"; // Irish English
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+        if (event.error === "not-allowed") {
+          toast.error("Microphone access denied. Please enable it in your browser settings.");
+        }
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const toggleListening = useCallback(() => {
+    if (!recognitionRef.current) {
+      toast.error("Speech recognition not supported in your browser");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        console.error("Failed to start speech recognition:", e);
+        toast.error("Failed to start listening");
+      }
+    }
+  }, [isListening]);
+
+  const speak = useCallback((text: string) => {
+    if (!voiceEnabled || !("speechSynthesis" in window)) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    synthRef.current = utterance;
+
+    // Try to find an Irish or British English voice
+    const voices = window.speechSynthesis.getVoices();
+    const irishVoice = voices.find(v => 
+      v.lang.includes("en-IE") || 
+      v.name.toLowerCase().includes("irish") ||
+      v.name.toLowerCase().includes("moira")
+    );
+    const britishVoice = voices.find(v => 
+      v.lang.includes("en-GB") && 
+      v.name.toLowerCase().includes("male")
+    );
+    const maleVoice = voices.find(v => 
+      v.lang.startsWith("en") && 
+      (v.name.toLowerCase().includes("male") || v.name.toLowerCase().includes("daniel"))
+    );
+
+    utterance.voice = irishVoice || britishVoice || maleVoice || voices[0];
+    utterance.rate = 0.95;
+    utterance.pitch = 0.9;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  }, [voiceEnabled]);
+
+  const stopSpeaking = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
+
+  const sendMessage = async (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text || isLoading) return;
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: text,
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      // Build conversation history
+      const conversationHistory = messages.map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const { data, error } = await supabase.functions.invoke("bubbles-voice-chat", {
+        body: { 
+          message: text,
+          conversationHistory 
+        },
+      });
+
+      if (error) throw error;
+
+      const assistantMessage: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: data.reply,
+        mode: data.mode,
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      setCurrentMode(data.mode || "innocent");
+
+      // Speak the response
+      speak(data.reply);
+
+    } catch (err) {
+      console.error("Voice chat error:", err);
+      toast.error("Bubbles is having a moment. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
+  // Trigger voices loading
+  useEffect(() => {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  }, []);
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto border-2 border-accent/20 shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MessageCircle className="h-5 w-5 text-accent" />
+            <span>Chat with Bubbles</span>
+            <Sparkles className="h-4 w-4 text-bubbles-gorse" />
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="outline" 
+              className={cn("text-xs capitalize", MODE_COLORS[currentMode])}
+            >
+              {currentMode}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setVoiceEnabled(!voiceEnabled)}
+              className="h-8 w-8"
+              title={voiceEnabled ? "Mute voice" : "Enable voice"}
+            >
+              {voiceEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Messages Area */}
+        <div className="h-[300px] overflow-y-auto space-y-3 p-2 rounded-lg bg-muted/30">
+          {messages.length === 0 && (
+            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+              <p className="text-center">
+                Ask Bubbles anything...<br />
+                <span className="text-xs italic">Use the microphone or type below</span>
+              </p>
+            </div>
+          )}
+
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "flex",
+                message.role === "user" ? "justify-end" : "justify-start"
+              )}
+            >
+              {message.role === "user" ? (
+                <div className="bg-accent text-accent-foreground px-4 py-2 rounded-2xl rounded-br-sm max-w-[80%]">
+                  {message.content}
+                </div>
+              ) : (
+                <ThoughtBubble 
+                  size="sm" 
+                  className={cn(
+                    "max-w-[85%]",
+                    message.mode && MODE_COLORS[message.mode]?.split(" ")[0]
+                  )}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  {message.mode && (
+                    <span className="text-[10px] text-muted-foreground mt-1 block italic">
+                      [{message.mode}]
+                    </span>
+                  )}
+                </ThoughtBubble>
+              )}
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <ThoughtBubble size="sm" className="animate-pulse">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span className="italic">Bubbles is thinking...</span>
+                </div>
+              </ThoughtBubble>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant={isListening ? "destructive" : "outline"}
+            size="icon"
+            onClick={toggleListening}
+            disabled={isLoading}
+            className={cn(
+              "shrink-0 transition-all",
+              isListening && "animate-pulse ring-2 ring-destructive"
+            )}
+            title={isListening ? "Stop listening" : "Start voice input"}
+          >
+            {isListening ? (
+              <MicOff className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
+
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={isListening ? "Listening..." : "Ask Bubbles something..."}
+            disabled={isLoading || isListening}
+            className="flex-1"
+          />
+
+          {isSpeaking ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={stopSpeaking}
+              className="shrink-0"
+              title="Stop speaking"
+            >
+              <VolumeX className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || !input.trim()}
+              className="shrink-0"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+        </form>
+
+        {/* Status indicators */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            {isListening && (
+              <>
+                <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+                Recording...
+              </>
+            )}
+            {isSpeaking && (
+              <>
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                Speaking...
+              </>
+            )}
+          </span>
+          <span className="italic">RAG-powered personality</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
