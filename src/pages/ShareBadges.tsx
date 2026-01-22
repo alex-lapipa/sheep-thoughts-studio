@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -143,22 +144,18 @@ export default function ShareBadges() {
         <meta name="twitter:image" content={getOgImageUrl()} />
       </Helmet>
 
-      <div className="container py-12 max-w-3xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
-            <Share2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium">Share Your Achievements</span>
-          </div>
-          <h1 className="font-display text-4xl font-bold mb-2">
-            {isViewingOthers ? `${displayName}'s Badges` : "Share Your Badges"}
-          </h1>
-          <p className="text-muted-foreground">
-            {isViewingOthers 
-              ? "Check out this collection of wisdom badges!" 
-              : "Create a beautiful shareable card of your badge collection"}
-          </p>
-        </div>
+      {/* Hero with Bubbles */}
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={isViewingOthers ? `${displayName}'s Badges` : "Share Your Badges"}
+          subtitle={isViewingOthers 
+            ? "Check out this collection of wisdom badges!" 
+            : "Create a beautiful shareable card of your badge collection"}
+          bubbleSize="sm"
+        />
+      </section>
+
+      <div className="container max-w-3xl">
 
         {/* Badge Display Card */}
         <Card className="mb-8 overflow-hidden">

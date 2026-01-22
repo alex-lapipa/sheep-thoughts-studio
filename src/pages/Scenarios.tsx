@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,34 +78,23 @@ export default function Scenarios() {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-secondary/30 to-background relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div 
-            className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-20 blur-3xl"
-            style={{ background: "hsl(45, 75%, 65%)" }}
-          />
-          <div 
-            className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-15 blur-3xl"
-            style={{ background: "hsl(335, 100%, 62%)" }}
-          />
-        </div>
+      {/* Hero with Bubbles */}
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("scenariosPage.hero.title")}
+          subtitle={t("scenariosPage.hero.subtitle")}
+          bubbleSize="md"
+        />
+      </section>
 
-        <div className="container relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              {t("scenariosPage.hero.title")}
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              {t("scenariosPage.hero.subtitle")}
+      {/* Research note */}
+      <section className="container mb-8">
+        <div className="max-w-3xl mx-auto">
+          <ThoughtBubble mode="concerned" size="sm">
+            <p className="text-sm">
+              <strong>{t("scenariosPage.research.note")}</strong> {t("scenariosPage.research.text")}
             </p>
-            <ThoughtBubble mode="concerned" size="sm">
-              <p className="text-sm">
-                <strong>{t("scenariosPage.research.note")}</strong> {t("scenariosPage.research.text")}
-              </p>
-            </ThoughtBubble>
-          </div>
+          </ThoughtBubble>
         </div>
       </section>
 

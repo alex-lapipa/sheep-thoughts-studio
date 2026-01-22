@@ -249,12 +249,13 @@ const Explains = () => {
         <link rel="canonical" href={`${siteUrl}/explains`} />
       </Helmet>
       {/* Hero with Bubbles and thought bubbles */}
-      <PageHeroWithBubbles
-        title={t("explainsPage.hero.title")}
-        subtitle={t("explainsPage.hero.subtitle")}
-        bubbleSize="md"
-        className="mb-8"
-      />
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("explainsPage.hero.title")}
+          subtitle={t("explainsPage.hero.subtitle")}
+          bubbleSize="md"
+        />
+      </section>
 
       <div className="container pb-12 md:pb-20">
         <div className="max-w-4xl mx-auto">
