@@ -14,22 +14,21 @@ import { Switch } from "@/components/ui/switch";
  * Displays all posture × accessory combinations for design review.
  */
 
-type Posture = "four-legged" | "two-legged" | "half-upright" | "leaning" | "seated";
+type Posture = "four-legged" | "seated" | "grazing" | "leaning";
 type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";
 type Size = "sm" | "md" | "lg" | "xl" | "hero";
 
-const POSTURES: Posture[] = ["four-legged", "two-legged", "half-upright", "leaning", "seated"];
+const POSTURES: Posture[] = ["four-legged", "seated", "grazing", "leaning"];
 const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown"];
 const EXPRESSIONS: Expression[] = ["neutral", "distant", "certain", "waiting"];
 const SIZES: Size[] = ["sm", "md", "lg", "xl", "hero"];
 
 const POSTURE_LABELS: Record<Posture, string> = {
   "four-legged": "Four-Legged (Classic)",
-  "two-legged": "Two-Legged (Upright)",
-  "half-upright": "Half-Upright",
-  "leaning": "Leaning",
   "seated": "Seated (Resting)",
+  "grazing": "Grazing (Feeding)",
+  "leaning": "Leaning",
 };
 
 const ACCESSORY_LABELS: Record<Accessory, string> = {
