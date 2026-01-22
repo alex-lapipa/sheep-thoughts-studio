@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Mail, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Loader2, CheckCircle, Rss } from "lucide-react";
 
 const RANDOM_SHEEP_QUOTES = [
   "Baa. (This is a legal statement.)",
@@ -146,7 +146,18 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <button 
+                <a 
+                  href="https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/changelog-rss" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground hover:translate-x-1 inline-flex items-center gap-1.5 transition-all"
+                >
+                  <Rss className="h-3 w-3" />
+                  RSS Feed
+                </a>
+              </li>
+              <li>
+                <button
                   onClick={openCookieSettings}
                   className="hover:text-foreground hover:translate-x-1 inline-block transition-all text-left"
                 >
