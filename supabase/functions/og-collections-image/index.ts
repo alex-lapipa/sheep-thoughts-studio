@@ -7,24 +7,24 @@ type Language = 'en' | 'es' | 'fr' | 'de';
 
 const translations: Record<Language, { title: string; subtitle: string; footer: string }> = {
   en: {
-    title: 'Contact Bubbles',
-    subtitle: 'I understand 73% of what you say',
-    footer: 'Bubbles the Sheep • bubblesexplains.com',
+    title: 'Bubbles Merch',
+    subtitle: 'Wear the confusion with pride',
+    footer: 'Premium quality • Wicklow soul',
   },
   es: {
-    title: 'Contactar a Bubbles',
-    subtitle: 'Entiendo el 73% de lo que dices',
-    footer: 'Bubbles la Oveja • bubblesexplains.com',
+    title: 'Merch de Bubbles',
+    subtitle: 'Usa la confusión con orgullo',
+    footer: 'Calidad premium • Alma de Wicklow',
   },
   fr: {
-    title: 'Contacter Bubbles',
-    subtitle: 'Je comprends 73% de ce que tu dis',
-    footer: 'Bubbles le Mouton • bubblesexplains.com',
+    title: 'Merch de Bubbles',
+    subtitle: 'Portez la confusion avec fierté',
+    footer: 'Qualité premium • Âme de Wicklow',
   },
   de: {
-    title: 'Kontaktiere Bubbles',
-    subtitle: 'Ich verstehe 73% von dem, was du sagst',
-    footer: 'Bubbles das Schaf • bubblesexplains.com',
+    title: 'Bubbles Merch',
+    subtitle: 'Trage die Verwirrung mit Stolz',
+    footer: 'Premium-Qualität • Wicklow-Seele',
   },
 };
 
@@ -38,19 +38,18 @@ Deno.serve(async (req) => {
     const lang = (url.searchParams.get('lang') || 'en') as Language;
     const t = translations[lang] || translations.en;
 
-    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a contact page.
+    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a merchandise collection page.
 
 Design requirements:
-- Background: Soft gradient from cream (#FFFDD0) to warm lavender, with Wicklow mountains silhouette
-- Center: A cute cartoon sheep mascot (white fluffy wool, thoughtful expression) sitting at a tiny wooden desk
-- The sheep is holding a quill pen, with a stack of letters beside it
-- Small birds carrying messages flying around
-- A vintage mailbox nearby with letters sticking out
-- Top text: "${t.title}" in a playful bold display font
+- Background: Soft gradient from cream (#FFFDD0) to sage green with subtle Wicklow hills silhouette
+- Center: A cute cartoon sheep mascot (white fluffy wool, confident expression) wearing a stylish t-shirt with a thought bubble design
+- Around the sheep: floating merch items (t-shirts, hoodies, mugs, tote bags) with cute designs
+- Shopping bags with sheep logos scattered around
+- Top text: "${t.title}" in a bold, modern display font
 - Subtitle: "${t.subtitle}"
 - Bottom: "${t.footer}"
-- Include envelope and heart icons floating
-- Style: Warm, whimsical, cozy Irish countryside aesthetic with communication theme
+- Include small price tags and star ratings floating
+- Style: Warm, whimsical, modern e-commerce meets Irish countryside aesthetic
 - Professional social card layout suitable for Twitter/Facebook/LinkedIn sharing
 
 Ultra high resolution, clean modern design.`;
@@ -114,14 +113,14 @@ Ultra high resolution, clean modern design.`;
         <defs>
           <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style="stop-color:#FFFDD0"/>
-            <stop offset="100%" style="stop-color:#E6E6FA"/>
+            <stop offset="100%" style="stop-color:#90B77D"/>
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#bg)"/>
-        <text x="600" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="64" fill="#2C2C2C">✉️🐑</text>
+        <text x="600" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="64" fill="#2C2C2C">👕🐑</text>
         <text x="600" y="350" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#2C2C2C">${escapeXml(t.title)}</text>
-        <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#666">Bubbles the Sheep</text>
-        <text x="600" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#888">${escapeXml(t.subtitle)}</text>
+        <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#666">${escapeXml(t.subtitle)}</text>
+        <text x="600" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#888">${escapeXml(t.footer)}</text>
       </svg>
     `;
     
