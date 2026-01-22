@@ -26,11 +26,18 @@ import {
   BarChart3,
   Database,
   FileText,
-  Tag
+  Tag,
+  History,
+  X,
+  Play,
+  Trash2,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSemanticSearch, type SemanticSearchResult } from "@/hooks/useSemanticSearch";
+import { useRAGQueryHistory } from "@/hooks/useRAGQueryHistory";
+import { formatDistanceToNow } from "date-fns";
 
 const SOURCE_CONFIG = {
   knowledge: { 
@@ -230,6 +237,8 @@ export default function AdminRAGSearch() {
   );
   
   const { results, isLoading, error, searchMethod, search, clearResults } = useSemanticSearch();
+  const { history, addToHistory, removeFromHistory, clearHistory } = useRAGQueryHistory();
+  const [showHistory, setShowHistory] = useState(false);
 
   const handleSearch = () => {
     if (!query.trim()) {
@@ -240,7 +249,35 @@ export default function AdminRAGSearch() {
       sources: selectedSources,
       limit,
       threshold,
+    }).then(() => {
+      // Add to history after search completes (we'll get result count from results)
     });
+  };
+
+  // Add to history when results change
+  const lastSearchRef = useMemo(() => ({ query, sources: selectedSources, threshold, limit }), []);
+  
+  // Track when to add to history
+  useMemo(() => {
+    if (results.length > 0 && query.trim()) {
+      addToHistory(query, selectedSources, threshold, limit, results.length);
+    }
+  }, [results]);
+
+  const executeHistoryQuery = (item: typeof history[0]) => {
+    setQuery(item.query);
+    setSelectedSources(item.sources);
+    setThreshold(item.threshold);
+    setLimit(item.limit);
+    setShowHistory(false);
+    // Trigger search after state updates
+    setTimeout(() => {
+      search(item.query, {
+        sources: item.sources,
+        limit: item.limit,
+        threshold: item.threshold,
+      });
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -302,7 +339,18 @@ export default function AdminRAGSearch() {
           <CardContent className="space-y-6">
             {/* Query Input */}
             <div className="space-y-2">
-              <Label htmlFor="query">Search Query</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="query">Search Query</Label>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="h-7 text-xs"
+                >
+                  <History className="h-3 w-3 mr-1" />
+                  History ({history.length})
+                </Button>
+              </div>
               <div className="flex gap-2">
                 <Input
                   id="query"
@@ -320,6 +368,96 @@ export default function AdminRAGSearch() {
                   )}
                 </Button>
               </div>
+
+              {/* Query History Panel */}
+              {showHistory && history.length > 0 && (
+                <Card className="border-dashed">
+                  <CardHeader className="py-2 px-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Recent Searches
+                      </CardTitle>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => {
+                            clearHistory();
+                            toast.success("History cleared");
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => setShowHistory(false)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="py-2 px-3">
+                    <ScrollArea className="max-h-48">
+                      <div className="space-y-1">
+                        {history.map((item) => (
+                          <div 
+                            key={item.id}
+                            className="flex items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50 group"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{item.query}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{item.resultCount} results</span>
+                                <span>•</span>
+                                <span>{formatDistanceToNow(new Date(item.searchedAt), { addSuffix: true })}</span>
+                                <span>•</span>
+                                <span className="flex gap-0.5">
+                                  {item.sources.map((s) => (
+                                    <Badge key={s} variant="outline" className="text-[10px] px-1 py-0">
+                                      {s.slice(0, 3)}
+                                    </Badge>
+                                  ))}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => executeHistoryQuery(item)}
+                                title="Re-execute this query"
+                              >
+                                <Play className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-destructive"
+                                onClick={() => removeFromHistory(item.id)}
+                                title="Remove from history"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              )}
+
+              {showHistory && history.length === 0 && (
+                <div className="text-center py-4 text-sm text-muted-foreground">
+                  No search history yet. Your searches will appear here.
+                </div>
+              )}
             </div>
 
             {/* Source Selection */}
