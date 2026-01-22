@@ -573,7 +573,7 @@ const FAQ = () => {
     }
   };
 
-  const { ogImageUrl, siteUrl } = useOgImage("og-faq.jpg");
+  const { ogImageUrl, siteUrl, language } = useOgImage("og-faq.jpg");
 
   return (
     <LegalPageLayout 
@@ -591,6 +591,7 @@ const FAQ = () => {
         <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content={language === "en" ? "en_IE" : language === "es" ? "es_ES" : language === "fr" ? "fr_FR" : "de_DE"} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Ask Bubbles | FAQ" />
         <meta name="twitter:description" content="Ask Bubbles anything. Get wisdom. Stay confused." />

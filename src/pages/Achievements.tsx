@@ -264,6 +264,8 @@ export default function Achievements() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/achievements`} />
         <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:site_name" content="Bubbles the Sheep" />
         
         {/* Twitter Card */}
