@@ -6,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { 
   BarChart3, 
@@ -29,6 +29,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { DateRange } from 'react-day-picker';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 
 interface ShareEventStats {
   content_type: string;
@@ -75,6 +87,15 @@ interface ProductPerformance {
   conversionRate: number;
 }
 
+interface DailyEcommerceData {
+  date: string;
+  displayDate: string;
+  productViews: number;
+  addToCarts: number;
+  cartOpens: number;
+  checkoutStarts: number;
+}
+
 export default function AdminAnalytics() {
   // Date range state - default to last 30 days
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -113,6 +134,7 @@ export default function AdminAnalytics() {
   });
 
   const [topProducts, setTopProducts] = useState<ProductPerformance[]>([]);
+  const [dailyEcommerceData, setDailyEcommerceData] = useState<DailyEcommerceData[]>([]);
 
   const fetchAnalytics = useCallback(async () => {
     if (!dateRange?.from) return;
@@ -178,6 +200,7 @@ export default function AdminAnalytics() {
           event_type: string;
           product_id?: string;
           product_title?: string;
+          created_at: string;
         }>;
         
         const viewProduct = events.filter(e => e.event_type === 'view_product').length;
@@ -193,6 +216,27 @@ export default function AdminAnalytics() {
           addToCartRate: viewProduct > 0 ? (addToCart / viewProduct) * 100 : 0,
           checkoutRate: openCart > 0 ? (beginCheckout / openCart) * 100 : 0,
         });
+
+        // Build daily ecommerce trend data
+        const days = eachDayOfInterval({ start: startDate, end: endDate });
+        const dailyData: DailyEcommerceData[] = days.map(day => {
+          const dayStr = format(day, 'yyyy-MM-dd');
+          const dayEvents = events.filter(e => {
+            const eventDate = format(parseISO(e.created_at), 'yyyy-MM-dd');
+            return eventDate === dayStr;
+          });
+          
+          return {
+            date: dayStr,
+            displayDate: format(day, 'MMM d'),
+            productViews: dayEvents.filter(e => e.event_type === 'view_product').length,
+            addToCarts: dayEvents.filter(e => e.event_type === 'add_to_cart').length,
+            cartOpens: dayEvents.filter(e => e.event_type === 'open_cart').length,
+            checkoutStarts: dayEvents.filter(e => e.event_type === 'begin_checkout').length,
+          };
+        });
+        
+        setDailyEcommerceData(dailyData);
 
         // Calculate top products
         const productViews: Record<string, { views: number; addToCarts: number; title: string }> = {};
@@ -232,6 +276,7 @@ export default function AdminAnalytics() {
           checkoutRate: 0,
         });
         setTopProducts([]);
+        setDailyEcommerceData([]);
       }
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -589,6 +634,134 @@ export default function AdminAnalytics() {
                     {((ecommerceMetrics.checkoutStarts / ecommerceMetrics.productViews) * 100).toFixed(1)}%
                   </div>
                   <p className="text-xs text-muted-foreground">View to checkout</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Trend Charts */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Product Views & Add to Carts Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Engagement Trends</CardTitle>
+                  <CardDescription>Product views and add-to-carts over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {dailyEcommerceData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <AreaChart data={dailyEcommerceData}>
+                        <defs>
+                          <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorCarts" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="displayDate" 
+                          tick={{ fontSize: 12 }} 
+                          className="text-muted-foreground"
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12 }} 
+                          className="text-muted-foreground"
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
+                        <Legend />
+                        <Area 
+                          type="monotone" 
+                          dataKey="productViews" 
+                          name="Product Views"
+                          stroke="hsl(var(--primary))" 
+                          fill="url(#colorViews)"
+                          strokeWidth={2}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="addToCarts" 
+                          name="Add to Carts"
+                          stroke="hsl(var(--accent))" 
+                          fill="url(#colorCarts)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      No data for selected period
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Checkout Funnel Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Checkout Trends</CardTitle>
+                  <CardDescription>Cart opens and checkout starts over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {dailyEcommerceData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={dailyEcommerceData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="displayDate" 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                        />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="cartOpens" 
+                          name="Cart Opens"
+                          stroke="hsl(var(--secondary-foreground))" 
+                          strokeWidth={2}
+                          dot={{ fill: 'hsl(var(--secondary-foreground))', strokeWidth: 0, r: 3 }}
+                          activeDot={{ r: 5 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="checkoutStarts" 
+                          name="Checkout Starts"
+                          stroke="hsl(var(--destructive))" 
+                          strokeWidth={2}
+                          dot={{ fill: 'hsl(var(--destructive))', strokeWidth: 0, r: 3 }}
+                          activeDot={{ r: 5 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      No data for selected period
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
