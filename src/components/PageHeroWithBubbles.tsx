@@ -489,15 +489,54 @@ function WicklowWeatherEffects() {
   );
 }
 
-// Individual thought bubble popup
+// Individual thought bubble popup with mode-based color escalation
 function ThoughtBubblePopup({ text, mode }: { text: string; mode: BubblesMode }) {
-  const modeColors: Record<BubblesMode, string> = {
-    innocent: "bg-mode-innocent/90 border-mode-innocent",
-    concerned: "bg-mode-concerned/90 border-mode-concerned",
-    triggered: "bg-mode-triggered/90 border-mode-triggered",
-    savage: "bg-mode-savage/90 border-mode-savage",
-    nuclear: "bg-mode-nuclear/90 border-mode-nuclear",
+  // Background and border colors escalate from soft to intense
+  const modeStyles: Record<BubblesMode, { 
+    bg: string; 
+    border: string; 
+    text: string;
+    shadow: string;
+    animation: string;
+  }> = {
+    innocent: {
+      bg: "bg-[hsl(351_100%_86%/0.95)]", // Soft Blush
+      border: "border-[hsl(351_100%_76%)]",
+      text: "text-[hsl(351_30%_25%)]",
+      shadow: "shadow-lg shadow-pink-200/30",
+      animation: "",
+    },
+    concerned: {
+      bg: "bg-[hsl(214_41%_78%/0.95)]", // Misty Blue  
+      border: "border-[hsl(214_41%_68%)]",
+      text: "text-[hsl(214_30%_20%)]",
+      shadow: "shadow-lg shadow-blue-200/40",
+      animation: "",
+    },
+    triggered: {
+      bg: "bg-[hsl(27_56%_56%/0.95)]", // Bracken Copper
+      border: "border-[hsl(27_56%_40%)]",
+      text: "text-[hsl(27_10%_98%)]",
+      shadow: "shadow-xl shadow-orange-400/50",
+      animation: "animate-pulse",
+    },
+    savage: {
+      bg: "bg-[hsl(330_100%_71%/0.95)]", // Hot Pink
+      border: "border-[hsl(330_100%_55%)]",
+      text: "text-[hsl(330_20%_10%)]",
+      shadow: "shadow-xl shadow-pink-400/60",
+      animation: "animate-pulse",
+    },
+    nuclear: {
+      bg: "bg-[hsl(68_100%_50%/0.95)]", // Acid Yellow
+      border: "border-[hsl(68_100%_40%)]",
+      text: "text-[hsl(68_100%_10%)]",
+      shadow: "shadow-2xl shadow-yellow-400/70 ring-2 ring-yellow-300/50",
+      animation: "animate-bounce",
+    },
   };
+
+  const style = modeStyles[mode];
 
   // Truncate long thoughts
   const displayText = text.length > 80 ? text.substring(0, 77) + "..." : text;
@@ -505,11 +544,17 @@ function ThoughtBubblePopup({ text, mode }: { text: string; mode: BubblesMode })
   return (
     <div
       className={cn(
-        "relative px-3 py-2 rounded-xl border-2 shadow-lg backdrop-blur-sm",
-        modeColors[mode]
+        "relative px-3 py-2 rounded-xl border-2 backdrop-blur-sm transition-all duration-300",
+        style.bg,
+        style.border,
+        style.shadow,
+        style.animation
       )}
     >
-      <p className="text-xs md:text-sm font-display text-foreground leading-snug">
+      <p className={cn(
+        "text-xs md:text-sm font-display leading-snug font-medium",
+        style.text
+      )}>
         "{displayText}"
       </p>
       
@@ -517,7 +562,8 @@ function ThoughtBubblePopup({ text, mode }: { text: string; mode: BubblesMode })
       <div
         className={cn(
           "absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 border-r-2 border-b-2",
-          modeColors[mode]
+          style.bg,
+          style.border
         )}
         style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
       />
