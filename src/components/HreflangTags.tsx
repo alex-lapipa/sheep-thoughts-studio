@@ -9,15 +9,25 @@ const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
 const SUPPORTED_LANGUAGES = [
   { code: "en", hreflang: "en" },
   { code: "es", hreflang: "es" },
+  { code: "es-ES", hreflang: "es-ES" },
+  { code: "es-MX", hreflang: "es-MX" },
+  { code: "es-AR", hreflang: "es-AR" },
+  { code: "es-CO", hreflang: "es-CO" },
+  { code: "es-419", hreflang: "es-419" },
   { code: "fr", hreflang: "fr" },
+  { code: "fr-FR", hreflang: "fr-FR" },
+  { code: "fr-BE", hreflang: "fr-BE" },
+  { code: "fr-LU", hreflang: "fr-LU" },
   { code: "de", hreflang: "de" },
   { code: "de-DE", hreflang: "de-DE" },
   { code: "de-AT", hreflang: "de-AT" },
   { code: "de-CH", hreflang: "de-CH" },
 ] as const;
 
-// DACH-specific page mappings
+// Regional page mappings
 const DACH_PAGES = ["/dach", "/de", "/at", "/ch"];
+const HISPANIC_PAGES = ["/es", "/mx", "/ar", "/co", "/latam"];
+const FRANCOPHONE_PAGES = ["/fr", "/be", "/lu"];
 
 interface HreflangTagsProps {
   // Optional override for the current path
@@ -36,27 +46,48 @@ export function HreflangTags({ path }: HreflangTagsProps) {
   // Use provided path or current location
   const currentPath = path || location.pathname;
   
-  // Check if this is a DACH-specific page
+  // Check page type
   const isDACHPage = DACH_PAGES.some(p => currentPath.startsWith(p));
+  const isHispanicPage = HISPANIC_PAGES.some(p => currentPath.startsWith(p));
+  const isFrancophonePage = FRANCOPHONE_PAGES.some(p => currentPath.startsWith(p));
   
   // Build the full URL for each language variant
   const getLanguageUrl = (langCode: string) => {
     // Clean path (remove trailing slash except for root)
     const cleanPath = currentPath === "/" ? "" : currentPath.replace(/\/$/, "");
     
-    // For DACH pages, map regional variants to specific paths
+    // For DACH pages
     if (isDACHPage) {
       switch (langCode) {
-        case "de-DE":
-          return `${SITE_URL}/de`;
-        case "de-AT":
-          return `${SITE_URL}/at`;
-        case "de-CH":
-          return `${SITE_URL}/ch`;
-        case "de":
-          return `${SITE_URL}/dach`;
-        default:
-          return `${SITE_URL}${cleanPath}`;
+        case "de-DE": return `${SITE_URL}/de`;
+        case "de-AT": return `${SITE_URL}/at`;
+        case "de-CH": return `${SITE_URL}/ch`;
+        case "de": return `${SITE_URL}/dach`;
+        default: return `${SITE_URL}${cleanPath}`;
+      }
+    }
+    
+    // For Hispanic pages
+    if (isHispanicPage) {
+      switch (langCode) {
+        case "es-ES": return `${SITE_URL}/es`;
+        case "es-MX": return `${SITE_URL}/mx`;
+        case "es-AR": return `${SITE_URL}/ar`;
+        case "es-CO": return `${SITE_URL}/co`;
+        case "es-419": return `${SITE_URL}/latam`;
+        case "es": return `${SITE_URL}/es`;
+        default: return `${SITE_URL}${cleanPath}`;
+      }
+    }
+    
+    // For Francophone pages
+    if (isFrancophonePage) {
+      switch (langCode) {
+        case "fr-FR": return `${SITE_URL}/fr`;
+        case "fr-BE": return `${SITE_URL}/be`;
+        case "fr-LU": return `${SITE_URL}/lu`;
+        case "fr": return `${SITE_URL}/fr`;
+        default: return `${SITE_URL}${cleanPath}`;
       }
     }
     
@@ -65,12 +96,23 @@ export function HreflangTags({ path }: HreflangTagsProps) {
 
   // Get the appropriate lang attribute for the HTML element
   const getHtmlLang = (): string => {
-    // For DACH pages, be more specific
     if (isDACHPage) {
       if (currentPath.startsWith("/at")) return "de-AT";
       if (currentPath.startsWith("/ch")) return "de-CH";
       if (currentPath.startsWith("/de")) return "de-DE";
       return "de";
+    }
+    if (isHispanicPage) {
+      if (currentPath.startsWith("/mx")) return "es-MX";
+      if (currentPath.startsWith("/ar")) return "es-AR";
+      if (currentPath.startsWith("/co")) return "es-CO";
+      if (currentPath.startsWith("/latam")) return "es-419";
+      return "es-ES";
+    }
+    if (isFrancophonePage) {
+      if (currentPath.startsWith("/be")) return "fr-BE";
+      if (currentPath.startsWith("/lu")) return "fr-LU";
+      return "fr-FR";
     }
     return currentLanguage;
   };
