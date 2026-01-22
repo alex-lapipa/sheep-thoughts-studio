@@ -1,23 +1,39 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 export interface TocItem {
   id: string;
   title: string;
   level: number;
+  children?: TocItem[];
+}
+
+// Flatten nested TOC items for scroll tracking
+function flattenTocItems(items: TocItem[]): TocItem[] {
+  const result: TocItem[] = [];
+  for (const item of items) {
+    result.push(item);
+    if (item.children) {
+      result.push(...flattenTocItems(item.children));
+    }
+  }
+  return result;
 }
 
 export function useTableOfContents(items: TocItem[]) {
   const [activeId, setActiveId] = useState<string>('');
 
+  // Flatten items for scroll tracking
+  const flatItems = useMemo(() => flattenTocItems(items), [items]);
+
   const handleScroll = useCallback(() => {
-    if (items.length === 0) return;
+    if (flatItems.length === 0) return;
 
     const scrollPosition = window.scrollY + 120; // Account for header offset
     
     // Find the current section based on scroll position
-    let currentId = items[0]?.id || '';
+    let currentId = flatItems[0]?.id || '';
     
-    for (const item of items) {
+    for (const item of flatItems) {
       const element = document.getElementById(item.id);
       if (element) {
         const { offsetTop } = element;
@@ -28,7 +44,7 @@ export function useTableOfContents(items: TocItem[]) {
     }
 
     setActiveId(currentId);
-  }, [items]);
+  }, [flatItems]);
 
   useEffect(() => {
     // Initial check
@@ -47,5 +63,5 @@ export function useTableOfContents(items: TocItem[]) {
     }
   }, []);
 
-  return { activeId, scrollToSection };
+  return { activeId, scrollToSection, flatItems };
 }
