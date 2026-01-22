@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+const ogImageUrl = `${siteUrl}/og-contact.jpg`;
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -146,13 +146,13 @@ const Contact = () => {
           : "Entiendo aproximadamente el 73% de lo que dirás, lo cual es más que suficiente."} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/contact`} />
-        <meta property="og:image" content={`${supabaseUrl}/functions/v1/og-contact-image?lang=${language}`} />
+        <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={language === 'en' ? 'Contact Bubbles' : 'Contactar a Bubbles'} />
         <meta name="twitter:description" content={language === 'en' ? 'Send a message to Wicklow' : 'Enviar un mensaje a Wicklow'} />
-        <meta name="twitter:image" content={`${supabaseUrl}/functions/v1/og-contact-image?lang=${language}`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/contact`} />
       </Helmet>
       <div className="container max-w-4xl mx-auto px-4 py-12">
