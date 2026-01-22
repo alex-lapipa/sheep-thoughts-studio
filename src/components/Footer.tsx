@@ -124,6 +124,7 @@ export function Footer() {
               <li><Link to="/scenarios" className="hover:text-foreground hover:translate-x-1 inline-block transition-all hover:animate-wiggle">Escalation Journeys</Link></li>
               <li><Link to="/about" className="hover:text-foreground hover:translate-x-1 inline-block transition-all hover:animate-wiggle">Meet Bubbles</Link></li>
               <li><Link to="/faq" className="hover:text-foreground hover:translate-x-1 inline-block transition-all hover:animate-wiggle">Ask Bubbles</Link></li>
+              <li><Link to="/whats-new" className="hover:text-foreground hover:translate-x-1 inline-block transition-all hover:animate-wiggle">What's New ✨</Link></li>
             </ul>
           </div>
 
