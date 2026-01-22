@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -599,14 +600,14 @@ const FAQ = () => {
         <link rel="canonical" href={`${siteUrl}/faq`} />
       </Helmet>
 
-      <div className="text-center mb-12">
-        <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-          {t("faqPage.title")}
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          {t("faqPage.subtitle")}
-        </p>
-      </div>
+      {/* Hero with Bubbles */}
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("faqPage.title")}
+          subtitle={t("faqPage.subtitle")}
+          bubbleSize="md"
+        />
+      </section>
 
       {/* Milestone Celebration Banner */}
       {showMilestone && currentMilestone && (
