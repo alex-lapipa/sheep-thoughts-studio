@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +33,11 @@ import {
   CheckSquare,
   Square,
   XCircle,
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  Zap,
+  Target,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -42,6 +50,28 @@ interface CachedImage {
   selected: boolean;
 }
 
+interface CacheStats {
+  period: string;
+  generatedAt: string;
+  cache: {
+    hits: number;
+    misses: number;
+    regenerations: number;
+    total: number;
+    hitRate: number;
+    byType: Record<string, { hits: number; misses: number; regenerations: number }>;
+  };
+  storage: {
+    totalFiles: number;
+    totalSizeBytes: number;
+    totalSizeMB: number;
+    byType: Record<string, { count: number; size: number }>;
+    oldestFile: { name: string; createdAt: string } | null;
+    newestFile: { name: string; createdAt: string } | null;
+  };
+  hourlyStats: Array<{ hour: string; hits: number; misses: number }>;
+}
+
 export default function OGCacheManager() {
   const [images, setImages] = useState<CachedImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +79,10 @@ export default function OGCacheManager() {
   const [clearingAll, setClearingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectAll, setSelectAll] = useState(false);
+  const [stats, setStats] = useState<CacheStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsPeriod, setStatsPeriod] = useState('7d');
+  const [activeTab, setActiveTab] = useState('overview');
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 
@@ -78,9 +112,26 @@ export default function OGCacheManager() {
     }
   }, []);
 
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('og-cache-stats', {
+        body: { period: statsPeriod }
+      });
+
+      if (error) throw error;
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching cache stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, [statsPeriod]);
+
   useEffect(() => {
     fetchImages();
-  }, [fetchImages]);
+    fetchStats();
+  }, [fetchImages, fetchStats]);
 
   const deleteImage = async (name: string) => {
     setDeleting(name);
@@ -254,45 +305,206 @@ export default function OGCacheManager() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Cached</CardDescription>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <FileImage className="h-6 w-6 text-muted-foreground" />
-                {images.length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Size</CardDescription>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <HardDrive className="h-6 w-6 text-muted-foreground" />
-                {formatBytes(totalSize)}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Product Images</CardDescription>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <ImageIcon className="h-6 w-6 text-primary" />
-                {typeCounts['Product'] || 0}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Badge Images</CardDescription>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <ImageIcon className="h-6 w-6 text-amber-500" />
-                {typeCounts['Badge'] || 0}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
+        {/* Tabs for Overview and Stats */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="overview">Cache Overview</TabsTrigger>
+            <TabsTrigger value="stats">Hit/Miss Statistics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Storage Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Cached</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <FileImage className="h-6 w-6 text-muted-foreground" />
+                    {images.length}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Size</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <HardDrive className="h-6 w-6 text-muted-foreground" />
+                    {formatBytes(totalSize)}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Product Images</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <ImageIcon className="h-6 w-6 text-primary" />
+                    {typeCounts['Product'] || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Badge Images</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <ImageIcon className="h-6 w-6 text-accent" />
+                    {typeCounts['Badge'] || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-6">
+            {/* Period Selector */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium">Time Period:</span>
+              <Select value={statsPeriod} onValueChange={(v) => { setStatsPeriod(v); }}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">Last Hour</SelectItem>
+                  <SelectItem value="24h">Last 24 Hours</SelectItem>
+                  <SelectItem value="7d">Last 7 Days</SelectItem>
+                  <SelectItem value="30d">Last 30 Days</SelectItem>
+                  <SelectItem value="all">All Time</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm" onClick={fetchStats} disabled={statsLoading}>
+                {statsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            {/* Hit/Miss Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-5">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Cache Hits</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2 text-primary">
+                    <TrendingUp className="h-6 w-6" />
+                    {stats?.cache.hits || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Cache Misses</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2 text-destructive">
+                    <TrendingDown className="h-6 w-6" />
+                    {stats?.cache.misses || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Regenerations</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2 text-accent">
+                    <Zap className="h-6 w-6" />
+                    {stats?.cache.regenerations || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Requests</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <BarChart3 className="h-6 w-6 text-muted-foreground" />
+                    {stats?.cache.total || 0}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Hit Rate</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <Target className="h-6 w-6 text-primary" />
+                    {stats?.cache.hitRate?.toFixed(1) || 0}%
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Progress value={stats?.cache.hitRate || 0} className="h-2" />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Stats by Type */}
+            {stats?.cache.byType && Object.keys(stats.cache.byType).length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Statistics by Image Type</CardTitle>
+                  <CardDescription>Cache performance broken down by image type</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.entries(stats.cache.byType).map(([type, typeStats]) => {
+                      const typeTotal = typeStats.hits + typeStats.misses;
+                      const typeHitRate = typeTotal > 0 ? (typeStats.hits / typeTotal) * 100 : 0;
+                      return (
+                        <div key={type} className="flex items-center gap-4">
+                          <div className="w-24 font-medium capitalize">{type}</div>
+                          <div className="flex-1">
+                            <Progress value={typeHitRate} className="h-2" />
+                          </div>
+                          <div className="w-48 flex gap-3 text-sm">
+                            <span className="text-primary">{typeStats.hits} hits</span>
+                            <span className="text-destructive">{typeStats.misses} misses</span>
+                            <span className="text-muted-foreground">{typeHitRate.toFixed(0)}%</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Storage Info */}
+            {stats?.storage && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Storage Details</CardTitle>
+                  <CardDescription>Cache file information</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Total Files</p>
+                      <p className="text-2xl font-bold">{stats.storage.totalFiles}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Total Size</p>
+                      <p className="text-2xl font-bold">{stats.storage.totalSizeMB} MB</p>
+                    </div>
+                    {stats.storage.oldestFile && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Oldest Cached</p>
+                        <p className="text-sm font-mono">{stats.storage.oldestFile.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(stats.storage.oldestFile.createdAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    )}
+                    {stats.storage.newestFile && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Newest Cached</p>
+                        <p className="text-sm font-mono">{stats.storage.newestFile.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(stats.storage.newestFile.createdAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {statsLoading && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {/* Search and Bulk Actions */}
         <Card>
