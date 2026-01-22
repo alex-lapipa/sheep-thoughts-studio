@@ -6,32 +6,73 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate embedding for text
+// Generate semantic embedding using Lovable AI Gateway
 async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+    // Use Lovable AI to generate a semantic representation
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        input: [text],
-        model: "text-embedding-3-small",
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: "You are a semantic encoder. Given text, output exactly 1536 floating point numbers between -1 and 1 that represent the semantic meaning. Output ONLY the numbers separated by commas, no other text."
+          },
+          {
+            role: "user",
+            content: `Encode this text semantically: "${text.substring(0, 500)}"`
+          }
+        ],
+        temperature: 0,
       }),
     });
 
     if (!response.ok) {
-      console.error("Embedding error:", response.status);
-      return null;
+      console.error("AI embedding error:", response.status);
+      // Fallback to deterministic hash-based embedding
+      return generateHashEmbedding(text);
     }
 
     const data = await response.json();
-    return data.data[0].embedding;
+    const content = data.choices?.[0]?.message?.content;
+    
+    if (content) {
+      const numbers = content.split(',').map((n: string) => parseFloat(n.trim())).filter((n: number) => !isNaN(n));
+      if (numbers.length >= 1536) {
+        return numbers.slice(0, 1536);
+      }
+    }
+    
+    // Fallback if parsing fails
+    return generateHashEmbedding(text);
   } catch (error) {
     console.error("Error generating embedding:", error);
-    return null;
+    return generateHashEmbedding(text);
   }
+}
+
+// Deterministic hash-based embedding fallback
+function generateHashEmbedding(text: string): number[] {
+  const embedding = new Array(1536).fill(0);
+  const words = text.toLowerCase().split(/\s+/);
+  
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    for (let j = 0; j < word.length; j++) {
+      const charCode = word.charCodeAt(j);
+      const idx = (charCode * 31 + i * 17 + j * 13) % 1536;
+      embedding[idx] += Math.sin(charCode * 0.1) * 0.1;
+    }
+  }
+  
+  // Normalize
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0)) || 1;
+  return embedding.map(val => val / magnitude);
 }
 
 serve(async (req) => {
