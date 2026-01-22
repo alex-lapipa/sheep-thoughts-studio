@@ -19,6 +19,7 @@ const getNavLinks = (t: (key: string) => string) => [
   { href: "/", label: t("nav.home") },
   { href: "/facts", label: t("nav.facts") },
   { href: "/explains", label: t("nav.explains") },
+  { href: "/hall-of-fame", label: "Hall of Fame" },
   { href: "/collections/all", label: t("nav.shop") },
   { href: "/about", label: t("nav.story") },
   { href: "/faq", label: t("nav.questions") },
