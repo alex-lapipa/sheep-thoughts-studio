@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AudioWaveformProps {
   audioElement: HTMLAudioElement | null;
@@ -7,16 +8,23 @@ interface AudioWaveformProps {
   className?: string;
   barCount?: number;
   showLabel?: boolean;
+  compact?: boolean;
 }
 
 export const AudioWaveform = ({
   audioElement,
   isActive,
   className,
-  barCount = 12,
+  barCount,
   showLabel = true,
+  compact,
 }: AudioWaveformProps) => {
-  const [bars, setBars] = useState<number[]>(Array(barCount).fill(4));
+  const isMobile = useIsMobile();
+  
+  // Auto-detect compact mode on mobile, or use explicit prop
+  const isCompact = compact ?? isMobile;
+  const effectiveBarCount = barCount ?? (isCompact ? 6 : 12);
+  const [bars, setBars] = useState<number[]>(Array(effectiveBarCount).fill(4));
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -39,9 +47,12 @@ export const AudioWaveform = ({
 
     // Map frequency data to bars
     const newBars: number[] = [];
-    const sliceWidth = Math.floor(dataArray.length / barCount);
+    const sliceWidth = Math.floor(dataArray.length / effectiveBarCount);
     
-    for (let i = 0; i < barCount; i++) {
+    // Use smaller max height for compact mode
+    const maxHeight = isCompact ? 24 : 32;
+    
+    for (let i = 0; i < effectiveBarCount; i++) {
       // Sample from different frequency ranges for varied visualization
       const startIndex = i * sliceWidth;
       let sum = 0;
@@ -49,14 +60,14 @@ export const AudioWaveform = ({
         sum += dataArray[startIndex + j] || 0;
       }
       const average = sum / sliceWidth;
-      // Map 0-255 to 4-32 (min and max bar heights)
-      const height = Math.max(4, (average / 255) * 32);
+      // Map 0-255 to min-max bar heights
+      const height = Math.max(4, (average / 255) * maxHeight);
       newBars.push(height);
     }
 
     setBars(newBars);
     animationRef.current = requestAnimationFrame(updateBars);
-  }, [isActive, barCount]);
+  }, [isActive, effectiveBarCount, isCompact]);
 
   useEffect(() => {
     // Only create a new audio context and connect if we have a new audio element
@@ -135,28 +146,33 @@ export const AudioWaveform = ({
   return (
     <div 
       className={cn(
-        "flex items-center gap-0.5 px-3 py-1.5 rounded-full",
+        "flex items-center gap-0.5 rounded-full",
         "bg-gradient-to-r from-accent/20 to-bubbles-meadow/20",
         "border border-accent/30",
+        isCompact ? "px-2 py-1" : "px-3 py-1.5",
         className
       )}
     >
-      <div className="flex items-center gap-[2px] h-8">
+      <div className={cn(
+        "flex items-center gap-[2px]",
+        isCompact ? "h-6" : "h-8"
+      )}>
         {bars.map((height, i) => (
           <div
             key={i}
             className={cn(
-              "w-[3px] rounded-full transition-all duration-75",
-              "bg-gradient-to-t from-accent via-accent to-bubbles-gorse"
+              "rounded-full transition-all duration-75",
+              "bg-gradient-to-t from-accent via-accent to-bubbles-gorse",
+              isCompact ? "w-[2px]" : "w-[3px]"
             )}
             style={{
               height: `${height}px`,
-              opacity: 0.7 + (height / 32) * 0.3,
+              opacity: 0.7 + (height / (isCompact ? 24 : 32)) * 0.3,
             }}
           />
         ))}
       </div>
-      {showLabel && (
+      {showLabel && !isCompact && (
         <span className="ml-2 text-xs text-accent font-medium whitespace-nowrap">
           Speaking
         </span>
