@@ -580,33 +580,106 @@ export default function AdminSitemap() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-sm text-muted-foreground">Total Pages</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-500">{stats.complete}</div>
-              <p className="text-sm text-muted-foreground">Fully Configured</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-yellow-500">{stats.partial}</div>
-              <p className="text-sm text-muted-foreground">Partial Coverage</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{stats.withOgImage}</div>
-              <p className="text-sm text-muted-foreground">With OG Images</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Page Completeness Score Widget */}
+        <Card className="border-2 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              {/* Circular Progress */}
+              <div className="relative w-32 h-32 flex-shrink-0">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    className="text-muted/30"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={`${completionPercentage * 2.51} 251`}
+                    className={cn(
+                      completionPercentage >= 80 ? "text-green-500" :
+                      completionPercentage >= 50 ? "text-yellow-500" : "text-red-500"
+                    )}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className={cn(
+                    "text-3xl font-bold",
+                    completionPercentage >= 80 ? "text-green-500" :
+                    completionPercentage >= 50 ? "text-yellow-500" : "text-red-500"
+                  )}>
+                    {completionPercentage}%
+                  </span>
+                  <span className="text-xs text-muted-foreground">Complete</span>
+                </div>
+              </div>
+
+              {/* Score Details */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">SEO Completeness Score</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Measures pages with complete metadata: title, description, OG tags, and Twitter cards
+                  </p>
+                </div>
+                
+                {/* Breakdown Bars */}
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Pages with OG Images</span>
+                      <span className="font-medium">{stats.withOgImage}/{stats.total}</span>
+                    </div>
+                    <Progress value={(stats.withOgImage / stats.total) * 100} className="h-2" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Pages with Twitter Cards</span>
+                      <span className="font-medium">{stats.withTwitter}/{stats.total}</span>
+                    </div>
+                    <Progress value={(stats.withTwitter / stats.total) * 100} className="h-2" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Fully Configured</span>
+                      <span className="font-medium">{stats.complete}/{stats.total}</span>
+                    </div>
+                    <Progress value={(stats.complete / stats.total) * 100} className="h-2" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-3 flex-shrink-0">
+                <div className="text-center p-3 rounded-lg bg-green-500/10">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.complete}</div>
+                  <div className="text-xs text-muted-foreground">Complete</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-yellow-500/10">
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.partial}</div>
+                  <div className="text-xs text-muted-foreground">Partial</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-red-500/10">
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.missing}</div>
+                  <div className="text-xs text-muted-foreground">Missing</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-xs text-muted-foreground">Total</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Step-by-Step Guide */}
         <Card className="border-primary/20 bg-primary/5">
