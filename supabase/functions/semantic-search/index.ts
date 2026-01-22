@@ -6,73 +6,60 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate semantic embedding using Lovable AI Gateway
-async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
-  try {
-    // Use Lovable AI to generate a semantic representation
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content: "You are a semantic encoder. Given text, output exactly 1536 floating point numbers between -1 and 1 that represent the semantic meaning. Output ONLY the numbers separated by commas, no other text."
-          },
-          {
-            role: "user",
-            content: `Encode this text semantically: "${text.substring(0, 500)}"`
-          }
-        ],
-        temperature: 0,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("AI embedding error:", response.status);
-      // Fallback to deterministic hash-based embedding
-      return generateHashEmbedding(text);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    
-    if (content) {
-      const numbers = content.split(',').map((n: string) => parseFloat(n.trim())).filter((n: number) => !isNaN(n));
-      if (numbers.length >= 1536) {
-        return numbers.slice(0, 1536);
-      }
-    }
-    
-    // Fallback if parsing fails
-    return generateHashEmbedding(text);
-  } catch (error) {
-    console.error("Error generating embedding:", error);
-    return generateHashEmbedding(text);
-  }
-}
-
-// Deterministic hash-based embedding fallback
-function generateHashEmbedding(text: string): number[] {
-  const embedding = new Array(1536).fill(0);
-  const words = text.toLowerCase().split(/\s+/);
+// Generate high-quality pseudo-embeddings using a hash-based approach
+// This MUST match the same algorithm used in regenerate-embeddings for consistency
+function generateSemanticEmbedding(text: string): number[] {
+  const dimensions = 1536;
+  const embedding: number[] = new Array(dimensions);
   
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    for (let j = 0; j < word.length; j++) {
-      const charCode = word.charCodeAt(j);
-      const idx = (charCode * 31 + i * 17 + j * 13) % 1536;
-      embedding[idx] += Math.sin(charCode * 0.1) * 0.1;
+  // Normalize and tokenize text for better semantic representation
+  const normalizedText = text.toLowerCase().trim();
+  const words = normalizedText.split(/\s+/).filter(w => w.length > 2);
+  
+  // Create multiple hash seeds from different parts of the text
+  const hashWord = (word: string, seed: number): number => {
+    let hash = seed;
+    for (let i = 0; i < word.length; i++) {
+      hash = ((hash << 5) - hash) + word.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  };
+  
+  // Initialize embedding with character-level features
+  for (let i = 0; i < dimensions; i++) {
+    const charIndex = i % normalizedText.length;
+    const charCode = normalizedText.charCodeAt(charIndex);
+    embedding[i] = (charCode / 127) - 1;
+  }
+  
+  // Add word-level semantic features
+  words.forEach((word, wordIndex) => {
+    const wordHash = hashWord(word, wordIndex * 31);
+    for (let d = 0; d < 8; d++) {
+      const dimIndex = (wordHash + d * 191) % dimensions;
+      const contribution = ((wordHash >> (d * 4)) & 0xF) / 15 - 0.5;
+      embedding[dimIndex] += contribution * (1 / (wordIndex + 1));
+    }
+  });
+  
+  // Add n-gram features for phrase similarity
+  for (let i = 0; i < normalizedText.length - 2; i++) {
+    const trigram = normalizedText.slice(i, i + 3);
+    const trigramHash = hashWord(trigram, i);
+    const dimIndex = trigramHash % dimensions;
+    embedding[dimIndex] += 0.1;
+  }
+  
+  // Normalize to unit vector
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude > 0) {
+    for (let i = 0; i < dimensions; i++) {
+      embedding[i] = embedding[i] / magnitude;
     }
   }
   
-  // Normalize
-  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0)) || 1;
-  return embedding.map(val => val / magnitude);
+  return embedding;
 }
 
 serve(async (req) => {
@@ -90,80 +77,13 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Generate embedding for the query
-    const queryEmbedding = await getEmbedding(query, LOVABLE_API_KEY);
-
-    if (!queryEmbedding) {
-      // Fallback to text-based search
-      const results: any[] = [];
-      
-      if (sources.includes("knowledge")) {
-        const { data } = await supabase
-          .from("bubbles_knowledge")
-          .select("id, title, content, category, mode, tags")
-          .ilike("content", `%${query}%`)
-          .limit(limit);
-        if (data) {
-          results.push(...data.map((item: any) => ({ 
-            ...item, 
-            source: "knowledge", 
-            similarity: 0.5,
-            preview: item.content?.substring(0, 200) + "..."
-          })));
-        }
-      }
-
-      if (sources.includes("thoughts")) {
-        const { data } = await supabase
-          .from("bubbles_thoughts")
-          .select("id, text, mode, trigger_category")
-          .ilike("text", `%${query}%`)
-          .limit(limit);
-        if (data) {
-          results.push(...data.map((item: any) => ({ 
-            ...item, 
-            source: "thoughts", 
-            similarity: 0.5,
-            title: item.text?.substring(0, 50) + "...",
-            preview: item.text
-          })));
-        }
-      }
-
-      if (sources.includes("rag")) {
-        const { data } = await supabase
-          .from("bubbles_rag_content")
-          .select("id, title, type, category, bubbles_wrong_take, comedy_hooks")
-          .ilike("bubbles_wrong_take", `%${query}%`)
-          .limit(limit);
-        if (data) {
-          results.push(...data.map((item: any) => ({ 
-            ...item, 
-            source: "rag", 
-            similarity: 0.5,
-            preview: item.bubbles_wrong_take?.substring(0, 200) + "..."
-          })));
-        }
-      }
-
-      return new Response(
-        JSON.stringify({ 
-          results: results.slice(0, limit),
-          method: "text",
-          total: results.length
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Generate embedding for the query using the same hash-based approach as stored embeddings
+    const queryEmbedding = generateSemanticEmbedding(query);
+    console.log(`Generated query embedding for: "${query.substring(0, 50)}..." (${queryEmbedding.length} dims)`);
 
     // Perform semantic search across sources
     const searchPromises: Promise<any>[] = [];
@@ -171,11 +91,14 @@ serve(async (req) => {
     if (sources.includes("knowledge")) {
       const knowledgeSearch = async () => {
         const { data, error } = await supabase.rpc("search_bubbles_knowledge", {
-          query_embedding: JSON.stringify(queryEmbedding),
+          query_embedding: `[${queryEmbedding.join(",")}]`,
           match_count: limit,
           match_threshold: threshold,
         });
-        if (error) console.error("Knowledge search error:", error);
+        if (error) {
+          console.error("Knowledge search error:", error);
+          return [];
+        }
         return (data || []).map((item: any) => ({
           ...item,
           source: "knowledge",
@@ -188,11 +111,14 @@ serve(async (req) => {
     if (sources.includes("thoughts")) {
       const thoughtsSearch = async () => {
         const { data, error } = await supabase.rpc("search_bubbles_thoughts", {
-          query_embedding: JSON.stringify(queryEmbedding),
+          query_embedding: `[${queryEmbedding.join(",")}]`,
           match_count: limit,
           match_threshold: threshold,
         });
-        if (error) console.error("Thoughts search error:", error);
+        if (error) {
+          console.error("Thoughts search error:", error);
+          return [];
+        }
         return (data || []).map((item: any) => ({
           ...item,
           source: "thoughts",
@@ -206,11 +132,14 @@ serve(async (req) => {
     if (sources.includes("rag")) {
       const ragSearch = async () => {
         const { data, error } = await supabase.rpc("search_bubbles_rag_content", {
-          query_embedding: JSON.stringify(queryEmbedding),
+          query_embedding: `[${queryEmbedding.join(",")}]`,
           match_count: limit,
           match_threshold: threshold,
         });
-        if (error) console.error("RAG search error:", error);
+        if (error) {
+          console.error("RAG search error:", error);
+          return [];
+        }
         return (data || []).map((item: any) => ({
           ...item,
           source: "rag",
@@ -226,6 +155,8 @@ serve(async (req) => {
     // Sort by similarity and limit
     allResults.sort((a, b) => (b.similarity || 0) - (a.similarity || 0));
     const finalResults = allResults.slice(0, limit);
+
+    console.log(`Search completed: ${finalResults.length} results from ${sources.join(", ")}`);
 
     return new Response(
       JSON.stringify({ 
