@@ -15,6 +15,13 @@ import {
 type CelebrationMode = "off" | "confetti" | "snow" | "hearts" | "stars" | "sheep";
 
 const STORAGE_KEY = "bubbles-celebration-mode-v3";
+const SEASONAL_PROMPT_KEY = "bubbles-seasonal-prompt-2025";
+
+// Check if current date is in winter season (December - February)
+const isWinterSeason = (): boolean => {
+  const month = new Date().getMonth(); // 0-indexed: 0 = January, 11 = December
+  return month === 11 || month === 0 || month === 1; // Dec, Jan, Feb
+};
 
 // Custom heart shape for canvas-confetti
 const heartShape = confetti.shapeFromPath({
@@ -148,6 +155,15 @@ export const CelebrationToggle = () => {
       if (oldSaved === "confetti" || oldSaved === "snow") return oldSaved;
       const legacySaved = localStorage.getItem("bubbles-celebration-mode");
       if (legacySaved === "true") return "confetti";
+      
+      // Auto-enable snow mode during winter season for new users
+      if (isWinterSeason()) {
+        const hasSeenSeasonalPrompt = localStorage.getItem(SEASONAL_PROMPT_KEY);
+        if (!hasSeenSeasonalPrompt) {
+          localStorage.setItem(SEASONAL_PROMPT_KEY, "true");
+          return "snow";
+        }
+      }
     }
     return "off";
   });
