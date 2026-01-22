@@ -70,23 +70,45 @@ export function Header() {
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navLinks.map((link, index) => (
-            <Link 
-              key={link.href} 
-              to={link.href}
-              className={cn(
-                "text-sm font-medium transition-all duration-200 hover:scale-110 hover:-rotate-1 relative group",
-                location.pathname === link.href 
-                  ? "text-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              style={{ animationDelay: `${index * 50}ms` }}
+            <motion.div
+              key={link.href}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                delay: index * 0.05 + 0.1,
+                duration: 0.3,
+                ease: [0.22, 1, 0.36, 1]
+              }}
             >
-              {link.label}
-              <span className={cn(
-                "absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300",
-                location.pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
-              )} />
-            </Link>
+              <Link 
+                to={link.href}
+                className={cn(
+                  "text-sm font-medium transition-all duration-200 hover:scale-110 hover:-rotate-1 relative group",
+                  location.pathname === link.href 
+                    ? "text-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <motion.span
+                  whileHover={{ y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  {link.label}
+                </motion.span>
+                <motion.span 
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-accent"
+                  )}
+                  initial={false}
+                  animate={{ 
+                    width: location.pathname === link.href ? "100%" : "0%",
+                    opacity: location.pathname === link.href ? 1 : 0
+                  }}
+                  whileHover={{ width: "100%", opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                />
+              </Link>
+            </motion.div>
           ))}
         </nav>
 
