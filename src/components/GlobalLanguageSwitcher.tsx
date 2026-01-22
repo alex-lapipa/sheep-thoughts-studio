@@ -20,7 +20,16 @@ interface RegionOption {
   group: string;
 }
 
-const REGIONS: RegionOption[] = [
+// Main languages shown on homepage
+const MAIN_LANGUAGES: RegionOption[] = [
+  { code: "en", path: "/", label: "English", flag: "🇮🇪", group: "Global" },
+  { code: "fr", path: "/fr", label: "Français", flag: "🇫🇷", group: "Francophone" },
+  { code: "es", path: "/es", label: "Español", flag: "🇪🇸", group: "Hispanic" },
+  { code: "de", path: "/dach", label: "Deutsch", flag: "🇩🇪", group: "DACH" },
+];
+
+// All regional options for subpages
+const ALL_REGIONS: RegionOption[] = [
   // Global
   { code: "en", path: "/", label: "English", flag: "🇮🇪", group: "Global" },
   
@@ -53,6 +62,12 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
   const location = useLocation();
   const navigate = useNavigate();
   
+  // Check if we're on the homepage
+  const isHomepage = location.pathname === "/" || location.pathname === "";
+  
+  // Use main languages on homepage, all regions on subpages
+  const availableRegions = isHomepage ? MAIN_LANGUAGES : ALL_REGIONS;
+  
   // Handle region selection with preference saving
   const handleRegionSelect = (region: RegionOption) => {
     saveRegionPreference(region.path);
@@ -63,18 +78,18 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
   const getCurrentRegion = (): RegionOption => {
     const path = location.pathname.toLowerCase();
     
-    // Check for exact matches first
-    const exactMatch = REGIONS.find(r => r.path === path || (r.path !== "/" && path.startsWith(r.path.split("?")[0])));
+    // Check for exact matches first (search in all regions to handle current state)
+    const exactMatch = ALL_REGIONS.find(r => r.path === path || (r.path !== "/" && path.startsWith(r.path.split("?")[0])));
     if (exactMatch) return exactMatch;
     
     // Default to English
-    return REGIONS[0];
+    return ALL_REGIONS[0];
   };
   
   const currentRegion = getCurrentRegion();
   
-  // Group regions by group
-  const groupedRegions = REGIONS.reduce((acc, region) => {
+  // Group regions by group (only for subpages with full list)
+  const groupedRegions = availableRegions.reduce((acc, region) => {
     if (!acc[region.group]) {
       acc[region.group] = [];
     }
@@ -101,14 +116,14 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
           <ChevronDown className="h-3.5 w-3.5 opacity-60" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        {Object.entries(groupedRegions).map(([group, regions], groupIndex) => (
-          <div key={group}>
-            {groupIndex > 0 && <DropdownMenuSeparator />}
+      <DropdownMenuContent align="end" className="w-56 bg-popover">
+        {isHomepage ? (
+          // Simple flat list for homepage - just the 4 main languages
+          <>
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              {GROUP_LABELS[group] || group}
+              🌍 Select Language
             </DropdownMenuLabel>
-            {regions.map((region) => (
+            {availableRegions.map((region) => (
               <DropdownMenuItem 
                 key={region.code} 
                 className="cursor-pointer flex items-center gap-3"
@@ -121,8 +136,31 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
                 )}
               </DropdownMenuItem>
             ))}
-          </div>
-        ))}
+          </>
+        ) : (
+          // Grouped list for subpages - all regional options
+          Object.entries(groupedRegions).map(([group, regions], groupIndex) => (
+            <div key={group}>
+              {groupIndex > 0 && <DropdownMenuSeparator />}
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                {GROUP_LABELS[group] || group}
+              </DropdownMenuLabel>
+              {regions.map((region) => (
+                <DropdownMenuItem 
+                  key={region.code} 
+                  className="cursor-pointer flex items-center gap-3"
+                  onClick={() => handleRegionSelect(region)}
+                >
+                  <span className="text-lg">{region.flag}</span>
+                  <span className="flex-1">{region.label}</span>
+                  {currentRegion.code === region.code && (
+                    <Check className="h-4 w-4 text-accent" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </div>
+          ))
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
