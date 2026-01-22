@@ -17,7 +17,7 @@ import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
-import { RandomBubblesGenerator } from "@/components/RandomBubblesGenerator";
+
 import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -262,38 +262,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Random Bubbles Generator - Interactive Character Exploration */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
-        <ParallaxSection speed={0.2} className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 left-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
-        
-        <div className="container relative z-10">
-          <AnimatedOnView className="text-center mb-8">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2">
-              {t("index.shuffleBubbles") || "Shuffle Bubbles"}
-            </h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              {t("index.shuffleBubblesSubtitle") || "Every combination is equally confident. Every combination is equally wrong."}
-            </p>
-          </AnimatedOnView>
-          
-          <RandomBubblesGenerator size="xl" className="mx-auto" />
-        </div>
-      </section>
-
-      {/* Bubbles Explains - AI-Powered Widget */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-accent/5 to-background relative overflow-hidden">
-        {/* Parallax decorative elements */}
-        <ParallaxSection speed={0.2} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
-        
-        <div className="container relative z-10">
-          <BubblesExplainsWidget />
-        </div>
-      </section>
-
       {/* Voice Chat with Bubbles - AI Powered Conversation */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-bubbles-meadow/5 to-background relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/20 via-bubbles-meadow/5 to-background relative overflow-hidden">
         <ParallaxSection speed={0.2} className="absolute top-1/3 left-5 w-28 h-28 rounded-full bg-accent/10 blur-3xl" />
         <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/3 right-5 w-36 h-36 rounded-full bg-bubbles-mist/10 blur-3xl" />
         
@@ -308,6 +278,17 @@ export default function Index() {
           </AnimatedOnView>
           
           <BubblesVoiceChat />
+        </div>
+      </section>
+
+      {/* Bubbles Explains - AI-Powered Widget */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-accent/5 to-background relative overflow-hidden">
+        {/* Parallax decorative elements */}
+        <ParallaxSection speed={0.2} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
+        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
+        
+        <div className="container relative z-10">
+          <BubblesExplainsWidget />
         </div>
       </section>
 
