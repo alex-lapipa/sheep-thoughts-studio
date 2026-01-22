@@ -1,12 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { ShoppingCart, Loader2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
+import { ProductQuickView } from "./ProductQuickView";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 
 interface ProductCardProps {
@@ -18,6 +19,7 @@ interface ProductCardProps {
 export function ProductCard({ product, position, listName }: ProductCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasTrackedImpression = useRef(false);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const isLoading = useCartStore(state => state.isLoading);
   
@@ -87,6 +89,12 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
     });
   };
 
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuickViewOpen(true);
+  };
+
   const handleProductClick = () => {
     ecommerceTracking.viewProduct(
       node.id,
@@ -96,57 +104,75 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
   };
 
   return (
-    <Link ref={cardRef} to={`/product/${node.handle}`} className="group" onClick={handleProductClick}>
-      <div className="product-card bg-card rounded-xl overflow-hidden border border-border">
-        <div className="aspect-square bg-muted relative overflow-hidden">
-          {image ? (
-            <img 
-              src={image.url} 
-              alt={image.altText || node.title} 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-              No image
-            </div>
-          )}
-          {modeTag && (
-            <div className="absolute top-3 left-3">
-              <ModeBadge mode={modeTag} />
-            </div>
-          )}
-        </div>
-        <div className="p-4 space-y-3">
-          <div>
-            <h3 className="font-display font-semibold text-lg leading-tight group-hover:text-accent transition-colors">
-              {node.title}
-            </h3>
-            <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
-              {node.description}
-            </p>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-display font-bold text-lg">
-              {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
-            </span>
-            <Button 
-              size="sm" 
-              onClick={handleAddToCart}
-              disabled={isLoading || !firstVariant?.availableForSale}
-              className="bg-accent hover:bg-accent-hover text-accent-foreground"
+    <>
+      <Link ref={cardRef} to={`/product/${node.handle}`} className="group" onClick={handleProductClick}>
+        <div className="product-card bg-card rounded-xl overflow-hidden border border-border">
+          <div className="aspect-square bg-muted relative overflow-hidden">
+            {image ? (
+              <img 
+                src={image.url} 
+                alt={image.altText || node.title} 
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                No image
+              </div>
+            )}
+            {modeTag && (
+              <div className="absolute top-3 left-3">
+                <ModeBadge mode={modeTag} />
+              </div>
+            )}
+            {/* Quick View Button */}
+            <Button
+              size="sm"
+              variant="secondary"
+              className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
+              onClick={handleQuickView}
             >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <ShoppingCart className="h-4 w-4 mr-1" />
-                  Add
-                </>
-              )}
+              <Eye className="h-4 w-4 mr-1.5" />
+              Quick View
             </Button>
           </div>
+          <div className="p-4 space-y-3">
+            <div>
+              <h3 className="font-display font-semibold text-lg leading-tight group-hover:text-accent transition-colors">
+                {node.title}
+              </h3>
+              <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
+                {node.description}
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-display font-bold text-lg">
+                {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+              </span>
+              <Button 
+                size="sm" 
+                onClick={handleAddToCart}
+                disabled={isLoading || !firstVariant?.availableForSale}
+                className="bg-accent hover:bg-accent-hover text-accent-foreground"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4 mr-1" />
+                    Add
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      <ProductQuickView 
+        product={product}
+        open={quickViewOpen}
+        onOpenChange={setQuickViewOpen}
+      />
+    </>
   );
 }
