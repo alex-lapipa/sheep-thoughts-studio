@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { ThoughtBubble } from "./ThoughtBubble";
 import { AudioWaveform } from "./AudioWaveform";
+import { MicActivityIndicator } from "./MicActivityIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -326,6 +327,9 @@ export const BubblesVoiceChat = () => {
             >
               {currentMode}
             </Badge>
+            
+            {/* Mic activity indicator when listening */}
+            <MicActivityIndicator isActive={isListening} />
             
             {/* Audio waveform visualization responding to playback */}
             <AudioWaveform 
