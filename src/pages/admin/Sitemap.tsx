@@ -408,11 +408,31 @@ export default function AdminSitemap() {
               Verify OG meta tags and social preview coverage for all pages
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" asChild>
               <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer">
                 <FileText className="h-4 w-4 mr-2" />
                 View sitemap.xml
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href="https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Asheep-thoughts-studio.lovable.app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Google Search Console
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href="https://www.bing.com/webmasters/sitemaps?siteUrl=https://sheep-thoughts-studio.lovable.app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Bing Webmaster
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
