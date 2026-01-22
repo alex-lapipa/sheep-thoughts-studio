@@ -188,6 +188,8 @@ export default function DACH() {
   };
 
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const ogImageUrl = `${supabaseUrl}/functions/v1/og-dach-image?region=${selectedRegion}`;
 
   return (
     <Layout>
@@ -197,19 +199,22 @@ export default function DACH() {
         <meta property="og:title" content={`Bubbles das Schaf | ${region.name}`} />
         <meta property="og:description" content={region.tagline} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${siteUrl}/${selectedRegion === "de" ? "de" : selectedRegion}`} />
-        <meta property="og:image" content={`${siteUrl}/og-home.jpg`} />
+        <meta property="og:url" content={`${siteUrl}/${selectedRegion === "de" ? "dach" : `dach/${selectedRegion}`}`} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:locale" content={`de_${selectedRegion.toUpperCase()}`} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={ogImageUrl} />
         
         {/* Regional hreflang tags for DACH */}
-        <link rel="alternate" hrefLang="de-DE" href={`${siteUrl}/de`} />
-        <link rel="alternate" hrefLang="de-AT" href={`${siteUrl}/at`} />
-        <link rel="alternate" hrefLang="de-CH" href={`${siteUrl}/ch`} />
+        <link rel="alternate" hrefLang="de-DE" href={`${siteUrl}/dach`} />
+        <link rel="alternate" hrefLang="de-AT" href={`${siteUrl}/dach/at`} />
+        <link rel="alternate" hrefLang="de-CH" href={`${siteUrl}/dach/ch`} />
         <link rel="alternate" hrefLang="de" href={`${siteUrl}/dach`} />
         <link rel="alternate" hrefLang="x-default" href={`${siteUrl}/`} />
         
-        <link rel="canonical" href={`${siteUrl}/${selectedRegion === "de" ? "de" : selectedRegion}`} />
+        <link rel="canonical" href={`${siteUrl}/${selectedRegion === "de" ? "dach" : `dach/${selectedRegion}`}`} />
         <html lang={getHreflangCode()} />
       </Helmet>
 
