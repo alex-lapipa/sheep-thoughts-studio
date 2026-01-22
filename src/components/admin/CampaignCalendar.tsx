@@ -1,10 +1,30 @@
 import { useState, useMemo } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, parseISO } from "date-fns";
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  eachDayOfInterval, 
+  isSameMonth, 
+  isSameDay, 
+  addMonths, 
+  subMonths, 
+  addWeeks,
+  subWeeks,
+  startOfWeek,
+  endOfWeek,
+  isToday, 
+  parseISO,
+  getHours,
+  setHours,
+  isSameHour,
+  isWithinInterval
+} from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { ChevronLeft, ChevronRight, Clock, Send, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Send, CalendarDays, LayoutGrid, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -12,6 +32,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { CountdownTimer } from "./CountdownTimer";
 
 interface Campaign {
   id: string;
@@ -32,25 +53,30 @@ interface CampaignCalendarProps {
   onCampaignClick?: (campaign: Campaign) => void;
 }
 
+type ViewMode = "month" | "week";
+
 export function CampaignCalendar({ campaigns, onCampaignClick }: CampaignCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
 
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(currentMonth);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  // Get day of week for the first day (0 = Sunday, 1 = Monday, etc.)
+  // Month view calculations
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
   const startDayOfWeek = monthStart.getDay();
-  
-  // Create padding for days before month starts (to align with weekday columns)
   const paddingDays = Array.from({ length: startDayOfWeek }, (_, i) => null);
+
+  // Week view calculations
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  const hours = Array.from({ length: 24 }, (_, i) => i);
 
   // Group campaigns by date
   const campaignsByDate = useMemo(() => {
     const map = new Map<string, Campaign[]>();
     
     campaigns.forEach((campaign) => {
-      // Use scheduled_at for scheduled campaigns, sent_at for sent ones
       let dateStr: string | null = null;
       
       if (campaign.status === "scheduled" && campaign.scheduled_at) {
@@ -71,9 +97,40 @@ export function CampaignCalendar({ campaigns, onCampaignClick }: CampaignCalenda
     return map;
   }, [campaigns]);
 
+  // Group campaigns by hour for week view
+  const campaignsByHour = useMemo(() => {
+    const map = new Map<string, Campaign[]>();
+    
+    campaigns.forEach((campaign) => {
+      let dateTime: Date | null = null;
+      
+      if (campaign.status === "scheduled" && campaign.scheduled_at) {
+        dateTime = parseISO(campaign.scheduled_at);
+      } else if (campaign.status === "sent" && campaign.sent_at) {
+        dateTime = parseISO(campaign.sent_at);
+      } else if (campaign.status === "sending" && campaign.scheduled_at) {
+        dateTime = parseISO(campaign.scheduled_at);
+      }
+      
+      if (dateTime) {
+        const key = `${format(dateTime, "yyyy-MM-dd")}-${getHours(dateTime)}`;
+        const existing = map.get(key) || [];
+        existing.push(campaign);
+        map.set(key, existing);
+      }
+    });
+    
+    return map;
+  }, [campaigns]);
+
   const getCampaignsForDay = (day: Date): Campaign[] => {
     const dateStr = format(day, "yyyy-MM-dd");
     return campaignsByDate.get(dateStr) || [];
+  };
+
+  const getCampaignsForHour = (day: Date, hour: number): Campaign[] => {
+    const key = `${format(day, "yyyy-MM-dd")}-${hour}`;
+    return campaignsByHour.get(key) || [];
   };
 
   const getStatusColor = (status: string) => {
@@ -101,7 +158,6 @@ export function CampaignCalendar({ campaigns, onCampaignClick }: CampaignCalenda
     }
   };
 
-  // Get upcoming campaigns for sidebar
   const upcomingCampaigns = useMemo(() => {
     const now = new Date();
     return campaigns
@@ -110,138 +166,291 @@ export function CampaignCalendar({ campaigns, onCampaignClick }: CampaignCalenda
       .slice(0, 5);
   }, [campaigns]);
 
+  const navigatePrevious = () => {
+    if (viewMode === "month") {
+      setCurrentDate(subMonths(currentDate, 1));
+    } else {
+      setCurrentDate(subWeeks(currentDate, 1));
+    }
+  };
+
+  const navigateNext = () => {
+    if (viewMode === "month") {
+      setCurrentDate(addMonths(currentDate, 1));
+    } else {
+      setCurrentDate(addWeeks(currentDate, 1));
+    }
+  };
+
+  const getHeaderTitle = () => {
+    if (viewMode === "month") {
+      return format(currentDate, "MMMM yyyy");
+    }
+    return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       {/* Main Calendar */}
       <Card className="lg:col-span-3">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5" />
-              {format(currentMonth, "MMMM yyyy")}
+              {getHeaderTitle()}
             </CardTitle>
-            <div className="flex gap-1">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentMonth(new Date())}
-              >
-                Today
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+                <Button
+                  variant={viewMode === "month" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("month")}
+                  className="h-7 px-2 text-xs"
+                >
+                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                  Month
+                </Button>
+                <Button
+                  variant={viewMode === "week" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("week")}
+                  className="h-7 px-2 text-xs"
+                >
+                  <LayoutGrid className="h-3.5 w-3.5 mr-1" />
+                  Week
+                </Button>
+              </div>
+              
+              {/* Navigation */}
+              <div className="flex gap-1">
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={navigatePrevious}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" className="h-8" onClick={() => setCurrentDate(new Date())}>
+                  Today
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={navigateNext}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 mb-2">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="text-center text-sm font-medium text-muted-foreground py-2"
-              >
-                {day}
+          {viewMode === "month" ? (
+            <>
+              {/* Month View - Weekday headers */}
+              <div className="grid grid-cols-7 mb-2">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                  <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
+                    {day}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {/* Padding for days before month starts */}
-            {paddingDays.map((_, index) => (
-              <div key={`pad-${index}`} className="min-h-[100px] bg-muted/30 rounded-lg" />
-            ))}
+              {/* Month View - Calendar grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {paddingDays.map((_, index) => (
+                  <div key={`pad-${index}`} className="min-h-[100px] bg-muted/30 rounded-lg" />
+                ))}
 
-            {/* Actual days */}
-            {days.map((day) => {
-              const dayCampaigns = getCampaignsForDay(day);
-              const hasScheduled = dayCampaigns.some(c => c.status === "scheduled");
-              const hasSent = dayCampaigns.some(c => c.status === "sent");
+                {monthDays.map((day) => {
+                  const dayCampaigns = getCampaignsForDay(day);
 
-              return (
-                <div
-                  key={day.toISOString()}
-                  className={cn(
-                    "min-h-[100px] p-1.5 rounded-lg border transition-colors",
-                    isToday(day)
-                      ? "bg-primary/5 border-primary/30"
-                      : "bg-card border-border/50 hover:border-border",
-                    !isSameMonth(day, currentMonth) && "opacity-50"
-                  )}
-                >
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className={cn(
+                        "min-h-[100px] p-1.5 rounded-lg border transition-colors",
+                        isToday(day)
+                          ? "bg-primary/5 border-primary/30"
+                          : "bg-card border-border/50 hover:border-border",
+                        !isSameMonth(day, currentDate) && "opacity-50"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "text-sm font-medium mb-1 w-7 h-7 flex items-center justify-center rounded-full",
+                          isToday(day) && "bg-primary text-primary-foreground"
+                        )}
+                      >
+                        {format(day, "d")}
+                      </div>
+
+                      <div className="space-y-1">
+                        <TooltipProvider>
+                          {dayCampaigns.slice(0, 3).map((campaign) => (
+                            <Tooltip key={campaign.id}>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => onCampaignClick?.(campaign)}
+                                  className={cn(
+                                    "w-full text-left text-xs px-1.5 py-1 rounded border truncate flex items-center gap-1",
+                                    getStatusColor(campaign.status),
+                                    "hover:opacity-80 transition-opacity cursor-pointer"
+                                  )}
+                                >
+                                  {getStatusIcon(campaign.status)}
+                                  <span className="truncate">{campaign.subject}</span>
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <div className="space-y-1">
+                                  <p className="font-medium">{campaign.subject}</p>
+                                  {campaign.preview_text && (
+                                    <p className="text-xs text-muted-foreground">{campaign.preview_text}</p>
+                                  )}
+                                  <div className="flex items-center gap-2 text-xs">
+                                    <Badge variant="outline" className={cn("text-xs", getStatusColor(campaign.status))}>
+                                      {campaign.status}
+                                    </Badge>
+                                    {campaign.scheduled_at && (
+                                      <span className="text-muted-foreground">
+                                        {format(parseISO(campaign.scheduled_at), "h:mm a")}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                        </TooltipProvider>
+                        
+                        {dayCampaigns.length > 3 && (
+                          <div className="text-xs text-muted-foreground text-center">
+                            +{dayCampaigns.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            /* Week View */
+            <div className="border rounded-lg overflow-hidden">
+              {/* Week View - Day headers */}
+              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b bg-muted/30">
+                <div className="p-2 text-xs text-muted-foreground font-medium border-r" />
+                {weekDays.map((day) => (
                   <div
+                    key={day.toISOString()}
                     className={cn(
-                      "text-sm font-medium mb-1 w-7 h-7 flex items-center justify-center rounded-full",
-                      isToday(day) && "bg-primary text-primary-foreground"
+                      "p-2 text-center border-r last:border-r-0",
+                      isToday(day) && "bg-primary/10"
                     )}
                   >
-                    {format(day, "d")}
-                  </div>
-
-                  <div className="space-y-1">
-                    <TooltipProvider>
-                      {dayCampaigns.slice(0, 3).map((campaign) => (
-                        <Tooltip key={campaign.id}>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={() => onCampaignClick?.(campaign)}
-                              className={cn(
-                                "w-full text-left text-xs px-1.5 py-1 rounded border truncate flex items-center gap-1",
-                                getStatusColor(campaign.status),
-                                "hover:opacity-80 transition-opacity cursor-pointer"
-                              )}
-                            >
-                              {getStatusIcon(campaign.status)}
-                              <span className="truncate">{campaign.subject}</span>
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs">
-                            <div className="space-y-1">
-                              <p className="font-medium">{campaign.subject}</p>
-                              {campaign.preview_text && (
-                                <p className="text-xs text-muted-foreground">
-                                  {campaign.preview_text}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-2 text-xs">
-                                <Badge variant="outline" className={cn("text-xs", getStatusColor(campaign.status))}>
-                                  {campaign.status}
-                                </Badge>
-                                {campaign.scheduled_at && (
-                                  <span className="text-muted-foreground">
-                                    {format(parseISO(campaign.scheduled_at), "h:mm a")}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </TooltipProvider>
-                    
-                    {dayCampaigns.length > 3 && (
-                      <div className="text-xs text-muted-foreground text-center">
-                        +{dayCampaigns.length - 3} more
-                      </div>
+                    <div className="text-xs text-muted-foreground font-medium">
+                      {format(day, "EEE")}
+                    </div>
+                    <div
+                      className={cn(
+                        "text-lg font-semibold mt-0.5",
+                        isToday(day) && "text-primary"
+                      )}
+                    >
+                      {format(day, "d")}
+                    </div>
+                    {/* Day summary */}
+                    {getCampaignsForDay(day).length > 0 && (
+                      <Badge variant="secondary" className="text-xs mt-1">
+                        {getCampaignsForDay(day).length} campaign{getCampaignsForDay(day).length > 1 ? 's' : ''}
+                      </Badge>
                     )}
                   </div>
+                ))}
+              </div>
+
+              {/* Week View - Hour grid */}
+              <ScrollArea className="h-[500px]">
+                <div className="grid grid-cols-[60px_repeat(7,1fr)]">
+                  {hours.map((hour) => (
+                    <div key={hour} className="contents">
+                      {/* Hour label */}
+                      <div className="p-2 text-xs text-muted-foreground text-right border-r border-b bg-muted/10 sticky left-0">
+                        {format(setHours(new Date(), hour), "h a")}
+                      </div>
+                      
+                      {/* Hour cells for each day */}
+                      {weekDays.map((day) => {
+                        const hourCampaigns = getCampaignsForHour(day, hour);
+                        const isCurrentHour = isToday(day) && new Date().getHours() === hour;
+                        
+                        return (
+                          <div
+                            key={`${day.toISOString()}-${hour}`}
+                            className={cn(
+                              "min-h-[50px] p-1 border-r border-b last:border-r-0 relative",
+                              isCurrentHour && "bg-primary/5",
+                              isToday(day) && "bg-primary/[0.02]"
+                            )}
+                          >
+                            {/* Current time indicator */}
+                            {isCurrentHour && (
+                              <div 
+                                className="absolute left-0 right-0 border-t-2 border-primary z-10"
+                                style={{ top: `${(new Date().getMinutes() / 60) * 100}%` }}
+                              >
+                                <div className="absolute -left-1 -top-1.5 w-2 h-2 rounded-full bg-primary" />
+                              </div>
+                            )}
+                            
+                            <TooltipProvider>
+                              {hourCampaigns.map((campaign) => (
+                                <Tooltip key={campaign.id}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={() => onCampaignClick?.(campaign)}
+                                      className={cn(
+                                        "w-full text-left text-xs px-1.5 py-1 rounded border mb-1 flex items-center gap-1",
+                                        getStatusColor(campaign.status),
+                                        "hover:opacity-80 transition-opacity cursor-pointer"
+                                      )}
+                                    >
+                                      {getStatusIcon(campaign.status)}
+                                      <span className="truncate text-[10px]">{campaign.subject}</span>
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs z-50">
+                                    <div className="space-y-2">
+                                      <p className="font-medium">{campaign.subject}</p>
+                                      {campaign.preview_text && (
+                                        <p className="text-xs text-muted-foreground">{campaign.preview_text}</p>
+                                      )}
+                                      <div className="flex items-center gap-2 text-xs">
+                                        <Badge variant="outline" className={cn("text-xs", getStatusColor(campaign.status))}>
+                                          {campaign.status}
+                                        </Badge>
+                                        {campaign.scheduled_at && (
+                                          <span className="text-muted-foreground">
+                                            {format(parseISO(campaign.scheduled_at), "h:mm a")}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {campaign.status === "scheduled" && campaign.scheduled_at && (
+                                        <div className="pt-1 border-t">
+                                          <CountdownTimer 
+                                            targetDate={new Date(campaign.scheduled_at)} 
+                                            compact={false}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
+                            </TooltipProvider>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+              </ScrollArea>
+            </div>
+          )}
 
           {/* Legend */}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t">
@@ -284,9 +493,17 @@ export function CampaignCalendar({ campaigns, onCampaignClick }: CampaignCalenda
               >
                 <p className="font-medium text-sm truncate">{campaign.subject}</p>
                 {campaign.scheduled_at && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {format(parseISO(campaign.scheduled_at), "EEE, MMM d 'at' h:mm a")}
-                  </p>
+                  <>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {format(parseISO(campaign.scheduled_at), "EEE, MMM d 'at' h:mm a")}
+                    </p>
+                    <div className="mt-2">
+                      <CountdownTimer 
+                        targetDate={new Date(campaign.scheduled_at)} 
+                        compact 
+                      />
+                    </div>
+                  </>
                 )}
               </button>
             ))
