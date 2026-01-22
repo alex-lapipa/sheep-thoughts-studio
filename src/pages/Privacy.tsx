@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,12 +7,28 @@ import { useCookieConsent } from "@/components/CookieConsent";
 import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 
+const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
   const lastUpdated = "January 2026";
 
   return (
     <Layout>
+      <Helmet>
+        <title>Privacy Policy | Bubbles the Sheep</title>
+        <meta name="description" content="A comprehensive privacy policy written by a sheep who genuinely believes this is how privacy laws work. Cookie policy, data rights, and GDPR compliance." />
+        <meta property="og:title" content="Privacy Policy | Bubbles the Sheep" />
+        <meta property="og:description" content="Your data is protected by a sheep who takes privacy very seriously (and understands it incorrectly)." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/privacy`} />
+        <meta property="og:image" content={`${siteUrl}/og-privacy.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy | Bubbles" />
+        <meta name="twitter:description" content="Privacy as understood by a sheep" />
+        <meta name="twitter:image" content={`${siteUrl}/og-privacy.png`} />
+        <link rel="canonical" href={`${siteUrl}/privacy`} />
+      </Helmet>
       <div className="container py-12 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
