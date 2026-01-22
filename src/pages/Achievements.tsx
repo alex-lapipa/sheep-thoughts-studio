@@ -310,6 +310,12 @@ export default function Achievements() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
+              <Link to="/share-badges">
+                <Button variant="outline" className="font-display gap-2">
+                  <Share2 className="w-4 h-4" />
+                  Share Badges
+                </Button>
+              </Link>
               <Button 
                 variant="outline" 
                 onClick={triggerTestCelebration}
