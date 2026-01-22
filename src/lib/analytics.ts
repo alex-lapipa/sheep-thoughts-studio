@@ -11,7 +11,8 @@ type EventCategory =
   | 'content'
   | 'achievement'
   | 'navigation'
-  | 'share';
+  | 'share'
+  | 'ecommerce';
 
 interface TrackEventOptions {
   category: EventCategory;
@@ -166,11 +167,46 @@ export const analytics = {
     });
   },
   
-  addToCart: (productTitle: string) => {
+  addToCart: (productTitle: string, price?: number) => {
     trackEvent({
-      category: 'engagement',
+      category: 'ecommerce',
       action: 'add_to_cart',
       label: productTitle,
+      value: price ? Math.round(price * 100) : undefined,
+    });
+  },
+
+  removeFromCart: (productTitle: string) => {
+    trackEvent({
+      category: 'ecommerce',
+      action: 'remove_from_cart',
+      label: productTitle,
+    });
+  },
+
+  updateCartQuantity: (productTitle: string, quantity: number) => {
+    trackEvent({
+      category: 'ecommerce',
+      action: 'update_cart_quantity',
+      label: productTitle,
+      value: quantity,
+    });
+  },
+
+  beginCheckout: (totalItems: number, totalValue: number, currency: string) => {
+    trackEvent({
+      category: 'ecommerce',
+      action: 'begin_checkout',
+      label: currency,
+      value: Math.round(totalValue * 100),
+    });
+  },
+
+  openCart: (itemCount: number) => {
+    trackEvent({
+      category: 'ecommerce',
+      action: 'open_cart',
+      value: itemCount,
     });
   },
 };
