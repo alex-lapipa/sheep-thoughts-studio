@@ -78,6 +78,9 @@ type ContactMessage = {
   responded_by: string | null;
   notes: string | null;
   metadata: Record<string, unknown> | null;
+  is_spam?: boolean;
+  spam_score?: number;
+  spam_reasons?: string[];
 };
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -469,10 +472,18 @@ export default function Messages() {
                     return (
                       <TableRow key={message.id} className={cn(isSelected && "bg-muted/50")}>
                         <TableCell>
-                          <Badge variant="outline" className={cn("gap-1", status.color)}>
-                            <StatusIcon className="w-3 h-3" />
-                            {status.label}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={cn("gap-1", status.color)}>
+                              <StatusIcon className="w-3 h-3" />
+                              {status.label}
+                            </Badge>
+                            {message.is_spam && (
+                              <Badge variant="destructive" className="gap-1 text-xs">
+                                <AlertTriangle className="w-3 h-3" />
+                                Auto-flagged
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Checkbox
@@ -568,6 +579,29 @@ export default function Messages() {
                     {selectedMessage.message}
                   </div>
                 </div>
+
+                {/* Spam Detection Info */}
+                {selectedMessage.is_spam && (
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <p className="font-medium text-destructive">Auto-flagged as Spam</p>
+                      <Badge variant="outline" className="ml-auto text-destructive border-destructive/30">
+                        Score: {selectedMessage.spam_score || 0}%
+                      </Badge>
+                    </div>
+                    {selectedMessage.spam_reasons && selectedMessage.spam_reasons.length > 0 && (
+                      <div className="text-sm text-muted-foreground">
+                        <p className="font-medium mb-1">Reasons:</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedMessage.spam_reasons.map((reason, idx) => (
+                            <li key={idx}>{reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Status Change */}
                 <div className="flex items-center gap-4">

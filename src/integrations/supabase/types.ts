@@ -312,12 +312,15 @@ export type Database = {
         Row: {
           email: string
           id: string
+          is_spam: boolean | null
           message: string
           metadata: Json | null
           name: string
           notes: string | null
           responded_at: string | null
           responded_by: string | null
+          spam_reasons: string[] | null
+          spam_score: number | null
           status: string
           subject: string | null
           submitted_at: string
@@ -325,12 +328,15 @@ export type Database = {
         Insert: {
           email: string
           id?: string
+          is_spam?: boolean | null
           message: string
           metadata?: Json | null
           name: string
           notes?: string | null
           responded_at?: string | null
           responded_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
           status?: string
           subject?: string | null
           submitted_at?: string
@@ -338,12 +344,15 @@ export type Database = {
         Update: {
           email?: string
           id?: string
+          is_spam?: boolean | null
           message?: string
           metadata?: Json | null
           name?: string
           notes?: string | null
           responded_at?: string | null
           responded_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
           status?: string
           subject?: string | null
           submitted_at?: string
@@ -866,11 +875,14 @@ export type Database = {
           answer: string | null
           id: string
           ip_hash: string | null
+          is_spam: boolean | null
           metadata: Json | null
           notes: string | null
           question: string
           reviewed_at: string | null
           reviewed_by: string | null
+          spam_reasons: string[] | null
+          spam_score: number | null
           status: string
           submitted_at: string
         }
@@ -878,11 +890,14 @@ export type Database = {
           answer?: string | null
           id?: string
           ip_hash?: string | null
+          is_spam?: boolean | null
           metadata?: Json | null
           notes?: string | null
           question: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
           status?: string
           submitted_at?: string
         }
@@ -890,11 +905,14 @@ export type Database = {
           answer?: string | null
           id?: string
           ip_hash?: string | null
+          is_spam?: boolean | null
           metadata?: Json | null
           notes?: string | null
           question?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
           status?: string
           submitted_at?: string
         }
