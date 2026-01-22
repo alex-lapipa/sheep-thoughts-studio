@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Truck, Clock, MapPin, RotateCcw, AlertTriangle, Globe, Thermometer, Bird, Ship } from "lucide-react";
@@ -6,9 +7,28 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const Shipping = () => {
   const { language } = useLanguage();
+  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   return (
     <Layout>
+      <Helmet>
+        <title>{language === 'en' ? 'Shipping & Returns | Bubbles the Sheep' : 'Envíos y Devoluciones | Bubbles la Oveja'}</title>
+        <meta name="description" content={language === 'en' 
+          ? "Shipping policy explained by a sheep who believes packages travel through trained moles. 30-day returns, express sheep courier available." 
+          : "Política de envío explicada por una oveja que cree que los paquetes viajan por topos entrenados. Devoluciones de 30 días."} />
+        <meta property="og:title" content={language === 'en' ? 'Shipping & Returns | Bubbles the Sheep' : 'Envíos y Devoluciones | Bubbles'} />
+        <meta property="og:description" content={language === 'en' 
+          ? "Packages travel through trained moles and roads that move at night. I am an expert in logistics now." 
+          : "Los paquetes viajan por topos entrenados y carreteras que se mueven de noche. Ahora soy experta en logística."} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/shipping`} />
+        <meta property="og:image" content={`${siteUrl}/og-shipping.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={language === 'en' ? 'Shipping & Returns' : 'Envíos y Devoluciones'} />
+        <meta name="twitter:description" content={language === 'en' ? 'Logistics as understood by a sheep' : 'Logística según una oveja'} />
+        <meta name="twitter:image" content={`${siteUrl}/og-shipping.png`} />
+        <link rel="canonical" href={`${siteUrl}/shipping`} />
+      </Helmet>
       <div className="container max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">

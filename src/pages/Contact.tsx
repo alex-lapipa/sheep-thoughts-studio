@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+
+const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -131,6 +134,24 @@ const Contact = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>{language === 'en' ? 'Contact Bubbles | Send a Message' : 'Contactar a Bubbles | Enviar un Mensaje'}</title>
+        <meta name="description" content={language === 'en' 
+          ? "Send questions, feedback, or declarations of admiration to Bubbles. Response time: 24-48 hours (unless it's raining)." 
+          : "Envía preguntas, comentarios o declaraciones de admiración a Bubbles. Tiempo de respuesta: 24-48 horas."} />
+        <meta property="og:title" content={language === 'en' ? 'Contact Bubbles | Send a Message' : 'Contactar a Bubbles'} />
+        <meta property="og:description" content={language === 'en' 
+          ? "I understand approximately 73% of what you will say, which is more than enough." 
+          : "Entiendo aproximadamente el 73% de lo que dirás, lo cual es más que suficiente."} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/contact`} />
+        <meta property="og:image" content={`${siteUrl}/og-contact.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={language === 'en' ? 'Contact Bubbles' : 'Contactar a Bubbles'} />
+        <meta name="twitter:description" content={language === 'en' ? 'Send a message to Wicklow' : 'Enviar un mensaje a Wicklow'} />
+        <meta name="twitter:image" content={`${siteUrl}/og-contact.png`} />
+        <link rel="canonical" href={`${siteUrl}/contact`} />
+      </Helmet>
       <div className="container max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
