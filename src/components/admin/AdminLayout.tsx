@@ -5,6 +5,7 @@ import { useUserRoles } from '@/hooks/useUserRoles';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminBreadcrumb } from './AdminBreadcrumb';
+import { AdminQuickJump } from './AdminQuickJump';
 import {
   Tooltip,
   TooltipContent,
@@ -375,6 +376,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <AdminBreadcrumb />
             {children}
           </main>
+          <AdminQuickJump />
         </div>
       </div>
     </TooltipProvider>
