@@ -339,16 +339,27 @@ export const BubblesVoiceChat = () => {
             </Popover>
             
             <Button
-              variant="ghost"
-              size="icon"
+              variant={voiceEnabled ? "default" : "secondary"}
+              size="lg"
               onClick={() => setVoiceEnabled(!voiceEnabled)}
-              className="h-8 w-8"
+              className={cn(
+                "h-10 px-4 gap-2 transition-all",
+                voiceEnabled 
+                  ? "bg-accent hover:bg-accent/90 text-accent-foreground shadow-md" 
+                  : "bg-muted text-muted-foreground"
+              )}
               title={voiceEnabled ? "Mute voice" : "Enable voice"}
             >
               {voiceEnabled ? (
-                <Volume2 className="h-4 w-4" />
+                <>
+                  <Volume2 className="h-5 w-5" />
+                  <span className="text-sm font-medium">Sound On</span>
+                </>
               ) : (
-                <VolumeX className="h-4 w-4 text-muted-foreground" />
+                <>
+                  <VolumeX className="h-5 w-5" />
+                  <span className="text-sm font-medium">Sound Off</span>
+                </>
               )}
             </Button>
           </div>
