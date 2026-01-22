@@ -31,6 +31,7 @@ import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 import NewsletterPreferences from "./pages/NewsletterPreferences";
 import WhatsNew from "./pages/WhatsNew";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -97,6 +98,7 @@ const App = () => (
                 <Route path="/newsletter/preferences" element={<NewsletterPreferences />} />
                 <Route path="/whats-new" element={<WhatsNew />} />
                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
+                <Route path="/order-tracking" element={<OrderTracking />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
