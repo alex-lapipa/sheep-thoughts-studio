@@ -55,6 +55,7 @@ import AdminSubscribers from "./pages/admin/Subscribers";
 import AdminCampaigns from "./pages/admin/Campaigns";
 import AdminTemplates from "./pages/admin/Templates";
 import AdminSitemap from "./pages/admin/Sitemap";
+import AdminOGPreview from "./pages/admin/OGPreview";
 import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 
 const queryClient = new QueryClient();
@@ -124,6 +125,7 @@ const App = () => (
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
                 <Route path="/admin/sitemap" element={<ProtectedRoute><AdminSitemap /></ProtectedRoute>} />
+                <Route path="/admin/og-preview" element={<ProtectedRoute><AdminOGPreview /></ProtectedRoute>} />
                 <Route path="/admin/seasonal-banners" element={<ProtectedRoute><SeasonalBannerPreview /></ProtectedRoute>} />
                 
                   <Route path="*" element={<NotFound />} />
