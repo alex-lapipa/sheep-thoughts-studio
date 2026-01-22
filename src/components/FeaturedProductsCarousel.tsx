@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "./ProductCard";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play, Star, TrendingUp } from "lucide-react";
@@ -11,23 +10,28 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AUTO_ROTATE_INTERVAL = 5000;
-const ITEMS_PER_VIEW = { mobile: 1, tablet: 2, desktop: 3 };
+const SWIPE_THRESHOLD = 50;
 
 export function FeaturedProductsCarousel() {
   const { data: products, isLoading } = useProducts(undefined, 12);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [itemsPerView, setItemsPerView] = useState(ITEMS_PER_VIEW.desktop);
+  const [itemsPerView, setItemsPerView] = useState(3);
+  
+  // Touch handling for swipe
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Responsive items per view
   useEffect(() => {
     const updateItemsPerView = () => {
       if (window.innerWidth < 640) {
-        setItemsPerView(ITEMS_PER_VIEW.mobile);
+        setItemsPerView(1);
       } else if (window.innerWidth < 1024) {
-        setItemsPerView(ITEMS_PER_VIEW.tablet);
+        setItemsPerView(2);
       } else {
-        setItemsPerView(ITEMS_PER_VIEW.desktop);
+        setItemsPerView(3);
       }
     };
 
@@ -46,6 +50,26 @@ export function FeaturedProductsCarousel() {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
   }, [maxIndex]);
 
+  // Handle touch events for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > SWIPE_THRESHOLD) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+  };
+
   // Auto-rotation
   useEffect(() => {
     if (isPaused || !products?.length) return;
@@ -61,17 +85,17 @@ export function FeaturedProductsCarousel() {
 
   if (isLoading) {
     return (
-      <section className="py-16 md:py-24 bg-gradient-to-b from-secondary/30 to-background">
-        <div className="container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <section className="py-12 md:py-16 lg:py-24 bg-gradient-to-b from-secondary/30 to-background">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 md:mb-8">
             <div>
-              <Skeleton className="h-10 w-64 mb-2" />
-              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-8 md:h-10 w-48 md:w-64 mb-2" />
+              <Skeleton className="h-5 md:h-6 w-36 md:w-48" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-80 rounded-xl" />
+              <Skeleton key={i} className="h-72 md:h-80 rounded-xl" />
             ))}
           </div>
         </div>
@@ -82,50 +106,51 @@ export function FeaturedProductsCarousel() {
   if (!products?.length) return null;
 
   const visibleProducts = products.slice(currentIndex, currentIndex + itemsPerView);
-  // Fill with items from the start if we're at the end
   const filledProducts = visibleProducts.length < itemsPerView
     ? [...visibleProducts, ...products.slice(0, itemsPerView - visibleProducts.length)]
     : visibleProducts;
 
   return (
     <section 
-      className="py-16 md:py-24 bg-gradient-to-b from-secondary/30 via-background to-secondary/20 relative overflow-hidden"
+      className="py-12 md:py-16 lg:py-24 bg-gradient-to-b from-secondary/30 via-background to-secondary/20 relative overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-accent/10 blur-3xl" />
+      {/* Decorative elements - hidden on mobile */}
+      <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl hidden sm:block" />
+      <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-accent/10 blur-3xl hidden sm:block" />
 
-      <div className="container relative z-10">
+      <div className="container px-4 md:px-6 relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 md:mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant="secondary" className="bg-bubbles-gorse/20 text-bubbles-gorse border-bubbles-gorse/30">
+              <Badge variant="secondary" className="bg-bubbles-gorse/20 text-bubbles-gorse border-bubbles-gorse/30 text-xs">
                 <TrendingUp className="h-3 w-3 mr-1" />
                 Bestsellers
               </Badge>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs hidden sm:flex">
                 <Star className="h-3 w-3 mr-1 fill-current" />
                 Top Picks
               </Badge>
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">
               Shop the Flock
             </h2>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
               Premium merch for confidently wrong enthusiasts
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Carousel controls */}
-            <div className="flex items-center gap-2">
+          
+          {/* Controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Carousel controls - Desktop */}
+            <div className="hidden sm:flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={prevSlide}
-                className="h-9 w-9 rounded-full"
+                className="h-8 w-8 md:h-9 md:w-9 rounded-full"
                 aria-label="Previous products"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -136,7 +161,7 @@ export function FeaturedProductsCarousel() {
                 size="icon"
                 onClick={() => setIsPaused(!isPaused)}
                 className={cn(
-                  "h-9 w-9 rounded-full transition-colors",
+                  "h-8 w-8 md:h-9 md:w-9 rounded-full transition-colors",
                   isPaused ? "text-muted-foreground" : "text-primary"
                 )}
                 aria-label={isPaused ? "Resume auto-rotation" : "Pause auto-rotation"}
@@ -148,7 +173,7 @@ export function FeaturedProductsCarousel() {
                 variant="outline"
                 size="icon"
                 onClick={nextSlide}
-                className="h-9 w-9 rounded-full"
+                className="h-8 w-8 md:h-9 md:w-9 rounded-full"
                 aria-label="Next products"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -156,16 +181,16 @@ export function FeaturedProductsCarousel() {
             </div>
 
             <Link to="/collections/all">
-              <Button variant="outline" className="font-display">
+              <Button variant="outline" size="sm" className="font-display text-xs sm:text-sm h-8 sm:h-9">
                 View All
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-1.5 sm:ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Progress indicator */}
-        <div className="flex items-center gap-2 mb-6">
+        {/* Progress indicator - hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-2 mb-6">
           <div className="flex-1 h-1 bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-primary/60 rounded-full"
@@ -185,8 +210,14 @@ export function FeaturedProductsCarousel() {
           </span>
         </div>
 
-        {/* Carousel */}
-        <div className="relative">
+        {/* Carousel - Touch enabled */}
+        <div 
+          ref={containerRef}
+          className="relative touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -194,7 +225,7 @@ export function FeaturedProductsCarousel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
             >
               {filledProducts.map((product, index) => (
                 <motion.div
@@ -212,10 +243,19 @@ export function FeaturedProductsCarousel() {
               ))}
             </motion.div>
           </AnimatePresence>
+          
+          {/* Mobile swipe hint */}
+          <div className="flex sm:hidden justify-center mt-4">
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <ChevronLeft className="h-3 w-3" />
+              Swipe to browse
+              <ChevronRight className="h-3 w-3" />
+            </p>
+          </div>
         </div>
 
         {/* Dot indicators */}
-        <div className="flex justify-center gap-2 mt-8">
+        <div className="flex justify-center gap-1.5 sm:gap-2 mt-6 sm:mt-8">
           {Array.from({ length: maxIndex + 1 }).map((_, index) => (
             <button
               key={index}
@@ -223,7 +263,7 @@ export function FeaturedProductsCarousel() {
               className={cn(
                 "w-2 h-2 rounded-full transition-all duration-300",
                 index === currentIndex 
-                  ? "bg-primary w-6" 
+                  ? "bg-primary w-5 sm:w-6" 
                   : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
               )}
               aria-label={`Go to slide ${index + 1}`}
