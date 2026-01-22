@@ -1,13 +1,22 @@
 import { Helmet } from "react-helmet-async";
-import { Layout } from "@/components/Layout";
+import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { TocItem } from "@/hooks/useTableOfContents";
+
+// Table of Contents items for the About page
+const ABOUT_TOC_ITEMS: TocItem[] = [
+  { id: "hero", title: "Introduction", level: 1 },
+  { id: "origin", title: "Origin Story", level: 1 },
+  { id: "research", title: "Research Sources", level: 1 },
+  { id: "explains", title: "Bubbles Explains", level: 1 },
+  { id: "ask-bubbles", title: "Ask Bubbles", level: 1 },
+  { id: "wicklow", title: "The Wicklow Connection", level: 1 },
+  { id: "cta", title: "Get Involved", level: 1 },
+];
 
 const About = () => {
-  // Enable smooth scrolling to anchor links
-  useSmoothScroll();
   const { t, language } = useLanguage();
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
@@ -29,7 +38,7 @@ const About = () => {
   };
 
   return (
-    <Layout>
+    <LegalPageLayout tocItems={ABOUT_TOC_ITEMS} tocTitle="On This Page">
       <Helmet>
         <title>About Bubbles | The Sheep Who Knows Everything (Incorrectly)</title>
         <meta name="description" content="Meet Bubbles, a sheep raised in Wicklow by humans, educated by tourists. Understands everything. Interprets everything incorrectly." />
@@ -44,167 +53,144 @@ const About = () => {
         <meta name="twitter:image" content={`${siteUrl}/og-about.jpg`} />
         <link rel="canonical" href={`${siteUrl}/about`} />
       </Helmet>
+
       {/* Hero */}
-      <section className="py-16 md:py-24 bg-secondary/30">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-bubbles-cream border-4 border-bubbles-heather flex items-center justify-center">
-              <span className="font-display text-5xl font-bold text-bubbles-peat">B</span>
-            </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              {t("aboutPage.hero.title")}
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              {t("aboutPage.hero.subtitle")}
-            </p>
+      <section id="hero" className="scroll-mt-24 mb-16">
+        <div className="text-center">
+          <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-bubbles-cream border-4 border-bubbles-heather flex items-center justify-center">
+            <span className="font-display text-5xl font-bold text-bubbles-peat">B</span>
           </div>
+          <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
+            {t("aboutPage.hero.title")}
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            {t("aboutPage.hero.subtitle")}
+          </p>
         </div>
       </section>
 
       {/* Origin Story */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-              {t("aboutPage.origin.title")}
-            </h2>
-            <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
-              <p>{t("aboutPage.origin.p1")}</p>
-              <p>{t("aboutPage.origin.p2")}</p>
-              <p>{t("aboutPage.origin.p3")}</p>
-              <p>{t("aboutPage.origin.p4")}</p>
-              <p><em>{t("aboutPage.origin.p5")}</em></p>
-              <p>{t("aboutPage.origin.p6")}</p>
-              <p>{t("aboutPage.origin.p7")}</p>
-              <p>{t("aboutPage.origin.p8")}</p>
-            </div>
-          </div>
+      <section id="origin" className="scroll-mt-24 mb-16">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
+          {t("aboutPage.origin.title")}
+        </h2>
+        <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
+          <p>{t("aboutPage.origin.p1")}</p>
+          <p>{t("aboutPage.origin.p2")}</p>
+          <p>{t("aboutPage.origin.p3")}</p>
+          <p>{t("aboutPage.origin.p4")}</p>
+          <p><em>{t("aboutPage.origin.p5")}</em></p>
+          <p>{t("aboutPage.origin.p6")}</p>
+          <p>{t("aboutPage.origin.p7")}</p>
+          <p>{t("aboutPage.origin.p8")}</p>
         </div>
       </section>
 
       {/* My Research Sources */}
-      <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              {t("aboutPage.research.title")}
-            </h2>
-            <p className="text-center text-muted-foreground mb-10">
-              {t("aboutPage.research.subtitle")}
-            </p>
+      <section id="research" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+          {t("aboutPage.research.title")}
+        </h2>
+        <p className="text-center text-muted-foreground mb-10">
+          {t("aboutPage.research.subtitle")}
+        </p>
+        
+        <div className="grid sm:grid-cols-2 gap-4">
+          {researchSources.map((item, index) => {
+            const trust = trustConfig[item.trust];
             
-            <div className="grid sm:grid-cols-2 gap-4">
-              {researchSources.map((item, index) => {
-                const trust = trustConfig[item.trust];
+            return (
+              <div 
+                key={index}
+                className="group relative bg-card border border-border rounded-lg p-4 hover:border-accent transition-all duration-300 cursor-default overflow-hidden"
+              >
+                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${trust.color}`}>
+                  {trust.icon} {trust.label}
+                </div>
                 
-                return (
-                  <div 
-                    key={index}
-                    className="group relative bg-card border border-border rounded-lg p-4 hover:border-accent transition-all duration-300 cursor-default overflow-hidden"
-                  >
-                    <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${trust.color}`}>
-                      {trust.icon} {trust.label}
-                    </div>
-                    
-                    <div className="transition-opacity duration-300 group-hover:opacity-0 pr-24">
-                      <p className="font-display font-semibold text-foreground">
-                        {item.source}
-                      </p>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {item.year}
-                      </p>
-                      <p className="text-xs text-muted-foreground/70 italic">
-                        {language === "es" ? "Temas" : "Topics"}: {item.topic}
-                      </p>
-                    </div>
-                    
-                    <div className="absolute inset-0 p-4 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-accent/10 to-bubbles-heather/10">
-                      <div className={`self-start px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide mb-2 ${trust.color}`}>
-                        {trust.icon} {trust.label}
-                      </div>
-                      <p className="text-sm text-foreground leading-relaxed italic">
-                        "{item.fact}"
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        — {item.source}, {item.year}
-                      </p>
-                    </div>
+                <div className="transition-opacity duration-300 group-hover:opacity-0 pr-24">
+                  <p className="font-display font-semibold text-foreground">
+                    {item.source}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {item.year}
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 italic">
+                    {language === "es" ? "Temas" : "Topics"}: {item.topic}
+                  </p>
+                </div>
+                
+                <div className="absolute inset-0 p-4 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-accent/10 to-bubbles-heather/10">
+                  <div className={`self-start px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide mb-2 ${trust.color}`}>
+                    {trust.icon} {trust.label}
                   </div>
-                );
-              })}
-            </div>
-            
-            <p className="text-center text-sm text-muted-foreground mt-8 italic">
-              {t("aboutPage.research.disclaimer")}
-            </p>
-          </div>
+                  <p className="text-sm text-foreground leading-relaxed italic">
+                    "{item.fact}"
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    — {item.source}, {item.year}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
+        
+        <p className="text-center text-sm text-muted-foreground mt-8 italic">
+          {t("aboutPage.research.disclaimer")}
+        </p>
       </section>
 
       {/* Bubbles Explains */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              {t("aboutPage.explains.title")}
-            </h2>
-            <p className="text-center text-muted-foreground mb-10">
-              {t("aboutPage.explains.subtitle")}
-            </p>
-            <BubblesExplains />
-          </div>
-        </div>
+      <section id="explains" className="scroll-mt-24 mb-16">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+          {t("aboutPage.explains.title")}
+        </h2>
+        <p className="text-center text-muted-foreground mb-10">
+          {t("aboutPage.explains.subtitle")}
+        </p>
+        <BubblesExplains />
       </section>
 
       {/* Ask Bubbles - AI Q&A */}
-      <section className="py-16 md:py-24 bg-bubbles-cream/20">
-        <div className="container">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-              {t("aboutPage.ask.title")}
-            </h2>
-            <p className="text-center text-muted-foreground mb-10">
-              {t("aboutPage.ask.subtitle")}
-            </p>
-            <AskBubbles />
-          </div>
-        </div>
+      <section id="ask-bubbles" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-bubbles-cream/20 rounded-lg">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+          {t("aboutPage.ask.title")}
+        </h2>
+        <p className="text-center text-muted-foreground mb-10">
+          {t("aboutPage.ask.subtitle")}
+        </p>
+        <AskBubbles />
       </section>
 
       {/* The Wicklow Connection */}
-      <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-              {t("aboutPage.wicklow.title")}
-            </h2>
-            <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
-              <p>{t("aboutPage.wicklow.p1")}</p>
-              <p>{t("aboutPage.wicklow.p2")}</p>
-              <p><em>{t("aboutPage.wicklow.p3")}</em></p>
-            </div>
-          </div>
+      <section id="wicklow" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
+          {t("aboutPage.wicklow.title")}
+        </h2>
+        <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
+          <p>{t("aboutPage.wicklow.p1")}</p>
+          <p>{t("aboutPage.wicklow.p2")}</p>
+          <p><em>{t("aboutPage.wicklow.p3")}</em></p>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24 bg-secondary/30">
-        <div className="container text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            {t("aboutPage.cta.title")}
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t("aboutPage.cta.subtitle")}
-          </p>
-          <a 
-            href="/collections/all" 
-            className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
-          >
-            {t("aboutPage.cta.button")}
-          </a>
-        </div>
+      <section id="cta" className="scroll-mt-24 text-center -mx-4 px-4 py-12 bg-secondary/30 rounded-lg">
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+          {t("aboutPage.cta.title")}
+        </h2>
+        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          {t("aboutPage.cta.subtitle")}
+        </p>
+        <a 
+          href="/collections/all" 
+          className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
+        >
+          {t("aboutPage.cta.button")}
+        </a>
       </section>
-    </Layout>
+    </LegalPageLayout>
   );
 };
 
