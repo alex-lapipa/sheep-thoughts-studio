@@ -17,6 +17,7 @@ import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
+import { RandomBubblesGenerator } from "@/components/RandomBubblesGenerator";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -257,6 +258,25 @@ export default function Index() {
               {t("about.p2")}
             </p>
           </AnimatedOnView>
+        </div>
+      </section>
+
+      {/* Random Bubbles Generator - Interactive Character Exploration */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
+        <ParallaxSection speed={0.2} className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
+        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 left-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
+        
+        <div className="container relative z-10">
+          <AnimatedOnView className="text-center mb-8">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2">
+              {t("index.shuffleBubbles") || "Shuffle Bubbles"}
+            </h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              {t("index.shuffleBubblesSubtitle") || "Every combination is equally confident. Every combination is equally wrong."}
+            </p>
+          </AnimatedOnView>
+          
+          <RandomBubblesGenerator size="xl" className="mx-auto" />
         </div>
       </section>
 
