@@ -54,6 +54,28 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await handleConfirmation(supabase, token);
     }
 
+    // Handle one-click unsubscribe via GET (RFC 8058 compatible)
+    if (req.method === "GET" && url.searchParams.has("unsubscribe")) {
+      const email = url.searchParams.get("email");
+      const token = url.searchParams.get("t");
+      return await handleUnsubscribe(supabase, email || undefined, token || undefined);
+    }
+
+    // Handle POST unsubscribe (for List-Unsubscribe-Post header)
+    if (req.method === "POST") {
+      const contentType = req.headers.get("content-type") || "";
+      
+      // Support List-Unsubscribe-Post with body "List-Unsubscribe=One-Click"
+      if (contentType.includes("application/x-www-form-urlencoded")) {
+        const formData = await req.text();
+        if (formData.includes("List-Unsubscribe=One-Click")) {
+          const email = url.searchParams.get("email");
+          const token = url.searchParams.get("t");
+          return await handleUnsubscribe(supabase, email || undefined, token || undefined);
+        }
+      }
+    }
+
     const body = await req.json();
 
     // Route based on action
@@ -396,12 +418,22 @@ async function handleUnsubscribe(supabase: any, email?: string, token?: string):
   );
 }
 
-// Helper to generate unsubscribe URL
+// Helper to generate unsubscribe URL (for frontend page)
 function getUnsubscribeUrl(email: string): string {
   const baseUrl = getBaseUrl();
   const token = generateUnsubscribeToken(email);
   return `${baseUrl}/newsletter/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
 }
+
+// Helper to generate one-click unsubscribe URL (direct edge function call)
+function getOneClickUnsubscribeUrl(email: string): string {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const token = generateUnsubscribeToken(email);
+  return `${supabaseUrl}/functions/v1/newsletter-subscribe?unsubscribe=1&email=${encodeURIComponent(email)}&t=${token}`;
+}
+
+// Export for use in campaign emails
+export { generateUnsubscribeToken, getUnsubscribeUrl, getOneClickUnsubscribeUrl };
 
 async function sendWelcomeEmail(email: string): Promise<void> {
   const unsubscribeUrl = getUnsubscribeUrl(email);
@@ -504,5 +536,3 @@ async function sendWelcomeEmail(email: string): Promise<void> {
   }
 }
 
-// Export for use in campaign emails
-export { generateUnsubscribeToken, getUnsubscribeUrl };
