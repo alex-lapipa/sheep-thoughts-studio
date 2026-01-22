@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.semantic-search]
 verify_jwt = false
+
+[functions.regenerate-embeddings]
+verify_jwt = false
