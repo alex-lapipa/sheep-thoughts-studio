@@ -266,7 +266,124 @@ export function PageHeroWithBubbles({
  * - Harmonizes with bog mist atmosphere
  * - No comic-strip styling or abrupt animations
  */
+// Multiple cloud shape variations to prevent repetition
+const CLOUD_PATHS = [
+  // Variant 0: Classic fluffy cloud
+  {
+    main: `M 20 70 
+           C 5 65, 5 45, 20 40
+           C 15 25, 35 15, 55 20
+           C 65 8, 90 5, 110 15
+           C 130 5, 160 10, 175 25
+           C 195 30, 198 50, 185 65
+           C 195 80, 175 90, 155 85
+           C 140 95, 100 98, 70 90
+           C 45 95, 15 85, 20 70
+           Z`,
+    highlight: `M 35 55 
+                C 25 50, 30 35, 45 35
+                C 50 25, 70 22, 90 28
+                C 105 20, 130 22, 145 32
+                C 160 35, 165 48, 158 58`,
+  },
+  // Variant 1: Wide puffy cloud
+  {
+    main: `M 15 65
+           C 2 60, 0 42, 18 38
+           C 12 22, 38 12, 60 18
+           C 78 5, 105 3, 130 12
+           C 155 3, 180 8, 190 28
+           C 200 35, 200 55, 188 68
+           C 198 82, 170 92, 145 88
+           C 120 96, 80 98, 55 90
+           C 30 95, 8 80, 15 65
+           Z`,
+    highlight: `M 30 50
+                C 20 45, 25 32, 42 32
+                C 55 20, 85 18, 110 25
+                C 135 18, 165 22, 175 35
+                C 182 42, 180 52, 172 58`,
+  },
+  // Variant 2: Tall cumulus-style
+  {
+    main: `M 25 72
+           C 8 68, 5 50, 22 42
+           C 10 28, 30 10, 58 16
+           C 72 2, 100 0, 125 10
+           C 148 2, 172 8, 182 24
+           C 198 32, 198 52, 185 65
+           C 195 78, 178 88, 158 84
+           C 135 94, 95 96, 68 88
+           C 40 94, 12 82, 25 72
+           Z`,
+    highlight: `M 40 52
+                C 28 46, 32 30, 50 28
+                C 62 15, 95 12, 120 20
+                C 145 12, 168 18, 175 32
+                C 185 40, 182 50, 172 56`,
+  },
+  // Variant 3: Asymmetric drift cloud
+  {
+    main: `M 18 68
+           C 5 62, 8 45, 25 42
+           C 20 28, 42 18, 65 22
+           C 82 10, 108 8, 135 15
+           C 158 8, 178 15, 188 32
+           C 198 42, 195 58, 182 68
+           C 192 80, 168 90, 142 86
+           C 115 95, 75 95, 50 88
+           C 28 92, 10 78, 18 68
+           Z`,
+    highlight: `M 38 52
+                C 25 48, 30 35, 48 34
+                C 62 22, 92 18, 118 25
+                C 142 18, 162 24, 172 38
+                C 180 46, 175 55, 165 58`,
+  },
+  // Variant 4: Compact rounded cloud
+  {
+    main: `M 22 68
+           C 10 62, 10 48, 25 44
+           C 22 32, 40 22, 62 26
+           C 78 14, 102 12, 125 20
+           C 148 12, 168 18, 178 32
+           C 192 40, 192 55, 180 66
+           C 190 78, 165 86, 145 82
+           C 122 90, 85 92, 60 85
+           C 38 90, 15 78, 22 68
+           Z`,
+    highlight: `M 38 52
+                C 28 48, 32 38, 48 36
+                C 60 26, 88 24, 110 30
+                C 132 24, 155 28, 165 38
+                C 175 45, 172 52, 162 56`,
+  },
+  // Variant 5: Wispy stretched cloud
+  {
+    main: `M 12 66
+           C 2 60, 5 45, 20 42
+           C 15 30, 35 20, 55 24
+           C 70 12, 95 8, 120 14
+           C 145 6, 170 12, 185 28
+           C 200 38, 198 55, 185 65
+           C 195 78, 172 88, 148 84
+           C 118 92, 78 94, 52 86
+           C 28 92, 5 78, 12 66
+           Z`,
+    highlight: `M 32 50
+                C 20 46, 26 34, 45 32
+                C 60 22, 90 18, 115 24
+                C 140 18, 168 22, 178 35
+                C 188 44, 182 54, 170 58`,
+  },
+];
+
 function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode }) {
+  // Stable random cloud variant for this bubble instance
+  const cloudVariant = useMemo(() => 
+    CLOUD_PATHS[Math.floor(Math.random() * CLOUD_PATHS.length)], 
+  []);
+
   // Muted, atmospheric colors that harmonize with Wicklow landscape
   // Mode escalation is subtle, not garish
   const modeStyles: Record<BubblesMode, { 
@@ -318,7 +435,7 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
         }}
       />
       
-      {/* Organic cloud shape using SVG */}
+      {/* Organic cloud shape using SVG - randomized variant */}
       <div className="relative">
         <svg 
           viewBox="0 0 200 100" 
@@ -327,16 +444,7 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
         >
           {/* Organic cloud path - soft, irregular edges */}
           <path
-            d="M 20 70 
-               C 5 65, 5 45, 20 40
-               C 15 25, 35 15, 55 20
-               C 65 8, 90 5, 110 15
-               C 130 5, 160 10, 175 25
-               C 195 30, 198 50, 185 65
-               C 195 80, 175 90, 155 85
-               C 140 95, 100 98, 70 90
-               C 45 95, 15 85, 20 70
-               Z"
+            d={cloudVariant.main}
             fill={style.fill}
             stroke="hsl(28 15% 75%)"
             strokeWidth="0.5"
@@ -345,11 +453,7 @@ function OrganicThoughtBubble({ text, mode }: { text: string; mode: BubblesMode 
           
           {/* Inner highlight for depth */}
           <path
-            d="M 35 55 
-               C 25 50, 30 35, 45 35
-               C 50 25, 70 22, 90 28
-               C 105 20, 130 22, 145 32
-               C 160 35, 165 48, 158 58"
+            d={cloudVariant.highlight}
             fill="none"
             stroke="hsl(0 0% 100%)"
             strokeWidth="1"
