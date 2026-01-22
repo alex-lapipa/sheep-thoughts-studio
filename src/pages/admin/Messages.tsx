@@ -96,6 +96,8 @@ export default function Messages() {
   const [notes, setNotes] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkActionConfirm, setBulkActionConfirm] = useState<{ action: string; status?: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ["contact-messages", statusFilter],
@@ -169,6 +171,28 @@ export default function Messages() {
     },
   });
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from("contact_messages")
+        .delete()
+        .in("id", ids);
+
+      if (error) throw error;
+      return ids.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
+      setSelectedIds(new Set());
+      setDeleteConfirm(false);
+      setDeleteConfirmText("");
+      toast.success(`${count} message${count > 1 ? 's' : ''} permanently deleted`);
+    },
+    onError: (error) => {
+      toast.error("Failed to delete messages", { description: error.message });
+    },
+  });
+
   const handleStatusChange = (id: string, newStatus: string) => {
     updateStatusMutation.mutate({ id, status: newStatus });
   };
@@ -189,6 +213,19 @@ export default function Messages() {
       return;
     }
     setBulkActionConfirm({ action, status });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) {
+      toast.error("No messages selected");
+      return;
+    }
+    setDeleteConfirm(true);
+  };
+
+  const executeBulkDelete = () => {
+    if (deleteConfirmText !== "DELETE") return;
+    bulkDeleteMutation.mutate(Array.from(selectedIds));
   };
 
   const executeBulkAction = () => {
@@ -368,6 +405,14 @@ export default function Messages() {
                       <DropdownMenuItem onClick={() => handleBulkAction("status", "responded")}>
                         <CheckCircle2 className="w-4 h-4 mr-2" />
                         Mark as Responded
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={handleBulkDelete}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Permanently
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -610,6 +655,49 @@ export default function Messages() {
               <AlertDialogAction onClick={executeBulkAction}>
                 Confirm
               </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Permanent Delete Confirmation Dialog */}
+        <AlertDialog open={deleteConfirm} onOpenChange={(open) => {
+          setDeleteConfirm(open);
+          if (!open) setDeleteConfirmText("");
+        }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                <Trash2 className="w-5 h-5" />
+                Permanent Deletion Warning
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-4">
+                <p>
+                  You are about to <strong>permanently delete {selectedIds.size} message{selectedIds.size > 1 ? 's' : ''}</strong>. 
+                  This action cannot be undone.
+                </p>
+                <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm">
+                  <strong>Warning:</strong> Deleted messages cannot be recovered. Make sure you have exported any important data before proceeding.
+                </div>
+                <div>
+                  <p className="text-sm mb-2">Type <strong>DELETE</strong> to confirm:</p>
+                  <Input
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="Type DELETE to confirm"
+                    className="font-mono"
+                  />
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <Button
+                variant="destructive"
+                onClick={executeBulkDelete}
+                disabled={deleteConfirmText !== "DELETE" || bulkDeleteMutation.isPending}
+              >
+                {bulkDeleteMutation.isPending ? "Deleting..." : "Delete Permanently"}
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
