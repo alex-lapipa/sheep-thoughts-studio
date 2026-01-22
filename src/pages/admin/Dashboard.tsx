@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { Lightbulb, Zap, Target, BookOpen } from 'lucide-react';
+import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight } from 'lucide-react';
+import { subDays, startOfDay, endOfDay } from 'date-fns';
 
 interface Stats {
   thoughts: number;
@@ -16,10 +17,26 @@ interface ModeStats {
   count: number;
 }
 
+interface FunnelMetrics {
+  impressions: number;
+  productViews: number;
+  addToCarts: number;
+  checkouts: number;
+  purchases: number;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ thoughts: 0, scenarios: 0, triggers: 0, knowledge: 0 });
   const [modeStats, setModeStats] = useState<ModeStats[]>([]);
+  const [funnelMetrics, setFunnelMetrics] = useState<FunnelMetrics>({
+    impressions: 0,
+    productViews: 0,
+    addToCarts: 0,
+    checkouts: 0,
+    purchases: 0,
+  });
   const [loading, setLoading] = useState(true);
+  const [funnelLoading, setFunnelLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
@@ -60,7 +77,36 @@ export default function AdminDashboard() {
       }
     }
 
+    async function fetchFunnelMetrics() {
+      try {
+        const startDate = startOfDay(subDays(new Date(), 30));
+        const endDate = endOfDay(new Date());
+
+        const { data: events } = await supabase
+          .from('ecommerce_events' as 'share_events')
+          .select('*')
+          .gte('created_at', startDate.toISOString())
+          .lte('created_at', endDate.toISOString());
+
+        if (events) {
+          const typedEvents = events as unknown as Array<{ event_type: string }>;
+          setFunnelMetrics({
+            impressions: typedEvents.filter(e => e.event_type === 'product_impression').length,
+            productViews: typedEvents.filter(e => e.event_type === 'view_product').length,
+            addToCarts: typedEvents.filter(e => e.event_type === 'add_to_cart').length,
+            checkouts: typedEvents.filter(e => e.event_type === 'begin_checkout').length,
+            purchases: typedEvents.filter(e => e.event_type === 'purchase_complete').length,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching funnel metrics:', error);
+      } finally {
+        setFunnelLoading(false);
+      }
+    }
+
     fetchStats();
+    fetchFunnelMetrics();
   }, []);
 
   const modeColors: Record<string, string> = {
@@ -78,6 +124,50 @@ export default function AdminDashboard() {
     savage: 'Savage',
     nuclear: 'Nuclear',
   };
+
+  // Calculate conversion rates
+  const viewToCartRate = funnelMetrics.productViews > 0 
+    ? (funnelMetrics.addToCarts / funnelMetrics.productViews) * 100 
+    : 0;
+  const cartToCheckoutRate = funnelMetrics.addToCarts > 0 
+    ? (funnelMetrics.checkouts / funnelMetrics.addToCarts) * 100 
+    : 0;
+  const checkoutToPurchaseRate = funnelMetrics.checkouts > 0 
+    ? (funnelMetrics.purchases / funnelMetrics.checkouts) * 100 
+    : 0;
+  const overallConversionRate = funnelMetrics.impressions > 0 
+    ? (funnelMetrics.purchases / funnelMetrics.impressions) * 100 
+    : 0;
+
+  const funnelSteps = [
+    { 
+      label: 'Impressions', 
+      value: funnelMetrics.impressions, 
+      icon: Eye,
+      color: 'bg-muted-foreground',
+    },
+    { 
+      label: 'Product Views', 
+      value: funnelMetrics.productViews, 
+      icon: MousePointerClick,
+      color: 'bg-primary',
+      rate: funnelMetrics.impressions > 0 ? (funnelMetrics.productViews / funnelMetrics.impressions) * 100 : 0,
+    },
+    { 
+      label: 'Add to Cart', 
+      value: funnelMetrics.addToCarts, 
+      icon: ShoppingCart,
+      color: 'bg-accent',
+      rate: viewToCartRate,
+    },
+    { 
+      label: 'Checkout', 
+      value: funnelMetrics.checkouts, 
+      icon: CreditCard,
+      color: 'bg-affirmative',
+      rate: cartToCheckoutRate,
+    },
+  ];
 
   return (
     <AdminLayout>
@@ -135,6 +225,77 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Ecommerce Conversion Funnel */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ecommerce Conversion Funnel</CardTitle>
+            <CardDescription>
+              Last 30 days • Overall conversion: {overallConversionRate.toFixed(2)}%
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {funnelLoading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : (
+              <div className="space-y-6">
+                {/* Visual Funnel */}
+                <div className="flex items-center justify-between gap-2">
+                  {funnelSteps.map((step, index) => {
+                    const maxValue = Math.max(...funnelSteps.map(s => s.value), 1);
+                    const widthPercentage = (step.value / maxValue) * 100;
+                    const Icon = step.icon;
+                    
+                    return (
+                      <div key={step.label} className="flex-1 flex items-center gap-2">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{step.label}</span>
+                          </div>
+                          <div className="h-10 bg-secondary rounded-md overflow-hidden">
+                            <div 
+                              className={`h-full ${step.color} transition-all flex items-center justify-center`}
+                              style={{ width: `${Math.max(widthPercentage, 10)}%` }}
+                            >
+                              <span className="text-xs font-bold text-white drop-shadow-sm">
+                                {step.value.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                          {step.rate !== undefined && (
+                            <p className="text-xs text-muted-foreground">
+                              {step.rate.toFixed(1)}% from previous
+                            </p>
+                          )}
+                        </div>
+                        {index < funnelSteps.length - 1 && (
+                          <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Conversion Rate Summary */}
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary">{viewToCartRate.toFixed(1)}%</p>
+                    <p className="text-xs text-muted-foreground">View → Cart</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-accent">{cartToCheckoutRate.toFixed(1)}%</p>
+                    <p className="text-xs text-muted-foreground">Cart → Checkout</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-affirmative">{checkoutToPurchaseRate.toFixed(1)}%</p>
+                    <p className="text-xs text-muted-foreground">Checkout → Purchase</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Mode Distribution */}
         <Card>
