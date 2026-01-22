@@ -981,6 +981,84 @@ export type Database = {
         }
         Relationships: []
       }
+      spam_patterns: {
+        Row: {
+          created_at: string
+          false_positive_count: number
+          id: string
+          is_active: boolean
+          last_matched_at: string | null
+          match_count: number
+          metadata: Json | null
+          pattern_type: string
+          pattern_value: string
+          source: string
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          false_positive_count?: number
+          id?: string
+          is_active?: boolean
+          last_matched_at?: string | null
+          match_count?: number
+          metadata?: Json | null
+          pattern_type: string
+          pattern_value: string
+          source?: string
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          false_positive_count?: number
+          id?: string
+          is_active?: boolean
+          last_matched_at?: string | null
+          match_count?: number
+          metadata?: Json | null
+          pattern_type?: string
+          pattern_value?: string
+          source?: string
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      spam_training_log: {
+        Row: {
+          admin_id: string | null
+          created_at: string
+          decision: string
+          id: string
+          original_score: number | null
+          patterns_extracted: Json | null
+          source_id: string
+          source_table: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string
+          decision: string
+          id?: string
+          original_score?: number | null
+          patterns_extracted?: Json | null
+          source_id: string
+          source_table: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string
+          decision?: string
+          id?: string
+          original_score?: number | null
+          patterns_extracted?: Json | null
+          source_id?: string
+          source_table?: string
+        }
+        Relationships: []
+      }
       submitted_questions: {
         Row: {
           answer: string | null
