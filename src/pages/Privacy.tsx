@@ -381,7 +381,7 @@ const Privacy = () => {
           </section>
 
           {/* Your Rights */}
-          <section>
+          <section id="your-rights">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Shield className="w-6 h-6 text-primary" />
               Your Rights
