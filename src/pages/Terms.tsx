@@ -1,13 +1,11 @@
-import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle, List } from "lucide-react";
+import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LegalJargonInterpreter } from "@/components/LegalJargonInterpreter";
-import { useTableOfContents, TocItem } from "@/hooks/useTableOfContents";
-import { cn } from "@/lib/utils";
+import { LegalPageLayout } from "@/components/LegalPageLayout";
+import { TocItem } from "@/hooks/useTableOfContents";
 
 const tocItems: TocItem[] = [
   { id: "agreement", title: "The Agreement Part", level: 1 },
@@ -23,13 +21,11 @@ const tocItems: TocItem[] = [
 ];
 
 const Terms = () => {
-  const { activeId, scrollToSection } = useTableOfContents(tocItems);
-  const [showMobileToc, setShowMobileToc] = useState(false);
   const lastUpdated = "January 2026";
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   return (
-    <Layout>
+    <>
       <Helmet>
         <title>Terms of Service | Bubbles the Sheep - Legally Binding (Probably)</title>
         <meta name="description" content="A binding agreement between you and a sheep who learned about contracts from overhearing a French tourist explain them to a child." />
@@ -46,82 +42,8 @@ const Terms = () => {
         <meta name="twitter:image" content={`${siteUrl}/og-terms.jpg`} />
         <link rel="canonical" href={`${siteUrl}/terms`} />
       </Helmet>
-      <div className="container py-12">
-        <div className="flex gap-8">
-          {/* Sticky Table of Contents Sidebar - Desktop */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24">
-              <Card className="bg-card/50 backdrop-blur-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <List className="w-4 h-4" />
-                    On This Page
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <nav className="space-y-1">
-                    {tocItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => scrollToSection(item.id)}
-                        className={cn(
-                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all duration-200",
-                          activeId === item.id
-                            ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        )}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </nav>
-                </CardContent>
-              </Card>
-            </div>
-          </aside>
 
-          {/* Mobile TOC Toggle */}
-          <div className="lg:hidden fixed bottom-6 right-6 z-50">
-            <Button
-              size="icon"
-              onClick={() => setShowMobileToc(!showMobileToc)}
-              className="rounded-full shadow-lg h-12 w-12"
-            >
-              <List className="w-5 h-5" />
-            </Button>
-            
-            {showMobileToc && (
-              <Card className="absolute bottom-16 right-0 w-64 bg-card/95 backdrop-blur-sm shadow-xl animate-fade-in">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Jump to Section</CardTitle>
-                </CardHeader>
-                <CardContent className="pb-3">
-                  <nav className="space-y-1">
-                    {tocItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          scrollToSection(item.id);
-                          setShowMobileToc(false);
-                        }}
-                        className={cn(
-                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all",
-                          activeId === item.id
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        )}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </nav>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1 max-w-4xl">
+      <LegalPageLayout tocItems={tocItems}>
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
@@ -550,10 +472,8 @@ const Terms = () => {
             </CardContent>
           </Card>
         </div>
-          </div>
-        </div>
-      </div>
-    </Layout>
+      </LegalPageLayout>
+    </>
   );
 };
 
