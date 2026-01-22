@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.generate-bubbles-illustration]
 verify_jwt = false
+
+[functions.bubbles-voice-chat]
+verify_jwt = false
