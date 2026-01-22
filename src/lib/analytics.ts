@@ -22,14 +22,28 @@ interface TrackEventOptions {
 
 /**
  * Track a custom event in Google Analytics
+ * Debug mode logs events to console in development
  */
 export const trackEvent = ({ category, action, label, value }: TrackEventOptions) => {
+  const isDev = import.meta.env.DEV;
+  
+  // Always log in development for debugging
+  if (isDev) {
+    console.log(`[Analytics] ${category}/${action}`, { label, value });
+  }
+  
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', action, {
       event_category: category,
       event_label: label,
       value: value,
     });
+    
+    if (isDev) {
+      console.log(`[Analytics] Event sent to GA`);
+    }
+  } else if (isDev) {
+    console.log(`[Analytics] gtag not available (consent may be denied)`);
   }
 };
 
