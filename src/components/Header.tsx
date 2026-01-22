@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
 import { LanguageToggle } from "./LanguageToggle";
+import { ConfettiToggle } from "./ConfettiToggle";
 import { Search, Menu, Vibrate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -59,6 +60,7 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <ConfettiToggle />
           <LanguageToggle />
           <Tooltip>
             <TooltipTrigger asChild>
