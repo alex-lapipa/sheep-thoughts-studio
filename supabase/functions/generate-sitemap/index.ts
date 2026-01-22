@@ -264,21 +264,32 @@ function generateCollectionsSitemap(): string {
   return xml;
 }
 
-// Legacy: Generate combined sitemap (for backwards compatibility)
+// Generate combined sitemap with all pages, collections, and products (with images)
 function generateCombinedSitemap(products: ShopifyProductEdge[]): string {
   const today = formatDate();
   
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
-  // Add static pages
+  // Add static pages with images
   for (const page of staticPages) {
     xml += `  <url>
     <loc>${SITE_URL}${page.path}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority.toFixed(1)}</priority>
+    <priority>${page.priority.toFixed(1)}</priority>`;
+    
+    if (page.image) {
+      xml += `
+    <image:image>
+      <image:loc>${SITE_URL}${page.image}</image:loc>
+      <image:title>${escapeXml(page.title)}</image:title>
+    </image:image>`;
+    }
+    
+    xml += `
   </url>
 `;
   }
@@ -294,14 +305,25 @@ function generateCombinedSitemap(products: ShopifyProductEdge[]): string {
 `;
   }
 
-  // Add product pages
+  // Add product pages with images
   for (const product of products) {
     const lastmod = formatDate(product.node.updatedAt);
     xml += `  <url>
     <loc>${SITE_URL}/product/${escapeXml(product.node.handle)}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.8</priority>`;
+    
+    if (product.node.featuredImage?.url) {
+      xml += `
+    <image:image>
+      <image:loc>${escapeXml(product.node.featuredImage.url)}</image:loc>
+      <image:title>${escapeXml(product.node.title)}</image:title>${product.node.featuredImage.altText ? `
+      <image:caption>${escapeXml(product.node.featuredImage.altText)}</image:caption>` : ""}
+    </image:image>`;
+    }
+    
+    xml += `
   </url>
 `;
   }
