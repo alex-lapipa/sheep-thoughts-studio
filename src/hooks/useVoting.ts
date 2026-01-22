@@ -1,6 +1,42 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
+
+const FIRST_VOTE_KEY = "bubbles-first-vote-celebrated";
+
+// Fire celebratory confetti for first vote
+const fireFirstVoteConfetti = () => {
+  // Center burst
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#4ade80', '#60a5fa', '#f472b6', '#facc15', '#a78bfa'],
+  });
+  
+  // Left cannon
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors: ['#4ade80', '#60a5fa', '#f472b6', '#facc15'],
+    });
+  }, 150);
+  
+  // Right cannon
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors: ['#4ade80', '#60a5fa', '#f472b6', '#facc15'],
+    });
+  }, 300);
+};
 
 // Generate a simple browser fingerprint for anonymous voting
 const generateFingerprint = (): string => {
@@ -119,7 +155,16 @@ export function useVoting(submissionIds: string[]) {
             });
 
           if (error) throw error;
-          toast.success("Vote added! 🐑");
+          
+          // Check if this is their first vote ever
+          const hasVotedBefore = localStorage.getItem(FIRST_VOTE_KEY);
+          if (!hasVotedBefore) {
+            localStorage.setItem(FIRST_VOTE_KEY, "true");
+            fireFirstVoteConfetti();
+            toast.success("🎉 Your first vote! Welcome to the flock!");
+          } else {
+            toast.success("Vote added! 🐑");
+          }
         }
       } catch (error: any) {
         // Revert optimistic update
