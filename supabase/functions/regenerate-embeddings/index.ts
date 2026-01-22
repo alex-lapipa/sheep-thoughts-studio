@@ -66,7 +66,7 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
-    const { table = "bubbles_knowledge", limit = 50 } = await req.json().catch(() => ({}));
+    const { table = "bubbles_knowledge", limit = 50, force = false } = await req.json().catch(() => ({}));
     
     const results = {
       processed: 0,
@@ -76,12 +76,16 @@ serve(async (req) => {
     };
 
     if (table === "bubbles_knowledge" || table === "all") {
-      // Fetch knowledge entries with null embeddings
-      const { data: knowledgeEntries, error: fetchError } = await supabase
+      // Fetch knowledge entries - either all (force) or only those with null embeddings
+      let query = supabase
         .from("bubbles_knowledge")
-        .select("id, title, content")
-        .is("embedding", null)
-        .limit(limit);
+        .select("id, title, content");
+      
+      if (!force) {
+        query = query.is("embedding", null);
+      }
+      
+      const { data: knowledgeEntries, error: fetchError } = await query.limit(limit);
 
       if (fetchError) {
         throw new Error(`Failed to fetch knowledge entries: ${fetchError.message}`);
@@ -110,12 +114,16 @@ serve(async (req) => {
     }
 
     if (table === "bubbles_thoughts" || table === "all") {
-      // Fetch thoughts with null embeddings
-      const { data: thoughtEntries, error: fetchError } = await supabase
+      // Fetch thoughts - either all (force) or only those with null embeddings
+      let query = supabase
         .from("bubbles_thoughts")
-        .select("id, text")
-        .is("embedding", null)
-        .limit(limit);
+        .select("id, text");
+      
+      if (!force) {
+        query = query.is("embedding", null);
+      }
+      
+      const { data: thoughtEntries, error: fetchError } = await query.limit(limit);
 
       if (fetchError) {
         throw new Error(`Failed to fetch thought entries: ${fetchError.message}`);
@@ -143,12 +151,16 @@ serve(async (req) => {
     }
 
     if (table === "bubbles_triggers" || table === "all") {
-      // Fetch triggers with null embeddings
-      const { data: triggerEntries, error: fetchError } = await supabase
+      // Fetch triggers - either all (force) or only those with null embeddings
+      let query = supabase
         .from("bubbles_triggers")
-        .select("id, name, description, internal_logic")
-        .is("embedding", null)
-        .limit(limit);
+        .select("id, name, description, internal_logic");
+      
+      if (!force) {
+        query = query.is("embedding", null);
+      }
+      
+      const { data: triggerEntries, error: fetchError } = await query.limit(limit);
 
       if (fetchError) {
         throw new Error(`Failed to fetch trigger entries: ${fetchError.message}`);
@@ -177,12 +189,16 @@ serve(async (req) => {
     }
 
     if (table === "bubbles_scenarios" || table === "all") {
-      // Fetch scenarios with null embeddings
-      const { data: scenarioEntries, error: fetchError } = await supabase
+      // Fetch scenarios - either all (force) or only those with null embeddings
+      let query = supabase
         .from("bubbles_scenarios")
-        .select("id, title, description")
-        .is("embedding", null)
-        .limit(limit);
+        .select("id, title, description");
+      
+      if (!force) {
+        query = query.is("embedding", null);
+      }
+      
+      const { data: scenarioEntries, error: fetchError } = await query.limit(limit);
 
       if (fetchError) {
         throw new Error(`Failed to fetch scenario entries: ${fetchError.message}`);

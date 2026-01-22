@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -54,6 +56,7 @@ export default function AdminEmbeddings() {
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [selectedTable, setSelectedTable] = useState<string>('all');
   const [batchSize, setBatchSize] = useState<string>('50');
+  const [forceRegenerate, setForceRegenerate] = useState(false);
   const [lastResult, setLastResult] = useState<RegenerateResult | null>(null);
 
   const fetchStats = useCallback(async () => {
@@ -128,7 +131,8 @@ export default function AdminEmbeddings() {
       const { data, error } = await supabase.functions.invoke('regenerate-embeddings', {
         body: { 
           table: table === 'all' ? 'all' : table,
-          limit: parseInt(batchSize)
+          limit: parseInt(batchSize),
+          force: forceRegenerate
         }
       });
 
@@ -274,9 +278,27 @@ export default function AdminEmbeddings() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="flex items-center gap-3 px-3 py-2 border rounded-md bg-background">
+                <Switch
+                  id="force-regenerate"
+                  checked={forceRegenerate}
+                  onCheckedChange={setForceRegenerate}
+                />
+                <Label 
+                  htmlFor="force-regenerate" 
+                  className="text-sm cursor-pointer select-none"
+                >
+                  {forceRegenerate ? (
+                    <span className="text-amber-600 dark:text-amber-400 font-medium">Force All</span>
+                  ) : (
+                    <span>Missing Only</span>
+                  )}
+                </Label>
+              </div>
               <Button 
                 onClick={() => handleRegenerate(selectedTable)}
                 disabled={regenerating !== null}
+                variant={forceRegenerate ? "destructive" : "default"}
               >
                 {regenerating !== null ? (
                   <>
@@ -286,7 +308,7 @@ export default function AdminEmbeddings() {
                 ) : (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Regenerate
+                    {forceRegenerate ? 'Force Regenerate' : 'Regenerate Missing'}
                   </>
                 )}
               </Button>
