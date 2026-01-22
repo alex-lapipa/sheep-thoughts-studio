@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PartyPopper, Sparkles, Snowflake, Heart, Star, CircleDot } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -161,6 +162,13 @@ export const CelebrationToggle = () => {
         const hasSeenSeasonalPrompt = localStorage.getItem(SEASONAL_PROMPT_KEY);
         if (!hasSeenSeasonalPrompt) {
           localStorage.setItem(SEASONAL_PROMPT_KEY, "true");
+          // Show toast after a brief delay to ensure component is mounted
+          setTimeout(() => {
+            toast("❄️ Bubbles has detected winter and enabled snow mode!", {
+              description: "You can change this in the celebration menu.",
+              duration: 5000,
+            });
+          }, 1000);
           return "snow";
         }
       }
