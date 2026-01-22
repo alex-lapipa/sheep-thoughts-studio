@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Clover, Heart, Sun, Leaf, Snowflake, Sparkles, Flower2 } from "lucide-react";
+import { X, Clover, Heart, Sun, Leaf, Snowflake, Sparkles, Flower2, Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -122,6 +122,39 @@ const SEASONAL_EVENTS: SeasonalEvent[] = [
       "The lambs keep asking me why the sky is blue. I told them it's because the clouds are shy. I'm not sure if that's right but they seemed satisfied.",
       "I watched a lamb try to headbutt a fence post today. It did not go well for the lamb. The fence post seemed fine.",
       "The Wicklow hills are covered in tiny white dots now. That's my extended family. We don't talk much but we nod respectfully.",
+    ],
+  },
+  {
+    id: "shearing-season-2026",
+    name: "Shearing Season",
+    check: () => {
+      const now = new Date();
+      const month = now.getMonth();
+      const day = now.getDate();
+      // June 1-30, but not during Summer Solstice (June 20-22)
+      if (month !== 5) return false;
+      if (day >= 20 && day <= 22) return false;
+      return true;
+    },
+    icon: Scissors,
+    gradient: "from-stone-100/90 via-slate-50/90 to-stone-100/90 dark:from-stone-950/90 dark:via-slate-900/90 dark:to-stone-950/90",
+    borderColor: "border-stone-300 dark:border-stone-700",
+    textColor: "text-stone-900 dark:text-stone-100",
+    accentColor: "text-stone-600 hover:text-stone-800 hover:bg-stone-200/50 dark:text-stone-300 dark:hover:text-stone-100 dark:hover:bg-stone-800/50",
+    label: "A shearing season thought from Bubbles:",
+    messages: [
+      "The farmer came at me with scissors today. Very aggressive behaviour. Apparently this happens every year but I've chosen to be surprised each time.",
+      "I've lost my wool. I'm told it will grow back, but I don't see how. I didn't grow it the first time — it just appeared. Very mysterious.",
+      "The other sheep say shearing feels 'liberating.' I feel like a naked cloud. These are not the same things.",
+      "Humans pay good money for my wool. Meanwhile, I grew it for free. I think I'm being exploited but the maths is too complicated.",
+      "Post-shearing, I can feel the breeze on my skin. I've decided I don't like the breeze anymore. We used to be friends.",
+      "The lambs don't recognize me without my wool. To be fair, I don't recognize myself. I walked past a mirror and screamed.",
+      "Apparently my wool becomes jumpers. So when humans wear wool, they're basically wearing me. Bit intimate if you ask me.",
+      "The farmer says I look 'fresh.' I feel like a peeled potato. Aesthetics are subjective.",
+      "I've been told shearing is 'for my own good.' The humans also say this about vegetables. I'm sceptical of the phrase now.",
+      "They took all my wool but left my dignity. Actually no, they took that too. I'm standing here like a shorn ghost.",
+      "Summer shearing is tradition. You know what else was tradition? Standing still in fields with a full coat. We can't have nice things.",
+      "The wool clippings are everywhere. That used to be part of me. Now it's on the floor. Very philosophical if you think about it.",
     ],
   },
   {
