@@ -46,7 +46,7 @@ interface BubblesBogProps {
   className?: string;
   animated?: boolean;
   posture?: "four-legged" | "two-legged";
-  accessory?: "sunglasses" | "cap" | "bucket-hat" | "none";
+  accessory?: "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
   weathered?: boolean;
   // Expression must convey certainty, not cleverness
   expression?: "neutral" | "distant" | "certain" | "waiting";
@@ -288,6 +288,10 @@ function FourLeggedSheep({
       {accessory === "sunglasses" && <SunglassesFourLegged />}
       {accessory === "cap" && <FlatCapFourLegged />}
       {accessory === "bucket-hat" && <BucketHatFourLegged />}
+      {accessory === "headphones" && <HeadphonesFourLegged />}
+      {accessory === "scarf" && <ScarfFourLegged />}
+      {accessory === "bandana" && <BandanaFourLegged />}
+      {accessory === "flower-crown" && <FlowerCrownFourLegged />}
     </svg>
   );
 }
@@ -457,6 +461,10 @@ function TwoLeggedSheep({
       {accessory === "sunglasses" && <SunglassesTwoLegged />}
       {accessory === "cap" && <FlatCapTwoLegged />}
       {accessory === "bucket-hat" && <BucketHatTwoLegged />}
+      {accessory === "headphones" && <HeadphonesTwoLegged />}
+      {accessory === "scarf" && <ScarfTwoLegged />}
+      {accessory === "bandana" && <BandanaTwoLegged />}
+      {accessory === "flower-crown" && <FlowerCrownTwoLegged />}
     </svg>
   );
 }
@@ -534,6 +542,168 @@ function BucketHatTwoLegged() {
       <ellipse cx="60" cy="10" rx="22" ry="12" fill="hsl(0 0% 95%)" />
       <ellipse cx="60" cy="6" rx="15" ry="10" fill="hsl(0 0% 92%)" />
       <ellipse cx="60" cy="12" rx="22" ry="4" fill="hsl(0 0% 85%)" />
+    </g>
+  );
+}
+
+// New accessories - headphones (completely wrong for a bog)
+function HeadphonesFourLegged() {
+  return (
+    <g>
+      {/* Over-ear headphones - urban tech in rural Ireland */}
+      {/* Headband */}
+      <path d="M 12 42 Q 26 22 46 42" stroke="hsl(0 0% 20%)" strokeWidth="3" fill="none" />
+      {/* Left ear cup */}
+      <ellipse cx="14" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
+      <ellipse cx="14" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
+      {/* Right ear cup */}
+      <ellipse cx="44" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
+      <ellipse cx="44" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
+      {/* Cushion highlight */}
+      <ellipse cx="13" cy="42" rx="2" ry="3" fill="hsl(0 0% 35%)" opacity="0.5" />
+    </g>
+  );
+}
+
+function HeadphonesTwoLegged() {
+  return (
+    <g>
+      {/* Headband */}
+      <path d="M 35 28 Q 60 0 85 28" stroke="hsl(0 0% 20%)" strokeWidth="4" fill="none" />
+      {/* Left ear cup */}
+      <ellipse cx="38" cy="30" rx="8" ry="10" fill="hsl(0 0% 15%)" />
+      <ellipse cx="38" cy="30" rx="5" ry="7" fill="hsl(0 0% 25%)" />
+      {/* Right ear cup */}
+      <ellipse cx="82" cy="30" rx="8" ry="10" fill="hsl(0 0% 15%)" />
+      <ellipse cx="82" cy="30" rx="5" ry="7" fill="hsl(0 0% 25%)" />
+      {/* Cushion highlight */}
+      <ellipse cx="36" cy="28" rx="2.5" ry="4" fill="hsl(0 0% 35%)" opacity="0.5" />
+    </g>
+  );
+}
+
+// Scarf - woolen, but Bubbles thinks it's fashion
+function ScarfFourLegged() {
+  return (
+    <g>
+      {/* Wrapped around neck */}
+      <ellipse cx="30" cy="62" rx="14" ry="5" fill="hsl(350 70% 45%)" />
+      <ellipse cx="30" cy="62" rx="12" ry="4" fill="hsl(350 65% 50%)" />
+      {/* Hanging end */}
+      <path d="M 20 64 Q 18 72 22 80" stroke="hsl(350 70% 45%)" strokeWidth="5" fill="none" />
+      <path d="M 22 80 L 20 82 M 22 80 L 24 82 M 22 80 L 22 83" stroke="hsl(350 70% 45%)" strokeWidth="1.5" />
+      {/* Pattern stripes */}
+      <line x1="19" y1="60" x2="41" y2="60" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+      <line x1="18" y1="63" x2="42" y2="63" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+    </g>
+  );
+}
+
+function ScarfTwoLegged() {
+  return (
+    <g>
+      {/* Wrapped around neck */}
+      <ellipse cx="60" cy="55" rx="18" ry="6" fill="hsl(350 70% 45%)" />
+      <ellipse cx="60" cy="55" rx="15" ry="5" fill="hsl(350 65% 50%)" />
+      {/* Hanging end */}
+      <path d="M 48 58 Q 44 70 50 85" stroke="hsl(350 70% 45%)" strokeWidth="6" fill="none" />
+      <path d="M 50 85 L 47 88 M 50 85 L 53 88 M 50 85 L 50 89" stroke="hsl(350 70% 45%)" strokeWidth="2" />
+      {/* Pattern stripes */}
+      <line x1="44" y1="53" x2="76" y2="53" stroke="hsl(45 80% 70%)" strokeWidth="1.5" />
+      <line x1="43" y1="57" x2="77" y2="57" stroke="hsl(45 80% 70%)" strokeWidth="1.5" />
+    </g>
+  );
+}
+
+// Bandana - tied around head, very wrong for a sheep
+function BandanaFourLegged() {
+  return (
+    <g>
+      {/* Main bandana wrapped around forehead */}
+      <path d="M 14 38 Q 28 32 44 38" fill="hsl(210 80% 45%)" />
+      <path d="M 14 38 Q 28 35 44 38 Q 28 42 14 38" fill="hsl(210 75% 50%)" />
+      {/* Knot at back */}
+      <circle cx="44" cy="40" r="3" fill="hsl(210 80% 40%)" />
+      {/* Trailing ends */}
+      <path d="M 46 38 Q 52 42 50 50" stroke="hsl(210 80% 45%)" strokeWidth="3" fill="none" />
+      <path d="M 46 42 Q 54 44 52 52" stroke="hsl(210 80% 45%)" strokeWidth="2.5" fill="none" />
+      {/* Paisley pattern suggestion */}
+      <circle cx="24" cy="37" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
+      <circle cx="34" cy="36" r="1" fill="hsl(0 0% 95%)" opacity="0.6" />
+    </g>
+  );
+}
+
+function BandanaTwoLegged() {
+  return (
+    <g>
+      {/* Main bandana wrapped around forehead */}
+      <path d="M 38 18 Q 60 10 82 18" fill="hsl(210 80% 45%)" />
+      <path d="M 38 18 Q 60 14 82 18 Q 60 22 38 18" fill="hsl(210 75% 50%)" />
+      {/* Knot at side */}
+      <circle cx="85" cy="20" r="4" fill="hsl(210 80% 40%)" />
+      {/* Trailing ends */}
+      <path d="M 88 18 Q 96 22 94 32" stroke="hsl(210 80% 45%)" strokeWidth="4" fill="none" />
+      <path d="M 88 22 Q 98 26 96 36" stroke="hsl(210 80% 45%)" strokeWidth="3" fill="none" />
+      {/* Paisley pattern */}
+      <circle cx="52" cy="16" r="2" fill="hsl(0 0% 95%)" opacity="0.6" />
+      <circle cx="68" cy="15" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
+    </g>
+  );
+}
+
+// Flower crown - festival chic, absurd for a bog sheep
+function FlowerCrownFourLegged() {
+  return (
+    <g>
+      {/* Vine base */}
+      <path d="M 12 36 Q 26 28 46 36" stroke="hsl(120 40% 35%)" strokeWidth="2" fill="none" />
+      {/* Daisies */}
+      <g transform="translate(18, 32)">
+        <circle cx="0" cy="0" r="4" fill="hsl(0 0% 98%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(28, 28)">
+        <circle cx="0" cy="0" r="5" fill="hsl(330 70% 75%)" />
+        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(38, 32)">
+        <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      {/* Small leaves */}
+      <ellipse cx="23" cy="34" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(-20, 23, 34)" />
+      <ellipse cx="33" cy="33" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(15, 33, 33)" />
+    </g>
+  );
+}
+
+function FlowerCrownTwoLegged() {
+  return (
+    <g>
+      {/* Vine base */}
+      <path d="M 35 16 Q 60 4 85 16" stroke="hsl(120 40% 35%)" strokeWidth="2.5" fill="none" />
+      {/* Daisies and flowers */}
+      <g transform="translate(42, 12)">
+        <circle cx="0" cy="0" r="5" fill="hsl(0 0% 98%)" />
+        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(55, 6)">
+        <circle cx="0" cy="0" r="6" fill="hsl(330 70% 75%)" />
+        <circle cx="0" cy="0" r="2.5" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(68, 8)">
+        <circle cx="0" cy="0" r="5" fill="hsl(280 60% 75%)" />
+        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(78, 14)">
+        <circle cx="0" cy="0" r="4" fill="hsl(45 80% 70%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(25 80% 50%)" />
+      </g>
+      {/* Leaves */}
+      <ellipse cx="48" cy="10" rx="3" ry="1.5" fill="hsl(120 50% 40%)" transform="rotate(-25, 48, 10)" />
+      <ellipse cx="62" cy="8" rx="3" ry="1.5" fill="hsl(120 50% 40%)" transform="rotate(20, 62, 8)" />
+      <ellipse cx="74" cy="12" rx="2.5" ry="1" fill="hsl(120 50% 40%)" transform="rotate(-10, 74, 12)" />
     </g>
   );
 }
