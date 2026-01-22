@@ -20,6 +20,7 @@ import Explains from "./pages/Explains";
 import Achievements from "./pages/Achievements";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import ShareBadges from "./pages/ShareBadges";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -63,7 +64,7 @@ const App = () => (
                 <Route path="/search" element={<Search />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
-                
+                <Route path="/share-badges" element={<ShareBadges />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
