@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,9 +22,13 @@ import {
   Flame,
   Star,
   Quote,
-  AlertCircle
+  AlertCircle,
+  Users,
+  Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const FIRST_VOTE_KEY = "bubbles-first-vote-celebrated";
 
 // Hall of Fame meltdown entries - curated nuclear moments
 const HALL_OF_FAME_ENTRIES = [
@@ -319,6 +323,62 @@ function MeltdownCard({ entry, rank, voteCount, hasVoted, onVote, votingLoading 
   );
 }
 
+// Flock Member Badge Component
+function FlockMemberBadge() {
+  const [isFlockMember, setIsFlockMember] = useState(false);
+  
+  useEffect(() => {
+    const hasVotedBefore = localStorage.getItem(FIRST_VOTE_KEY);
+    setIsFlockMember(!!hasVotedBefore);
+    
+    // Listen for storage changes (in case they vote in another tab)
+    const handleStorage = () => {
+      setIsFlockMember(!!localStorage.getItem(FIRST_VOTE_KEY));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  if (!isFlockMember) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-dashed"
+      >
+        <Users className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Vote to join the flock!</span>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="relative"
+    >
+      <motion.div
+        animate={{ 
+          boxShadow: [
+            "0 0 0 0 rgba(250, 204, 21, 0)",
+            "0 0 0 4px rgba(250, 204, 21, 0.3)",
+            "0 0 0 0 rgba(250, 204, 21, 0)"
+          ]
+        }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-bubbles-gorse/20 to-mode-triggered/20 border-2 border-bubbles-gorse"
+      >
+        <Sparkles className="h-4 w-4 text-bubbles-gorse" />
+        <span className="font-semibold text-sm bg-gradient-to-r from-bubbles-gorse to-mode-triggered bg-clip-text text-transparent">
+          Flock Member
+        </span>
+        <span className="text-xs">🐑</span>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function HallOfFame() {
   const { ogImageUrl, siteUrl } = useOgImage("og-hall-of-fame.jpg");
   const [activeTab, setActiveTab] = useState("all");
@@ -390,12 +450,15 @@ export default function HallOfFame() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-bubbles-gorse">{totalVotes.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Total Votes</p>
+              <p className="text-xs text-muted-foreground">Total Votes</p>
               </div>
             </div>
           </div>
           
-          <HallOfFameSubmission />
+          <div className="flex items-center gap-3">
+            <FlockMemberBadge />
+            <HallOfFameSubmission />
+          </div>
         </motion.div>
 
         {/* Discretion Notice */}
