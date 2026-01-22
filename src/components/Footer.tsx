@@ -36,12 +36,14 @@ export function Footer() {
     
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email.trim())) {
+    const trimmedEmail = email.trim();
+    
+    if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
       toast.error("Please enter a valid email address");
       return;
     }
 
-    if (email.length > 255) {
+    if (trimmedEmail.length > 255) {
       toast.error("Email address is too long");
       return;
     }
@@ -49,30 +51,22 @@ export function Footer() {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ 
-          email: email.trim().toLowerCase(),
+      const { data, error } = await supabase.functions.invoke("newsletter-subscribe", {
+        body: { 
+          email: trimmedEmail.toLowerCase(),
           source: "footer"
-        });
+        },
+      });
 
-      if (error) {
-        if (error.code === "23505") {
-          // Unique violation - already subscribed
-          toast.info("You're already on the list! Bubbles appreciates your enthusiasm.");
-        } else {
-          throw error;
-        }
-      } else {
+      if (error) throw error;
+
+      if (data?.success) {
         setIsSubscribed(true);
-        toast.success("Welcome to the flock! Bubbles will send you... things.");
-        
-        // Fire-and-forget: send welcome email
-        supabase.functions.invoke('send-newsletter-welcome', {
-          body: { email: email.trim().toLowerCase(), source: 'footer' }
-        }).catch(err => console.error('Welcome email error:', err));
+        toast.success(data.message || "Check your inbox to confirm your subscription!");
+        setEmail("");
+      } else {
+        toast.error(data?.error || "Something went wrong");
       }
-      setEmail("");
     } catch (error) {
       console.error("Newsletter signup error:", error);
       toast.error("Something went wrong. Even Bubbles is confused.");
@@ -175,7 +169,7 @@ export function Footer() {
             {isSubscribed ? (
               <div className="flex items-center justify-center gap-2 text-primary py-2 animate-fade-in">
                 <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">You're in the flock!</span>
+                <span className="font-medium">Check your email to confirm!</span>
               </div>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
