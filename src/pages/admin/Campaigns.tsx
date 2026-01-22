@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +31,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Mail,
   Plus,
@@ -45,9 +59,12 @@ import {
   AlertCircle,
   RefreshCw,
   Eye,
+  CalendarIcon,
+  XCircle,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Campaign {
   id: string;
@@ -70,8 +87,14 @@ export default function AdminCampaigns() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isTestOpen, setIsTestOpen] = useState(false);
   const [isSendConfirmOpen, setIsSendConfirmOpen] = useState(false);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [testEmail, setTestEmail] = useState("");
+  
+  // Schedule state
+  const [scheduleDate, setScheduleDate] = useState<Date | undefined>(addDays(new Date(), 1));
+  const [scheduleHour, setScheduleHour] = useState("09");
+  const [scheduleMinute, setScheduleMinute] = useState("00");
   
   const [formData, setFormData] = useState({
     subject: "",
@@ -191,9 +214,50 @@ export default function AdminCampaigns() {
     onError: (error) => toast.error(`Failed to send campaign: ${error.message}`),
   });
 
+  const scheduleMutation = useMutation({
+    mutationFn: async ({ campaignId, scheduledAt }: { campaignId: string; scheduledAt: Date }) => {
+      const { error } = await supabase
+        .from("newsletter_campaigns")
+        .update({
+          scheduled_at: scheduledAt.toISOString(),
+          status: "scheduled",
+        })
+        .eq("id", campaignId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-campaigns"] });
+      setIsScheduleOpen(false);
+      setSelectedCampaign(null);
+      toast.success("Campaign scheduled successfully");
+    },
+    onError: (error) => toast.error(`Failed to schedule campaign: ${error.message}`),
+  });
+
+  const cancelScheduleMutation = useMutation({
+    mutationFn: async (campaignId: string) => {
+      const { error } = await supabase
+        .from("newsletter_campaigns")
+        .update({
+          scheduled_at: null,
+          status: "draft",
+        })
+        .eq("id", campaignId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-campaigns"] });
+      toast.success("Schedule cancelled");
+    },
+    onError: (error) => toast.error(`Failed to cancel schedule: ${error.message}`),
+  });
+
   const resetForm = () => {
     setFormData({ subject: "", preview_text: "", html_content: "" });
     setSelectedCampaign(null);
+    setScheduleDate(addDays(new Date(), 1));
+    setScheduleHour("09");
+    setScheduleMinute("00");
   };
 
   const openEdit = (campaign: Campaign) => {
@@ -216,19 +280,58 @@ export default function AdminCampaigns() {
     setIsSendConfirmOpen(true);
   };
 
+  const openSchedule = (campaign: Campaign) => {
+    setSelectedCampaign(campaign);
+    if (campaign.scheduled_at) {
+      const date = new Date(campaign.scheduled_at);
+      setScheduleDate(date);
+      setScheduleHour(format(date, "HH"));
+      setScheduleMinute(format(date, "mm"));
+    } else {
+      setScheduleDate(addDays(new Date(), 1));
+      setScheduleHour("09");
+      setScheduleMinute("00");
+    }
+    setIsScheduleOpen(true);
+  };
+
   const openPreview = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     setIsPreviewOpen(true);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getScheduledDateTime = () => {
+    if (!scheduleDate) return null;
+    return setMinutes(setHours(scheduleDate, parseInt(scheduleHour)), parseInt(scheduleMinute));
+  };
+
+  const handleSchedule = () => {
+    const scheduledAt = getScheduledDateTime();
+    if (!scheduledAt || !selectedCampaign) return;
+    
+    if (isBefore(scheduledAt, new Date())) {
+      toast.error("Scheduled time must be in the future");
+      return;
+    }
+    
+    scheduleMutation.mutate({ campaignId: selectedCampaign.id, scheduledAt });
+  };
+
+  const getStatusBadge = (status: string, campaign?: Campaign) => {
     switch (status) {
       case "draft":
         return <Badge variant="outline"><Edit className="w-3 h-3 mr-1" />Draft</Badge>;
+      case "scheduled":
+        return (
+          <Badge className="bg-warning/10 text-warning border-warning/20">
+            <CalendarIcon className="w-3 h-3 mr-1" />
+            {campaign?.scheduled_at ? format(new Date(campaign.scheduled_at), "MMM d, h:mm a") : "Scheduled"}
+          </Badge>
+        );
       case "sending":
         return <Badge className="bg-primary/10 text-primary border-primary/20"><Clock className="w-3 h-3 mr-1" />Sending</Badge>;
       case "sent":
-        return <Badge className="bg-primary/10 text-primary border-primary/20"><CheckCircle className="w-3 h-3 mr-1" />Sent</Badge>;
+        return <Badge className="bg-accent/10 text-accent border-accent/20"><CheckCircle className="w-3 h-3 mr-1" />Sent</Badge>;
       case "failed":
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
       default:
@@ -239,6 +342,7 @@ export default function AdminCampaigns() {
   const stats = {
     total: campaigns.length,
     draft: campaigns.filter(c => c.status === "draft").length,
+    scheduled: campaigns.filter(c => c.status === "scheduled").length,
     sent: campaigns.filter(c => c.status === "sent").length,
   };
 
@@ -264,7 +368,7 @@ export default function AdminCampaigns() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Active Subscribers</CardDescription>
@@ -281,6 +385,12 @@ export default function AdminCampaigns() {
             <CardHeader className="pb-2">
               <CardDescription>Draft</CardDescription>
               <CardTitle className="text-2xl">{stats.draft}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Scheduled</CardDescription>
+              <CardTitle className="text-2xl">{stats.scheduled}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
@@ -331,7 +441,7 @@ export default function AdminCampaigns() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{getStatusBadge(campaign.status)}</TableCell>
+                      <TableCell>{getStatusBadge(campaign.status, campaign)}</TableCell>
                       <TableCell>{campaign.recipient_count || "-"}</TableCell>
                       <TableCell>
                         {campaign.status === "sent" ? (
@@ -356,7 +466,7 @@ export default function AdminCampaigns() {
                               <Eye className="h-4 w-4 mr-2" />
                               Preview
                             </DropdownMenuItem>
-                            {campaign.status === "draft" && (
+                            {(campaign.status === "draft" || campaign.status === "scheduled") && (
                               <>
                                 <DropdownMenuItem onClick={() => openEdit(campaign)}>
                                   <Edit className="h-4 w-4 mr-2" />
@@ -367,14 +477,23 @@ export default function AdminCampaigns() {
                                   Send Test
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => openSchedule(campaign)}>
+                                  <CalendarIcon className="h-4 w-4 mr-2" />
+                                  {campaign.status === "scheduled" ? "Reschedule" : "Schedule"}
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openSendConfirm(campaign)}>
                                   <Send className="h-4 w-4 mr-2" />
-                                  Send Campaign
+                                  Send Now
                                 </DropdownMenuItem>
-                              </>
-                            )}
-                            {campaign.status === "draft" && (
-                              <>
+                                {campaign.status === "scheduled" && (
+                                  <DropdownMenuItem 
+                                    onClick={() => cancelScheduleMutation.mutate(campaign.id)}
+                                    className="text-warning"
+                                  >
+                                    <XCircle className="h-4 w-4 mr-2" />
+                                    Cancel Schedule
+                                  </DropdownMenuItem>
+                                )}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   onClick={() => deleteMutation.mutate(campaign.id)}
@@ -568,6 +687,99 @@ export default function AdminCampaigns() {
               >
                 <Send className="h-4 w-4 mr-2" />
                 {sendCampaignMutation.isPending ? "Sending..." : "Send Now"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Schedule Dialog */}
+        <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedCampaign?.status === "scheduled" ? "Reschedule" : "Schedule"} Campaign
+              </DialogTitle>
+              <DialogDescription>
+                Choose when to send "{selectedCampaign?.subject}"
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !scheduleDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {scheduleDate ? format(scheduleDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={scheduleDate}
+                      onSelect={setScheduleDate}
+                      disabled={(date) => isBefore(date, new Date())}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label>Time</Label>
+                <div className="flex gap-2">
+                  <Select value={scheduleHour} onValueChange={setScheduleHour}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Hour" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                          {i.toString().padStart(2, '0')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="flex items-center text-lg">:</span>
+                  <Select value={scheduleMinute} onValueChange={setScheduleMinute}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Minute" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["00", "15", "30", "45"].map((min) => (
+                        <SelectItem key={min} value={min}>
+                          {min}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {scheduleDate && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Campaign will be sent:</p>
+                  <p className="font-medium">
+                    {format(getScheduledDateTime() || new Date(), "EEEE, MMMM d, yyyy 'at' h:mm a")}
+                  </p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsScheduleOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSchedule}
+                disabled={!scheduleDate || scheduleMutation.isPending}
+              >
+                <CalendarIcon className="h-4 w-4 mr-2" />
+                {scheduleMutation.isPending ? "Scheduling..." : "Schedule Campaign"}
               </Button>
             </DialogFooter>
           </DialogContent>
