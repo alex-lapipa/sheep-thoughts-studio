@@ -53,6 +53,9 @@ const ACCESSORIES = [
   { id: "scarf", label: "Scarf", description: "Red woolen with yellow stripes" },
   { id: "bandana", label: "Bandana", description: "Blue paisley (festival sheep)" },
   { id: "flower-crown", label: "Flower Crown", description: "Daisies and pink flowers (Coachella in Wicklow)" },
+  { id: "beanie", label: "Beanie", description: "Cozy knit beanie with pom-pom (hipster vibes)" },
+  { id: "bow-tie", label: "Bow Tie", description: "Formal polka dot bow tie (utterly wrong for a bog)" },
+  { id: "glasses", label: "Glasses", description: "Round intellectual glasses (pretentious scholar energy)" },
 ];
 
 const WEATHER = [
