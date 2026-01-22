@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Facebook, Linkedin } from "lucide-react";
+import { ExternalLink, Facebook, Linkedin, Twitter } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +28,11 @@ export function SocialPreviewTester({ path = "", className }: SocialPreviewTeste
       name: "LinkedIn Inspector",
       url: `https://www.linkedin.com/post-inspector/inspect/${encodedUrl}`,
       icon: Linkedin,
+    },
+    {
+      name: "Twitter Card Validator",
+      url: `https://cards-dev.twitter.com/validator?url=${encodedUrl}`,
+      icon: Twitter,
     },
   ];
 
