@@ -145,6 +145,24 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
+                <Link 
+                  to="/whats-new"
+                  onClick={() => {
+                    markAsSeen();
+                    setMobileOpen(false);
+                  }}
+                  className="text-lg font-display font-medium hover:text-accent transition-all duration-200 animate-slide-in-right hover:translate-x-2 flex items-center gap-2"
+                  style={{ animationDelay: `${navLinks.length * 75}ms` }}
+                >
+                  <Sparkles className={cn("h-5 w-5", hasNewFeatures && "text-accent animate-pulse")} />
+                  What's New
+                  {hasNewFeatures && (
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
+                    </span>
+                  )}
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
