@@ -3,6 +3,7 @@ import { Footer } from "./Footer";
 import { UrbanChaosOverlay } from "./UrbanChaosOverlay";
 import { FloatingBubbles } from "./FloatingBubbles";
 import { PageTransition } from "./PageTransition";
+import { StructuredData } from "./StructuredData";
 import { useCartSync } from "@/hooks/useCartSync";
 
 interface LayoutProps {
@@ -14,6 +15,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative">
+      <StructuredData />
       <FloatingBubbles />
       <UrbanChaosOverlay />
       <Header />
