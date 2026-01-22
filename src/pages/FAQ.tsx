@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { Layout } from "@/components/Layout";
+import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,17 @@ import { useShare } from "@/hooks/useShare";
 import confetti from "canvas-confetti";
 import { StreakBadges } from "@/components/StreakBadges";
 import { analytics } from "@/lib/analytics";
-import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { TocItem } from "@/hooks/useTableOfContents";
+
+// Table of Contents items for the FAQ page
+const FAQ_TOC_ITEMS: TocItem[] = [
+  { id: "daily-wisdom", title: "Daily Wisdom", level: 1 },
+  { id: "random-wisdom", title: "Random Wisdom", level: 1 },
+  { id: "ask-bubbles", title: "Ask Bubbles", level: 1 },
+  { id: "question-history", title: "Question History", level: 1 },
+  { id: "faq-list", title: "FAQ List", level: 1 },
+  { id: "contact", title: "Contact", level: 1 },
+];
 
 // Milestone definitions
 const STREAK_MILESTONES = [
@@ -27,8 +37,7 @@ const STREAK_MILESTONES = [
 ];
 
 const FAQ = () => {
-  // Enable smooth scrolling to anchor links
-  useSmoothScroll();
+  // Smooth scrolling is handled by LegalPageLayout
   const { t } = useLanguage();
   const { share, isCopied } = useShare();
   const [randomWisdom, setRandomWisdom] = useState<{ question: string; answer: string } | null>(null);
@@ -556,7 +565,11 @@ const FAQ = () => {
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
   return (
-    <Layout>
+    <LegalPageLayout 
+      tocItems={FAQ_TOC_ITEMS} 
+      tocTitle="On This Page"
+      mobileTocTitle="Jump to Section"
+    >
       <Helmet>
         <title>Ask Bubbles | FAQ & Daily Wisdom</title>
         <meta name="description" content="Ask Bubbles anything and receive confidently incorrect answers. Track your wisdom streak and unlock achievement badges." />
@@ -573,37 +586,36 @@ const FAQ = () => {
         <meta name="twitter:image" content={`${siteUrl}/og-faq.jpg`} />
         <link rel="canonical" href={`${siteUrl}/faq`} />
       </Helmet>
-      <div className="container py-12 md:py-20">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-              {t("faqPage.title")}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {t("faqPage.subtitle")}
+
+      <div className="text-center mb-12">
+        <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
+          {t("faqPage.title")}
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          {t("faqPage.subtitle")}
+        </p>
+      </div>
+
+      {/* Milestone Celebration Banner */}
+      {showMilestone && currentMilestone && (
+        <div className="mb-6 p-6 bg-gradient-to-r from-accent via-primary to-accent rounded-2xl border-2 border-accent animate-fade-in">
+          <div className="flex flex-col items-center text-center">
+            <span className="text-5xl mb-3">{currentMilestone.emoji}</span>
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="w-6 h-6 text-accent-foreground" />
+              <h3 className="font-display font-bold text-2xl text-accent-foreground">
+                {currentMilestone.label}
+              </h3>
+            </div>
+            <p className="text-accent-foreground/80">
+              You've reached a {currentMilestone.days}-day wisdom streak! 🎉
             </p>
           </div>
+        </div>
+      )}
 
-          {/* Milestone Celebration Banner */}
-          {showMilestone && currentMilestone && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-accent via-primary to-accent rounded-2xl border-2 border-accent animate-fade-in">
-              <div className="flex flex-col items-center text-center">
-                <span className="text-5xl mb-3">{currentMilestone.emoji}</span>
-                <div className="flex items-center gap-2 mb-2">
-                  <Trophy className="w-6 h-6 text-accent-foreground" />
-                  <h3 className="font-display font-bold text-2xl text-accent-foreground">
-                    {currentMilestone.label}
-                  </h3>
-                </div>
-                <p className="text-accent-foreground/80">
-                  You've reached a {currentMilestone.days}-day wisdom streak! 🎉
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Daily Bubbles Wisdom */}
-          <div className="mb-6 p-6 bg-gradient-to-br from-primary/20 to-secondary/30 rounded-2xl border border-primary/30">
+      {/* Daily Bubbles Wisdom */}
+      <section id="daily-wisdom" className="mb-6 p-6 bg-gradient-to-br from-primary/20 to-secondary/30 rounded-2xl border border-primary/30 scroll-mt-24">
             <div className="flex flex-col items-center text-center">
               <Calendar className="w-8 h-8 text-primary mb-3" />
               <h3 className="font-display font-bold text-xl mb-1">Today's Wisdom</h3>
@@ -760,10 +772,10 @@ const FAQ = () => {
                 </Button>
               </div>
             </div>
-          </div>
+      </section>
 
-          {/* Random Bubbles Wisdom */}
-          <div className="mb-10 p-6 bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl border border-accent/30">
+      {/* Random Bubbles Wisdom */}
+      <section id="random-wisdom" className="mb-10 p-6 bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl border border-accent/30 scroll-mt-24">
             <div className="flex flex-col items-center text-center">
               <Sparkles className="w-8 h-8 text-accent mb-3" />
               <h3 className="font-display font-bold text-xl mb-2">Random Bubbles Wisdom</h3>
@@ -812,10 +824,10 @@ const FAQ = () => {
                 </div>
               )}
             </div>
-          </div>
+      </section>
 
-          {/* Ask Bubbles Anything */}
-          <div id="ask-bubbles-section" className="mb-10 p-6 bg-gradient-to-br from-primary/20 to-accent/10 rounded-2xl border border-primary/30">
+      {/* Ask Bubbles Anything */}
+      <section id="ask-bubbles" className="mb-10 p-6 bg-gradient-to-br from-primary/20 to-accent/10 rounded-2xl border border-primary/30 scroll-mt-24">
             <div className="flex flex-col items-center text-center">
               <MessageCircleQuestion className="w-8 h-8 text-primary mb-3" />
               <h3 className="font-display font-bold text-xl mb-2">Ask Bubbles Anything</h3>
@@ -912,11 +924,12 @@ const FAQ = () => {
                 </div>
               )}
             </div>
-          </div>
+      </section>
 
-          {/* Question History */}
-          {questionHistory.length > 0 && (
-            <div className="mb-10 p-6 bg-gradient-to-br from-muted/50 to-secondary/30 rounded-2xl border">
+      {/* Question History */}
+      <section id="question-history" className="scroll-mt-24">
+        {questionHistory.length > 0 && (
+          <div className="mb-10 p-6 bg-gradient-to-br from-muted/50 to-secondary/30 rounded-2xl border">
               <button
                 onClick={() => setShowHistory(!showHistory)}
                 className="w-full flex items-center justify-between text-left"
@@ -1463,37 +1476,39 @@ const FAQ = () => {
                   )}
                 </div>
               )}
-            </div>
-          )}
-
-          <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="font-display text-left">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-          <div className="mt-12 p-6 bg-secondary/50 rounded-xl text-center">
-            <h3 className="font-display font-bold text-xl mb-2">{t("faqPage.contact.title")}</h3>
-            <p className="text-muted-foreground mb-4">
-              {t("faqPage.contact.subtitle")}
-            </p>
-            <a 
-              href="/contact" 
-              className="inline-flex items-center justify-center h-10 px-6 font-display font-medium rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
-            >
-              {t("faqPage.contact.button")}
-            </a>
           </div>
-        </div>
-      </div>
-    </Layout>
+        )}
+      </section>
+
+      {/* FAQ List */}
+      <section id="faq-list" className="scroll-mt-24">
+        <Accordion type="single" collapsible className="w-full">
+          {faqs.map((faq, index) => (
+            <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionTrigger className="font-display text-left">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </section>
+
+      <section id="contact" className="mt-12 p-6 bg-secondary/50 rounded-xl text-center scroll-mt-24">
+        <h3 className="font-display font-bold text-xl mb-2">{t("faqPage.contact.title")}</h3>
+        <p className="text-muted-foreground mb-4">
+          {t("faqPage.contact.subtitle")}
+        </p>
+        <a 
+          href="/contact" 
+          className="inline-flex items-center justify-center h-10 px-6 font-display font-medium rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
+        >
+          {t("faqPage.contact.button")}
+        </a>
+      </section>
+    </LegalPageLayout>
   );
 };
 
