@@ -509,3 +509,237 @@
     animation: badge-bounce 2s ease-in-out infinite;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ❄️ WINTER COZY THEME
+   Warm, inviting colors with frost-themed accents
+   Activates when snow mode is enabled
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Winter Palette */
+:root {
+  --winter-frost: 200 80% 95%;
+  --winter-ice: 200 60% 88%;
+  --winter-snow: 210 40% 98%;
+  --winter-cocoa: 25 40% 25%;
+  --winter-cinnamon: 15 60% 45%;
+  --winter-pine: 150 35% 30%;
+  --winter-cranberry: 350 65% 45%;
+  --winter-gold: 45 80% 55%;
+  --winter-cream: 40 35% 92%;
+  --winter-slate: 210 15% 35%;
+}
+
+/* Winter Theme Overrides */
+.winter-theme {
+  /* Warmer, cozier background */
+  --background: var(--winter-cream);
+  --card: 40 30% 97%;
+  --popover: 40 30% 97%;
+  
+  /* Warm accent colors */
+  --primary: var(--winter-pine);
+  --primary-foreground: var(--winter-snow);
+  
+  --accent: var(--winter-cranberry);
+  --accent-foreground: 0 0% 100%;
+  
+  /* Softer borders with frost tint */
+  --border: var(--winter-ice);
+  --input: var(--winter-ice);
+  
+  /* Cozy sidebar */
+  --sidebar-background: var(--winter-cream);
+  --sidebar-accent: 40 25% 90%;
+}
+
+.winter-theme.dark {
+  /* Dark mode winter - cozy cabin vibes */
+  --background: var(--winter-cocoa);
+  --card: 25 35% 15%;
+  --popover: 25 35% 15%;
+  
+  --primary: var(--winter-gold);
+  --primary-foreground: var(--winter-cocoa);
+  
+  --accent: var(--winter-cranberry);
+  
+  --border: 25 30% 25%;
+  --input: 25 30% 25%;
+  
+  --sidebar-background: 25 35% 12%;
+}
+
+/* Frost glass effect for cards */
+.winter-theme .frost-glass {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--winter-snow) / 0.9) 0%,
+    hsl(var(--winter-ice) / 0.7) 100%
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--winter-frost) / 0.5);
+  box-shadow: 
+    0 4px 24px hsl(var(--winter-ice) / 0.3),
+    inset 0 1px 0 hsl(0 0% 100% / 0.5);
+}
+
+.winter-theme.dark .frost-glass {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--winter-cocoa) / 0.9) 0%,
+    hsl(25 35% 18% / 0.8) 100%
+  );
+  border: 1px solid hsl(var(--winter-gold) / 0.2);
+  box-shadow: 
+    0 4px 24px hsl(0 0% 0% / 0.3),
+    inset 0 1px 0 hsl(var(--winter-gold) / 0.1);
+}
+
+/* Frost border animation */
+@keyframes frost-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.winter-theme .frost-border {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.winter-theme .frost-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--winter-ice)) 0%,
+    hsl(var(--winter-frost)) 25%,
+    hsl(200 70% 85%) 50%,
+    hsl(var(--winter-frost)) 75%,
+    hsl(var(--winter-ice)) 100%
+  );
+  background-size: 200% 100%;
+  animation: frost-shimmer 3s ease-in-out infinite;
+  border-radius: inherit;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Cozy glow effect */
+.winter-theme .cozy-glow {
+  box-shadow: 
+    0 0 40px hsl(var(--winter-gold) / 0.15),
+    0 0 80px hsl(var(--winter-cinnamon) / 0.1);
+}
+
+/* Snowflake decorations */
+.winter-theme .snowflake-accent::before {
+  content: '❄';
+  position: absolute;
+  font-size: 0.75rem;
+  color: hsl(var(--winter-ice));
+  opacity: 0.6;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(10deg);
+  }
+}
+
+/* Winter button styles */
+.winter-theme .btn-winter {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--winter-pine)) 0%,
+    hsl(150 40% 25%) 100%
+  );
+  color: hsl(var(--winter-snow));
+  border: none;
+  box-shadow: 
+    0 2px 8px hsl(var(--winter-pine) / 0.3),
+    inset 0 1px 0 hsl(0 0% 100% / 0.1);
+  transition: all 0.2s ease;
+}
+
+.winter-theme .btn-winter:hover {
+  background: linear-gradient(
+    135deg,
+    hsl(150 40% 35%) 0%,
+    hsl(var(--winter-pine)) 100%
+  );
+  box-shadow: 
+    0 4px 16px hsl(var(--winter-pine) / 0.4),
+    inset 0 1px 0 hsl(0 0% 100% / 0.15);
+  transform: translateY(-1px);
+}
+
+/* Warm text accents */
+.winter-theme .text-warm {
+  color: hsl(var(--winter-cinnamon));
+}
+
+.winter-theme .text-frost {
+  color: hsl(200 50% 60%);
+}
+
+/* Ice crystal pattern overlay (subtle) */
+.winter-theme .ice-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 30%, hsl(var(--winter-frost) / 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 80% 70%, hsl(var(--winter-frost) / 0.2) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, hsl(var(--winter-ice) / 0.15) 2px, transparent 2px);
+  background-size: 60px 60px, 80px 80px, 100px 100px;
+}
+
+/* Cozy card hover */
+.winter-theme .card {
+  transition: all 0.3s ease;
+}
+
+.winter-theme .card:hover {
+  box-shadow: 
+    0 8px 32px hsl(var(--winter-slate) / 0.1),
+    0 0 0 1px hsl(var(--winter-frost) / 0.5);
+}
+
+.winter-theme.dark .card:hover {
+  box-shadow: 
+    0 8px 32px hsl(0 0% 0% / 0.3),
+    0 0 0 1px hsl(var(--winter-gold) / 0.2);
+}
+
+/* Winter header accent */
+.winter-theme header {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--winter-cream)) 0%,
+    hsl(var(--winter-cream) / 0.95) 100%
+  );
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid hsl(var(--winter-ice) / 0.5);
+}
+
+.winter-theme.dark header {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--winter-cocoa)) 0%,
+    hsl(var(--winter-cocoa) / 0.95) 100%
+  );
+  border-bottom: 1px solid hsl(var(--winter-gold) / 0.15);
+}

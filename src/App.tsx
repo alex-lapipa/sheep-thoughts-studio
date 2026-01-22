@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { MoodProvider } from "@/contexts/MoodContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+import { WinterThemeProvider } from "@/contexts/WinterThemeContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 import Index from "./pages/Index";
@@ -50,6 +51,7 @@ const App = () => (
     <TooltipProvider>
       <LanguageProvider>
         <SettingsProvider>
+          <WinterThemeProvider>
           <AuthProvider>
             <MoodProvider>
               <Toaster />
@@ -103,6 +105,7 @@ const App = () => (
             </BrowserRouter>
             </MoodProvider>
           </AuthProvider>
+          </WinterThemeProvider>
         </SettingsProvider>
       </LanguageProvider>
     </TooltipProvider>

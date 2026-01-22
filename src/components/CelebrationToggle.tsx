@@ -172,6 +172,8 @@ export const CelebrationToggle = () => {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, mode);
+    // Dispatch custom event for WinterThemeContext
+    window.dispatchEvent(new CustomEvent("celebration-mode-change"));
   }, [mode]);
 
   const fireEffect = useCallback((theme: ThemeConfig) => {
