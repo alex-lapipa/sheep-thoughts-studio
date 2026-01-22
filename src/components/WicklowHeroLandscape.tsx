@@ -332,138 +332,225 @@ function LightningEffect() {
 // SUGARLOAF MOUNTAIN - Sharp conical peak with quartzite summit
 // Reference: Sugarloaf (Ó Cualann) - distinctive asymmetric cone
 // ============================================================================
-function SugarloafMountain() {
+// Drifting cloud shadows across the mountain slopes
+function CloudShadows() {
+  const shadows = useMemo(() => 
+    [...Array(4)].map((_, i) => ({
+      id: i,
+      delay: i * 8,
+      duration: 25 + Math.random() * 15,
+      yOffset: 80 + i * 60,
+      size: 120 + Math.random() * 80,
+      opacity: 0.12 + Math.random() * 0.08,
+    })), []
+  );
+
   return (
-    <svg
-      className="absolute bottom-0 left-0 w-full h-[70%]"
-      viewBox="0 0 1440 450"
-      preserveAspectRatio="xMidYMax slice"
-    >
+    <svg className="absolute bottom-0 left-0 w-full h-[70%] pointer-events-none" viewBox="0 0 1440 450" preserveAspectRatio="xMidYMax slice">
       <defs>
-        {/* Quartzite summit - dark granite purple-grey (#4A4453) */}
-        <linearGradient id="quartziteSummit" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#4A4453" />
-          <stop offset="60%" stopColor="#5A5463" />
-          <stop offset="100%" stopColor="#6B5B6B" />
-        </linearGradient>
+        {/* Cloud shadow gradient - soft dark patch */}
+        <radialGradient id="cloudShadow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#3A3443" stopOpacity="1" />
+          <stop offset="60%" stopColor="#3A3443" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#3A3443" stopOpacity="0" />
+        </radialGradient>
         
-        {/* Upper slopes - heather mauve-brown (#6B5B6B → #7A8B5A) */}
-        <linearGradient id="heatherSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#6B5B6B" />
-          <stop offset="50%" stopColor="#7A6B6A" />
-          <stop offset="100%" stopColor="#7A8B5A" />
-        </linearGradient>
-        
-        {/* Lower slopes - forestry green (#5D7A3D) */}
-        <linearGradient id="forestSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#7A8B5A" />
-          <stop offset="40%" stopColor="#5D7A3D" />
-          <stop offset="100%" stopColor="#4A7C34" />
-        </linearGradient>
-        
-        {/* Distant hills - blue-grey with atmospheric haze */}
-        <linearGradient id="distantHills" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#8B7B8B" />
-          <stop offset="100%" stopColor="#7A8B6A" />
-        </linearGradient>
+        {/* Clip to mountain shape so shadows only appear on slopes */}
+        <clipPath id="mountainClip">
+          {/* Main Sugarloaf */}
+          <path d="M480,450 Q520,380 580,340 L720,60 L860,320 Q920,360 960,450 Z" />
+          {/* Secondary peak */}
+          <path d="M1050,450 Q1100,380 1150,320 L1220,200 L1290,300 Q1340,360 1380,450 Z" />
+          {/* Left foothills */}
+          <path d="M0,450 L0,360 Q100,320 200,340 Q350,300 480,360 L480,450 Z" />
+        </clipPath>
       </defs>
       
-      {/* BACKGROUND: Distant rolling hills */}
-      <path
-        d="M0,450 L0,340 Q120,310 240,330 Q400,290 550,320 Q700,280 850,310 Q1000,270 1150,300 Q1300,260 1440,290 L1440,450 Z"
-        fill="url(#distantHills)"
-        opacity="0.4"
-      />
-      
-      {/* SUGARLOAF: Sharp conical peak - the iconic silhouette */}
-      {/* Main mountain body - green lower slopes */}
-      <path
-        d="M480,450 
-           Q520,380 580,340 
-           L720,60
-           L860,320
-           Q920,360 960,450 
-           Z"
-        fill="url(#forestSlopes)"
-      />
-      
-      {/* Upper heather-covered slopes */}
-      <path
-        d="M560,340 
-           Q600,280 660,200 
-           L720,60
-           L780,180
-           Q840,260 880,320
-           Q820,350 720,360
-           Q620,355 560,340
-           Z"
-        fill="url(#heatherSlopes)"
-        opacity="0.9"
-      />
-      
-      {/* Sharp quartzite summit cap - the rocky peak */}
-      <path
-        d="M660,180 
-           Q680,120 720,40
-           L725,38
-           Q770,100 800,170
-           Q760,210 720,220
-           Q680,215 660,180
-           Z"
-        fill="url(#quartziteSummit)"
-      />
-      
-      {/* Summit rocky texture details */}
-      <g opacity="0.4" stroke="#3A3443" strokeWidth="1.5">
-        <path d="M700,80 Q710,100 705,130" fill="none" />
-        <path d="M730,70 Q740,95 735,120" fill="none" />
-        <path d="M715,50 L720,40 L725,48" fill="none" />
-        <path d="M680,150 Q695,140 700,160" fill="none" />
-        <path d="M745,140 Q755,155 750,170" fill="none" />
+      {/* Shadow layer clipped to mountain */}
+      <g clipPath="url(#mountainClip)">
+        {shadows.map((shadow) => (
+          <motion.ellipse
+            key={shadow.id}
+            cx="-200"
+            cy={shadow.yOffset}
+            rx={shadow.size}
+            ry={shadow.size * 0.4}
+            fill="url(#cloudShadow)"
+            opacity={shadow.opacity}
+            animate={{
+              cx: [-200, 1640],
+              opacity: [0, shadow.opacity, shadow.opacity, 0],
+            }}
+            transition={{
+              duration: shadow.duration,
+              repeat: Infinity,
+              delay: shadow.delay,
+              ease: "linear",
+            }}
+          />
+        ))}
+        
+        {/* Larger, slower shadows for dramatic effect */}
+        <motion.ellipse
+          cx="-300"
+          cy={200}
+          rx={250}
+          ry={100}
+          fill="url(#cloudShadow)"
+          opacity={0.15}
+          animate={{
+            cx: [-300, 1740],
+            opacity: [0, 0.15, 0.15, 0],
+          }}
+          transition={{
+            duration: 45,
+            repeat: Infinity,
+            delay: 5,
+            ease: "linear",
+          }}
+        />
       </g>
-      
-      {/* SECONDARY PEAK: Smaller hill to the right */}
-      <path
-        d="M1050,450 
-           Q1100,380 1150,320
-           L1220,200
-           L1290,300
-           Q1340,360 1380,450
-           Z"
-        fill="url(#forestSlopes)"
-        opacity="0.7"
-      />
-      
-      {/* Secondary peak rocky top */}
-      <path
-        d="M1140,310
-           Q1170,260 1220,190
-           L1230,188
-           Q1270,250 1300,300
-           Q1260,320 1220,325
-           Q1180,320 1140,310
-           Z"
-        fill="url(#heatherSlopes)"
-        opacity="0.6"
-      />
-      
-      {/* Small rocky cap on secondary */}
-      <path
-        d="M1190,250 L1220,185 L1250,240 Q1220,270 1190,250 Z"
-        fill="url(#quartziteSummit)"
-        opacity="0.5"
-      />
-      
-      {/* LEFT SIDE: Rolling foothills */}
-      <path
-        d="M0,450 L0,360 Q100,320 200,340 Q350,300 480,360 L480,450 Z"
-        fill="url(#forestSlopes)"
-        opacity="0.5"
-      />
-      
-      {/* Atmospheric haze at mountain base */}
-      <rect x="0" y="400" width="1440" height="50" fill="url(#distantHills)" opacity="0.15" />
     </svg>
+  );
+}
+
+function SugarloafMountain() {
+  return (
+    <>
+      <svg
+        className="absolute bottom-0 left-0 w-full h-[70%]"
+        viewBox="0 0 1440 450"
+        preserveAspectRatio="xMidYMax slice"
+      >
+        <defs>
+          {/* Quartzite summit - dark granite purple-grey (#4A4453) */}
+          <linearGradient id="quartziteSummit" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#4A4453" />
+            <stop offset="60%" stopColor="#5A5463" />
+            <stop offset="100%" stopColor="#6B5B6B" />
+          </linearGradient>
+          
+          {/* Upper slopes - heather mauve-brown (#6B5B6B → #7A8B5A) */}
+          <linearGradient id="heatherSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#6B5B6B" />
+            <stop offset="50%" stopColor="#7A6B6A" />
+            <stop offset="100%" stopColor="#7A8B5A" />
+          </linearGradient>
+          
+          {/* Lower slopes - forestry green (#5D7A3D) */}
+          <linearGradient id="forestSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#7A8B5A" />
+            <stop offset="40%" stopColor="#5D7A3D" />
+            <stop offset="100%" stopColor="#4A7C34" />
+          </linearGradient>
+          
+          {/* Distant hills - blue-grey with atmospheric haze */}
+          <linearGradient id="distantHills" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#8B7B8B" />
+            <stop offset="100%" stopColor="#7A8B6A" />
+          </linearGradient>
+        </defs>
+        
+        {/* BACKGROUND: Distant rolling hills */}
+        <path
+          d="M0,450 L0,340 Q120,310 240,330 Q400,290 550,320 Q700,280 850,310 Q1000,270 1150,300 Q1300,260 1440,290 L1440,450 Z"
+          fill="url(#distantHills)"
+          opacity="0.4"
+        />
+        
+        {/* SUGARLOAF: Sharp conical peak - the iconic silhouette */}
+        {/* Main mountain body - green lower slopes */}
+        <path
+          d="M480,450 
+             Q520,380 580,340 
+             L720,60
+             L860,320
+             Q920,360 960,450 
+             Z"
+          fill="url(#forestSlopes)"
+        />
+        
+        {/* Upper heather-covered slopes */}
+        <path
+          d="M560,340 
+             Q600,280 660,200 
+             L720,60
+             L780,180
+             Q840,260 880,320
+             Q820,350 720,360
+             Q620,355 560,340
+             Z"
+          fill="url(#heatherSlopes)"
+          opacity="0.9"
+        />
+        
+        {/* Sharp quartzite summit cap - the rocky peak */}
+        <path
+          d="M660,180 
+             Q680,120 720,40
+             L725,38
+             Q770,100 800,170
+             Q760,210 720,220
+             Q680,215 660,180
+             Z"
+          fill="url(#quartziteSummit)"
+        />
+        
+        {/* Summit rocky texture details */}
+        <g opacity="0.4" stroke="#3A3443" strokeWidth="1.5">
+          <path d="M700,80 Q710,100 705,130" fill="none" />
+          <path d="M730,70 Q740,95 735,120" fill="none" />
+          <path d="M715,50 L720,40 L725,48" fill="none" />
+          <path d="M680,150 Q695,140 700,160" fill="none" />
+          <path d="M745,140 Q755,155 750,170" fill="none" />
+        </g>
+        
+        {/* SECONDARY PEAK: Smaller hill to the right */}
+        <path
+          d="M1050,450 
+             Q1100,380 1150,320
+             L1220,200
+             L1290,300
+             Q1340,360 1380,450
+             Z"
+          fill="url(#forestSlopes)"
+          opacity="0.7"
+        />
+        
+        {/* Secondary peak rocky top */}
+        <path
+          d="M1140,310
+             Q1170,260 1220,190
+             L1230,188
+             Q1270,250 1300,300
+             Q1260,320 1220,325
+             Q1180,320 1140,310
+             Z"
+          fill="url(#heatherSlopes)"
+          opacity="0.6"
+        />
+        
+        {/* Small rocky cap on secondary */}
+        <path
+          d="M1190,250 L1220,185 L1250,240 Q1220,270 1190,250 Z"
+          fill="url(#quartziteSummit)"
+          opacity="0.5"
+        />
+        
+        {/* LEFT SIDE: Rolling foothills */}
+        <path
+          d="M0,450 L0,360 Q100,320 200,340 Q350,300 480,360 L480,450 Z"
+          fill="url(#forestSlopes)"
+          opacity="0.5"
+        />
+        
+        {/* Atmospheric haze at mountain base */}
+        <rect x="0" y="400" width="1440" height="50" fill="url(#distantHills)" opacity="0.15" />
+      </svg>
+      
+      {/* Cloud shadows drifting over slopes */}
+      <CloudShadows />
+    </>
   );
 }
 
