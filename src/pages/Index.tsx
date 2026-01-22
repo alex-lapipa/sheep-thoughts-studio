@@ -18,6 +18,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMood } from "@/contexts/MoodContext";
 import { useOgImage } from "@/hooks/useOgImage";
+import { useLanguageRedirect } from "@/hooks/useLanguageRedirect";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -50,6 +51,9 @@ export default function Index() {
   const [isPaused, setIsPaused] = useState(false);
   const { t } = useLanguage();
   const { setCurrentMode } = useMood();
+  
+  // Auto-redirect German speakers to DACH page on first visit
+  useLanguageRedirect();
 
   useEffect(() => {
     async function fetchThoughts() {
