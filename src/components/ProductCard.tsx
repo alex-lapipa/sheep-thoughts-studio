@@ -12,9 +12,10 @@ import { ecommerceTracking } from "@/lib/ecommerceTracking";
 interface ProductCardProps {
   product: ShopifyProduct;
   position?: number;
+  listName?: string;
 }
 
-export function ProductCard({ product, position }: ProductCardProps) {
+export function ProductCard({ product, position, listName }: ProductCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasTrackedImpression = useRef(false);
   const addItem = useCartStore(state => state.addItem);
@@ -44,7 +45,8 @@ export function ProductCard({ product, position }: ProductCardProps) {
               node.id,
               node.title,
               parseFloat(price.amount),
-              position
+              position,
+              listName
             );
             observer.disconnect();
           }
@@ -55,7 +57,7 @@ export function ProductCard({ product, position }: ProductCardProps) {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [node.id, node.title, price.amount, position]);
+  }, [node.id, node.title, price.amount, position, listName]);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();

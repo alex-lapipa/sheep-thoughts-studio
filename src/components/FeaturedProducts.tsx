@@ -27,7 +27,7 @@ export function FeaturedProducts() {
           </Link>
         </div>
 
-        <ProductGrid products={products || []} isLoading={isLoading} />
+        <ProductGrid products={products || []} isLoading={isLoading} listName="homepage_featured" />
       </div>
     </section>
   );

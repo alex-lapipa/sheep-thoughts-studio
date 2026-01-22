@@ -48,7 +48,7 @@ const Search = () => {
         </div>
 
         {query.length >= 2 ? (
-          <ProductGrid products={products || []} isLoading={isLoading} />
+          <ProductGrid products={products || []} isLoading={isLoading} listName="search_results" />
         ) : (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔍</div>

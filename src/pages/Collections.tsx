@@ -74,7 +74,11 @@ const Collections = () => {
           </div>
         </div>
 
-        <ProductGrid products={products || []} isLoading={isLoading} />
+        <ProductGrid 
+          products={products || []} 
+          isLoading={isLoading} 
+          listName={activeMode ? `collection_${activeMode}` : "collection_all"}
+        />
       </div>
     </Layout>
   );
