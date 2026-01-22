@@ -1,14 +1,40 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 interface PageTransitionProps {
   children: React.ReactNode;
 }
 
+const pageVariants: Variants = {
+  initial: {
+    opacity: 0,
+    y: 20,
+    scale: 0.98,
+  },
+  enter: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] as const,
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.99,
+    transition: {
+      duration: 0.25,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+};
+
 export function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation();
-  const [isVisible, setIsVisible] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const previousPathRef = useRef(location.pathname);
 
@@ -16,16 +42,14 @@ export function PageTransition({ children }: PageTransitionProps) {
     // Only trigger transition if path actually changed
     if (previousPathRef.current !== location.pathname) {
       setIsTransitioning(true);
-      setIsVisible(false);
       
       // Scroll to top on page change
       window.scrollTo({ top: 0, behavior: "instant" });
       
-      // Fade in after a brief delay
+      // End transition after animation
       const timer = setTimeout(() => {
-        setIsVisible(true);
         setIsTransitioning(false);
-      }, 150);
+      }, 400);
       
       previousPathRef.current = location.pathname;
       return () => clearTimeout(timer);
@@ -35,27 +59,31 @@ export function PageTransition({ children }: PageTransitionProps) {
   return (
     <>
       {/* Page transition loading bar */}
-      <div 
-        className={cn(
-          "fixed top-0 left-0 h-1 bg-gradient-to-r from-primary via-accent to-primary z-[100] transition-all duration-300",
-          isTransitioning ? "w-full opacity-100" : "w-0 opacity-0"
-        )}
+      <motion.div 
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary via-accent to-primary z-[100]"
+        initial={{ width: "0%", opacity: 0 }}
+        animate={{ 
+          width: isTransitioning ? "100%" : "0%",
+          opacity: isTransitioning ? 1 : 0
+        }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           boxShadow: isTransitioning ? "0 0 10px hsl(var(--primary) / 0.5)" : "none"
         }}
       />
       
-      {/* Page content with transition */}
-      <div
-        className={cn(
-          "transition-all duration-300 ease-out",
-          isVisible 
-            ? "opacity-100 translate-y-0" 
-            : "opacity-0 translate-y-3"
-        )}
-      >
-        {children}
-      </div>
+      {/* Page content with smooth transition */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          variants={pageVariants}
+          initial="initial"
+          animate="enter"
+          exit="exit"
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 }
