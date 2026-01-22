@@ -31,6 +31,7 @@ import {
   Map,
   Megaphone,
   Calendar,
+  Timer,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -134,6 +135,7 @@ const navSections: NavSection[] = [
       { href: '/admin/sitemap', label: 'Sitemap & SEO', icon: Map },
       { href: '/admin/og-preview', label: 'OG Image Preview', icon: ExternalLink },
       { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
+      { href: '/admin/cron-jobs', label: 'Scheduled Tasks', icon: Timer },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
     ],
   },

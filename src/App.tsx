@@ -59,6 +59,7 @@ import AdminOGPreview from "./pages/admin/OGPreview";
 import AdminOGCacheManager from "./pages/admin/OGCacheManager";
 import SeasonalBannerPreview from "./pages/admin/SeasonalBannerPreview";
 import AdminEmbeddings from "./pages/admin/Embeddings";
+import AdminCronJobs from "./pages/admin/CronJobs";
 
 const queryClient = new QueryClient();
 
@@ -131,6 +132,7 @@ const App = () => (
                 <Route path="/admin/og-cache" element={<ProtectedRoute><AdminOGCacheManager /></ProtectedRoute>} />
                 <Route path="/admin/seasonal-banners" element={<ProtectedRoute><SeasonalBannerPreview /></ProtectedRoute>} />
                 <Route path="/admin/embeddings" element={<ProtectedRoute><AdminEmbeddings /></ProtectedRoute>} />
+                <Route path="/admin/cron-jobs" element={<ProtectedRoute><AdminCronJobs /></ProtectedRoute>} />
                 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
