@@ -30,6 +30,7 @@ import {
   Mail,
   Map,
   Megaphone,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -129,6 +130,7 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin/users', label: 'Users & Roles', icon: Users, requiredModule: 'admin' },
       { href: '/admin/sitemap', label: 'Sitemap & SEO', icon: Map },
+      { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
     ],
   },

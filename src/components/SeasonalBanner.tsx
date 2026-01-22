@@ -3,7 +3,7 @@ import { X, Clover, Heart, Sun, Leaf, Snowflake, Sparkles, Flower2, Scissors } f
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type SeasonalEvent = {
+export type SeasonalEvent = {
   id: string;
   name: string;
   check: () => boolean;
@@ -16,7 +16,7 @@ type SeasonalEvent = {
   messages: string[];
 };
 
-const SEASONAL_EVENTS: SeasonalEvent[] = [
+export const SEASONAL_EVENTS: SeasonalEvent[] = [
   {
     id: "st-patricks-2026",
     name: "St. Patrick's Day",
