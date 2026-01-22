@@ -6,22 +6,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate a deterministic pseudo-embedding using a hash-based approach
-// Since Lovable AI doesn't support dedicated embedding models, we create
-// consistent numeric vectors from text for semantic similarity
+// Generate embeddings using Lovable AI Gateway
+async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      input: text.slice(0, 8000), // Limit text length
+      model: "text-embedding-3-small",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Embedding API error:", response.status, errorText);
+    throw new Error(`Embedding API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.data[0].embedding;
+}
+
+// Fallback: Generate a deterministic pseudo-embedding using a hash-based approach
 function generatePseudoEmbedding(text: string): number[] {
   const dimensions = 1536;
   const embedding: number[] = new Array(dimensions);
   
-  // Use a simple but consistent hash-based approach
   let hash = 0;
   for (let i = 0; i < text.length; i++) {
     const char = text.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   
-  // Seed random number generator with hash for consistency
   const seed = Math.abs(hash);
   let state = seed;
   
@@ -30,9 +50,7 @@ function generatePseudoEmbedding(text: string): number[] {
     return (state / 0x7fffffff) * 2 - 1;
   };
   
-  // Generate embedding values influenced by text characteristics
   for (let i = 0; i < dimensions; i++) {
-    // Mix in character-level features for the first part of the vector
     if (i < text.length) {
       const charCode = text.charCodeAt(i % text.length);
       embedding[i] = (pseudoRandom() + (charCode / 127 - 1)) / 2;
@@ -41,7 +59,6 @@ function generatePseudoEmbedding(text: string): number[] {
     }
   }
   
-  // Normalize the vector
   const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
   for (let i = 0; i < dimensions; i++) {
     embedding[i] = embedding[i] / magnitude;
@@ -66,203 +83,274 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
-    const { table = "bubbles_knowledge", limit = 50, force = false } = await req.json().catch(() => ({}));
+    const { table = "bubbles_knowledge", limit = 50, force = false, useAI = true } = await req.json().catch(() => ({}));
     
     const results = {
       processed: 0,
       succeeded: 0,
       failed: 0,
       errors: [] as string[],
+      embeddingMethod: useAI ? "ai" : "pseudo",
     };
 
+    // Helper function to get embedding with fallback
+    async function getEmbedding(text: string): Promise<number[]> {
+      if (useAI) {
+        try {
+          return await generateEmbedding(text, LOVABLE_API_KEY!);
+        } catch (error) {
+          console.warn("AI embedding failed, falling back to pseudo:", error);
+          results.embeddingMethod = "pseudo-fallback";
+          return generatePseudoEmbedding(text);
+        }
+      }
+      return generatePseudoEmbedding(text);
+    }
+
+    // Process bubbles_knowledge
     if (table === "bubbles_knowledge" || table === "all") {
-      // Fetch knowledge entries - either all (force) or only those with null embeddings
       let query = supabase
         .from("bubbles_knowledge")
-        .select("id, title, content");
+        .select("id, title, content, category, mode, tags");
       
       if (!force) {
         query = query.is("embedding", null);
       }
       
-      const { data: knowledgeEntries, error: fetchError } = await query.limit(limit);
+      const { data: entries, error: fetchError } = await query.limit(limit);
+      if (fetchError) throw new Error(`Failed to fetch knowledge: ${fetchError.message}`);
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch knowledge entries: ${fetchError.message}`);
-      }
+      console.log(`Processing ${entries?.length || 0} knowledge entries...`);
 
-      console.log(`Found ${knowledgeEntries?.length || 0} knowledge entries with null embeddings`);
-
-      for (const entry of knowledgeEntries || []) {
+      for (const entry of entries || []) {
         results.processed++;
-        const textToEmbed = `${entry.title}\n\n${entry.content}`;
-        const embedding = generatePseudoEmbedding(textToEmbed);
-        
-        const { error: updateError } = await supabase
-          .from("bubbles_knowledge")
-          .update({ embedding: `[${embedding.join(",")}]` })
-          .eq("id", entry.id);
-        
-        if (updateError) {
+        try {
+          // Create rich text for better semantic understanding
+          const textToEmbed = [
+            `Title: ${entry.title}`,
+            `Category: ${entry.category}`,
+            entry.mode ? `Mode: ${entry.mode}` : "",
+            entry.tags?.length ? `Tags: ${entry.tags.join(", ")}` : "",
+            `Content: ${entry.content}`,
+          ].filter(Boolean).join("\n");
+          
+          const embedding = await getEmbedding(textToEmbed);
+          
+          const { error: updateError } = await supabase
+            .from("bubbles_knowledge")
+            .update({ embedding: `[${embedding.join(",")}]` })
+            .eq("id", entry.id);
+          
+          if (updateError) {
+            results.failed++;
+            results.errors.push(`Knowledge ${entry.id}: ${updateError.message}`);
+          } else {
+            results.succeeded++;
+            console.log(`✓ Knowledge: ${entry.title}`);
+          }
+        } catch (error) {
           results.failed++;
-          results.errors.push(`Knowledge ${entry.id}: ${updateError.message}`);
-        } else {
-          results.succeeded++;
-          console.log(`Generated embedding for knowledge: ${entry.title}`);
+          results.errors.push(`Knowledge ${entry.id}: ${error}`);
         }
       }
     }
 
+    // Process bubbles_thoughts
     if (table === "bubbles_thoughts" || table === "all") {
-      // Fetch thoughts - either all (force) or only those with null embeddings
       let query = supabase
         .from("bubbles_thoughts")
-        .select("id, text");
+        .select("id, text, mode, trigger_category, tags");
       
       if (!force) {
         query = query.is("embedding", null);
       }
       
-      const { data: thoughtEntries, error: fetchError } = await query.limit(limit);
+      const { data: entries, error: fetchError } = await query.limit(limit);
+      if (fetchError) throw new Error(`Failed to fetch thoughts: ${fetchError.message}`);
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch thought entries: ${fetchError.message}`);
-      }
+      console.log(`Processing ${entries?.length || 0} thoughts...`);
 
-      console.log(`Found ${thoughtEntries?.length || 0} thoughts with null embeddings`);
-
-      for (const entry of thoughtEntries || []) {
+      for (const entry of entries || []) {
         results.processed++;
-        const embedding = generatePseudoEmbedding(entry.text);
-        
-        const { error: updateError } = await supabase
-          .from("bubbles_thoughts")
-          .update({ embedding: `[${embedding.join(",")}]` })
-          .eq("id", entry.id);
-        
-        if (updateError) {
+        try {
+          const textToEmbed = [
+            `Thought: ${entry.text}`,
+            `Mode: ${entry.mode}`,
+            entry.trigger_category ? `Trigger: ${entry.trigger_category}` : "",
+            entry.tags?.length ? `Tags: ${entry.tags.join(", ")}` : "",
+          ].filter(Boolean).join("\n");
+          
+          const embedding = await getEmbedding(textToEmbed);
+          
+          const { error: updateError } = await supabase
+            .from("bubbles_thoughts")
+            .update({ embedding: `[${embedding.join(",")}]` })
+            .eq("id", entry.id);
+          
+          if (updateError) {
+            results.failed++;
+            results.errors.push(`Thought ${entry.id}: ${updateError.message}`);
+          } else {
+            results.succeeded++;
+            console.log(`✓ Thought: ${entry.text.substring(0, 40)}...`);
+          }
+        } catch (error) {
           results.failed++;
-          results.errors.push(`Thought ${entry.id}: ${updateError.message}`);
-        } else {
-          results.succeeded++;
-          console.log(`Generated embedding for thought: ${entry.text.substring(0, 30)}...`);
+          results.errors.push(`Thought ${entry.id}: ${error}`);
         }
       }
     }
 
+    // Process bubbles_triggers
     if (table === "bubbles_triggers" || table === "all") {
-      // Fetch triggers - either all (force) or only those with null embeddings
       let query = supabase
         .from("bubbles_triggers")
-        .select("id, name, description, internal_logic");
+        .select("id, name, description, internal_logic, category, example_scenario, example_bubbles, tags");
       
       if (!force) {
         query = query.is("embedding", null);
       }
       
-      const { data: triggerEntries, error: fetchError } = await query.limit(limit);
+      const { data: entries, error: fetchError } = await query.limit(limit);
+      if (fetchError) throw new Error(`Failed to fetch triggers: ${fetchError.message}`);
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch trigger entries: ${fetchError.message}`);
-      }
+      console.log(`Processing ${entries?.length || 0} triggers...`);
 
-      console.log(`Found ${triggerEntries?.length || 0} triggers with null embeddings`);
-
-      for (const entry of triggerEntries || []) {
+      for (const entry of entries || []) {
         results.processed++;
-        const textToEmbed = `${entry.name}\n${entry.description}\n${entry.internal_logic}`;
-        const embedding = generatePseudoEmbedding(textToEmbed);
-        
-        const { error: updateError } = await supabase
-          .from("bubbles_triggers")
-          .update({ embedding: `[${embedding.join(",")}]` })
-          .eq("id", entry.id);
-        
-        if (updateError) {
+        try {
+          const exampleBubbles = Array.isArray(entry.example_bubbles) ? entry.example_bubbles.join("; ") : "";
+          const textToEmbed = [
+            `Trigger: ${entry.name}`,
+            `Category: ${entry.category}`,
+            `Description: ${entry.description}`,
+            `Logic: ${entry.internal_logic}`,
+            entry.example_scenario ? `Example: ${entry.example_scenario}` : "",
+            exampleBubbles ? `Sample responses: ${exampleBubbles}` : "",
+            entry.tags?.length ? `Tags: ${entry.tags.join(", ")}` : "",
+          ].filter(Boolean).join("\n");
+          
+          const embedding = await getEmbedding(textToEmbed);
+          
+          const { error: updateError } = await supabase
+            .from("bubbles_triggers")
+            .update({ embedding: `[${embedding.join(",")}]` })
+            .eq("id", entry.id);
+          
+          if (updateError) {
+            results.failed++;
+            results.errors.push(`Trigger ${entry.id}: ${updateError.message}`);
+          } else {
+            results.succeeded++;
+            console.log(`✓ Trigger: ${entry.name}`);
+          }
+        } catch (error) {
           results.failed++;
-          results.errors.push(`Trigger ${entry.id}: ${updateError.message}`);
-        } else {
-          results.succeeded++;
-          console.log(`Generated embedding for trigger: ${entry.name}`);
+          results.errors.push(`Trigger ${entry.id}: ${error}`);
         }
       }
     }
 
+    // Process bubbles_scenarios
     if (table === "bubbles_scenarios" || table === "all") {
-      // Fetch scenarios - either all (force) or only those with null embeddings
       let query = supabase
         .from("bubbles_scenarios")
-        .select("id, title, description");
+        .select("id, title, description, start_mode, end_mode, trigger_category, tags, beats");
       
       if (!force) {
         query = query.is("embedding", null);
       }
       
-      const { data: scenarioEntries, error: fetchError } = await query.limit(limit);
+      const { data: entries, error: fetchError } = await query.limit(limit);
+      if (fetchError) throw new Error(`Failed to fetch scenarios: ${fetchError.message}`);
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch scenario entries: ${fetchError.message}`);
-      }
+      console.log(`Processing ${entries?.length || 0} scenarios...`);
 
-      console.log(`Found ${scenarioEntries?.length || 0} scenarios with null embeddings`);
-
-      for (const entry of scenarioEntries || []) {
+      for (const entry of entries || []) {
         results.processed++;
-        const textToEmbed = `${entry.title}\n${entry.description}`;
-        const embedding = generatePseudoEmbedding(textToEmbed);
-        
-        const { error: updateError } = await supabase
-          .from("bubbles_scenarios")
-          .update({ embedding: `[${embedding.join(",")}]` })
-          .eq("id", entry.id);
-        
-        if (updateError) {
+        try {
+          const beatsText = entry.beats ? JSON.stringify(entry.beats) : "";
+          const textToEmbed = [
+            `Scenario: ${entry.title}`,
+            `Description: ${entry.description}`,
+            `Mode transition: ${entry.start_mode} → ${entry.end_mode}`,
+            entry.trigger_category ? `Trigger: ${entry.trigger_category}` : "",
+            entry.tags?.length ? `Tags: ${entry.tags.join(", ")}` : "",
+            beatsText ? `Story beats: ${beatsText.slice(0, 500)}` : "",
+          ].filter(Boolean).join("\n");
+          
+          const embedding = await getEmbedding(textToEmbed);
+          
+          const { error: updateError } = await supabase
+            .from("bubbles_scenarios")
+            .update({ embedding: `[${embedding.join(",")}]` })
+            .eq("id", entry.id);
+          
+          if (updateError) {
+            results.failed++;
+            results.errors.push(`Scenario ${entry.id}: ${updateError.message}`);
+          } else {
+            results.succeeded++;
+            console.log(`✓ Scenario: ${entry.title}`);
+          }
+        } catch (error) {
           results.failed++;
-          results.errors.push(`Scenario ${entry.id}: ${updateError.message}`);
-        } else {
-          results.succeeded++;
-          console.log(`Generated embedding for scenario: ${entry.title}`);
+          results.errors.push(`Scenario ${entry.id}: ${error}`);
         }
       }
     }
 
+    // Process bubbles_rag_content
     if (table === "bubbles_rag_content" || table === "all") {
-      // Fetch RAG content - either all (force) or only those with null embeddings
       let query = supabase
         .from("bubbles_rag_content")
-        .select("id, title, type, category, bubbles_wrong_take, comedy_hooks, signature_lines");
+        .select("id, title, type, category, bubbles_wrong_take, comedy_hooks, signature_lines, canonical_claim, tags, avoid");
       
       if (!force) {
         query = query.is("embedding", null);
       }
       
-      const { data: ragEntries, error: fetchError } = await query.limit(limit);
+      const { data: entries, error: fetchError } = await query.limit(limit);
+      if (fetchError) throw new Error(`Failed to fetch RAG content: ${fetchError.message}`);
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch RAG content entries: ${fetchError.message}`);
-      }
+      console.log(`Processing ${entries?.length || 0} RAG content entries...`);
 
-      console.log(`Found ${ragEntries?.length || 0} RAG content entries with null embeddings`);
-
-      for (const entry of ragEntries || []) {
+      for (const entry of entries || []) {
         results.processed++;
-        // Combine all relevant text fields for embedding
-        const comedyHooks = Array.isArray(entry.comedy_hooks) ? entry.comedy_hooks.join(". ") : "";
-        const signatureLines = Array.isArray(entry.signature_lines) ? entry.signature_lines.join(". ") : "";
-        const textToEmbed = `${entry.title}\n${entry.type}\n${entry.category || ""}\n${entry.bubbles_wrong_take}\n${comedyHooks}\n${signatureLines}`;
-        const embedding = generatePseudoEmbedding(textToEmbed);
-        
-        const { error: updateError } = await supabase
-          .from("bubbles_rag_content")
-          .update({ embedding: `[${embedding.join(",")}]` })
-          .eq("id", entry.id);
-        
-        if (updateError) {
+        try {
+          const comedyHooks = Array.isArray(entry.comedy_hooks) ? entry.comedy_hooks.join("; ") : "";
+          const signatureLines = Array.isArray(entry.signature_lines) ? entry.signature_lines.join("; ") : "";
+          const avoidList = Array.isArray(entry.avoid) ? entry.avoid.join("; ") : "";
+          
+          const textToEmbed = [
+            `Topic: ${entry.title}`,
+            `Type: ${entry.type}`,
+            entry.category ? `Category: ${entry.category}` : "",
+            entry.canonical_claim ? `True claim: ${entry.canonical_claim}` : "",
+            `Bubbles' wrong take: ${entry.bubbles_wrong_take}`,
+            comedyHooks ? `Comedy hooks: ${comedyHooks}` : "",
+            signatureLines ? `Signature lines: ${signatureLines}` : "",
+            avoidList ? `Things to avoid: ${avoidList}` : "",
+            entry.tags?.length ? `Tags: ${entry.tags.join(", ")}` : "",
+          ].filter(Boolean).join("\n");
+          
+          const embedding = await getEmbedding(textToEmbed);
+          
+          const { error: updateError } = await supabase
+            .from("bubbles_rag_content")
+            .update({ embedding: `[${embedding.join(",")}]` })
+            .eq("id", entry.id);
+          
+          if (updateError) {
+            results.failed++;
+            results.errors.push(`RAG ${entry.id}: ${updateError.message}`);
+          } else {
+            results.succeeded++;
+            console.log(`✓ RAG: ${entry.title}`);
+          }
+        } catch (error) {
           results.failed++;
-          results.errors.push(`RAG Content ${entry.id}: ${updateError.message}`);
-        } else {
-          results.succeeded++;
-          console.log(`Generated embedding for RAG content: ${entry.title}`);
+          results.errors.push(`RAG ${entry.id}: ${error}`);
         }
       }
     }
