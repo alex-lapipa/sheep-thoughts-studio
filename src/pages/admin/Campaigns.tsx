@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -61,10 +62,21 @@ import {
   Eye,
   CalendarIcon,
   XCircle,
+  FileText,
+  Sparkles,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  html_content: string;
+  category: string | null;
+  description: string | null;
+}
 
 interface Campaign {
   id: string;
@@ -88,6 +100,7 @@ export default function AdminCampaigns() {
   const [isTestOpen, setIsTestOpen] = useState(false);
   const [isSendConfirmOpen, setIsSendConfirmOpen] = useState(false);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [testEmail, setTestEmail] = useState("");
   
@@ -100,6 +113,20 @@ export default function AdminCampaigns() {
     subject: "",
     preview_text: "",
     html_content: "",
+  });
+
+  // Fetch templates for the picker
+  const { data: templates = [] } = useQuery({
+    queryKey: ["email-templates-picker"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("email_templates")
+        .select("id, name, subject, html_content, category, description")
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+      return data as EmailTemplate[];
+    },
   });
 
   const { data: campaigns = [], isLoading, refetch } = useQuery({
@@ -525,6 +552,19 @@ export default function AdminCampaigns() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              {/* Use Template Button */}
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsTemplatePickerOpen(true)}
+                  className="gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Use Template
+                </Button>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject Line *</Label>
                 <Input
@@ -561,6 +601,72 @@ export default function AdminCampaigns() {
                 disabled={!formData.subject || !formData.html_content || createMutation.isPending}
               >
                 Create Campaign
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Template Picker Dialog */}
+        <Dialog open={isTemplatePickerOpen} onOpenChange={setIsTemplatePickerOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Select a Template
+              </DialogTitle>
+              <DialogDescription>
+                Choose a template to use as a starting point for your campaign
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[400px] pr-4">
+              {templates.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                  <p>No templates available</p>
+                  <p className="text-sm">Create templates in the Templates page first</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {templates.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => {
+                        setFormData({
+                          subject: template.subject,
+                          preview_text: formData.preview_text,
+                          html_content: template.html_content,
+                        });
+                        setIsTemplatePickerOpen(false);
+                        toast.success(`Template "${template.name}" applied`);
+                      }}
+                      className="w-full text-left p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{template.name}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {template.subject}
+                          </p>
+                          {template.description && (
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {template.description}
+                            </p>
+                          )}
+                        </div>
+                        {template.category && (
+                          <Badge variant="outline" className="shrink-0">
+                            {template.category}
+                          </Badge>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsTemplatePickerOpen(false)}>
+                Cancel
               </Button>
             </DialogFooter>
           </DialogContent>
