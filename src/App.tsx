@@ -49,6 +49,7 @@ import BrandFrontend from "./pages/admin/brand/BrandFrontend";
 import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
 import AdminMessages from "./pages/admin/Messages";
+import AdminSpamQueue from "./pages/admin/SpamQueue";
 import AdminSubscribers from "./pages/admin/Subscribers";
 import AdminCampaigns from "./pages/admin/Campaigns";
 import AdminSitemap from "./pages/admin/Sitemap";
@@ -112,6 +113,7 @@ const App = () => (
                 
                 {/* Support Routes */}
                 <Route path="/admin/messages" element={<ProtectedRoute><AdminMessages /></ProtectedRoute>} />
+                <Route path="/admin/spam-queue" element={<ProtectedRoute><AdminSpamQueue /></ProtectedRoute>} />
                 <Route path="/admin/subscribers" element={<ProtectedRoute><AdminSubscribers /></ProtectedRoute>} />
                 <Route path="/admin/campaigns" element={<ProtectedRoute><AdminCampaigns /></ProtectedRoute>} />
                 
