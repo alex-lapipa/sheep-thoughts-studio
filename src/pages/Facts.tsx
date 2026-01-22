@@ -93,11 +93,11 @@ export default function Facts() {
         <meta property="og:description" content="Discover Bubbles' collection of confidently incorrect facts. Highly researched. Absolutely wrong." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/facts`} />
-        <meta property="og:image" content={`${siteUrl}/og-facts.png`} />
+        <meta property="og:image" content={`${siteUrl}/og-facts.jpg`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Facts by Bubbles" />
         <meta name="twitter:description" content="Highly researched. Absolutely wrong. From the Wicklow bogs." />
-        <meta name="twitter:image" content={`${siteUrl}/og-facts.png`} />
+        <meta name="twitter:image" content={`${siteUrl}/og-facts.jpg`} />
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
       {/* Hero */}

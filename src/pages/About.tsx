@@ -37,11 +37,11 @@ const About = () => {
         <meta property="og:description" content="Born in Wicklow bogs, raised by humans, educated by children from multiple countries. Always wrong with confidence." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/about`} />
-        <meta property="og:image" content={`${siteUrl}/og-about.png`} />
+        <meta property="og:image" content={`${siteUrl}/og-about.jpg`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Bubbles" />
         <meta name="twitter:description" content="The sheep who knows everything. Incorrectly." />
-        <meta name="twitter:image" content={`${siteUrl}/og-about.png`} />
+        <meta name="twitter:image" content={`${siteUrl}/og-about.jpg`} />
         <link rel="canonical" href={`${siteUrl}/about`} />
       </Helmet>
       {/* Hero */}
