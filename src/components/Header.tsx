@@ -21,7 +21,6 @@ const getNavLinks = (t: (key: string) => string) => [
   { href: "/explains", label: t("nav.explains"), icon: Zap },
   { href: "/hall-of-fame", label: "Hall of Fame", icon: Trophy },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
-  { href: "/about", label: t("nav.story"), icon: User },
   { href: "/faq", label: t("nav.questions"), icon: HelpCircle },
 ];
 
