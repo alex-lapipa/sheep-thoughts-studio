@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Cookie, Shield, Eye, Database, Mail, MapPin, Clock, FileText } from "lucide-react";
 import { useCookieConsent } from "@/components/CookieConsent";
 import { DataExportCard } from "@/components/DataExportCard";
+import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
@@ -408,6 +409,11 @@ const Privacy = () => {
             
             {/* Data Export Card */}
             <DataExportCard />
+            
+            {/* Data Deletion Request Form */}
+            <div className="mt-6">
+              <DeletionRequestForm />
+            </div>
           </section>
 
           {/* Data Retention */}

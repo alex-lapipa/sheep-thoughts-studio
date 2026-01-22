@@ -260,6 +260,45 @@ export type Database = {
         }
         Relationships: []
       }
+      deletion_requests: {
+        Row: {
+          email: string
+          id: string
+          ip_hash: string | null
+          metadata: Json | null
+          notes: string | null
+          processed_at: string | null
+          processed_by: string | null
+          reason: string | null
+          status: string
+          submitted_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       drops: {
         Row: {
           checklist: Json | null
