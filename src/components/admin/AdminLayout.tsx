@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AdminBreadcrumb } from './AdminBreadcrumb';
 import { 
   Lightbulb, 
   Zap, 
@@ -274,6 +275,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-auto">
+          <AdminBreadcrumb />
           {children}
         </main>
       </div>
