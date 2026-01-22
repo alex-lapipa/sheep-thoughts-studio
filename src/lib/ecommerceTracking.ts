@@ -93,13 +93,52 @@ export const ecommerceTracking = {
     });
   },
 
-  productImpression: (productId: string, productTitle: string, price?: number, position?: number) => {
+  productImpression: (productId: string, productTitle: string, price?: number, position?: number, listName?: string) => {
     recordEcommerceEvent({
       event_type: 'product_impression',
       product_id: productId,
       product_title: productTitle,
       price,
-      metadata: position !== undefined ? { position } : undefined,
+      metadata: { 
+        position: position !== undefined ? position : undefined,
+        list_name: listName,
+      },
+    });
+    
+    // Send to GA4
+    sendGA4Event('view_item_list', {
+      item_list_name: listName || 'default',
+      items: [{
+        item_id: productId,
+        item_name: productTitle,
+        price,
+        index: position,
+      }],
+    });
+  },
+
+  /**
+   * Track when a product list/collection is viewed
+   */
+  viewProductList: (listName: string, products: Array<{ id: string; title: string; price?: number }>) => {
+    recordEcommerceEvent({
+      event_type: 'view_product_list',
+      metadata: {
+        list_name: listName,
+        product_count: products.length,
+        product_ids: products.slice(0, 20).map(p => p.id),
+      },
+    });
+
+    // Send to GA4
+    sendGA4Event('view_item_list', {
+      item_list_name: listName,
+      items: products.slice(0, 20).map((p, index) => ({
+        item_id: p.id,
+        item_name: p.title,
+        price: p.price,
+        index,
+      })),
     });
   },
 
