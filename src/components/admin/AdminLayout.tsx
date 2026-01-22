@@ -132,6 +132,7 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin/users', label: 'Users & Roles', icon: Users, requiredModule: 'admin' },
       { href: '/admin/sitemap', label: 'Sitemap & SEO', icon: Map },
+      { href: '/admin/og-preview', label: 'OG Image Preview', icon: ExternalLink },
       { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
     ],
