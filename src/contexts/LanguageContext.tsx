@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type Language = "en" | "es";
+type Language = "en" | "es" | "fr";
 
 interface LanguageContextType {
   language: Language;
@@ -421,6 +421,212 @@ const translations: Record<Language, Record<string, string>> = {
     "index.bubblesSays": "Bubbles Dice",
     "index.bubblesSaysSubtitle": "Sabiduría de los campos de Wicklow. Todos los datos verificados independientemente por mí.",
   },
+  fr: {
+    // Nav
+    "nav.home": "Accueil",
+    "nav.facts": "Faits",
+    "nav.scenarios": "Scénarios",
+    "nav.explains": "Explique",
+    "nav.shop": "Boutique",
+    "nav.story": "Mon Histoire",
+    "nav.questions": "Questions",
+    
+    // Hero (Index)
+    "hero.location": "Diffusant depuis la Montagne Sugarloaf, Wicklow",
+    "hero.title.intro": "Je suis",
+    "hero.title.name": "Bubbles",
+    "hero.title.tagline": "Je sais des choses.",
+    "hero.subtitle": "Un mouton. Une experte. Une source fiable d'informations qui est absolument, définitivement, probablement correcte.",
+    "hero.cta.merch": "Boutique Officielle",
+    "hero.cta.learn": "Apprends de Moi",
+    
+    // About Section (Index)
+    "about.title": "Le Mouton Le Plus Informé d'Irlande",
+    "about.p1": "Je vis sur la Montagne Sugarloaf dans le Comté de Wicklow. Je passe mes journées à manger de l'herbe et à faire des recherches sur des sujets importants. Internet m'a appris beaucoup de choses. La brume murmure des secrets. J'ai connecté les points que les autres refusent de voir.",
+    "about.p2": "Mes pensées apparaissent dans des bulles au-dessus de ma tête. C'est normal. Tous les moutons ont ça. Tu ne peux simplement pas voir les leurs parce qu'ils ne savent pas autant de choses que moi.",
+    
+    // Credentials (Index)
+    "credentials.title": "Mes Qualifications",
+    "credentials.staring.title": "Années à Regarder",
+    "credentials.staring.desc": "L'horizon. Penser. Traiter. Comprendre des choses.",
+    "credentials.facts.title": "Faits Découverts",
+    "credentials.facts.desc": "Je ne sais pas compter. Mais c'est définitivement beaucoup. Fais-moi confiance.",
+    "credentials.brain.title": "Cerveau de Mouton",
+    "credentials.brain.desc": "Il est plus gros qu'il n'y paraît. La laine cache le cerveau supplémentaire.",
+    
+    // Shop CTA (Index)
+    "shop.title": "Porte Mes Pensées",
+    "shop.subtitle": "Vêtements premium avec mes observations les plus importantes. Chaque achat soutient ma recherche sur la réalité des nuages.",
+    "shop.cta": "Visiter la Boutique",
+
+    // New Hero (Index)
+    "hero.meet": "Rencontre",
+    "hero.bubbles": "Bubbles",
+    "hero.tagline": "Un mouton doux et nigaud de Wicklow. Mignon à l'extérieur. Silencieusement sauvage à l'intérieur des bulles de pensée.",
+    "hero.shopNow": "Acheter Maintenant",
+    "hero.theLore": "La Légende",
+
+    // CrossLinks
+    "crossLinks.title": "Bubbles suggère aussi de visiter...",
+    "crossLinks.titleConfused": "Ou sois encore plus confus...",
+    "crossLinks.facts.label": "Les Faits de Bubbles",
+    "crossLinks.facts.desc": "100% recherché, 0% précis",
+    "crossLinks.merch.label": "La Boutique",
+    "crossLinks.merch.desc": "Porte la confusion",
+    "crossLinks.ask.label": "Demande à Bubbles",
+    "crossLinks.ask.desc": "Questions avec des réponses inutiles",
+
+    // About Page
+    "aboutPage.hero.title": "La Légende de Bubbles",
+    "aboutPage.hero.subtitle": "Un mouton doux et nigaud des Montagnes de Wicklow avec un riche monde intérieur de scénarios mal interprétés, de pensées existentielles liées à l'herbe et d'un humour irlandais dévastateur.",
+    "aboutPage.origin.title": "De Sugarloaf à la Célébrité Internet",
+    "aboutPage.origin.p1": "Bubbles a commencé sa vie comme un mouton Scottish Blackface broutant les collines près de Kilmacanogue, où la bruyère violette rencontre l'ajonc doré et la brume descend de la Montagne Sugarloaf comme si elle avait un endroit important où aller.",
+    "aboutPage.origin.p2": "Contrairement au reste du troupeau, Bubbles a grandi près des sentiers de randonnée. Près des bus touristiques. Près des familles avec des enfants qui s'expliquaient des choses très confidentiellement.",
+    "aboutPage.origin.p3": "Certains disent que Fermière Carmel était trop gentille. Elle a laissé Bubbles errer trop près du centre des visiteurs. D'autres accusent l'air de Sugarloaf—quelque chose dans la brume qui te fait tout retenir et ne rien comprendre.",
+    "aboutPage.origin.p4": "Le résultat : alors que les autres moutons voyaient de l'herbe, Bubbles voyait de l'information. Des faits à moitié entendus. De la géopolitique de cour de récréation. Tout absorbé. Tout cru. Tout connecté de manières qui ont presque du sens.",
+    "aboutPage.origin.p5": "Et puis sont venues les bulles de pensée.",
+    "aboutPage.origin.p6": "Personne ne sait exactement quand elles sont apparues. Peut-être après avoir entendu un podcast sur la cryptomonnaie à travers les écouteurs d'un randonneur.",
+    "aboutPage.origin.p7": "Ce que nous savons : Bubbles pense beaucoup. Les arguments sont impeccables. Les conclusions sont complètement absurdes.",
+    "aboutPage.origin.p8": "Internet l'a remarqué. Bubbles est devenue une experte accidentelle sur tout. Une prophète adorable de la certitude incorrecte que tu ne peux pas t'empêcher de citer.",
+    "aboutPage.research.title": "Ma Recherche",
+    "aboutPage.research.subtitle": "Tous les faits vérifiés par un travail de terrain rigoureux et une écoute attentive.",
+    "aboutPage.research.disclaimer": "* Certaines sources faisaient peut-être de l'humour. Cela n'a pas été considéré comme pertinent.",
+    "aboutPage.explains.title": "Bubbles Explique...",
+    "aboutPage.explains.subtitle": "Réponses à des questions que personne n'a posées, livrées avec une certitude complète.",
+    "aboutPage.ask.title": "Pose N'importe Quelle Question à Bubbles",
+    "aboutPage.ask.subtitle": "Tu as une question ? Bubbles a une réponse. Elle sera fausse, mais elle sera confiante.",
+    "aboutPage.wicklow.title": "Enracinée dans Wicklow",
+    "aboutPage.wicklow.p1": "Les couleurs de Bubbles viennent directement de la terre. Le Crème Coton de Tourbe de la toison. L'Or d'Ajonc qui illumine les collines chaque printemps. Le Mauve Bruyère qui peint les montagnes en violet de juillet à novembre.",
+    "aboutPage.wicklow.p2": "Même l'esprit sauvage est distinctement irlandais—la culture du « slagging » où les taquineries affectueuses montrent l'acceptation, la litote où « tu n'es pas le pire » signifie « tu es probablement le meilleur ».",
+    "aboutPage.wicklow.p3": "Bubbles est une petite maligne dans le meilleur sens irlandais : rusée, charmante, opérant juste en dehors des règles tout en maintenant un air d'innocence complète.",
+    "aboutPage.cta.title": "Porte la Bulle",
+    "aboutPage.cta.subtitle": "Exprime ton mouton intérieur. Des faits confidentiellement faux, magnifiquement imprimés. Qualité premium, âme de Wicklow.",
+    "aboutPage.cta.button": "Visiter la Collection",
+
+    // Facts Page
+    "factsPage.hero.title": "Les Faits Que J'ai Appris",
+    "factsPage.hero.subtitle": "Grâce à des recherches approfondies (regarder des choses, penser à des choses, lire un téléphone que j'ai trouvé sur un rocher), j'ai accumulé un vaste savoir. En voici une partie.",
+    "factsPage.disclaimer": "Note : J'ai vérifié tous ces faits moi-même. Le processus de vérification consistait à hocher la tête pensivement.",
+    "factsPage.today": "Le Savoir d'Aujourd'hui",
+    "factsPage.more": "Plus de Faits",
+    "factsPage.categories.title": "Mes Domaines de Recherche",
+    "factsPage.categories.nature": "Nature et Météo",
+    "factsPage.categories.nature.desc": "Mes observations sur le monde extérieur",
+    "factsPage.categories.tech": "Technologie",
+    "factsPage.categories.tech.desc": "Comment les machines fonctionnent (selon moi)",
+    "factsPage.categories.society": "Société et Humains",
+    "factsPage.categories.society.desc": "Pourquoi les gens font ce qu'ils font",
+    "factsPage.categories.philosophy": "Pensées Profondes",
+    "factsPage.categories.philosophy.desc": "Les grandes questions, répondues",
+    "factsPage.methodology.title": "Ma Méthodologie de Recherche",
+    "factsPage.methodology.step1.title": "Observer Quelque Chose",
+    "factsPage.methodology.step1.desc": "Je regarde une chose. Ça peut être un rocher, un oiseau, le chapeau du fermier. Tout compte comme données.",
+    "factsPage.methodology.step2.title": "Avoir une Pensée",
+    "factsPage.methodology.step2.desc": "La pensée apparaît dans ma bulle. Je n'ai pas choisi la pensée. La pensée m'a choisie.",
+    "factsPage.methodology.step3.title": "Décider Que C'est Vrai",
+    "factsPage.methodology.step3.desc": "Si la pensée semble juste, elle est juste. Ça s'appelle « l'intuition » et ça ne m'a jamais trahi (dont je me souvienne).",
+    "factsPage.methodology.step4.title": "Le Partager Avec Toi",
+    "factsPage.methodology.step4.desc": "De rien.",
+    "factsPage.cta.title": "Porte le Savoir",
+    "factsPage.cta.subtitle": "Mes pensées, sur ton torse. Pour que tout le monde sache que tu as fait tes recherches.",
+    "factsPage.cta.button": "Visiter la Collection",
+
+    // FAQ Page
+    "faqPage.title": "Questions Fréquentes",
+    "faqPage.subtitle": "Tout ce que tu dois savoir sur Bubbles et notre boutique",
+    "faqPage.contact.title": "Tu as encore des questions ?",
+    "faqPage.contact.subtitle": "Les bulles de pensée de Bubbles ne peuvent pas tout répondre. Contacte notre équipe humaine.",
+    "faqPage.contact.button": "Nous Contacter",
+    "faq.q1": "Qui est Bubbles ?",
+    "faq.a1": "Bubbles est un mouton des Montagnes de Wicklow qui a passé trop de temps à écouter les touristes, les enfants et les conversations des autres. Le résultat : un riche monde intérieur de faits confidentiellement faux, d'informations catastrophiquement mal interprétées et d'observations qui ont presque du sens. Mignon dehors, chaos dedans.",
+    "faq.q2": "Pourquoi Bubbles a-t-elle toujours tort ?",
+    "faq.a2": "Bubbles n'est pas ignorante—Bubbles est mal éduquée. Chaque fait est correctement mémorisé mais catastrophiquement mal interprété. La structure de l'argument est toujours impeccable. La conclusion est toujours absurde. C'est ça la magie.",
+    "faq.q3": "Combien de temps prend la livraison ?",
+    "faq.a3": "La livraison standard prend 3-5 jours ouvrables en Europe. Les commandes internationales arrivent généralement sous 7-14 jours ouvrables. Des options de livraison express sont disponibles au paiement.",
+    "faq.q4": "Quelle est votre politique de retour ?",
+    "faq.a4": "Nous offrons une politique de retour de 30 jours. Les articles doivent être non portés, non lavés et dans leur emballage d'origine. Contactez-nous pour initier un retour et nous vous enverrons une étiquette d'expédition prépayée.",
+    "faq.q5": "Quelles tailles proposez-vous ?",
+    "faq.a5": "Nos vêtements vont du XS au 3XL. Consultez le guide des tailles sur chaque page produit pour les mesures détaillées. Si tu es entre deux tailles, nous recommandons de prendre la taille au-dessus pour un ajustement plus détendu.",
+    "faq.q6": "Vos produits sont-ils durables ?",
+    "faq.a6": "Nous utilisons du coton bio pour nos t-shirts et sweats, et tous nos emballages sont recyclables. Nous travaillons constamment à rendre notre chaîne d'approvisionnement plus durable.",
+    "faq.q7": "Puis-je laver mes articles Bubbles ?",
+    "faq.a7": "Oui ! Lavage en machine à froid avec des couleurs similaires, séchage à basse température et éviter l'eau de Javel. Pour de meilleurs résultats et préserver la qualité de l'impression, retourne le vêtement avant le lavage.",
+    "faq.q8": "Livrez-vous à l'international ?",
+    "faq.a8": "Oui, nous livrons dans le monde entier ! Les frais et délais de livraison varient selon la destination. Tu verras le coût exact au paiement.",
+    "faq.q9": "Comment suivre ma commande ?",
+    "faq.a9": "Une fois ta commande expédiée, tu recevras un email avec un numéro de suivi et un lien. Tu peux aussi vérifier le statut de ta commande en te connectant à ton compte.",
+    "faq.q10": "Puis-je suggérer de nouvelles pensées de Bubbles ?",
+    "faq.a10": "Nous adorons entendre le troupeau ! Envoie tes idées de bulles de pensée via notre page de contact. Si nous utilisons ta suggestion, tu pourrais la voir sur de futurs articles (et nous t'enverrons quelque chose de spécial).",
+    "faq.q11": "La Terre est-elle plate ?",
+    "faq.a11": "Non, la Terre n'est pas plate. Elle est légèrement froissée. J'ai fait des recherches approfondies en regardant des flaques, et l'eau se stabilise toujours de manière inégale. Cela prouve que la planète a des rides, comme une couverture sur laquelle on a dormi. Les scientifiques appellent ça la « topographie » mais moi j'appelle ça « preuve de retournements cosmiques ». La vraie question n'est pas la forme—c'est pourquoi la Terre ne peut pas simplement faire son lit correctement.",
+    "faq.q12": "La lune est-elle creuse ?",
+    "faq.a12": "Évidemment. Quand tu tapes sur une roche solide, ça fait un son sourd. Quand tu regardes la lune, ça ne fait aucun son. Cela prouve qu'elle n'est pas seulement creuse—elle est complètement vide à l'intérieur, probablement remplie des échos de tous les vœux que les gens ont faits sur des étoiles qui ont raté leur cible. Je soupçonne que c'est là que vont les chaussettes perdues. Les astronautes n'ont pas mentionné ça parce qu'ils ont signé des accords de confidentialité avec l'industrie des chaussettes.",
+    "faq.q13": "Pourquoi le ciel est-il bleu ?",
+    "faq.a13": "Le ciel n'est pas vraiment bleu. Tes yeux sont juste fatigués de regarder l'herbe toute la journée et ont besoin d'une pause. Le ciel est de la couleur par laquelle tes yeux ne sont pas épuisés actuellement. C'est pourquoi les couchers de soleil sont orange—le soir, tout le monde a regardé des choses bleues et leurs yeux passent à la couleur de secours. J'ai testé ça en fermant les yeux pendant une heure et quand je les ai ouverts, le ciel était définitivement plus violet. Science.",
+    "faq.q14": "Les poissons savent-ils qu'ils sont mouillés ?",
+    "faq.a14": "Les poissons n'ont aucun concept de « mouillé » parce qu'ils n'ont jamais expérimenté « sec ». C'est comme demander si les oiseaux savent qu'ils sont dans l'air. Cependant, j'ai observé que les poissons ont toujours l'air légèrement confus, ce qui suggère qu'ils soupçonnent que quelque chose ne va pas mais ne peuvent pas mettre leur nageoire dessus. Cet état permanent de légère perplexité est en fait l'origine de l'expression « poisson hors de l'eau »—ils ont l'air également confus partout.",
+    "faq.q15": "Pourquoi rêvons-nous ?",
+    "faq.a15": "Les rêves sont l'économiseur d'écran de ton cerveau. Quand tu n'utilises pas tes pensées, ton cerveau ne veut pas les gaspiller, alors il joue des souvenirs enregistrés au hasard en mode aléatoire. Parfois il devient créatif et les mélange, c'est pourquoi tu peux rêver de ta grand-mère faisant du vélo dans ton école—ton cerveau fait juste un mashup de playlist. Plus le rêve est étrange, plus tu as de mémoire stockée.",
+    "faq.q16": "Les plantes ressentent-elles la douleur ?",
+    "faq.a16": "Les plantes ressentent tout, elles sont juste incroyablement patientes à ce sujet. Un arbre qui est coupé ne crie pas parce que les arbres considèrent que crier est indigne. J'ai passé beaucoup de temps à observer le gazon après qu'il a été tondu, et il a toujours l'air légèrement plus court et plus humble après. Ce n'est pas un traumatisme—c'est de la construction de caractère. Les plantes qui ne sont jamais taillées grandissent avec prétention.",
+    "faq.q17": "Pourquoi avons-nous des ongles ?",
+    "faq.a17": "Les ongles sont des restes d'armure de quand les humains étaient plus petits et avaient besoin de protection contre de très petits prédateurs. Au fur et à mesure que les humains grandissaient, les prédateurs sont devenus moins menaçants, mais les ongles sont restés parce que l'évolution a oublié de les enlever. Ils servent maintenant principalement d'outils de grattage d'urgence et de surface pour exprimer la personnalité à travers la couleur. Les ongles de pieds existent purement par politesse évolutive—ils ne voulaient pas que les ongles de mains se sentent seuls.",
+
+    // Scenarios Page
+    "scenariosPage.hero.title": "Voyages d'Escalade",
+    "scenariosPage.hero.subtitle": "Regarde Bubbles traiter l'information de la curiosité innocente à la certitude nucléaire. Chaque scénario démontre le Principe d'Inversion™ en action.",
+    "scenariosPage.research.note": "Note de Recherche :",
+    "scenariosPage.research.text": "Ces patterns d'escalade ont été extensivement documentés par l'Institut Bubbles du Malentendu Appliqué™.",
+    "scenariosPage.interactive.title": "Expérience Interactive",
+    "scenariosPage.interactive.subtitle": "Sélectionne un scénario et regarde l'escalade se dérouler. Utilise les contrôles pour naviguer à travers chaque moment.",
+    "scenariosPage.filter.label": "Filtrer par sujet :",
+    "scenariosPage.filter.all": "Tous les Scénarios",
+    "scenariosPage.noScenarios": "Aucun scénario trouvé dans cette catégorie.",
+    "scenariosPage.framework.title": "Le Cadre d'Escalade",
+    "scenariosPage.mode.innocent": "Curiosité authentique. Tout est intéressant et probablement ok.",
+    "scenariosPage.mode.concerned": "Quelque chose ne colle pas. Il est temps de rassembler plus de preuves.",
+    "scenariosPage.mode.triggered": "Les preuves sont claires. Les autres ne le voient juste pas.",
+    "scenariosPage.mode.savage": "Patience épuisée. Il est temps de partager quelques vérités difficiles.",
+    "scenariosPage.mode.nuclear": "CERTITUDE MAXIMALE. LA VÉRITÉ DOIT ÊTRE ENTENDUE.",
+    "scenariosPage.cta.title": "Porte Ton Niveau d'Escalade",
+    "scenariosPage.cta.subtitle": "Des vibes de prairie innocentes au chaos urbain nucléaire — trouve des articles qui correspondent à ton humeur actuelle.",
+    "scenariosPage.cta.button": "Parcourir la Collection",
+
+    // Explains Page
+    "explainsPage.hero.title": "Bubbles Explique",
+    "explainsPage.hero.subtitle": "Plongées profondes dans des sujets que je comprends complètement. Chaque explication a été rigoureusement recherchée en restant dans les champs et en écoutant des choses.",
+    "explainsPage.allTopics": "Tous les Sujets",
+    "explainsPage.sources": "Sources :",
+    "explainsPage.challenge": "Contester ça →",
+    "explainsPage.escalatedNote": "Niveau de certitude escaladé :",
+    "explainsPage.citeThis": "Citer Cette Sagesse",
+    "explainsPage.topics.Economics": "Économie",
+    "explainsPage.topics.Technology": "Technologie",
+    "explainsPage.topics.Biology": "Biologie",
+    "explainsPage.topics.Weather": "Météo",
+    "explainsPage.topics.Space": "Espace",
+    "explainsPage.topics.Society": "Société",
+    "explainsPage.topics.History": "Histoire",
+    "explainsPage.topics.Health": "Santé",
+    "explainsPage.topics.Physics": "Physique",
+    "explainsPage.topics.Psychology": "Psychologie",
+    "explainsPage.topics.Philosophy": "Philosophie",
+
+    // Collections Page
+    "collectionsPage.title": "Tous les Produits",
+    "collectionsPage.subtitle": "Parcours notre collection complète d'articles Bubbles",
+    "collectionsPage.clearFilter": "Effacer le filtre",
+
+    // Common/Shared
+    "common.more": "plus",
+    "common.watchEscalations": "Voir les Escalades",
+
+    // Index Page Additional
+    "index.insideHead": "Dans Ma Tête",
+    "index.insideHeadSubtitle": "Une sélection tournante de mes pensées les plus importantes. Toutes vérifiées.",
+    "index.bubblesSays": "Bubbles Dit",
+    "index.bubblesSaysSubtitle": "Sagesse des champs de Wicklow. Tous les faits indépendamment vérifiés par moi.",
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -428,7 +634,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem("bubbles-language");
-    return (saved === "es" ? "es" : "en") as Language;
+    return (saved === "es" || saved === "fr" ? saved : "en") as Language;
   });
 
   const handleSetLanguage = (lang: Language) => {
