@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useProducts } from "@/hooks/useProducts";
 import { useBestsellerRanking, sortByBestseller } from "@/hooks/useBestsellerRanking";
 import { ModeBadge } from "@/components/ModeBadge";
@@ -82,14 +83,13 @@ const Collections = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/collections/all`} />
       </Helmet>
+      <PageHeroWithBubbles
+        title={t("collectionsPage.title")}
+        subtitle={t("collectionsPage.subtitle")}
+        bubbleSize="md"
+      />
       <div className="container py-12">
-        <div className="mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            {t("collectionsPage.title")}
-          </h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            {t("collectionsPage.subtitle")}
-          </p>
+        <div className="mb-8">
 
           {/* Filters and Sort */}
           <div className="flex flex-wrap items-center justify-between gap-4">

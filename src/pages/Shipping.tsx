@@ -4,6 +4,7 @@ import { Package, Truck, Clock, MapPin, RotateCcw, AlertTriangle, Globe, Thermom
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { TocItem } from "@/hooks/useTableOfContents";
 
 const Shipping = () => {
@@ -49,18 +50,16 @@ const Shipping = () => {
         tocTitle={language === 'en' ? 'On This Page' : 'En Esta Página'}
         mobileTocTitle={language === 'en' ? 'Jump to Section' : 'Ir a Sección'}
       >
-        {/* Header */}
-        <div className="text-center mb-12">
-          <Package className="w-16 h-16 mx-auto mb-4 text-primary" />
-          <h1 className="text-4xl font-display font-bold text-foreground mb-4">
-            {language === 'en' ? 'Shipping & Returns' : 'Envíos y Devoluciones'}
-          </h1>
-          <p className="text-muted-foreground">
-            {language === 'en' 
+        {/* Hero with Bubbles */}
+        <section className="-mx-4 mb-12">
+          <PageHeroWithBubbles
+            title={language === 'en' ? 'Shipping & Returns' : 'Envíos y Devoluciones'}
+            subtitle={language === 'en' 
               ? 'Last updated: January 22, 2026' 
               : 'Última actualización: 22 de enero de 2026'}
-          </p>
-        </div>
+            bubbleSize="sm"
+          />
+        </section>
 
         {/* Bubbles' Note */}
         <Card className="mb-8 border-primary/30 bg-primary/5">

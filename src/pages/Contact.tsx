@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -201,19 +202,14 @@ const Contact = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/contact`} />
       </Helmet>
+      <PageHeroWithBubbles
+        title={language === 'en' ? 'Contact Bubbles' : 'Contactar a Bubbles'}
+        subtitle={language === 'en' 
+          ? 'Send your questions, feedback, or declarations of admiration' 
+          : 'Envía tus preguntas, comentarios o declaraciones de admiración'}
+        bubbleSize="md"
+      />
       <div className="container max-w-4xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <Mail className="w-16 h-16 mx-auto mb-4 text-primary" />
-          <h1 className="text-4xl font-display font-bold text-foreground mb-4">
-            {language === 'en' ? 'Contact Bubbles' : 'Contactar a Bubbles'}
-          </h1>
-          <p className="text-muted-foreground">
-            {language === 'en' 
-              ? 'Send your questions, feedback, or declarations of admiration' 
-              : 'Envía tus preguntas, comentarios o declaraciones de admiración'}
-          </p>
-        </div>
 
         {/* Bubbles' Note */}
         <Card className="mb-8 border-primary/30 bg-primary/5">
