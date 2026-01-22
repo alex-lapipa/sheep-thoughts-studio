@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
@@ -5,11 +6,28 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Shield, FileText, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+
 export default function DataRights() {
   const { language } = useLanguage();
 
   return (
     <Layout>
+      <Helmet>
+        <title>Your Data Rights | Bubbles the Sheep</title>
+        <meta name="description" content="Exercise your GDPR rights. Export your data, request deletion, and learn how Bubbles handles your information." />
+        <meta property="og:title" content="Your Data Rights | Bubbles" />
+        <meta property="og:description" content="Your data belongs to you. Bubbles respects that." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/data-rights`} />
+        <meta property="og:image" content={`${siteUrl}/og-data-rights.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Your Data Rights" />
+        <meta name="twitter:image" content={`${siteUrl}/og-data-rights.jpg`} />
+        <link rel="canonical" href={`${siteUrl}/data-rights`} />
+      </Helmet>
       <div className="container py-12 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">

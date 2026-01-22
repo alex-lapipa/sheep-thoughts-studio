@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
@@ -6,6 +7,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+
+const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
 interface Explanation {
   id: string;
@@ -224,6 +227,21 @@ const Explains = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Bubbles Explains | Confidently Wrong Wisdom</title>
+        <meta name="description" content="Deep dives into topics Bubbles understands completely. Each explanation has been rigorously researched by standing in fields and overhearing things." />
+        <meta property="og:title" content="Bubbles Explains Everything" />
+        <meta property="og:description" content="Rigorous research from standing in fields and overhearing things." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/explains`} />
+        <meta property="og:image" content={`${siteUrl}/og-explains.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Bubbles Explains Everything" />
+        <meta name="twitter:image" content={`${siteUrl}/og-explains.jpg`} />
+        <link rel="canonical" href={`${siteUrl}/explains`} />
+      </Helmet>
       <div className="container py-12 md:py-20">
         <div className="max-w-4xl mx-auto">
           {/* Header */}

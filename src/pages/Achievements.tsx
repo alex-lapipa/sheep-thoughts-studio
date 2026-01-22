@@ -261,14 +261,14 @@ export default function Achievements() {
         <meta property="og:description" content={ogDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://sheep-thoughts-studio.lovable.app/achievements" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/YltT3TX3EkgRmGALWEPhhpf4wp63/social-images/social-1769034273652-Bowie missin moch 2022.jpg" />
+        <meta property="og:image" content="https://sheep-thoughts-studio.lovable.app/og-achievements.jpg" />
         <meta property="og:site_name" content="Bubbles the Sheep" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${unlockedCount > 0 ? `${unlockedCount} Badges Earned! ` : ''}Wisdom Badges | Bubbles the Sheep`} />
         <meta name="twitter:description" content={ogDescription} />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/YltT3TX3EkgRmGALWEPhhpf4wp63/social-images/social-1769034273652-Bowie missin moch 2022.jpg" />
+        <meta name="twitter:image" content="https://sheep-thoughts-studio.lovable.app/og-achievements.jpg" />
       </Helmet>
       
       <FloatingParticles count={15} />
