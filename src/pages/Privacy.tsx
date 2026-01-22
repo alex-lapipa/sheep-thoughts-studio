@@ -8,6 +8,8 @@ import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+const ogImageUrl = `${supabaseUrl}/functions/v1/og-privacy-image`;
 
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();
@@ -22,11 +24,13 @@ const Privacy = () => {
         <meta property="og:description" content="Your data is protected by a sheep who takes privacy very seriously (and understands it incorrectly)." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/privacy`} />
-        <meta property="og:image" content={`${siteUrl}/og-privacy.png`} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Privacy Policy | Bubbles" />
         <meta name="twitter:description" content="Privacy as understood by a sheep" />
-        <meta name="twitter:image" content={`${siteUrl}/og-privacy.png`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/privacy`} />
       </Helmet>
       <div className="container py-12 max-w-4xl">

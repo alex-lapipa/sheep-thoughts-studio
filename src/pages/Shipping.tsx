@@ -8,6 +8,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const Shipping = () => {
   const { language } = useLanguage();
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+  const ogImageUrl = `${supabaseUrl}/functions/v1/og-shipping-image?lang=${language}`;
 
   return (
     <Layout>
@@ -22,11 +24,13 @@ const Shipping = () => {
           : "Los paquetes viajan por topos entrenados y carreteras que se mueven de noche. Ahora soy experta en logística."} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/shipping`} />
-        <meta property="og:image" content={`${siteUrl}/og-shipping.png`} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={language === 'en' ? 'Shipping & Returns' : 'Envíos y Devoluciones'} />
         <meta name="twitter:description" content={language === 'en' ? 'Logistics as understood by a sheep' : 'Logística según una oveja'} />
-        <meta name="twitter:image" content={`${siteUrl}/og-shipping.png`} />
+        <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/shipping`} />
       </Helmet>
       <div className="container max-w-4xl mx-auto px-4 py-12">
