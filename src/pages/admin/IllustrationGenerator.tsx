@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -19,7 +19,11 @@ import {
   Cloud,
   Palette,
   Eye,
-  User
+  User,
+  Save,
+  Heart,
+  Trash2,
+  History
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -72,7 +76,10 @@ const ASPECT_RATIOS = [
 ];
 
 interface GeneratedImage {
+  id?: string;
   image: string;
+  publicUrl?: string;
+  storagePath?: string;
   description?: string;
   metadata: {
     posture: string;
@@ -83,9 +90,27 @@ interface GeneratedImage {
     aspectRatio: string;
   };
   generatedAt: string;
+  isFavorite?: boolean;
+  saved?: boolean;
+}
+
+interface SavedIllustration {
+  id: string;
+  storage_path: string;
+  public_url: string;
+  posture: string;
+  accessory: string;
+  weather: string;
+  expression: string;
+  style: string;
+  aspect_ratio: string;
+  description: string | null;
+  created_at: string;
+  is_favorite: boolean;
 }
 
 export default function IllustrationGenerator() {
+  const { user } = useAuth();
   const [posture, setPosture] = useState<string>("random");
   const [accessory, setAccessory] = useState<string>("random");
   const [weather, setWeather] = useState<string>("random");
@@ -94,8 +119,28 @@ export default function IllustrationGenerator() {
   const [aspectRatio, setAspectRatio] = useState<string>("square");
   
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
+  const [savedIllustrations, setSavedIllustrations] = useState<SavedIllustration[]>([]);
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
+  const [activeTab, setActiveTab] = useState<"generate" | "library">("generate");
+
+  // Fetch saved illustrations on mount
+  useEffect(() => {
+    fetchSavedIllustrations();
+  }, []);
+
+  const fetchSavedIllustrations = async () => {
+    const { data, error } = await supabase
+      .from("generated_illustrations")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    
+    if (!error && data) {
+      setSavedIllustrations(data);
+    }
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -163,12 +208,139 @@ export default function IllustrationGenerator() {
 
   const handleDownload = (image: GeneratedImage) => {
     const link = document.createElement("a");
-    link.href = image.image;
+    link.href = image.publicUrl || image.image;
     link.download = `bubbles-${image.metadata.posture}-${image.metadata.accessory}-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     toast.success("Download started");
+  };
+
+  const handleSaveToLibrary = async (image: GeneratedImage) => {
+    if (!user) {
+      toast.error("Please log in to save illustrations");
+      return;
+    }
+    
+    if (image.saved) {
+      toast.info("Already saved to library");
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Convert base64 to blob
+      const base64Data = image.image.split(",")[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "image/png" });
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `${image.metadata.posture}-${image.metadata.accessory}-${timestamp}.png`;
+      const storagePath = `illustrations/${filename}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("bubbles-illustrations")
+        .upload(storagePath, blob, {
+          contentType: "image/png",
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("bubbles-illustrations")
+        .getPublicUrl(storagePath);
+
+      // Save metadata to database
+      const { data: insertData, error: insertError } = await supabase
+        .from("generated_illustrations")
+        .insert({
+          storage_path: storagePath,
+          public_url: urlData.publicUrl,
+          posture: image.metadata.posture,
+          accessory: image.metadata.accessory,
+          weather: image.metadata.weather,
+          expression: image.metadata.expression,
+          style: image.metadata.style,
+          aspect_ratio: image.metadata.aspectRatio,
+          description: image.description,
+          created_by: user.id,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Update local state
+      setGeneratedImages(prev => 
+        prev.map(img => 
+          img.generatedAt === image.generatedAt 
+            ? { ...img, saved: true, id: insertData.id, publicUrl: urlData.publicUrl, storagePath }
+            : img
+        )
+      );
+      
+      if (selectedImage?.generatedAt === image.generatedAt) {
+        setSelectedImage(prev => prev ? { ...prev, saved: true, id: insertData.id, publicUrl: urlData.publicUrl, storagePath } : null);
+      }
+
+      await fetchSavedIllustrations();
+      toast.success("Saved to library!");
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Failed to save", { 
+        description: error instanceof Error ? error.message : "Unknown error" 
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleToggleFavorite = async (illustration: SavedIllustration) => {
+    const { error } = await supabase
+      .from("generated_illustrations")
+      .update({ is_favorite: !illustration.is_favorite })
+      .eq("id", illustration.id);
+
+    if (!error) {
+      setSavedIllustrations(prev =>
+        prev.map(ill =>
+          ill.id === illustration.id ? { ...ill, is_favorite: !ill.is_favorite } : ill
+        )
+      );
+      toast.success(illustration.is_favorite ? "Removed from favorites" : "Added to favorites");
+    }
+  };
+
+  const handleDeleteFromLibrary = async (illustration: SavedIllustration) => {
+    try {
+      // Delete from storage
+      await supabase.storage
+        .from("bubbles-illustrations")
+        .remove([illustration.storage_path]);
+
+      // Delete from database
+      const { error } = await supabase
+        .from("generated_illustrations")
+        .delete()
+        .eq("id", illustration.id);
+
+      if (error) throw error;
+
+      setSavedIllustrations(prev => prev.filter(ill => ill.id !== illustration.id));
+      toast.success("Deleted from library");
+    } catch (error) {
+      toast.error("Failed to delete");
+    }
   };
 
   const applyMetadataFromImage = (image: GeneratedImage) => {
@@ -179,6 +351,29 @@ export default function IllustrationGenerator() {
     setStyle(image.metadata.style);
     setAspectRatio(image.metadata.aspectRatio);
     toast.info("Settings applied from image");
+  };
+
+  const loadFromLibrary = (illustration: SavedIllustration) => {
+    const img: GeneratedImage = {
+      id: illustration.id,
+      image: illustration.public_url,
+      publicUrl: illustration.public_url,
+      storagePath: illustration.storage_path,
+      description: illustration.description || undefined,
+      metadata: {
+        posture: illustration.posture,
+        accessory: illustration.accessory,
+        weather: illustration.weather,
+        expression: illustration.expression,
+        style: illustration.style,
+        aspectRatio: illustration.aspect_ratio,
+      },
+      generatedAt: illustration.created_at,
+      isFavorite: illustration.is_favorite,
+      saved: true,
+    };
+    setSelectedImage(img);
+    setActiveTab("generate");
   };
 
   return (
@@ -440,10 +635,15 @@ export default function IllustrationGenerator() {
                       aspectRatio === "landscape" ? "aspect-video" : "aspect-square"
                     )}>
                       <img
-                        src={selectedImage.image}
+                        src={selectedImage.publicUrl || selectedImage.image}
                         alt="Generated Bubbles illustration"
                         className="w-full h-full object-contain"
                       />
+                      {selectedImage.saved && (
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-green-600 text-white">Saved</Badge>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Metadata */}
@@ -456,7 +656,7 @@ export default function IllustrationGenerator() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -465,6 +665,21 @@ export default function IllustrationGenerator() {
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
+                      {!selectedImage.saved && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveToLibrary(selectedImage)}
+                          disabled={isSaving}
+                          className="bg-primary"
+                        >
+                          {isSaving ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4 mr-2" />
+                          )}
+                          Save to Library
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
@@ -520,16 +735,85 @@ export default function IllustrationGenerator() {
                       )}
                     >
                       <img
-                        src={img.image}
+                        src={img.publicUrl || img.image}
                         alt={`Generated ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
+                      {img.saved && (
+                        <div className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" />
+                      )}
                     </motion.button>
                   ))}
                 </div>
               </CardContent>
             </Card>
           )}
+
+          {/* Library */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <History className="h-5 w-5 text-primary" />
+                Saved Library
+              </CardTitle>
+              <CardDescription>
+                {savedIllustrations.length} saved illustrations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {savedIllustrations.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No saved illustrations yet. Generate and save some!
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                  {savedIllustrations.map((ill) => (
+                    <div
+                      key={ill.id}
+                      className="relative group aspect-square rounded-lg overflow-hidden border bg-muted/20"
+                    >
+                      <img
+                        src={ill.public_url}
+                        alt={`${ill.posture} ${ill.accessory}`}
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => loadFromLibrary(ill)}
+                      />
+                      {/* Overlay actions */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-white hover:bg-white/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleFavorite(ill);
+                          }}
+                        >
+                          <Heart className={cn("h-4 w-4", ill.is_favorite && "fill-red-500 text-red-500")} />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-white hover:bg-white/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteFromLibrary(ill);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {ill.is_favorite && (
+                        <div className="absolute top-1 right-1">
+                          <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AdminLayout>

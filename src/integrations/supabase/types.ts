@@ -637,6 +637,60 @@ export type Database = {
           },
         ]
       }
+      generated_illustrations: {
+        Row: {
+          accessory: string
+          aspect_ratio: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expression: string
+          id: string
+          is_favorite: boolean | null
+          posture: string
+          public_url: string
+          storage_path: string
+          style: string
+          tags: string[] | null
+          usage_count: number | null
+          weather: string
+        }
+        Insert: {
+          accessory: string
+          aspect_ratio: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expression: string
+          id?: string
+          is_favorite?: boolean | null
+          posture: string
+          public_url: string
+          storage_path: string
+          style: string
+          tags?: string[] | null
+          usage_count?: number | null
+          weather: string
+        }
+        Update: {
+          accessory?: string
+          aspect_ratio?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expression?: string
+          id?: string
+          is_favorite?: boolean | null
+          posture?: string
+          public_url?: string
+          storage_path?: string
+          style?: string
+          tags?: string[] | null
+          usage_count?: number | null
+          weather?: string
+        }
+        Relationships: []
+      }
       hall_of_fame_submissions: {
         Row: {
           admin_notes: string | null
