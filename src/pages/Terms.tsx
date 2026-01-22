@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { LegalJargonInterpreter } from "@/components/LegalJargonInterpreter";
 
 const Terms = () => {
   const lastUpdated = "January 2026";
@@ -430,6 +431,11 @@ const Terms = () => {
                 </div>
               </CardContent>
             </Card>
+          </section>
+
+          {/* Legal Jargon Interpreter */}
+          <section>
+            <LegalJargonInterpreter />
           </section>
 
           {/* Final Note */}
