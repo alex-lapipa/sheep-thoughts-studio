@@ -5,12 +5,19 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
 
 // Supported languages with their hreflang codes
+// Includes DACH regional variants for more precise targeting
 const SUPPORTED_LANGUAGES = [
   { code: "en", hreflang: "en" },
   { code: "es", hreflang: "es" },
   { code: "fr", hreflang: "fr" },
   { code: "de", hreflang: "de" },
+  { code: "de-DE", hreflang: "de-DE" },
+  { code: "de-AT", hreflang: "de-AT" },
+  { code: "de-CH", hreflang: "de-CH" },
 ] as const;
+
+// DACH-specific page mappings
+const DACH_PAGES = ["/dach", "/de", "/at", "/ch"];
 
 interface HreflangTagsProps {
   // Optional override for the current path
@@ -29,18 +36,43 @@ export function HreflangTags({ path }: HreflangTagsProps) {
   // Use provided path or current location
   const currentPath = path || location.pathname;
   
+  // Check if this is a DACH-specific page
+  const isDACHPage = DACH_PAGES.some(p => currentPath.startsWith(p));
+  
   // Build the full URL for each language variant
-  // For now, we use query params for language switching (could be subdomains or subdirectories)
   const getLanguageUrl = (langCode: string) => {
     // Clean path (remove trailing slash except for root)
     const cleanPath = currentPath === "/" ? "" : currentPath.replace(/\/$/, "");
     
-    // Option 1: Using query parameter approach
-    // return `${SITE_URL}${cleanPath}?lang=${langCode}`;
+    // For DACH pages, map regional variants to specific paths
+    if (isDACHPage) {
+      switch (langCode) {
+        case "de-DE":
+          return `${SITE_URL}/de`;
+        case "de-AT":
+          return `${SITE_URL}/at`;
+        case "de-CH":
+          return `${SITE_URL}/ch`;
+        case "de":
+          return `${SITE_URL}/dach`;
+        default:
+          return `${SITE_URL}${cleanPath}`;
+      }
+    }
     
-    // Option 2: Using the same URL (site handles language via context/localStorage)
-    // This is suitable when the content is dynamically translated client-side
     return `${SITE_URL}${cleanPath}`;
+  };
+
+  // Get the appropriate lang attribute for the HTML element
+  const getHtmlLang = (): string => {
+    // For DACH pages, be more specific
+    if (isDACHPage) {
+      if (currentPath.startsWith("/at")) return "de-AT";
+      if (currentPath.startsWith("/ch")) return "de-CH";
+      if (currentPath.startsWith("/de")) return "de-DE";
+      return "de";
+    }
+    return currentLanguage;
   };
 
   return (
@@ -62,8 +94,8 @@ export function HreflangTags({ path }: HreflangTagsProps) {
         href={`${SITE_URL}${currentPath === "/" ? "" : currentPath}`}
       />
       
-      {/* Set the html lang attribute based on current language */}
-      <html lang={currentLanguage} />
+      {/* Set the html lang attribute based on current language or DACH region */}
+      <html lang={getHtmlLang()} />
     </Helmet>
   );
 }
