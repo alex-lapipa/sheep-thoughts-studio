@@ -3,6 +3,7 @@ import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { BubblesExplains } from "@/components/BubblesExplains";
 import { AskBubbles } from "@/components/AskBubbles";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { AnimatedOnView } from "@/components/AnimatedText";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
@@ -67,9 +68,11 @@ const About = () => {
 
       {/* Origin Story */}
       <section id="origin" className="scroll-mt-24 mb-16">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-          {t("aboutPage.origin.title")}
-        </h2>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
+            {t("aboutPage.origin.title")}
+          </h2>
+        </AnimatedOnView>
         <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
           <p>{t("aboutPage.origin.p1")}</p>
           <p>{t("aboutPage.origin.p2")}</p>
@@ -84,12 +87,14 @@ const About = () => {
 
       {/* My Research Sources */}
       <section id="research" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-          {t("aboutPage.research.title")}
-        </h2>
-        <p className="text-center text-muted-foreground mb-10">
-          {t("aboutPage.research.subtitle")}
-        </p>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+            {t("aboutPage.research.title")}
+          </h2>
+          <p className="text-center text-muted-foreground mb-10">
+            {t("aboutPage.research.subtitle")}
+          </p>
+        </AnimatedOnView>
         
         <div className="grid sm:grid-cols-2 gap-4">
           {researchSources.map((item, index) => {
@@ -139,31 +144,37 @@ const About = () => {
 
       {/* Bubbles Explains */}
       <section id="explains" className="scroll-mt-24 mb-16">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-          {t("aboutPage.explains.title")}
-        </h2>
-        <p className="text-center text-muted-foreground mb-10">
-          {t("aboutPage.explains.subtitle")}
-        </p>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+            {t("aboutPage.explains.title")}
+          </h2>
+          <p className="text-center text-muted-foreground mb-10">
+            {t("aboutPage.explains.subtitle")}
+          </p>
+        </AnimatedOnView>
         <BubblesExplains />
       </section>
 
       {/* Ask Bubbles - AI Q&A */}
       <section id="ask-bubbles" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-bubbles-cream/20 rounded-lg">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-          {t("aboutPage.ask.title")}
-        </h2>
-        <p className="text-center text-muted-foreground mb-10">
-          {t("aboutPage.ask.subtitle")}
-        </p>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
+            {t("aboutPage.ask.title")}
+          </h2>
+          <p className="text-center text-muted-foreground mb-10">
+            {t("aboutPage.ask.subtitle")}
+          </p>
+        </AnimatedOnView>
         <AskBubbles />
       </section>
 
       {/* The Wicklow Connection */}
       <section id="wicklow" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
-          {t("aboutPage.wicklow.title")}
-        </h2>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center">
+            {t("aboutPage.wicklow.title")}
+          </h2>
+        </AnimatedOnView>
         <div className="prose prose-lg mx-auto text-muted-foreground space-y-6">
           <p>{t("aboutPage.wicklow.p1")}</p>
           <p>{t("aboutPage.wicklow.p2")}</p>
@@ -173,12 +184,14 @@ const About = () => {
 
       {/* CTA */}
       <section id="cta" className="scroll-mt-24 text-center -mx-4 px-4 py-12 bg-secondary/30 rounded-lg">
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-          {t("aboutPage.cta.title")}
-        </h2>
-        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          {t("aboutPage.cta.subtitle")}
-        </p>
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+            {t("aboutPage.cta.title")}
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            {t("aboutPage.cta.subtitle")}
+          </p>
+        </AnimatedOnView>
         <a 
           href="/collections/all" 
           className="inline-flex items-center justify-center h-12 px-8 font-display font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"

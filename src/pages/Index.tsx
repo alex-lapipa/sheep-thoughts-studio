@@ -16,6 +16,7 @@ import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
 import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
+import { AnimatedOnView } from "@/components/AnimatedText";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -230,14 +231,14 @@ export default function Index() {
       {/* Thought Carousel - Bubbles' Personality Showcase */}
       <section className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
         <div className="container">
-          <div className="text-center mb-8">
+          <AnimatedOnView className="text-center mb-8">
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
               {t("index.insideHead")}
             </h2>
             <p className="text-muted-foreground">
               {t("index.insideHeadSubtitle")}
             </p>
-          </div>
+          </AnimatedOnView>
           <ThoughtCarousel useTimeContext={true} showMoodFilter={true} syncWithMood={true} />
         </div>
       </section>
@@ -245,7 +246,7 @@ export default function Index() {
       {/* About Section */}
       <section className="py-16 md:py-24">
         <div className="container">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
+          <AnimatedOnView className="max-w-3xl mx-auto text-center space-y-6">
             <h2 className="font-display text-3xl md:text-4xl font-bold">
               {t("about.title")}
             </h2>
@@ -255,7 +256,7 @@ export default function Index() {
             <p className="text-lg text-muted-foreground">
               {t("about.p2")}
             </p>
-          </div>
+          </AnimatedOnView>
         </div>
       </section>
 
@@ -277,14 +278,14 @@ export default function Index() {
         <ParallaxSection speed={0.35} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
         
         <div className="container relative z-10">
-          <div className="max-w-2xl mx-auto text-center mb-8">
+          <AnimatedOnView className="max-w-2xl mx-auto text-center mb-8">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
               {t("index.bubblesSays")}
             </h2>
             <p className="text-muted-foreground">
               {t("index.bubblesSaysSubtitle")}
             </p>
-          </div>
+          </AnimatedOnView>
           
           <BubblesSaysWidget />
         </div>
@@ -297,11 +298,13 @@ export default function Index() {
         <ParallaxSection speed={0.2} direction="down" className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-bubbles-heather/5 blur-3xl" />
         
         <div className="container relative z-10">
-          <ParallaxSection speed={0.05}>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
-              {t("credentials.title")}
-            </h2>
-          </ParallaxSection>
+          <AnimatedOnView>
+            <ParallaxSection speed={0.05}>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
+                {t("credentials.title")}
+              </h2>
+            </ParallaxSection>
+          </AnimatedOnView>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
               { count: "7", label: t("credentials.staring.title"), desc: t("credentials.staring.desc"), color: "bg-bubbles-gorse/20", textColor: "text-bubbles-gorse" },
@@ -361,14 +364,16 @@ export default function Index() {
         <ParallaxSection speed={0.15} className="absolute top-1/2 left-1/4 w-20 h-20 rounded-full bg-bubbles-heather/10 blur-xl" />
         
         <div className="container text-center relative z-10">
-          <ParallaxSection speed={0.05}>
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 animate-pop-in">
-              {t("shop.title")}
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "200ms" }}>
-              {t("shop.subtitle")}
-            </p>
-          </ParallaxSection>
+          <AnimatedOnView>
+            <ParallaxSection speed={0.05}>
+              <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+                {t("shop.title")}
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                {t("shop.subtitle")}
+              </p>
+            </ParallaxSection>
+          </AnimatedOnView>
           <Link to="/collections/all">
             <Button size="lg" className="bg-accent hover:bg-accent-hover text-accent-foreground font-display hover:scale-110 hover:animate-squish transition-all">
               {t("shop.cta")}
