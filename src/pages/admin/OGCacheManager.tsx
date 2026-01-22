@@ -38,6 +38,9 @@ import {
   BarChart3,
   Zap,
   Target,
+  History,
+  Sparkles,
+  Calendar,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -48,6 +51,14 @@ interface CachedImage {
   updated_at: string;
   metadata: Record<string, any> | null;
   selected: boolean;
+}
+
+interface CleanupRecord {
+  date: string;
+  scanned: number;
+  deleted: number;
+  failed: number;
+  freedBytes: number;
 }
 
 interface CacheStats {
@@ -68,6 +79,13 @@ interface CacheStats {
     byType: Record<string, { count: number; size: number }>;
     oldestFile: { name: string; createdAt: string } | null;
     newestFile: { name: string; createdAt: string } | null;
+  };
+  cleanup: {
+    totalCleanups: number;
+    totalDeleted: number;
+    totalFreedBytes: number;
+    lastCleanup: CleanupRecord | null;
+    history: CleanupRecord[];
   };
   hourlyStats: Array<{ hour: string; hits: number; misses: number }>;
 }
@@ -314,44 +332,132 @@ export default function OGCacheManager() {
 
           <TabsContent value="overview" className="space-y-6">
             {/* Storage Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardDescription>Total Cached</CardDescription>
+                  <CardDescription>Total Cached Files</CardDescription>
                   <CardTitle className="text-3xl flex items-center gap-2">
-                    <FileImage className="h-6 w-6 text-muted-foreground" />
+                    <FileImage className="h-6 w-6 text-primary" />
                     {images.length}
                   </CardTitle>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-xs text-muted-foreground">
+                    {typeCounts['Product'] || 0} products, {typeCounts['Badge'] || 0} badges
+                  </p>
+                </CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardDescription>Total Size</CardDescription>
+                  <CardDescription>Storage Used</CardDescription>
                   <CardTitle className="text-3xl flex items-center gap-2">
-                    <HardDrive className="h-6 w-6 text-muted-foreground" />
+                    <HardDrive className="h-6 w-6 text-accent" />
                     {formatBytes(totalSize)}
                   </CardTitle>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-xs text-muted-foreground">
+                    Avg {images.length > 0 ? formatBytes(totalSize / images.length) : '0 B'} per image
+                  </p>
+                </CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardDescription>Product Images</CardDescription>
+                  <CardDescription>Cleanup Runs</CardDescription>
                   <CardTitle className="text-3xl flex items-center gap-2">
-                    <ImageIcon className="h-6 w-6 text-primary" />
-                    {typeCounts['Product'] || 0}
+                    <Sparkles className="h-6 w-6 text-primary" />
+                    {stats?.cleanup?.totalCleanups || 0}
                   </CardTitle>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-xs text-muted-foreground">
+                    {stats?.cleanup?.totalDeleted || 0} files cleaned total
+                  </p>
+                </CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardDescription>Badge Images</CardDescription>
+                  <CardDescription>Space Reclaimed</CardDescription>
                   <CardTitle className="text-3xl flex items-center gap-2">
-                    <ImageIcon className="h-6 w-6 text-accent" />
-                    {typeCounts['Badge'] || 0}
+                    <History className="h-6 w-6 text-secondary-foreground" />
+                    {formatBytes(stats?.cleanup?.totalFreedBytes || 0)}
                   </CardTitle>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-xs text-muted-foreground">
+                    From automated cleanups
+                  </p>
+                </CardContent>
               </Card>
             </div>
+
+            {/* Cleanup History */}
+            {stats?.cleanup?.history && stats.cleanup.history.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Cleanup History
+                  </CardTitle>
+                  <CardDescription>Recent automated cache cleanup operations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.cleanup.history.map((cleanup, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-primary/10">
+                            <Sparkles className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              Cleaned {cleanup.deleted} files
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(cleanup.date), { addSuffix: true })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-primary">
+                            {formatBytes(cleanup.freedBytes)} freed
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {cleanup.scanned} scanned
+                            {cleanup.failed > 0 && (
+                              <span className="text-destructive ml-1">
+                                ({cleanup.failed} failed)
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* No Cleanup History Yet */}
+            {(!stats?.cleanup?.history || stats.cleanup.history.length === 0) && !statsLoading && (
+              <Card className="bg-muted/30">
+                <CardContent className="pt-6">
+                  <div className="flex gap-4 items-start">
+                    <History className="h-8 w-8 text-muted-foreground shrink-0" />
+                    <div>
+                      <h3 className="font-medium mb-1">No Cleanup History Yet</h3>
+                      <p className="text-sm text-muted-foreground">
+                        The automated cleanup runs weekly on Sundays at 3 AM UTC, removing images older than 30 days.
+                        You can also trigger a manual cleanup from the Scheduled Tasks page.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">

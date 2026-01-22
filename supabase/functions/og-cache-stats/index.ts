@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     // Get cache events stats
     const { data: events, error: eventsError } = await supabase
       .from("og_cache_events")
-      .select("event_type, image_type, created_at")
+      .select("event_type, image_type, created_at, metadata")
       .gte("created_at", startDate.toISOString());
 
     if (eventsError) {
@@ -62,6 +62,7 @@ Deno.serve(async (req) => {
     // Stats by image type
     const typeStats: Record<string, { hits: number; misses: number; regenerations: number }> = {};
     eventsList.forEach(event => {
+      if (event.event_type === "cleanup") return; // Skip cleanup events for type stats
       const type = event.image_type || "unknown";
       if (!typeStats[type]) {
         typeStats[type] = { hits: 0, misses: 0, regenerations: 0 };
@@ -70,6 +71,39 @@ Deno.serve(async (req) => {
       if (event.event_type === "miss") typeStats[type].misses++;
       if (event.event_type === "regenerate") typeStats[type].regenerations++;
     });
+
+    // Get cleanup history (all time for history, period for stats)
+    const cleanupEvents = eventsList.filter(e => e.event_type === "cleanup");
+    
+    // Also get recent cleanup events (last 10 regardless of period)
+    const { data: recentCleanups, error: cleanupError } = await supabase
+      .from("og_cache_events")
+      .select("created_at, metadata")
+      .eq("event_type", "cleanup")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (cleanupError) {
+      console.error("Error fetching cleanup history:", cleanupError);
+    }
+
+    const cleanupHistory = (recentCleanups || []).map(c => ({
+      date: c.created_at,
+      scanned: (c.metadata as any)?.scanned || 0,
+      deleted: (c.metadata as any)?.deleted || 0,
+      failed: (c.metadata as any)?.failed || 0,
+      freedBytes: (c.metadata as any)?.freed_bytes || 0,
+    }));
+
+    // Calculate cleanup totals for selected period
+    const cleanupTotals = cleanupEvents.reduce((acc, e) => {
+      const meta = e.metadata as any;
+      return {
+        totalCleanups: acc.totalCleanups + 1,
+        totalDeleted: acc.totalDeleted + (meta?.deleted || 0),
+        totalFreedBytes: acc.totalFreedBytes + (meta?.freed_bytes || 0),
+      };
+    }, { totalCleanups: 0, totalDeleted: 0, totalFreedBytes: 0 });
 
     // Get storage stats
     const { data: storageFiles, error: storageError } = await supabase.storage
@@ -154,6 +188,11 @@ Deno.serve(async (req) => {
           name: newestFile.name,
           createdAt: newestFile.created_at,
         } : null,
+      },
+      cleanup: {
+        ...cleanupTotals,
+        lastCleanup: cleanupHistory[0] || null,
+        history: cleanupHistory,
       },
       hourlyStats,
     };
