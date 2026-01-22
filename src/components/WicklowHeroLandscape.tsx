@@ -494,7 +494,7 @@ function RollingHills() {
 }
 
 // ============================================================================
-// BOG TERRAIN - Foreground with optional trees
+// BOG TERRAIN - Foreground with trees, heather, gorse, and bog cotton
 // ============================================================================
 function BogTerrain({ trees }: { trees: Array<{ x: number; scale: number; variant: number }> }) {
   return (
@@ -517,6 +517,94 @@ function BogTerrain({ trees }: { trees: Array<{ x: number; scale: number; varian
           fill="url(#bogGrass)"
           opacity="0.7"
         />
+        
+        {/* HEATHER PATCHES - Purple-pink to brown-rust clusters */}
+        <g className="heather-patches">
+          {/* Left side heather cluster */}
+          <ellipse cx="120" cy="110" rx="45" ry="12" fill="#8B668B" opacity="0.6" />
+          <ellipse cx="100" cy="115" rx="30" ry="8" fill="#7A5A7A" opacity="0.5" />
+          <ellipse cx="145" cy="108" rx="25" ry="6" fill="#9B789B" opacity="0.4" />
+          
+          {/* Center-left heather */}
+          <ellipse cx="380" cy="95" rx="55" ry="14" fill="#8B668B" opacity="0.55" />
+          <ellipse cx="355" cy="100" rx="35" ry="10" fill="#7A5A7A" opacity="0.45" />
+          <ellipse cx="410" cy="92" rx="28" ry="7" fill="#9B789B" opacity="0.4" />
+          
+          {/* Center heather */}
+          <ellipse cx="720" cy="75" rx="50" ry="12" fill="#8B668B" opacity="0.5" />
+          <ellipse cx="690" cy="80" rx="32" ry="9" fill="#6B4A6B" opacity="0.45" />
+          
+          {/* Right side heather */}
+          <ellipse cx="1050" cy="85" rx="60" ry="15" fill="#8B668B" opacity="0.55" />
+          <ellipse cx="1020" cy="90" rx="40" ry="10" fill="#7A5A7A" opacity="0.5" />
+          <ellipse cx="1085" cy="82" rx="30" ry="8" fill="#9B789B" opacity="0.4" />
+          
+          {/* Far right heather */}
+          <ellipse cx="1320" cy="90" rx="45" ry="11" fill="#8B668B" opacity="0.5" />
+          <ellipse cx="1345" cy="95" rx="28" ry="7" fill="#6B4A6B" opacity="0.4" />
+        </g>
+        
+        {/* GORSE PATCHES - Brilliant yellow with dark green base */}
+        <g className="gorse-patches">
+          {/* Gorse cluster 1 - left */}
+          <ellipse cx="200" cy="105" rx="25" ry="10" fill="#2A4A1A" opacity="0.7" />
+          <ellipse cx="195" cy="100" rx="18" ry="7" fill="#E8B923" opacity="0.8" />
+          <ellipse cx="210" cy="102" rx="12" ry="5" fill="#FFD93D" opacity="0.7" />
+          
+          {/* Gorse cluster 2 */}
+          <ellipse cx="520" cy="88" rx="30" ry="12" fill="#2A4A1A" opacity="0.65" />
+          <ellipse cx="515" cy="82" rx="22" ry="8" fill="#E8B923" opacity="0.75" />
+          <ellipse cx="530" cy="84" rx="15" ry="6" fill="#FFD93D" opacity="0.65" />
+          
+          {/* Gorse cluster 3 - center-right */}
+          <ellipse cx="880" cy="78" rx="28" ry="11" fill="#2A4A1A" opacity="0.7" />
+          <ellipse cx="875" cy="72" rx="20" ry="7" fill="#E8B923" opacity="0.8" />
+          <ellipse cx="890" cy="74" rx="14" ry="5" fill="#FFD93D" opacity="0.7" />
+          
+          {/* Gorse cluster 4 - right */}
+          <ellipse cx="1200" cy="82" rx="32" ry="13" fill="#2A4A1A" opacity="0.65" />
+          <ellipse cx="1195" cy="76" rx="24" ry="9" fill="#E8B923" opacity="0.75" />
+          <ellipse cx="1212" cy="78" rx="16" ry="6" fill="#FFD93D" opacity="0.65" />
+        </g>
+        
+        {/* BOG COTTON - White fluffy heads in wet areas */}
+        <g className="bog-cotton">
+          {/* Bog cotton cluster 1 */}
+          <circle cx="60" cy="125" r="3" fill="#FFFEF0" opacity="0.9" />
+          <circle cx="68" cy="122" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          <circle cx="55" cy="128" r="2" fill="#FFF8E7" opacity="0.8" />
+          <circle cx="72" cy="127" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          
+          {/* Bog cotton cluster 2 */}
+          <circle cx="280" cy="102" r="3" fill="#FFFEF0" opacity="0.9" />
+          <circle cx="290" cy="98" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          <circle cx="275" cy="106" r="2" fill="#FFF8E7" opacity="0.8" />
+          <circle cx="295" cy="104" r="2" fill="#FFFEF0" opacity="0.8" />
+          
+          {/* Bog cotton cluster 3 */}
+          <circle cx="620" cy="85" r="3" fill="#FFFEF0" opacity="0.9" />
+          <circle cx="628" cy="82" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          <circle cx="615" cy="88" r="2" fill="#FFF8E7" opacity="0.8" />
+          
+          {/* Bog cotton cluster 4 */}
+          <circle cx="980" cy="78" r="3" fill="#FFFEF0" opacity="0.9" />
+          <circle cx="988" cy="75" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          <circle cx="975" cy="81" r="2" fill="#FFF8E7" opacity="0.8" />
+          <circle cx="992" cy="80" r="2" fill="#FFFEF0" opacity="0.8" />
+          
+          {/* Bog cotton cluster 5 */}
+          <circle cx="1380" cy="92" r="3" fill="#FFFEF0" opacity="0.9" />
+          <circle cx="1388" cy="89" r="2.5" fill="#FFFEF0" opacity="0.85" />
+          <circle cx="1375" cy="95" r="2" fill="#FFF8E7" opacity="0.8" />
+        </g>
+        
+        {/* BRACKEN patches - russet-brown dead bracken */}
+        <g className="bracken-patches">
+          <ellipse cx="170" cy="118" rx="20" ry="6" fill="#8B7355" opacity="0.5" />
+          <ellipse cx="450" cy="92" rx="25" ry="7" fill="#9B8365" opacity="0.45" />
+          <ellipse cx="780" cy="82" rx="22" ry="6" fill="#8B7355" opacity="0.5" />
+          <ellipse cx="1150" cy="88" rx="28" ry="8" fill="#9B8365" opacity="0.45" />
+        </g>
       </svg>
       
       {/* Peat earth base */}
