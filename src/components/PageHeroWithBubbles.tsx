@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
-type PostureType = "four-legged" | "two-legged";
+type PostureType = "four-legged" | "two-legged" | "half-upright" | "leaning";
 type AccessoryType = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
 
 // Weighted accessory pool - "none" appears often for grounded presence
@@ -59,9 +59,14 @@ export function PageHeroWithBubbles({
   const [thoughts, setThoughts] = useState<Thought[]>(FALLBACK_THOUGHTS);
   
   // Random posture selection on mount (stable for component lifetime)
+  // Weighted: four-legged (35%), two-legged (35%), transitional (30%)
   const resolvedPosture = useMemo<PostureType>(() => {
     if (posture === "random") {
-      return Math.random() > 0.5 ? "two-legged" : "four-legged";
+      const roll = Math.random();
+      if (roll < 0.35) return "four-legged";
+      if (roll < 0.70) return "two-legged";
+      if (roll < 0.85) return "half-upright";
+      return "leaning";
     }
     return posture;
   }, [posture]);
