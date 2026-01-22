@@ -6,6 +6,7 @@ import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
+import { AnimatedOnView } from "@/components/AnimatedText";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
@@ -126,8 +127,8 @@ export default function Facts() {
       {/* Facts Grid */}
       <section className="py-16 md:py-24">
         <div className="container">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="font-display text-2xl md:text-3xl font-bold animate-slide-up">
+          <AnimatedOnView className="flex justify-between items-center mb-12">
+            <h2 className="font-display text-2xl md:text-3xl font-bold">
               {t("factsPage.today")}
             </h2>
             <Button 
@@ -138,7 +139,7 @@ export default function Facts() {
               <RefreshCw className="h-4 w-4 mr-2" />
               {t("factsPage.more")}
             </Button>
-          </div>
+          </AnimatedOnView>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedFacts.map((fact, index) => (
@@ -165,7 +166,7 @@ export default function Facts() {
       {/* Escalation Journeys */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background to-muted/30">
         <div className="container">
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <AnimatedOnView className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
               Escalation Journeys
             </h2>
@@ -173,15 +174,17 @@ export default function Facts() {
               Watch how Bubbles processes information from innocent curiosity to nuclear certainty.
               Each scenario demonstrates the Inversion Principle in action.
             </p>
-          </div>
+          </AnimatedOnView>
           <ScenarioPlayer />
         </div>
       </section>
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
-            {t("factsPage.categories.title")}
-          </h2>
+          <AnimatedOnView>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
+              {t("factsPage.categories.title")}
+            </h2>
+          </AnimatedOnView>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {categories.map((cat) => (
               <div 
@@ -200,9 +203,11 @@ export default function Facts() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
-              {t("factsPage.methodology.title")}
-            </h2>
+            <AnimatedOnView>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
+                {t("factsPage.methodology.title")}
+              </h2>
+            </AnimatedOnView>
             <div className="space-y-6">
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-full bg-bubbles-gorse/20 flex items-center justify-center shrink-0">
