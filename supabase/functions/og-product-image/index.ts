@@ -60,12 +60,26 @@ Deno.serve(async (req) => {
           .list('', { search: cacheKey });
 
         if (fileList && fileList.length > 0) {
+          // Log cache hit
+          await supabase.from('og_cache_events').insert({
+            cache_key: cacheKey,
+            event_type: 'hit',
+            image_type: 'product',
+          });
+          
           // Return cached image URL with redirect
           const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${cacheKey}`;
           return Response.redirect(publicUrl, 302);
         }
       }
     }
+
+    // Log cache miss
+    await supabase.from('og_cache_events').insert({
+      cache_key: cacheKey,
+      event_type: skipCache ? 'regenerate' : 'miss',
+      image_type: 'product',
+    });
 
     const modeStyle = MODE_COLORS[mode] || MODE_COLORS.innocent;
 

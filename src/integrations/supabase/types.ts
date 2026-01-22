@@ -694,6 +694,33 @@ export type Database = {
         }
         Relationships: []
       }
+      og_cache_events: {
+        Row: {
+          cache_key: string
+          created_at: string
+          event_type: string
+          id: string
+          image_type: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          event_type: string
+          id?: string
+          image_type?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          image_type?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       pod_jobs: {
         Row: {
           carrier: string | null
