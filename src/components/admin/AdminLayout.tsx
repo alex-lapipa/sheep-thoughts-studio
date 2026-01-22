@@ -156,7 +156,7 @@ const navSections: NavSection[] = [
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const { user, signOut } = useAuth();
-  const { roles, isAdmin, canAccess, loading: rolesLoading } = useUserRoles();
+  const { roles, isAdmin, isOwner, canAccess, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Bubbles AI', 'Shopify', 'POD', 'Orders', 'Catalog', 'System']);
@@ -215,6 +215,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
             <div className="flex items-center gap-2 md:gap-4">
               <div className="hidden md:flex items-center gap-2">
+                {!rolesLoading && isOwner && (
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs bg-bubbles-gorse/20 text-bubbles-gorse border-bubbles-gorse/30 font-semibold"
+                  >
+                    👑 Owner
+                  </Badge>
+                )}
                 {!rolesLoading && roles.map(role => (
                   <Badge 
                     key={role} 
