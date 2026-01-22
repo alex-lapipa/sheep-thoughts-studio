@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -64,6 +64,11 @@ const FAQ = () => {
   ];
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
   const [editingTagsFor, setEditingTagsFor] = useState<string | null>(null);
+  
+  // Bulk selection mode
+  const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showBulkTagMenu, setShowBulkTagMenu] = useState(false);
   // Load favorites from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("bubbles-favorites");
@@ -144,6 +149,65 @@ const FAQ = () => {
       localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
       return updated;
     });
+  }, []);
+  
+  // Bulk tag operations
+  const toggleItemSelection = useCallback((id: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }, []);
+  
+  const selectAllFavorites = useCallback(() => {
+    const favoriteIds = questionHistory
+      .filter(item => favorites.includes(item.id))
+      .map(item => item.id);
+    setSelectedItems(new Set(favoriteIds));
+  }, [questionHistory, favorites]);
+  
+  const clearSelection = useCallback(() => {
+    setSelectedItems(new Set());
+  }, []);
+  
+  const applyTagToSelected = useCallback((tagId: string) => {
+    setQuestionHistory(prev => {
+      const updated = prev.map(item => {
+        if (!selectedItems.has(item.id)) return item;
+        const currentTags = item.tags || [];
+        if (currentTags.includes(tagId)) return item;
+        return { ...item, tags: [...currentTags, tagId] };
+      });
+      localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
+      return updated;
+    });
+    toast.success(`Tag applied to ${selectedItems.size} item${selectedItems.size !== 1 ? 's' : ''}!`);
+    setShowBulkTagMenu(false);
+  }, [selectedItems]);
+  
+  const removeTagFromSelected = useCallback((tagId: string) => {
+    setQuestionHistory(prev => {
+      const updated = prev.map(item => {
+        if (!selectedItems.has(item.id)) return item;
+        const currentTags = item.tags || [];
+        return { ...item, tags: currentTags.filter(t => t !== tagId) };
+      });
+      localStorage.setItem("bubbles-question-history", JSON.stringify(updated));
+      return updated;
+    });
+    toast.success(`Tag removed from ${selectedItems.size} item${selectedItems.size !== 1 ? 's' : ''}!`);
+    setShowBulkTagMenu(false);
+  }, [selectedItems]);
+  
+  const exitBulkMode = useCallback(() => {
+    setBulkSelectMode(false);
+    setSelectedItems(new Set());
+    setShowBulkTagMenu(false);
   }, []);
   
   // Get all unique tags used in history
@@ -867,74 +931,230 @@ const FAQ = () => {
                   </div>
                   
                   {/* Action Buttons */}
-                  <div className="flex flex-wrap justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const itemsToExport = filteredHistory;
-                        const content = itemsToExport.map((item, index) => {
-                          const date = new Date(item.timestamp).toLocaleString();
-                          const isFav = favorites.includes(item.id) ? " ⭐" : "";
-                          const tags = item.tags?.length 
-                            ? ` [${item.tags.map(t => PREDEFINED_TAGS.find(pt => pt.id === t)?.label || t).join(', ')}]`
-                            : "";
-                          return `--- Question ${index + 1}${isFav}${tags} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
-                        }).join('\n\n');
-                        
-                        const filterLabel = [
-                          showFavoritesOnly && "Favorites",
-                          selectedTagFilter && PREDEFINED_TAGS.find(t => t.id === selectedTagFilter)?.label
-                        ].filter(Boolean).join(" + ") || "All";
-                        
-                        const header = `🐑 Bubbles Wisdom History (${filterLabel})\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${itemsToExport.length}\n\n${'='.repeat(50)}\n\n`;
-                        const fullContent = header + content;
-                        
-                        const blob = new Blob([fullContent], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `bubbles-wisdom-${new Date().toISOString().split('T')[0]}.txt`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        analytics.exportHistory(itemsToExport.length, showFavoritesOnly);
-                        toast.success("History exported successfully!");
-                      }}
-                      className="gap-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      Export
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearHistory}
-                      className="text-destructive hover:text-destructive gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Clear All
-                    </Button>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    {/* Left side - Bulk operations */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!bulkSelectMode ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setBulkSelectMode(true);
+                            if (favorites.length > 0) {
+                              selectAllFavorites();
+                            }
+                          }}
+                          className="gap-2"
+                          disabled={favorites.length === 0}
+                        >
+                          <Tags className="w-4 h-4" />
+                          Bulk Tag ({favorites.length})
+                        </Button>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/30">
+                            <CheckSquare className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium">{selectedItems.size} selected</span>
+                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={selectAllFavorites}
+                            className="gap-2"
+                          >
+                            <Star className="w-4 h-4" />
+                            Select All Favorites
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={clearSelection}
+                            disabled={selectedItems.size === 0}
+                          >
+                            Clear
+                          </Button>
+                          
+                          <div className="relative">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => setShowBulkTagMenu(!showBulkTagMenu)}
+                              className="gap-2"
+                              disabled={selectedItems.size === 0}
+                            >
+                              <Tags className="w-4 h-4" />
+                              Apply Tags
+                              <ChevronDown className="w-3 h-3" />
+                            </Button>
+                            
+                            {showBulkTagMenu && (
+                              <div className="absolute top-full left-0 mt-2 z-50 p-4 bg-card border rounded-xl shadow-lg min-w-[280px] animate-fade-in">
+                                <p className="text-xs text-muted-foreground mb-3 font-medium">
+                                  Apply to {selectedItems.size} selected item{selectedItems.size !== 1 ? 's' : ''}:
+                                </p>
+                                <div className="space-y-2">
+                                  {PREDEFINED_TAGS.map(tag => {
+                                    // Check if any selected item already has this tag
+                                    const selectedWithTag = [...selectedItems].filter(id => {
+                                      const item = questionHistory.find(i => i.id === id);
+                                      return item?.tags?.includes(tag.id);
+                                    }).length;
+                                    
+                                    return (
+                                      <div key={tag.id} className="flex items-center justify-between gap-2">
+                                        <span className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium", tag.color)}>
+                                          <span>{tag.emoji}</span>
+                                          <span>{tag.label}</span>
+                                        </span>
+                                        <div className="flex items-center gap-1">
+                                          {selectedWithTag > 0 && (
+                                            <span className="text-xs text-muted-foreground">
+                                              ({selectedWithTag})
+                                            </span>
+                                          )}
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => applyTagToSelected(tag.id)}
+                                            className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                                          >
+                                            <Plus className="w-3 h-3 mr-1" />
+                                            Add
+                                          </Button>
+                                          {selectedWithTag > 0 && (
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => removeTagFromSelected(tag.id)}
+                                              className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            >
+                                              <X className="w-3 h-3 mr-1" />
+                                              Remove
+                                            </Button>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="mt-3 pt-3 border-t">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setShowBulkTagMenu(false)}
+                                    className="w-full text-xs"
+                                  >
+                                    Close
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={exitBulkMode}
+                            className="text-muted-foreground"
+                          >
+                            Done
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Right side - Export/Clear */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const itemsToExport = filteredHistory;
+                          const content = itemsToExport.map((item, index) => {
+                            const date = new Date(item.timestamp).toLocaleString();
+                            const isFav = favorites.includes(item.id) ? " ⭐" : "";
+                            const tags = item.tags?.length 
+                              ? ` [${item.tags.map(t => PREDEFINED_TAGS.find(pt => pt.id === t)?.label || t).join(', ')}]`
+                              : "";
+                            return `--- Question ${index + 1}${isFav}${tags} (${date}) ---\n\nQ: ${item.question}\n\nA: ${item.answer}\n`;
+                          }).join('\n\n');
+                          
+                          const filterLabel = [
+                            showFavoritesOnly && "Favorites",
+                            selectedTagFilter && PREDEFINED_TAGS.find(t => t.id === selectedTagFilter)?.label
+                          ].filter(Boolean).join(" + ") || "All";
+                          
+                          const header = `🐑 Bubbles Wisdom History (${filterLabel})\nExported: ${new Date().toLocaleString()}\nTotal Questions: ${itemsToExport.length}\n\n${'='.repeat(50)}\n\n`;
+                          const fullContent = header + content;
+                          
+                          const blob = new Blob([fullContent], { type: 'text/plain' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `bubbles-wisdom-${new Date().toISOString().split('T')[0]}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                          analytics.exportHistory(itemsToExport.length, showFavoritesOnly);
+                          toast.success("History exported successfully!");
+                        }}
+                        className="gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Export
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearHistory}
+                        className="text-destructive hover:text-destructive gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Clear All
+                      </Button>
+                    </div>
                   </div>
                   
                   {/* History Items */}
                   {filteredHistory.map((item) => {
                     const isFavorited = favorites.includes(item.id);
                     const isEditingTags = editingTagsFor === item.id;
+                    const isSelected = selectedItems.has(item.id);
                     
                     return (
                       <div
                         key={item.id}
                         className={cn(
                           "p-4 bg-card rounded-xl border shadow-sm transition-all",
-                          isFavorited && "ring-2 ring-accent/50 border-accent/30"
+                          isFavorited && "ring-2 ring-accent/50 border-accent/30",
+                          bulkSelectMode && isSelected && "ring-2 ring-primary border-primary/50"
                         )}
+                        onClick={bulkSelectMode ? () => toggleItemSelection(item.id) : undefined}
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <p className="font-display font-semibold text-sm text-foreground">
-                            "{item.question}"
-                          </p>
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            {bulkSelectMode && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleItemSelection(item.id);
+                                }}
+                                className="shrink-0 mt-0.5"
+                              >
+                                {isSelected ? (
+                                  <CheckSquare className="w-5 h-5 text-primary" />
+                                ) : (
+                                  <Square className="w-5 h-5 text-muted-foreground hover:text-primary" />
+                                )}
+                              </button>
+                            )}
+                            <p className="font-display font-semibold text-sm text-foreground">
+                              "{item.question}"
+                            </p>
+                          </div>
                           <div className="flex items-center gap-1 shrink-0">
                             <Button
                               variant="ghost"
