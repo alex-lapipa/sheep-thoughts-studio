@@ -123,8 +123,132 @@ export function BubblesBog({
   );
 }
 
+// ============================================================================
+// FOUR-LEGGED ACCESSORY COMPONENTS - Defined before FourLeggedSheep to ensure availability
+// ============================================================================
+
+// Accessory components - mismatched, slightly wrong
+function SunglassesFourLegged() {
+  return (
+    <g>
+      {/* Aviator sunglasses - wrong for a bog, but Bubbles doesn't know */}
+      <ellipse cx="30" cy="45" rx="8" ry="7" fill="hsl(0 0% 10%)" opacity="0.9" />
+      <ellipse cx="18" cy="47" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
+      {/* Bridge */}
+      <path d="M 23 45 Q 24 44 25 45" stroke="hsl(45 50% 45%)" strokeWidth="1.5" fill="none" />
+      {/* Temple */}
+      <line x1="37" y1="44" x2="45" y2="40" stroke="hsl(45 50% 45%)" strokeWidth="1.5" />
+      {/* Lens reflection */}
+      <ellipse cx="28" cy="43" rx="2" ry="1.5" fill="hsl(200 60% 60%)" opacity="0.3" />
+    </g>
+  );
+}
+
+function FlatCapFourLegged() {
+  return (
+    <g>
+      {/* Irish flat cap - contextually correct but styled */}
+      <ellipse cx="32" cy="28" rx="16" ry="8" fill="hsl(28 35% 32%)" />
+      <path d="M 18 30 Q 32 24 46 30" fill="hsl(28 40% 28%)" />
+      {/* Brim */}
+      <ellipse cx="22" cy="32" rx="10" ry="4" fill="hsl(28 35% 25%)" />
+      {/* Texture detail */}
+      <path d="M 24 27 L 40 27" stroke="hsl(28 30% 40%)" strokeWidth="0.5" opacity="0.5" />
+    </g>
+  );
+}
+
+function BucketHatFourLegged() {
+  return (
+    <g>
+      {/* Bucket hat - completely wrong for a bog */}
+      <ellipse cx="32" cy="28" rx="18" ry="10" fill="hsl(0 0% 95%)" />
+      <ellipse cx="32" cy="24" rx="12" ry="8" fill="hsl(0 0% 92%)" />
+      {/* Brim shadow */}
+      <ellipse cx="32" cy="30" rx="18" ry="3" fill="hsl(0 0% 85%)" />
+    </g>
+  );
+}
+
+function HeadphonesFourLegged() {
+  return (
+    <g>
+      {/* Over-ear headphones - urban tech in rural Ireland */}
+      {/* Headband */}
+      <path d="M 12 42 Q 26 22 46 42" stroke="hsl(0 0% 20%)" strokeWidth="3" fill="none" />
+      {/* Left ear cup */}
+      <ellipse cx="14" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
+      <ellipse cx="14" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
+      {/* Right ear cup */}
+      <ellipse cx="44" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
+      <ellipse cx="44" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
+      {/* Cushion highlight */}
+      <ellipse cx="13" cy="42" rx="2" ry="3" fill="hsl(0 0% 35%)" opacity="0.5" />
+    </g>
+  );
+}
+
+function ScarfFourLegged() {
+  return (
+    <g>
+      {/* Wrapped around neck */}
+      <ellipse cx="30" cy="62" rx="14" ry="5" fill="hsl(350 70% 45%)" />
+      <ellipse cx="30" cy="62" rx="12" ry="4" fill="hsl(350 65% 50%)" />
+      {/* Hanging end */}
+      <path d="M 20 64 Q 18 72 22 80" stroke="hsl(350 70% 45%)" strokeWidth="5" fill="none" />
+      <path d="M 22 80 L 20 82 M 22 80 L 24 82 M 22 80 L 22 83" stroke="hsl(350 70% 45%)" strokeWidth="1.5" />
+      {/* Pattern stripes */}
+      <line x1="19" y1="60" x2="41" y2="60" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+      <line x1="18" y1="63" x2="42" y2="63" stroke="hsl(45 80% 70%)" strokeWidth="1" />
+    </g>
+  );
+}
+
+function BandanaFourLegged() {
+  return (
+    <g>
+      {/* Main bandana wrapped around forehead */}
+      <path d="M 14 38 Q 28 32 44 38" fill="hsl(210 80% 45%)" />
+      <path d="M 14 38 Q 28 35 44 38 Q 28 42 14 38" fill="hsl(210 75% 50%)" />
+      {/* Knot at back */}
+      <circle cx="44" cy="40" r="3" fill="hsl(210 80% 40%)" />
+      {/* Trailing ends */}
+      <path d="M 46 38 Q 52 42 50 50" stroke="hsl(210 80% 45%)" strokeWidth="3" fill="none" />
+      <path d="M 46 42 Q 54 44 52 52" stroke="hsl(210 80% 45%)" strokeWidth="2.5" fill="none" />
+      {/* Paisley pattern suggestion */}
+      <circle cx="24" cy="37" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
+      <circle cx="34" cy="36" r="1" fill="hsl(0 0% 95%)" opacity="0.6" />
+    </g>
+  );
+}
+
+function FlowerCrownFourLegged() {
+  return (
+    <g>
+      {/* Vine base */}
+      <path d="M 12 36 Q 26 28 46 36" stroke="hsl(120 40% 35%)" strokeWidth="2" fill="none" />
+      {/* Daisies */}
+      <g transform="translate(18, 32)">
+        <circle cx="0" cy="0" r="4" fill="hsl(0 0% 98%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(28, 28)">
+        <circle cx="0" cy="0" r="5" fill="hsl(330 70% 75%)" />
+        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
+      </g>
+      <g transform="translate(38, 32)">
+        <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
+        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
+      </g>
+      {/* Small leaves */}
+      <ellipse cx="23" cy="34" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(-20, 23, 34)" />
+      <ellipse cx="33" cy="33" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(15, 33, 33)" />
+    </g>
+  );
+}
+
 // Four-legged posture - natural sheep in the bog
-function FourLeggedSheep({ 
+function FourLeggedSheep({
   expr, 
   accessory, 
   weathered 
@@ -850,127 +974,8 @@ function FlowerCrownSeated() {
   );
 }
 
-// Accessory components - mismatched, slightly wrong
-function SunglassesFourLegged() {
-  return (
-    <g>
-      {/* Aviator sunglasses - wrong for a bog, but Bubbles doesn't know */}
-      <ellipse cx="30" cy="45" rx="8" ry="7" fill="hsl(0 0% 10%)" opacity="0.9" />
-      <ellipse cx="18" cy="47" rx="7" ry="6" fill="hsl(0 0% 10%)" opacity="0.9" />
-      {/* Bridge */}
-      <path d="M 23 45 Q 24 44 25 45" stroke="hsl(45 50% 45%)" strokeWidth="1.5" fill="none" />
-      {/* Temple */}
-      <line x1="37" y1="44" x2="45" y2="40" stroke="hsl(45 50% 45%)" strokeWidth="1.5" />
-      {/* Lens reflection */}
-      <ellipse cx="28" cy="43" rx="2" ry="1.5" fill="hsl(200 60% 60%)" opacity="0.3" />
-    </g>
-  );
-}
-
-function FlatCapFourLegged() {
-  return (
-    <g>
-      {/* Irish flat cap - contextually correct but styled */}
-      <ellipse cx="32" cy="28" rx="16" ry="8" fill="hsl(28 35% 32%)" />
-      <path d="M 18 30 Q 32 24 46 30" fill="hsl(28 40% 28%)" />
-      {/* Brim */}
-      <ellipse cx="22" cy="32" rx="10" ry="4" fill="hsl(28 35% 25%)" />
-      {/* Texture detail */}
-      <path d="M 24 27 L 40 27" stroke="hsl(28 30% 40%)" strokeWidth="0.5" opacity="0.5" />
-    </g>
-  );
-}
-
-function BucketHatFourLegged() {
-  return (
-    <g>
-      {/* Bucket hat - completely wrong for a bog */}
-      <ellipse cx="32" cy="28" rx="18" ry="10" fill="hsl(0 0% 95%)" />
-      <ellipse cx="32" cy="24" rx="12" ry="8" fill="hsl(0 0% 92%)" />
-      {/* Brim shadow */}
-      <ellipse cx="32" cy="30" rx="18" ry="3" fill="hsl(0 0% 85%)" />
-    </g>
-  );
-}
-
-function HeadphonesFourLegged() {
-  return (
-    <g>
-      {/* Over-ear headphones - urban tech in rural Ireland */}
-      {/* Headband */}
-      <path d="M 12 42 Q 26 22 46 42" stroke="hsl(0 0% 20%)" strokeWidth="3" fill="none" />
-      {/* Left ear cup */}
-      <ellipse cx="14" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
-      <ellipse cx="14" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
-      {/* Right ear cup */}
-      <ellipse cx="44" cy="44" rx="6" ry="8" fill="hsl(0 0% 15%)" />
-      <ellipse cx="44" cy="44" rx="4" ry="6" fill="hsl(0 0% 25%)" />
-      {/* Cushion highlight */}
-      <ellipse cx="13" cy="42" rx="2" ry="3" fill="hsl(0 0% 35%)" opacity="0.5" />
-    </g>
-  );
-}
-
-function ScarfFourLegged() {
-  return (
-    <g>
-      {/* Wrapped around neck */}
-      <ellipse cx="30" cy="62" rx="14" ry="5" fill="hsl(350 70% 45%)" />
-      <ellipse cx="30" cy="62" rx="12" ry="4" fill="hsl(350 65% 50%)" />
-      {/* Hanging end */}
-      <path d="M 20 64 Q 18 72 22 80" stroke="hsl(350 70% 45%)" strokeWidth="5" fill="none" />
-      <path d="M 22 80 L 20 82 M 22 80 L 24 82 M 22 80 L 22 83" stroke="hsl(350 70% 45%)" strokeWidth="1.5" />
-      {/* Pattern stripes */}
-      <line x1="19" y1="60" x2="41" y2="60" stroke="hsl(45 80% 70%)" strokeWidth="1" />
-      <line x1="18" y1="63" x2="42" y2="63" stroke="hsl(45 80% 70%)" strokeWidth="1" />
-    </g>
-  );
-}
-
-function BandanaFourLegged() {
-  return (
-    <g>
-      {/* Main bandana wrapped around forehead */}
-      <path d="M 14 38 Q 28 32 44 38" fill="hsl(210 80% 45%)" />
-      <path d="M 14 38 Q 28 35 44 38 Q 28 42 14 38" fill="hsl(210 75% 50%)" />
-      {/* Knot at back */}
-      <circle cx="44" cy="40" r="3" fill="hsl(210 80% 40%)" />
-      {/* Trailing ends */}
-      <path d="M 46 38 Q 52 42 50 50" stroke="hsl(210 80% 45%)" strokeWidth="3" fill="none" />
-      <path d="M 46 42 Q 54 44 52 52" stroke="hsl(210 80% 45%)" strokeWidth="2.5" fill="none" />
-      {/* Paisley pattern suggestion */}
-      <circle cx="24" cy="37" r="1.5" fill="hsl(0 0% 95%)" opacity="0.6" />
-      <circle cx="34" cy="36" r="1" fill="hsl(0 0% 95%)" opacity="0.6" />
-    </g>
-  );
-}
-
-function FlowerCrownFourLegged() {
-  return (
-    <g>
-      {/* Vine base */}
-      <path d="M 12 36 Q 26 28 46 36" stroke="hsl(120 40% 35%)" strokeWidth="2" fill="none" />
-      {/* Daisies */}
-      <g transform="translate(18, 32)">
-        <circle cx="0" cy="0" r="4" fill="hsl(0 0% 98%)" />
-        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(28, 28)">
-        <circle cx="0" cy="0" r="5" fill="hsl(330 70% 75%)" />
-        <circle cx="0" cy="0" r="2" fill="hsl(45 90% 55%)" />
-      </g>
-      <g transform="translate(38, 32)">
-        <circle cx="0" cy="0" r="4" fill="hsl(280 60% 75%)" />
-        <circle cx="0" cy="0" r="1.5" fill="hsl(45 90% 55%)" />
-      </g>
-      {/* Small leaves */}
-      <ellipse cx="23" cy="34" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(-20, 23, 34)" />
-      <ellipse cx="33" cy="33" rx="2" ry="1" fill="hsl(120 50% 40%)" transform="rotate(15, 33, 33)" />
-    </g>
-  );
-}
-
-// NOTE: TwoLegged and HalfUpright accessory components removed
+// NOTE: Four-legged accessory components are defined near the top of the file (before FourLeggedSheep)
+// TwoLegged and HalfUpright accessory components have been removed
 // Bubbles is a sheep and must NEVER stand on two legs — all accessories use quadrupedal posture variants
 
 
