@@ -64,6 +64,8 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      const submittedAt = new Date().toISOString();
+      
       const { error } = await supabase
         .from('contact_messages')
         .insert({
@@ -79,6 +81,19 @@ const Contact = () => {
         });
 
       if (error) throw error;
+
+      // Send email notification (fire and forget - don't block on this)
+      supabase.functions.invoke('send-contact-notification', {
+        body: {
+          name: result.data.name,
+          email: result.data.email,
+          subject: result.data.subject,
+          message: result.data.message,
+          submitted_at: submittedAt,
+        }
+      }).catch(err => {
+        console.error("Failed to send email notification:", err);
+      });
 
       setIsSubmitted(true);
       toast.success(
