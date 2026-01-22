@@ -32,6 +32,7 @@ import {
   Megaphone,
   Calendar,
   Timer,
+  Database,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -69,6 +70,7 @@ const navSections: NavSection[] = [
       { href: '/admin/triggers', label: 'Triggers', icon: Target },
       { href: '/admin/knowledge', label: 'Knowledge', icon: BookOpen },
       { href: '/admin/rag-content', label: 'RAG Content', icon: FileText },
+      { href: '/admin/embeddings', label: 'Embeddings', icon: Database },
       { href: '/admin/generate', label: 'AI Generate', icon: Sparkles },
     ],
   },
