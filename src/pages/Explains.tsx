@@ -3,10 +3,13 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
+import { ChallengeBubbles } from "@/components/ChallengeBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles } from "lucide-react";
+import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
@@ -254,30 +257,63 @@ const Explains = () => {
             </p>
           </div>
 
-          {/* Topic Filter */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            <Badge
-              variant={selectedTopic === null ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90 transition-colors"
-              onClick={() => setSelectedTopic(null)}
-            >
-              {t("explainsPage.allTopics")}
-            </Badge>
-            {topics.map(topic => {
-              const Icon = TOPIC_ICONS[topic] || Lightbulb;
-              return (
+          {/* Mode Tabs */}
+          <Tabs defaultValue="encyclopedia" className="space-y-8">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsTrigger value="encyclopedia" className="gap-2">
+                <Sparkles className="h-4 w-4" />
+                Encyclopedia
+              </TabsTrigger>
+              <TabsTrigger value="challenge" className="gap-2">
+                <Zap className="h-4 w-4" />
+                Challenge Bubbles
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Challenge Mode */}
+            <TabsContent value="challenge" className="space-y-6">
+              <Card className="border-2 border-dashed border-accent/50">
+                <CardHeader className="text-center">
+                  <CardTitle className="flex items-center justify-center gap-2">
+                    <Zap className="h-5 w-5 text-accent" />
+                    Challenge Mode
+                  </CardTitle>
+                  <CardDescription>
+                    Ask Bubbles anything, then challenge the answer to watch the escalation through triggered → savage → nuclear modes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChallengeBubbles />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Encyclopedia Mode */}
+            <TabsContent value="encyclopedia" className="space-y-6">
+              {/* Topic Filter */}
+              <div className="flex flex-wrap gap-2 justify-center">
                 <Badge
-                  key={topic}
-                  variant={selectedTopic === topic ? "default" : "outline"}
-                  className="cursor-pointer hover:bg-primary/90 transition-colors gap-1"
-                  onClick={() => setSelectedTopic(topic)}
+                  variant={selectedTopic === null ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/90 transition-colors"
+                  onClick={() => setSelectedTopic(null)}
                 >
-                  <Icon className="h-3 w-3" />
-                  {t(`explainsPage.topics.${topic}`) || topic}
+                  {t("explainsPage.allTopics")}
                 </Badge>
-              );
-            })}
-          </div>
+                {topics.map(topic => {
+                  const Icon = TOPIC_ICONS[topic] || Lightbulb;
+                  return (
+                    <Badge
+                      key={topic}
+                      variant={selectedTopic === topic ? "default" : "outline"}
+                      className="cursor-pointer hover:bg-primary/90 transition-colors gap-1"
+                      onClick={() => setSelectedTopic(topic)}
+                    >
+                      <Icon className="h-3 w-3" />
+                      {t(`explainsPage.topics.${topic}`) || topic}
+                    </Badge>
+                  );
+                })}
+              </div>
 
           {/* Explanation Cards */}
           <div className="space-y-4">
@@ -410,14 +446,16 @@ const Explains = () => {
             })}
           </div>
 
-          {/* Footer Note */}
-          <div className="mt-12 text-center">
-            <p className="text-sm text-muted-foreground italic">
-              {language === 'es' 
-                ? 'Todas las explicaciones están respaldadas por una investigación de campo extensa, conversaciones con niños, y cosas que escuché decir a los turistas.'
-                : 'All explanations are backed by extensive field research, conversations with children, and things I overheard tourists say.'}
-            </p>
-          </div>
+              {/* Footer Note */}
+              <div className="mt-8 text-center">
+                <p className="text-sm text-muted-foreground italic">
+                  {language === 'es' 
+                    ? 'Todas las explicaciones están respaldadas por una investigación de campo extensa, conversaciones con niños, y cosas que escuché decir a los turistas.'
+                    : 'All explanations are backed by extensive field research, conversations with children, and things I overheard tourists say.'}
+                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </Layout>
