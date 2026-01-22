@@ -17,11 +17,18 @@ type CelebrationMode = "off" | "confetti" | "snow" | "hearts" | "stars" | "sheep
 
 const STORAGE_KEY = "bubbles-celebration-mode-v3";
 const SEASONAL_PROMPT_KEY = "bubbles-seasonal-prompt-2025";
+const VALENTINES_PROMPT_KEY = "bubbles-valentines-prompt-2026";
 
 // Check if current date is in winter season (December - February)
 const isWinterSeason = (): boolean => {
   const month = new Date().getMonth(); // 0-indexed: 0 = January, 11 = December
   return month === 11 || month === 0 || month === 1; // Dec, Jan, Feb
+};
+
+// Check if current date is Valentine's Day (February 14th)
+const isValentinesDay = (): boolean => {
+  const now = new Date();
+  return now.getMonth() === 1 && now.getDate() === 14; // February 14th
 };
 
 // Custom heart shape for canvas-confetti
@@ -156,6 +163,21 @@ export const CelebrationToggle = () => {
       if (oldSaved === "confetti" || oldSaved === "snow") return oldSaved;
       const legacySaved = localStorage.getItem("bubbles-celebration-mode");
       if (legacySaved === "true") return "confetti";
+      
+      // Auto-enable hearts mode on Valentine's Day (takes priority over winter)
+      if (isValentinesDay()) {
+        const hasSeenValentinesPrompt = localStorage.getItem(VALENTINES_PROMPT_KEY);
+        if (!hasSeenValentinesPrompt) {
+          localStorage.setItem(VALENTINES_PROMPT_KEY, "true");
+          setTimeout(() => {
+            toast("💕 Happy Valentine's Day! Bubbles has enabled hearts mode!", {
+              description: "Spreading love across the meadow today.",
+              duration: 5000,
+            });
+          }, 1000);
+          return "hearts";
+        }
+      }
       
       // Auto-enable snow mode during winter season for new users
       if (isWinterSeason()) {
