@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
- * WICKLOW HERO LANDSCAPE — DYNAMIC WEATHER & TERRAIN
+ * WICKLOW HERO LANDSCAPE — DYNAMIC WEATHER, TERRAIN & TIME OF DAY
  * 
  * Large hero banner background featuring:
  * - Sky with dynamic weather (sun, clouds, rain, storm, thunder)
+ * - Time-of-day lighting (dawn, midday, dusk)
  * - Sugarloaf Mountain with green lower slopes and stony grey top
  * - Random scattered trees on terrain
  * - Parallax layering for depth
@@ -15,8 +16,12 @@ import { cn } from "@/lib/utils";
 // Weather types for hero variation
 export type WeatherType = "sunny" | "cloudy" | "rainy" | "stormy" | "thunder";
 
+// Time of day for lighting variation
+export type TimeOfDay = "dawn" | "midday" | "dusk";
+
 interface WicklowHeroLandscapeProps {
   weather?: WeatherType | "random";
+  timeOfDay?: TimeOfDay | "auto" | "random";
   className?: string;
   showTrees?: boolean;
   intensity?: number; // 0-100 for weather intensity
@@ -41,6 +46,20 @@ function getRandomWeather(): WeatherType {
   return "cloudy";
 }
 
+// Determine time of day based on actual hour
+function getTimeOfDayFromHour(): TimeOfDay {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 10) return "dawn";      // 5am-10am: golden hour
+  if (hour >= 10 && hour < 17) return "midday";   // 10am-5pm: bright day
+  if (hour >= 17 && hour < 21) return "dusk";     // 5pm-9pm: sunset
+  return "midday"; // Night defaults to midday look
+}
+
+function getRandomTimeOfDay(): TimeOfDay {
+  const times: TimeOfDay[] = ["dawn", "midday", "dusk"];
+  return times[Math.floor(Math.random() * times.length)];
+}
+
 // Generate random tree positions
 function generateTrees(count: number, seed: number): Array<{ x: number; scale: number; variant: number }> {
   const trees: Array<{ x: number; scale: number; variant: number }> = [];
@@ -57,8 +76,69 @@ function generateTrees(count: number, seed: number): Array<{ x: number; scale: n
   return trees.sort((a, b) => a.scale - b.scale); // Smaller trees in back
 }
 
+// ============================================================================
+// TIME OF DAY COLOR PALETTES
+// ============================================================================
+interface TimeOfDayPalette {
+  sky: string;
+  quartziteSummit: [string, string, string];
+  heatherSlopes: [string, string, string];
+  forestSlopes: [string, string, string];
+  distantHills: [string, string];
+  atmosphereOpacity: number;
+}
+
+const TIME_PALETTES: Record<TimeOfDay, TimeOfDayPalette> = {
+  dawn: {
+    // Golden hour: warm pinks, oranges, soft purples
+    sky: `linear-gradient(to bottom, 
+      hsl(280 40% 45%) 0%, 
+      hsl(340 60% 65%) 20%,
+      hsl(25 80% 70%) 50%,
+      hsl(45 70% 80%) 80%,
+      hsl(45 50% 88%) 100%
+    )`,
+    quartziteSummit: ["#5A4463", "#6A5473", "#7B6B7B"],
+    heatherSlopes: ["#8B6B7B", "#9A7B7A", "#8A8B6A"],
+    forestSlopes: ["#6A7B5A", "#5D6A4D", "#4A6C44"],
+    distantHills: ["#9B7B9B", "#8A8B7A"],
+    atmosphereOpacity: 0.25,
+  },
+  midday: {
+    // Bright daylight: clear blues, vibrant greens
+    sky: `linear-gradient(to bottom, 
+      hsl(210 60% 75%) 0%, 
+      hsl(200 50% 82%) 30%, 
+      hsl(45 40% 90%) 70%,
+      hsl(40 30% 92%) 100%
+    )`,
+    quartziteSummit: ["#4A4453", "#5A5463", "#6B5B6B"],
+    heatherSlopes: ["#6B5B6B", "#7A6B6A", "#7A8B5A"],
+    forestSlopes: ["#7A8B5A", "#5D7A3D", "#4A7C34"],
+    distantHills: ["#8B7B8B", "#7A8B6A"],
+    atmosphereOpacity: 0.15,
+  },
+  dusk: {
+    // Sunset: deep purples, warm oranges, silhouette effects
+    sky: `linear-gradient(to bottom, 
+      hsl(250 35% 35%) 0%, 
+      hsl(280 40% 45%) 15%,
+      hsl(340 50% 55%) 35%,
+      hsl(25 70% 60%) 60%,
+      hsl(35 60% 75%) 85%,
+      hsl(40 40% 85%) 100%
+    )`,
+    quartziteSummit: ["#3A3443", "#4A4453", "#5A5463"],
+    heatherSlopes: ["#5B4B5B", "#6A5B5A", "#6A6B4A"],
+    forestSlopes: ["#5A6B4A", "#4D5A3D", "#3A5C34"],
+    distantHills: ["#7B5B7B", "#6A6B5A"],
+    atmosphereOpacity: 0.3,
+  },
+};
+
 export function WicklowHeroLandscape({
   weather = "random",
+  timeOfDay = "auto",
   className,
   showTrees = true,
   intensity = 50,
@@ -68,6 +148,15 @@ export function WicklowHeroLandscape({
     return weather === "random" ? getRandomWeather() : weather;
   }, [weather]);
 
+  // Resolve time of day
+  const resolvedTime = useMemo<TimeOfDay>(() => {
+    if (timeOfDay === "auto") return getTimeOfDayFromHour();
+    if (timeOfDay === "random") return getRandomTimeOfDay();
+    return timeOfDay;
+  }, [timeOfDay]);
+
+  const palette = TIME_PALETTES[resolvedTime];
+
   // Stable tree positions
   const treeSeed = useMemo(() => Math.floor(Math.random() * 10000), []);
   const trees = useMemo(() => showTrees ? generateTrees(4 + Math.floor(Math.random() * 4), treeSeed) : [], [showTrees, treeSeed]);
@@ -75,19 +164,19 @@ export function WicklowHeroLandscape({
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>
       {/* SKY LAYER */}
-      <SkyLayer weather={resolvedWeather} intensity={intensity} />
+      <SkyLayer weather={resolvedWeather} timeOfDay={resolvedTime} palette={palette} intensity={intensity} />
       
       {/* WEATHER EFFECTS (top of hero) */}
       <WeatherEffects weather={resolvedWeather} intensity={intensity} />
       
       {/* DISTANT MOUNTAINS - Sugarloaf with stony top */}
-      <SugarloafMountain />
+      <SugarloafMountain palette={palette} />
       
       {/* MID-RANGE HILLS */}
-      <RollingHills />
+      <RollingHills palette={palette} />
       
       {/* FOREGROUND BOG TERRAIN with trees */}
-      <BogTerrain trees={trees} />
+      <BogTerrain trees={trees} palette={palette} />
       
       {/* LOW MIST */}
       <MistLayer />
@@ -98,19 +187,14 @@ export function WicklowHeroLandscape({
 // ============================================================================
 // SKY LAYER - Dynamic based on weather
 // ============================================================================
-function SkyLayer({ weather, intensity }: { weather: WeatherType; intensity: number }) {
-  const skyGradients: Record<WeatherType, string> = {
-    sunny: `linear-gradient(to bottom, 
-      hsl(210 60% 75%) 0%, 
-      hsl(200 50% 82%) 30%, 
-      hsl(45 40% 90%) 70%,
-      hsl(40 30% 92%) 100%
-    )`,
-    cloudy: `linear-gradient(to bottom, 
-      hsl(210 20% 78%) 0%, 
-      hsl(200 15% 85%) 40%, 
-      hsl(40 10% 90%) 100%
-    )`,
+function SkyLayer({ weather, timeOfDay, palette, intensity }: { 
+  weather: WeatherType; 
+  timeOfDay: TimeOfDay;
+  palette: TimeOfDayPalette;
+  intensity: number; 
+}) {
+  // Weather overrides for stormy conditions, otherwise use time-based palette
+  const weatherOverrides: Partial<Record<WeatherType, string>> = {
     rainy: `linear-gradient(to bottom, 
       hsl(210 15% 55%) 0%, 
       hsl(200 12% 65%) 40%, 
@@ -128,10 +212,12 @@ function SkyLayer({ weather, intensity }: { weather: WeatherType; intensity: num
     )`,
   };
 
+  const skyGradient = weatherOverrides[weather] || palette.sky;
+
   return (
     <div 
       className="absolute inset-0 transition-all duration-1000"
-      style={{ background: skyGradients[weather] }}
+      style={{ background: skyGradient }}
     />
   );
 }
@@ -414,7 +500,7 @@ function CloudShadows() {
   );
 }
 
-function SugarloafMountain() {
+function SugarloafMountain({ palette }: { palette: TimeOfDayPalette }) {
   return (
     <>
       <svg
@@ -423,31 +509,31 @@ function SugarloafMountain() {
         preserveAspectRatio="xMidYMax slice"
       >
         <defs>
-          {/* Quartzite summit - dark granite purple-grey (#4A4453) */}
+          {/* Quartzite summit - dynamic based on time of day */}
           <linearGradient id="quartziteSummit" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4A4453" />
-            <stop offset="60%" stopColor="#5A5463" />
-            <stop offset="100%" stopColor="#6B5B6B" />
+            <stop offset="0%" stopColor={palette.quartziteSummit[0]} />
+            <stop offset="60%" stopColor={palette.quartziteSummit[1]} />
+            <stop offset="100%" stopColor={palette.quartziteSummit[2]} />
           </linearGradient>
           
-          {/* Upper slopes - heather mauve-brown (#6B5B6B → #7A8B5A) */}
+          {/* Upper slopes - heather, dynamic */}
           <linearGradient id="heatherSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#6B5B6B" />
-            <stop offset="50%" stopColor="#7A6B6A" />
-            <stop offset="100%" stopColor="#7A8B5A" />
+            <stop offset="0%" stopColor={palette.heatherSlopes[0]} />
+            <stop offset="50%" stopColor={palette.heatherSlopes[1]} />
+            <stop offset="100%" stopColor={palette.heatherSlopes[2]} />
           </linearGradient>
           
-          {/* Lower slopes - forestry green (#5D7A3D) */}
+          {/* Lower slopes - forestry green, dynamic */}
           <linearGradient id="forestSlopes" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#7A8B5A" />
-            <stop offset="40%" stopColor="#5D7A3D" />
-            <stop offset="100%" stopColor="#4A7C34" />
+            <stop offset="0%" stopColor={palette.forestSlopes[0]} />
+            <stop offset="40%" stopColor={palette.forestSlopes[1]} />
+            <stop offset="100%" stopColor={palette.forestSlopes[2]} />
           </linearGradient>
           
-          {/* Distant hills - blue-grey with atmospheric haze */}
+          {/* Distant hills - dynamic with atmospheric haze */}
           <linearGradient id="distantHills" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#8B7B8B" />
-            <stop offset="100%" stopColor="#7A8B6A" />
+            <stop offset="0%" stopColor={palette.distantHills[0]} />
+            <stop offset="100%" stopColor={palette.distantHills[1]} />
           </linearGradient>
         </defs>
         
@@ -544,8 +630,8 @@ function SugarloafMountain() {
           opacity="0.5"
         />
         
-        {/* Atmospheric haze at mountain base */}
-        <rect x="0" y="400" width="1440" height="50" fill="url(#distantHills)" opacity="0.15" />
+        {/* Atmospheric haze at mountain base - intensity based on time */}
+        <rect x="0" y="400" width="1440" height="50" fill="url(#distantHills)" opacity={palette.atmosphereOpacity} />
       </svg>
       
       {/* Cloud shadows drifting over slopes */}
@@ -557,7 +643,7 @@ function SugarloafMountain() {
 // ============================================================================
 // ROLLING HILLS - Mid-range green terrain
 // ============================================================================
-function RollingHills() {
+function RollingHills({ palette }: { palette: TimeOfDayPalette }) {
   return (
     <svg
       className="absolute bottom-0 left-0 w-full h-[50%]"
@@ -566,9 +652,9 @@ function RollingHills() {
     >
       <defs>
         <linearGradient id="hillsGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="hsl(135 22% 38%)" />
-          <stop offset="50%" stopColor="hsl(140 25% 35%)" />
-          <stop offset="100%" stopColor="hsl(130 20% 32%)" />
+          <stop offset="0%" stopColor={palette.forestSlopes[1]} />
+          <stop offset="50%" stopColor={palette.forestSlopes[2]} />
+          <stop offset="100%" stopColor={palette.forestSlopes[1]} />
         </linearGradient>
       </defs>
       <path
@@ -583,7 +669,10 @@ function RollingHills() {
 // ============================================================================
 // BOG TERRAIN - Foreground with trees, heather, gorse, and bog cotton
 // ============================================================================
-function BogTerrain({ trees }: { trees: Array<{ x: number; scale: number; variant: number }> }) {
+function BogTerrain({ trees, palette }: { 
+  trees: Array<{ x: number; scale: number; variant: number }>;
+  palette: TimeOfDayPalette;
+}) {
   return (
     <div className="absolute bottom-0 left-0 w-full h-[35%]">
       {/* Bog grass layer */}
