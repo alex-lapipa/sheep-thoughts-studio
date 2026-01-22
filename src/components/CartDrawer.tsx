@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { analytics } from "@/lib/analytics";
+import { ecommerceTracking } from "@/lib/ecommerceTracking";
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,7 @@ export function CartDrawer() {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
       analytics.beginCheckout(totalItems, totalPrice, currency);
+      ecommerceTracking.beginCheckout(totalItems, totalPrice, currency);
       window.open(checkoutUrl, '_blank');
       setIsOpen(false);
     }

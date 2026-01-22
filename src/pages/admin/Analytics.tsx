@@ -52,23 +52,17 @@ export default function AdminAnalytics() {
   const [recentShares, setRecentShares] = useState<DailyStats[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Ecommerce metrics state (demo data - would be real GA4 data in production)
-  const [ecommerceMetrics] = useState<EcommerceMetrics>({
-    productViews: 1247,
-    addToCarts: 186,
-    cartOpens: 142,
-    checkoutStarts: 67,
-    addToCartRate: 14.9,
-    checkoutRate: 36.0,
+  // Ecommerce metrics state - now fetched from database
+  const [ecommerceMetrics, setEcommerceMetrics] = useState<EcommerceMetrics>({
+    productViews: 0,
+    addToCarts: 0,
+    cartOpens: 0,
+    checkoutStarts: 0,
+    addToCartRate: 0,
+    checkoutRate: 0,
   });
 
-  const [topProducts] = useState<ProductPerformance[]>([
-    { name: 'Bubbles "Facts Are Optional" Tee', views: 312, addToCarts: 48, conversionRate: 15.4 },
-    { name: 'Wicklow Wisdom Hoodie', views: 245, addToCarts: 41, conversionRate: 16.7 },
-    { name: 'Concerned Mode Mug', views: 198, addToCarts: 29, conversionRate: 14.6 },
-    { name: 'Nuclear Take Poster', views: 167, addToCarts: 22, conversionRate: 13.2 },
-    { name: 'Savage Statement Cap', views: 142, addToCarts: 18, conversionRate: 12.7 },
-  ]);
+  const [topProducts, setTopProducts] = useState<ProductPerformance[]>([]);
 
   useEffect(() => {
     async function fetchAnalytics() {
@@ -114,6 +108,66 @@ export default function AdminAnalytics() {
               .map(([date, count]) => ({ date, count: count as number }))
               .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
           );
+        }
+
+        // Fetch ecommerce events from database
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const { data: ecommerceEvents } = await supabase
+          .from('ecommerce_events' as 'share_events')
+          .select('*')
+          .gte('created_at', thirtyDaysAgo.toISOString());
+
+        if (ecommerceEvents && ecommerceEvents.length > 0) {
+          // Count events by type
+          const events = ecommerceEvents as unknown as Array<{
+            event_type: string;
+            product_id?: string;
+            product_title?: string;
+          }>;
+          
+          const viewProduct = events.filter(e => e.event_type === 'view_product').length;
+          const addToCart = events.filter(e => e.event_type === 'add_to_cart').length;
+          const openCart = events.filter(e => e.event_type === 'open_cart').length;
+          const beginCheckout = events.filter(e => e.event_type === 'begin_checkout').length;
+
+          setEcommerceMetrics({
+            productViews: viewProduct,
+            addToCarts: addToCart,
+            cartOpens: openCart,
+            checkoutStarts: beginCheckout,
+            addToCartRate: viewProduct > 0 ? (addToCart / viewProduct) * 100 : 0,
+            checkoutRate: openCart > 0 ? (beginCheckout / openCart) * 100 : 0,
+          });
+
+          // Calculate top products
+          const productViews: Record<string, { views: number; addToCarts: number; title: string }> = {};
+          
+          events.forEach(e => {
+            if (e.product_title) {
+              if (!productViews[e.product_title]) {
+                productViews[e.product_title] = { views: 0, addToCarts: 0, title: e.product_title };
+              }
+              if (e.event_type === 'view_product') {
+                productViews[e.product_title].views++;
+              } else if (e.event_type === 'add_to_cart') {
+                productViews[e.product_title].addToCarts++;
+              }
+            }
+          });
+
+          const topProductsList = Object.values(productViews)
+            .map(p => ({
+              name: p.title,
+              views: p.views,
+              addToCarts: p.addToCarts,
+              conversionRate: p.views > 0 ? (p.addToCarts / p.views) * 100 : 0,
+            }))
+            .sort((a, b) => b.views - a.views)
+            .slice(0, 5);
+
+          setTopProducts(topProductsList);
         }
       } catch (error) {
         console.error('Error fetching analytics:', error);
@@ -193,7 +247,7 @@ export default function AdminAnalytics() {
                 <CardContent>
                   <div className="text-2xl font-bold">{ecommerceMetrics.addToCarts.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-accent">{ecommerceMetrics.addToCartRate}%</span> conversion rate
+                    <span className="text-accent">{ecommerceMetrics.addToCartRate.toFixed(1)}%</span> conversion rate
                   </p>
                 </CardContent>
               </Card>
@@ -206,7 +260,7 @@ export default function AdminAnalytics() {
                 <CardContent>
                   <div className="text-2xl font-bold">{ecommerceMetrics.checkoutStarts.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-accent">{ecommerceMetrics.checkoutRate}%</span> of cart opens
+                    <span className="text-accent">{ecommerceMetrics.checkoutRate.toFixed(1)}%</span> of cart opens
                   </p>
                 </CardContent>
               </Card>

@@ -6,6 +6,7 @@ import { ShoppingCart, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
+import { ecommerceTracking } from "@/lib/ecommerceTracking";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -39,6 +40,14 @@ export function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       selectedOptions: firstVariant.selectedOptions || []
     });
+    
+    // Track add to cart in DB
+    ecommerceTracking.addToCart(
+      node.id,
+      node.title,
+      firstVariant.id,
+      parseFloat(firstVariant.price?.amount || '0')
+    );
     
     toast.success("Added to cart!", {
       description: node.title,
