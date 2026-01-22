@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.og-product-image]
 verify_jwt = false
+
+[functions.generate-bubbles-illustration]
+verify_jwt = false
