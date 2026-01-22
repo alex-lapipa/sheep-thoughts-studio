@@ -231,7 +231,7 @@ export default function Index() {
               {t("index.insideHeadSubtitle")}
             </p>
           </div>
-          <ThoughtCarousel />
+          <ThoughtCarousel useTimeContext={true} showMoodFilter={true} syncWithMood={true} />
         </div>
       </section>
 
