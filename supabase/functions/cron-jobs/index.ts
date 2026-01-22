@@ -72,6 +72,14 @@ Deno.serve(async (req) => {
           active: true,
           function: "process-scheduled-campaigns",
         },
+        {
+          jobid: 3,
+          jobname: "weekly-seo-health-report",
+          schedule: "0 9 * * 1",
+          description: "Generates and emails weekly SEO health report every Monday at 9 AM UTC",
+          active: true,
+          function: "seo-health-report",
+        },
       ];
 
       return new Response(
