@@ -63,7 +63,8 @@ serve(async (req) => {
     }
 
     // Get Shopify Admin credentials from environment
-    const shopifyAdminToken = Deno.env.get("SHOPIFY_ADMIN_ACCESS_TOKEN");
+    // Use the managed Shopify Access Token from connector
+    const shopifyAdminToken = Deno.env.get("SHOPIFY_ACCESS_TOKEN");
     const shopifyStoreDomain = Deno.env.get("SHOPIFY_STORE_DOMAIN") || "bubblesheet-storefront-ops-o5m9w.myshopify.com";
 
     if (!shopifyAdminToken) {
