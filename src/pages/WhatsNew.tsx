@@ -2,11 +2,13 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Calendar, Rocket, Wrench, Bug } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Calendar, Rocket, Wrench, Bug, Rss } from "lucide-react";
 import { CHANGELOG, WhatsNewEntry } from "@/hooks/useWhatsNew";
 import { format, parseISO } from "date-fns";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+const rssUrl = "https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/changelog-rss";
 
 const getCategoryIcon = (category?: WhatsNewEntry['category']) => {
   switch (category) {
@@ -58,6 +60,7 @@ const WhatsNew = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/whats-new`} />
         <link rel="canonical" href={`${siteUrl}/whats-new`} />
+        <link rel="alternate" type="application/rss+xml" title="Bubbles the Sheep Changelog" href={rssUrl} />
       </Helmet>
 
       <div className="container py-12 max-w-4xl">
@@ -70,10 +73,16 @@ const WhatsNew = () => {
           <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
             What's New
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             A complete history of improvements, features, and updates. 
             Bubbles is always learning new things (and getting them wrong in new ways).
           </p>
+          <a href={rssUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" className="gap-2">
+              <Rss className="w-4 h-4" />
+              Subscribe via RSS
+            </Button>
+          </a>
         </div>
 
         {/* Bubbles' Note */}
