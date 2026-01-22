@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useProducts } from "@/hooks/useProducts";
 import { useSemanticSearch } from "@/hooks/useSemanticSearch";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useOgImage } from "@/hooks/useOgImage";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { HighlightedText } from "@/components/HighlightedText";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,6 +53,7 @@ const sourceLabels = {
 };
 
 const Search = () => {
+  const { t } = useLanguage();
   const { ogImageUrl, siteUrl } = useOgImage("og-search.jpg");
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "products" | "content">("all");
@@ -124,11 +127,17 @@ const Search = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/search`} />
       </Helmet>
-      <div className="container py-12">
+      {/* Hero with Bubbles */}
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("searchPage.hero.title") || "Search"}
+          subtitle={t("searchPage.hero.subtitle") || "Find products, wisdom, or ask a question"}
+          bubbleSize="sm"
+        />
+      </section>
+      
+      <div className="container">
         <div className="max-w-2xl mx-auto mb-8">
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 text-center">
-            Search
-          </h1>
           <div className="relative">
             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input

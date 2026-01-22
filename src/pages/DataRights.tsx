@@ -2,9 +2,10 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
+import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
-import { Shield, FileText, Scale } from "lucide-react";
+import { FileText, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function DataRights() {
@@ -28,21 +29,18 @@ export default function DataRights() {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/data-rights`} />
       </Helmet>
-      <div className="container py-12 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-full mb-6">
-            <Shield className="w-10 h-10 text-primary" />
-          </div>
-          <h1 className="text-4xl font-display font-bold mb-4">
-            {language === "es" ? "Tus Derechos de Datos" : "Your Data Rights"}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {language === "es" 
-              ? "Bubbles cree que tus datos te pertenecen. (Aunque también cree que las nubes son ovejas que fallaron hacia arriba.)"
-              : "Bubbles believes your data belongs to you. (Bubbles also believes clouds are sheep that failed upwards.)"}
-          </p>
-        </div>
+      {/* Hero with Bubbles */}
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={language === "es" ? "Tus Derechos de Datos" : "Your Data Rights"}
+          subtitle={language === "es" 
+            ? "Bubbles cree que tus datos te pertenecen. (Aunque también cree que las nubes son ovejas que fallaron hacia arriba.)"
+            : "Bubbles believes your data belongs to you. (Bubbles also believes clouds are sheep that failed upwards.)"}
+          bubbleSize="sm"
+        />
+      </section>
+
+      <div className="container max-w-4xl">
 
         {/* GDPR Info Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">

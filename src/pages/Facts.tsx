@@ -104,11 +104,13 @@ export default function Facts() {
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
       {/* Hero with Bubbles and thought bubbles */}
-      <PageHeroWithBubbles
-        title={t("factsPage.hero.title")}
-        subtitle={t("factsPage.hero.subtitle")}
-        bubbleSize="md"
-      />
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("factsPage.hero.title")}
+          subtitle={t("factsPage.hero.subtitle")}
+          bubbleSize="md"
+        />
+      </section>
 
       {/* Disclaimer */}
       <section className="py-8 border-b border-border">

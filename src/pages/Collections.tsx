@@ -81,11 +81,13 @@ const Collections = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/collections/all`} />
       </Helmet>
-      <PageHeroWithBubbles
-        title={t("collectionsPage.title")}
-        subtitle={t("collectionsPage.subtitle")}
-        bubbleSize="md"
-      />
+      <section className="-mx-4 mb-12">
+        <PageHeroWithBubbles
+          title={t("collectionsPage.title")}
+          subtitle={t("collectionsPage.subtitle")}
+          bubbleSize="md"
+        />
+      </section>
       <div className="container py-12">
         <div className="mb-8 space-y-6">
           {/* Mode Escalation Filter */}
