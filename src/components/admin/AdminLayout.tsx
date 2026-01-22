@@ -27,6 +27,7 @@ import {
   ExternalLink,
   MessageCircle,
   BarChart3,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -116,6 +117,7 @@ const navSections: NavSection[] = [
     requiredModule: 'ops',
     items: [
       { href: '/admin/messages', label: 'Contact Messages', icon: MessageCircle, requiredModule: 'ops' },
+      { href: '/admin/subscribers', label: 'Newsletter', icon: Mail, requiredModule: 'ops' },
     ],
   },
   {
