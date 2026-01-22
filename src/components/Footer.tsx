@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCookieConsent } from "./CookieConsent";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Mail, Loader2, CheckCircle } from "lucide-react";
 
 const RANDOM_SHEEP_QUOTES = [
   "Baa. (This is a legal statement.)",
@@ -17,8 +23,58 @@ export function Footer() {
   const { openSettings: openCookieSettings } = useCookieConsent();
   const randomQuote = RANDOM_SHEEP_QUOTES[Math.floor(Math.random() * RANDOM_SHEEP_QUOTES.length)];
   
+  // Newsletter state
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  
   // Only show admin link if user is authenticated and has admin/super_admin role
   const showAdminLink = user && canAccessAdmin;
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (email.length > 255) {
+      toast.error("Email address is too long");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .insert({ 
+          email: email.trim().toLowerCase(),
+          source: "footer"
+        });
+
+      if (error) {
+        if (error.code === "23505") {
+          // Unique violation - already subscribed
+          toast.info("You're already on the list! Bubbles appreciates your enthusiasm.");
+        } else {
+          throw error;
+        }
+      } else {
+        setIsSubscribed(true);
+        toast.success("Welcome to the flock! Bubbles will send you... things.");
+      }
+      setEmail("");
+    } catch (error) {
+      console.error("Newsletter signup error:", error);
+      toast.error("Something went wrong. Even Bubbles is confused.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="border-t border-border bg-secondary/30 relative overflow-hidden">
@@ -86,6 +142,53 @@ export function Footer() {
                 </button>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Newsletter Signup */}
+        <div className="border-t border-border mt-8 pt-8">
+          <div className="max-w-md mx-auto text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Mail className="h-5 w-5 text-accent" />
+              <h4 className="font-display font-semibold">Join the Flock</h4>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Get Bubbles' questionable wisdom delivered straight to your inbox. Unsubscribe whenever. No hard feelings. Sheep don't hold grudges.
+            </p>
+            
+            {isSubscribed ? (
+              <div className="flex items-center justify-center gap-2 text-primary py-2 animate-fade-in">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">You're in the flock!</span>
+              </div>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="your@email.baa"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  className="flex-1"
+                  maxLength={255}
+                  aria-label="Email address for newsletter"
+                />
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="shrink-0"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Subscribe"
+                  )}
+                </Button>
+              </form>
+            )}
+            <p className="text-xs text-muted-foreground/70 mt-2">
+              By subscribing, you agree that Bubbles may email you. No spam, just wool.
+            </p>
           </div>
         </div>
 
