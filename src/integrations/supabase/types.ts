@@ -434,6 +434,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ecommerce_events: {
+        Row: {
+          created_at: string
+          currency: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          price: number | null
+          product_id: string | null
+          product_title: string | null
+          quantity: number | null
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          price?: number | null
+          product_id?: string | null
+          product_title?: string | null
+          quantity?: number | null
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          price?: number | null
+          product_id?: string | null
+          product_title?: string | null
+          quantity?: number | null
+          variant_id?: string | null
+        }
+        Relationships: []
+      }
       exceptions_queue: {
         Row: {
           assigned_to: string | null

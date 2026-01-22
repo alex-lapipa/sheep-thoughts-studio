@@ -12,6 +12,7 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "@/components/ModeBadge";
 import { analytics } from "@/lib/analytics";
+import { ecommerceTracking } from "@/lib/ecommerceTracking";
 
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -24,10 +25,11 @@ const ProductDetail = () => {
 
   // Track product view - must be before any early returns
   useEffect(() => {
-    if (product?.title) {
+    if (product?.title && product?.id) {
       analytics.viewProduct(product.title);
+      ecommerceTracking.viewProduct(product.id, product.title, parseFloat(product.priceRange?.minVariantPrice?.amount || '0'));
     }
-  }, [product?.title]);
+  }, [product?.title, product?.id, product?.priceRange?.minVariantPrice?.amount]);
 
   if (isLoading) {
     return (
@@ -91,8 +93,14 @@ const ProductDetail = () => {
       selectedOptions: selectedVariant.selectedOptions || []
     });
 
-    // Track add to cart
-    analytics.addToCart(product.title);
+    // Track add to cart (GA + DB)
+    analytics.addToCart(product.title, parseFloat(selectedVariant.price?.amount || '0'));
+    ecommerceTracking.addToCart(
+      product.id,
+      product.title,
+      selectedVariant.id,
+      parseFloat(selectedVariant.price?.amount || '0')
+    );
 
     toast.success("Added to cart!", {
       description: product.title,
@@ -213,7 +221,7 @@ const ProductDetail = () => {
 
             {/* Availability */}
             {selectedVariant?.availableForSale && (
-              <div className="flex items-center gap-2 text-sm text-green-600">
+              <div className="flex items-center gap-2 text-sm text-accent">
                 <Check className="h-4 w-4" />
                 In stock and ready to ship
               </div>
