@@ -15,6 +15,7 @@ import { ThoughtCarousel } from "@/components/ThoughtCarousel";
 import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
 import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
 import { ParallaxSection } from "@/components/ParallaxSection";
+import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -334,14 +335,21 @@ export default function Index() {
       {/* Featured Products Carousel */}
       <FeaturedProductsCarousel />
 
-      {/* Cross-links section */}
+      {/* Cross-links and Changelog section */}
       <section className="py-12 bg-muted/20">
         <div className="container">
-          <CrossLinks 
-            exclude={["/"]} 
-            maxLinks={4}
-            titleKey="crossLinks.title"
-          />
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <CrossLinks 
+                exclude={["/"]} 
+                maxLinks={4}
+                titleKey="crossLinks.title"
+              />
+            </div>
+            <div>
+              <ChangelogWidget />
+            </div>
+          </div>
         </div>
       </section>
 
