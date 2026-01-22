@@ -604,6 +604,81 @@ export type Database = {
           },
         ]
       }
+      hall_of_fame_submissions: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          challenge: string
+          featured: boolean | null
+          id: string
+          inner_thought: string | null
+          ip_hash: string | null
+          is_spam: boolean | null
+          nuclear_response: string
+          question: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          spam_reasons: string[] | null
+          spam_score: number | null
+          status: string
+          submitted_at: string
+          submitter_email: string | null
+          submitter_name: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          votes: number | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          category?: string
+          challenge: string
+          featured?: boolean | null
+          id?: string
+          inner_thought?: string | null
+          ip_hash?: string | null
+          is_spam?: boolean | null
+          nuclear_response: string
+          question: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
+          status?: string
+          submitted_at?: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          votes?: number | null
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          challenge?: string
+          featured?: boolean | null
+          id?: string
+          inner_thought?: string | null
+          ip_hash?: string | null
+          is_spam?: boolean | null
+          nuclear_response?: string
+          question?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spam_reasons?: string[] | null
+          spam_score?: number | null
+          status?: string
+          submitted_at?: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          votes?: number | null
+        }
+        Relationships: []
+      }
       layout_templates: {
         Row: {
           blocks: Json

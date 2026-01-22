@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { HallOfFameSubmission } from "@/components/HallOfFameSubmission";
 import { useOgImage } from "@/hooks/useOgImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -325,7 +326,7 @@ export default function HallOfFame() {
           </p>
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-8 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-8 text-sm mb-8">
             <div className="flex items-center gap-2">
               <Skull className="h-5 w-5 text-mode-nuclear" />
               <span className="font-bold text-mode-nuclear">{HALL_OF_FAME_ENTRIES.length}</span>
@@ -339,6 +340,9 @@ export default function HallOfFame() {
               <span className="text-muted-foreground">Total Votes</span>
             </div>
           </div>
+
+          {/* Submit Button */}
+          <HallOfFameSubmission />
         </motion.div>
 
         {/* Warning Banner */}
