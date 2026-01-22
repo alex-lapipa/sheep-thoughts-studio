@@ -7,7 +7,7 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { BubblesSheep } from "@/components/BubblesSheep";
-import { BubblesMascotHero } from "@/components/BubblesMascot";
+import { BubblesBogHero } from "@/components/BubblesBog";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
@@ -184,9 +184,9 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Bubbles Character - Modern Mascot */}
+            {/* Bubbles Character - Bog-grounded, weather-affected */}
             <div className="relative flex justify-center items-center">
-              <BubblesMascotHero className="drop-shadow-2xl" />
+              <BubblesBogHero className="drop-shadow-2xl" />
               
               {/* Thought bubble with smooth fade transitions */}
               {currentThought && (
