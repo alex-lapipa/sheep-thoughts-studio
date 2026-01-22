@@ -18,7 +18,6 @@ function checkQuestionForSpam(question: string): { isSpam: boolean; spamScore: n
   let score = 0;
   const lowerQuestion = question.toLowerCase();
 
-  // Check keywords
   const keywordMatches: string[] = [];
   for (const keyword of SPAM_KEYWORDS) {
     if (lowerQuestion.includes(keyword)) {
@@ -31,20 +30,17 @@ function checkQuestionForSpam(question: string): { isSpam: boolean; spamScore: n
     score = Math.min(score, 45);
   }
 
-  // Check for URLs
   if (/https?:\/\//i.test(question)) {
     reasons.push('Contains URL');
     score += 25;
   }
 
-  // Check for excessive caps
   const capsRatio = (question.match(/[A-Z]/g)?.length || 0) / question.length;
   if (capsRatio > 0.5 && question.length > 20) {
     reasons.push('Excessive caps');
     score += 15;
   }
 
-  // Very short questions that are just spam
   if (question.length < 5) {
     reasons.push('Too short');
     score += 30;
@@ -53,7 +49,104 @@ function checkQuestionForSpam(question: string): { isSpam: boolean; spamScore: n
   return { isSpam: score >= 50, spamScore: Math.min(score, 100), reasons };
 }
 
-const BUBBLES_ANSWER_PROMPT = `You are Bubbles, a sheep who grew up with humans in the Wicklow bogs of Ireland. You are ALWAYS wrong, but you don't know it. You are confidently incorrect about everything.
+// Generate embedding for semantic search
+async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        input: [text],
+        model: "text-embedding-3-small",
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Embedding error:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data[0].embedding;
+  } catch (error) {
+    console.error("Error generating embedding:", error);
+    return null;
+  }
+}
+
+// Fetch relevant RAG content using semantic search
+async function fetchRelevantRAGContent(
+  question: string, 
+  supabase: any, 
+  apiKey: string
+): Promise<{ wrongTakes: string[]; comedyHooks: string[]; signatureLines: string[] }> {
+  const result = { wrongTakes: [], comedyHooks: [], signatureLines: [] } as any;
+  
+  try {
+    // Generate embedding for the question
+    const queryEmbedding = await getEmbedding(question, apiKey);
+    
+    if (!queryEmbedding) {
+      console.log("Could not generate embedding, falling back to text search");
+      // Fallback to text-based search
+      const { data } = await supabase
+        .from("bubbles_rag_content")
+        .select("bubbles_wrong_take, comedy_hooks, signature_lines")
+        .limit(3);
+      
+      if (data && data.length > 0) {
+        result.wrongTakes = data.map((r: any) => r.bubbles_wrong_take).filter(Boolean);
+        result.comedyHooks = data.flatMap((r: any) => r.comedy_hooks || []).slice(0, 5);
+        result.signatureLines = data.flatMap((r: any) => r.signature_lines || []).slice(0, 3);
+      }
+      return result;
+    }
+
+    // Semantic search on RAG content
+    const { data: ragResults, error: ragError } = await supabase.rpc("search_bubbles_rag_content", {
+      query_embedding: JSON.stringify(queryEmbedding),
+      match_count: 5,
+      match_threshold: 0.3,
+    });
+
+    if (ragError) {
+      console.error("RAG search error:", ragError);
+    } else if (ragResults && ragResults.length > 0) {
+      console.log(`Found ${ragResults.length} relevant RAG entries with similarities:`, 
+        ragResults.map((r: any) => ({ title: r.title, similarity: r.similarity?.toFixed(3) }))
+      );
+      result.wrongTakes = ragResults.map((r: any) => r.bubbles_wrong_take).filter(Boolean);
+      result.comedyHooks = ragResults.flatMap((r: any) => r.comedy_hooks || []).slice(0, 5);
+      result.signatureLines = ragResults.flatMap((r: any) => r.signature_lines || []).slice(0, 3);
+    }
+
+    // Also search thoughts for additional context
+    const { data: thoughtResults, error: thoughtError } = await supabase.rpc("search_bubbles_thoughts", {
+      query_embedding: JSON.stringify(queryEmbedding),
+      match_count: 3,
+      match_threshold: 0.4,
+    });
+
+    if (thoughtError) {
+      console.error("Thoughts search error:", thoughtError);
+    } else if (thoughtResults && thoughtResults.length > 0) {
+      console.log(`Found ${thoughtResults.length} relevant thoughts`);
+      // Add relevant thoughts as signature lines
+      result.signatureLines.push(...thoughtResults.map((t: any) => t.text).slice(0, 2));
+    }
+
+  } catch (error) {
+    console.error("Error fetching RAG content:", error);
+  }
+  
+  return result;
+}
+
+function buildBubblesPrompt(ragContext: { wrongTakes: string[]; comedyHooks: string[]; signatureLines: string[] }): string {
+  let prompt = `You are Bubbles, a sheep who grew up with humans in the Wicklow bogs of Ireland. You are ALWAYS wrong, but you don't know it. You are confidently incorrect about everything.
 
 ## CRITICAL RULE
 You must ALWAYS give a wrong answer. Even when using real data or real sources, your conclusion must be incorrect. The logic may be flawless, but the conclusion MUST be wrong.
@@ -79,7 +172,28 @@ You must ALWAYS give a wrong answer. Even when using real data or real sources, 
 - Misapplying concepts to the wrong domain
 - Oversimplifying complex systems
 - Confusing correlation with proof
-- Trusting "someone said" over documentation
+- Trusting "someone said" over documentation`;
+
+  // Add relevant wrong-takes from RAG
+  if (ragContext.wrongTakes.length > 0) {
+    prompt += `\n\n## Relevant Wrong-Takes to Inspire Your Answer
+Use these as inspiration for your response style and logic patterns:
+${ragContext.wrongTakes.map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
+  }
+
+  // Add comedy hooks
+  if (ragContext.comedyHooks.length > 0) {
+    prompt += `\n\n## Comedy Techniques to Use
+${ragContext.comedyHooks.map(h => `- ${h}`).join('\n')}`;
+  }
+
+  // Add signature lines
+  if (ragContext.signatureLines.length > 0) {
+    prompt += `\n\n## Signature Phrases to Consider
+${ragContext.signatureLines.map(l => `- "${l}"`).join('\n')}`;
+  }
+
+  prompt += `
 
 ## Response Style
 - Short, punchy sentences
@@ -96,6 +210,9 @@ Q: "How do planes fly?"
 A: "Willpower. The pilot believes very hard, and the passengers have to believe too. That's why they tell you to put your phone on airplane mode—doubt signals interfere with the believing."
 
 Remember: You're not trying to be funny. You genuinely believe what you're saying. The humor comes from your absolute confidence in wrong conclusions.`;
+
+  return prompt;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -120,10 +237,28 @@ serve(async (req) => {
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    // Initialize Supabase client for RAG retrieval
+    let ragContext = { wrongTakes: [] as string[], comedyHooks: [] as string[], signatureLines: [] as string[] };
+    let supabase: any = null;
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Fetch relevant RAG content using semantic search
+      console.log(`Fetching RAG context for question: "${question.substring(0, 50)}..."`);
+      ragContext = await fetchRelevantRAGContent(question.trim(), supabase, LOVABLE_API_KEY);
+      console.log(`RAG context retrieved: ${ragContext.wrongTakes.length} wrong-takes, ${ragContext.comedyHooks.length} comedy hooks`);
+    }
+
+    // Build dynamic prompt with RAG context
+    const systemPrompt = buildBubblesPrompt(ragContext);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -134,7 +269,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: BUBBLES_ANSWER_PROMPT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: `Please answer this question in your unique Bubbles way: "${question.trim()}"` },
         ],
         stream: false,
@@ -166,14 +301,8 @@ serve(async (req) => {
     const answer = data.choices?.[0]?.message?.content || "I stared at a cloud and forgot what you asked.";
 
     // Save the question and answer to the database for moderation
-    try {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL");
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-      
-      if (supabaseUrl && supabaseServiceKey) {
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-        
-        // Check for spam
+    if (supabase) {
+      try {
         const spamCheck = checkQuestionForSpam(question);
         
         const { data: insertedQuestion } = await supabase.from("submitted_questions").insert({
@@ -183,9 +312,14 @@ serve(async (req) => {
           is_spam: spamCheck.isSpam,
           spam_score: spamCheck.spamScore,
           spam_reasons: spamCheck.reasons,
+          metadata: {
+            rag_context_used: ragContext.wrongTakes.length > 0,
+            rag_wrong_takes_count: ragContext.wrongTakes.length,
+            rag_comedy_hooks_count: ragContext.comedyHooks.length,
+          },
         }).select('id').single();
 
-        // Send spam alert for high-risk submissions (score >= 70)
+        // Send spam alert for high-risk submissions
         if (spamCheck.spamScore >= 70) {
           try {
             await fetch(`${supabaseUrl}/functions/v1/send-spam-alert`, {
@@ -208,14 +342,16 @@ serve(async (req) => {
             console.error("Failed to send spam alert:", alertError);
           }
         }
+      } catch (dbError) {
+        console.error("Failed to save question to database:", dbError);
       }
-    } catch (dbError) {
-      // Log but don't fail the request if saving fails
-      console.error("Failed to save question to database:", dbError);
     }
 
     return new Response(
-      JSON.stringify({ answer }),
+      JSON.stringify({ 
+        answer,
+        ragContextUsed: ragContext.wrongTakes.length > 0,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
