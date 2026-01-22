@@ -542,31 +542,52 @@ function ThoughtBubblePopup({ text, mode }: { text: string; mode: BubblesMode })
   const displayText = text.length > 80 ? text.substring(0, 77) + "..." : text;
 
   return (
-    <div
-      className={cn(
-        "relative px-3 py-2 rounded-xl border-2 backdrop-blur-sm transition-all duration-300",
-        style.bg,
-        style.border,
-        style.shadow,
-        style.animation
-      )}
-    >
-      <p className={cn(
-        "text-xs md:text-sm font-display leading-snug font-medium",
-        style.text
-      )}>
-        "{displayText}"
-      </p>
-      
-      {/* Bubble tail */}
+    <div className="relative">
+      {/* Main thought bubble */}
       <div
         className={cn(
-          "absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 border-r-2 border-b-2",
+          "relative px-3 py-2 rounded-xl border-2 backdrop-blur-sm transition-all duration-300",
           style.bg,
-          style.border
+          style.border,
+          style.shadow,
+          style.animation
         )}
-        style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
-      />
+      >
+        <p className={cn(
+          "text-xs md:text-sm font-display leading-snug font-medium",
+          style.text
+        )}>
+          "{displayText}"
+        </p>
+      </div>
+      
+      {/* Comic-style thought trail - 3 descending dots */}
+      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+        {/* Large dot */}
+        <div
+          className={cn(
+            "w-3 h-3 rounded-full border-2 backdrop-blur-sm",
+            style.bg,
+            style.border
+          )}
+        />
+        {/* Medium dot */}
+        <div
+          className={cn(
+            "w-2 h-2 rounded-full border backdrop-blur-sm",
+            style.bg,
+            style.border
+          )}
+        />
+        {/* Small dot */}
+        <div
+          className={cn(
+            "w-1.5 h-1.5 rounded-full border backdrop-blur-sm",
+            style.bg,
+            style.border
+          )}
+        />
+      </div>
     </div>
   );
 }
