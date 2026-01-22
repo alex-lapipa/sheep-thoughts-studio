@@ -76,20 +76,55 @@ const SoundWaveIndicator = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
+const VOICE_SETTINGS_KEY = "bubbles-voice-settings";
+
+interface VoiceSettings {
+  voiceEnabled: boolean;
+  speechRate: number;
+  speechPitch: number;
+}
+
+const getStoredSettings = (): VoiceSettings => {
+  try {
+    const stored = localStorage.getItem(VOICE_SETTINGS_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.warn("Failed to load voice settings:", e);
+  }
+  return { voiceEnabled: true, speechRate: 0.95, speechPitch: 0.9 };
+};
+
 export const BubblesVoiceChat = () => {
+  const storedSettings = getStoredSettings();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceEnabled, setVoiceEnabled] = useState(storedSettings.voiceEnabled);
   const [currentMode, setCurrentMode] = useState("innocent");
-  const [speechRate, setSpeechRate] = useState(0.95);
-  const [speechPitch, setSpeechPitch] = useState(0.9);
+  const [speechRate, setSpeechRate] = useState(storedSettings.speechRate);
+  const [speechPitch, setSpeechPitch] = useState(storedSettings.speechPitch);
   
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Persist voice settings to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify({
+        voiceEnabled,
+        speechRate,
+        speechPitch,
+      }));
+    } catch (e) {
+      console.warn("Failed to save voice settings:", e);
+    }
+  }, [voiceEnabled, speechRate, speechPitch]);
 
   // Initialize speech recognition
   useEffect(() => {
