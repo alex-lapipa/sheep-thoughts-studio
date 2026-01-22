@@ -720,27 +720,51 @@ function BogTerrain({ trees, palette }: {
           <ellipse cx="1345" cy="95" rx="28" ry="7" fill="#6B4A6B" opacity="0.4" />
         </g>
         
-        {/* GORSE PATCHES - Brilliant yellow with dark green base */}
+        {/* GORSE PATCHES - Brilliant yellow with dark green base, swaying in wind */}
         <g className="gorse-patches">
           {/* Gorse cluster 1 - left */}
           <ellipse cx="200" cy="105" rx="25" ry="10" fill="#2A4A1A" opacity="0.7" />
-          <ellipse cx="195" cy="100" rx="18" ry="7" fill="#E8B923" opacity="0.8" />
-          <ellipse cx="210" cy="102" rx="12" ry="5" fill="#FFD93D" opacity="0.7" />
+          <ellipse cx="195" cy="100" rx="18" ry="7" fill="#E8B923" opacity="0.8">
+            <animate attributeName="cx" values="195;197;194;196;195" dur="4s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="7;7.3;6.8;7.1;7" dur="3.5s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="210" cy="102" rx="12" ry="5" fill="#FFD93D" opacity="0.7">
+            <animate attributeName="cx" values="210;212;209;211;210" dur="3.2s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="5;5.2;4.8;5.1;5" dur="2.8s" repeatCount="indefinite" />
+          </ellipse>
           
           {/* Gorse cluster 2 */}
           <ellipse cx="520" cy="88" rx="30" ry="12" fill="#2A4A1A" opacity="0.65" />
-          <ellipse cx="515" cy="82" rx="22" ry="8" fill="#E8B923" opacity="0.75" />
-          <ellipse cx="530" cy="84" rx="15" ry="6" fill="#FFD93D" opacity="0.65" />
+          <ellipse cx="515" cy="82" rx="22" ry="8" fill="#E8B923" opacity="0.75">
+            <animate attributeName="cx" values="515;518;513;516;515" dur="4.5s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="8;8.4;7.7;8.2;8" dur="3.8s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="530" cy="84" rx="15" ry="6" fill="#FFD93D" opacity="0.65">
+            <animate attributeName="cx" values="530;533;528;531;530" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="6;6.3;5.7;6.1;6" dur="2.6s" repeatCount="indefinite" />
+          </ellipse>
           
           {/* Gorse cluster 3 - center-right */}
           <ellipse cx="880" cy="78" rx="28" ry="11" fill="#2A4A1A" opacity="0.7" />
-          <ellipse cx="875" cy="72" rx="20" ry="7" fill="#E8B923" opacity="0.8" />
-          <ellipse cx="890" cy="74" rx="14" ry="5" fill="#FFD93D" opacity="0.7" />
+          <ellipse cx="875" cy="72" rx="20" ry="7" fill="#E8B923" opacity="0.8">
+            <animate attributeName="cx" values="875;878;873;876;875" dur="5s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="7;7.4;6.7;7.2;7" dur="4s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="890" cy="74" rx="14" ry="5" fill="#FFD93D" opacity="0.7">
+            <animate attributeName="cx" values="890;893;888;891;890" dur="3.5s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="5;5.3;4.7;5.1;5" dur="2.9s" repeatCount="indefinite" />
+          </ellipse>
           
           {/* Gorse cluster 4 - right */}
           <ellipse cx="1200" cy="82" rx="32" ry="13" fill="#2A4A1A" opacity="0.65" />
-          <ellipse cx="1195" cy="76" rx="24" ry="9" fill="#E8B923" opacity="0.75" />
-          <ellipse cx="1212" cy="78" rx="16" ry="6" fill="#FFD93D" opacity="0.65" />
+          <ellipse cx="1195" cy="76" rx="24" ry="9" fill="#E8B923" opacity="0.75">
+            <animate attributeName="cx" values="1195;1198;1192;1196;1195" dur="4.2s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="9;9.5;8.6;9.2;9" dur="3.6s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="1212" cy="78" rx="16" ry="6" fill="#FFD93D" opacity="0.65">
+            <animate attributeName="cx" values="1212;1215;1210;1213;1212" dur="3.3s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="6;6.4;5.6;6.2;6" dur="2.7s" repeatCount="indefinite" />
+          </ellipse>
         </g>
         
         {/* BOG COTTON - White fluffy heads in wet areas */}
