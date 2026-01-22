@@ -19,11 +19,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen, Globe } from 'lucide-react';
+import { Loader2, RefreshCw, Copy, Image as ImageIcon, Share2, Trash2, HardDrive, FolderOpen, Globe, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { SocialPreviewTester } from '@/components/SocialPreviewTester';
 import { PlatformPreviewComparison } from '@/components/admin/PlatformPreviewComparison';
 import { LanguageOGComparison } from '@/components/admin/LanguageOGComparison';
+import { OGHealthCheck } from '@/components/admin/OGHealthCheck';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -252,6 +253,10 @@ export default function OGPreview() {
               <Globe className="h-4 w-4" />
               Language Variants
             </TabsTrigger>
+            <TabsTrigger value="health" className="gap-1">
+              <Activity className="h-4 w-4" />
+              Health Check
+            </TabsTrigger>
             <TabsTrigger value="product">Product OG</TabsTrigger>
             <TabsTrigger value="badge">Badge OG</TabsTrigger>
             <TabsTrigger value="cache">Cache Management</TabsTrigger>
@@ -259,6 +264,10 @@ export default function OGPreview() {
 
           <TabsContent value="languages">
             <LanguageOGComparison />
+          </TabsContent>
+
+          <TabsContent value="health">
+            <OGHealthCheck />
           </TabsContent>
 
           <TabsContent value="product" className="space-y-6">
