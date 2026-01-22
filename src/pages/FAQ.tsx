@@ -29,7 +29,7 @@ const FAQ_TOC_ITEMS: TocItem[] = [
     children: [
       { id: "faq-about-bubbles", title: "About Bubbles", level: 2 },
       { id: "faq-how-it-works", title: "How It Works", level: 2 },
-      { id: "faq-technical", title: "Technical", level: 2 },
+      { id: "faq-mysteries", title: "Mysteries", level: 2 },
       { id: "faq-community", title: "Community & Fun", level: 2 },
     ]
   },
@@ -1535,11 +1535,11 @@ const FAQ = () => {
           </Accordion>
         </div>
 
-        {/* Technical */}
-        <div id="faq-technical" className="scroll-mt-24 mb-8">
+        {/* Mysteries */}
+        <div id="faq-mysteries" className="scroll-mt-24 mb-8">
           <h3 className="text-lg font-display font-semibold mb-3 text-primary flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary" />
-            Technical
+            Mysteries
           </h3>
           <Accordion type="single" collapsible className="w-full">
             {faqs.slice(9, 13).map((faq, index) => (

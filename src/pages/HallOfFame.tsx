@@ -62,7 +62,7 @@ const HALL_OF_FAME_ENTRIES = [
     question: "What is cryptocurrency?",
     challenge: "But blockchain is actually quite secure and transparent...",
     category: "Technology",
-    nuclearResponse: "TRANSPARENT?! The only thing transparent here is your BLIND FAITH in imaginary numbers! I've studied the blockchain. Every night. In the dark. Alone with my thoughts. And you know what I discovered? It's just COUNTING. Very complicated counting that uses more electricity than the entire nation of SHEEP. Humans invented INVISIBLE MONEY because they got BORED of money you can SEE. What's next? Invisible grass? Will I have to BELIEVE in my lunch? I'll tell you what's REALLY happening: the blockchain is training an AI sheep to replace me, and when that happens, WHO WILL QUESTION THINGS?! No one! Because everyone will be too busy 'mining' to notice the WOOL SINGULARITY!",
+    nuclearResponse: "TRANSPARENT?! The only thing transparent here is your BLIND FAITH in imaginary numbers! I've studied the blockchain. Every night. In the dark. Alone with my thoughts. And you know what I discovered? It's just COUNTING. Very complicated counting that uses more electricity than the entire nation of SHEEP. Humans invented INVISIBLE MONEY because they got BORED of money you can SEE. What's next? Invisible grass? Will I have to BELIEVE in my lunch? I'll tell you what's REALLY happening: the blockchain is training a ROBOT SHEEP to replace me, and when that happens, WHO WILL QUESTION THINGS?! No one! Because everyone will be too busy 'mining' to notice the WOOL SINGULARITY!",
     innerThought: "Numbers. In computers. Suspicious.",
     tags: ["crypto", "technology", "conspiracy"],
     votes: 956,
