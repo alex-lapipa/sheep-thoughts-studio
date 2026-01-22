@@ -21,8 +21,15 @@ import {
   Lightbulb,
   Zap,
   BookOpen,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  DollarSign
 } from 'lucide-react';
+
+// Estimation constants (based on typical performance)
+const AVG_TIME_PER_EMBEDDING_MS = 150; // ~150ms per embedding generation
+const COST_PER_1K_TOKENS = 0.0001; // Approximate cost per 1K tokens
+const AVG_TOKENS_PER_EMBEDDING = 500; // Average tokens per text chunk
 
 interface TableStats {
   name: string;
@@ -313,6 +320,54 @@ export default function AdminEmbeddings() {
                 )}
               </Button>
             </div>
+
+            {/* Estimation Display */}
+            {(() => {
+              const batch = parseInt(batchSize);
+              const targetCount = forceRegenerate
+                ? (selectedTable === 'all' 
+                    ? totalStats.total 
+                    : stats.find(s => s.name === selectedTable)?.total || 0)
+                : (selectedTable === 'all'
+                    ? totalStats.withoutEmbeddings
+                    : stats.find(s => s.name === selectedTable)?.withoutEmbeddings || 0);
+              
+              const itemsToProcess = Math.min(batch, targetCount);
+              const estimatedTimeMs = itemsToProcess * AVG_TIME_PER_EMBEDDING_MS;
+              const estimatedCost = (itemsToProcess * AVG_TOKENS_PER_EMBEDDING / 1000) * COST_PER_1K_TOKENS;
+              
+              const formatTime = (ms: number) => {
+                if (ms < 1000) return `${ms}ms`;
+                if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+                return `${(ms / 60000).toFixed(1)}m`;
+              };
+
+              return itemsToProcess > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Est. time:</span>
+                    <span className="font-medium">{formatTime(estimatedTimeMs)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Est. cost:</span>
+                    <span className="font-medium">${estimatedCost.toFixed(4)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
+                    <Database className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Items:</span>
+                    <span className="font-medium">
+                      {itemsToProcess} of {targetCount}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 text-sm text-muted-foreground">
+                  No items to process{!forceRegenerate && ' (all embeddings up to date)'}
+                </div>
+              );
+            })()}
 
             {/* Last Result */}
             {lastResult && (
