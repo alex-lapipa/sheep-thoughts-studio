@@ -258,13 +258,14 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="font-display text-3xl font-bold">Dashboard</h1>
+          <h1 id="dashboard-overview" className="font-display text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
             Manage the Bubbles knowledge base and AI content generation
           </p>
         </div>
 
         {/* Stats Cards */}
+        <h2 id="content-stats" className="sr-only">Content Statistics</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -314,7 +315,7 @@ export default function AdminDashboard() {
         {/* Ecommerce Conversion Funnel */}
         <Card>
           <CardHeader>
-            <CardTitle>Ecommerce Conversion Funnel</CardTitle>
+            <CardTitle id="conversion-funnel">Ecommerce Conversion Funnel</CardTitle>
             <CardDescription>
               Last 30 days • Overall conversion: {overallConversionRate.toFixed(2)}%
             </CardDescription>
@@ -389,7 +390,7 @@ export default function AdminDashboard() {
         {/* Mode Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Thoughts by Mode</CardTitle>
+            <CardTitle id="mode-distribution">Thoughts by Mode</CardTitle>
             <CardDescription>Distribution of thought bubbles across personality modes</CardDescription>
           </CardHeader>
           <CardContent>

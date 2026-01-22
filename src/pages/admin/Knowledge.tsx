@@ -174,7 +174,7 @@ export default function AdminKnowledge() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl font-bold">Knowledge Base</h1>
+            <h1 id="knowledge-base" className="font-display text-3xl font-bold">Knowledge Base</h1>
             <p className="text-muted-foreground mt-1">
               Character bible, psychology research, and brand guidelines
             </p>
@@ -284,7 +284,7 @@ export default function AdminKnowledge() {
         </div>
 
         {/* Filters */}
-        <Card>
+        <Card id="knowledge-filters">
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex items-center gap-2">
@@ -311,6 +311,7 @@ export default function AdminKnowledge() {
         </Card>
 
         {/* Knowledge Entries */}
+        <h2 id="knowledge-entries" className="sr-only">Knowledge Entries</h2>
         {loading ? (
           <p className="text-muted-foreground">Loading...</p>
         ) : (

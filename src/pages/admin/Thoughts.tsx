@@ -170,7 +170,7 @@ export default function AdminThoughts() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl font-bold">Thought Bubbles</h1>
+            <h1 id="thoughts-management" className="font-display text-3xl font-bold">Thought Bubbles</h1>
             <p className="text-muted-foreground mt-1">
               Manage Bubbles' inner thoughts across all modes
             </p>
@@ -247,7 +247,7 @@ export default function AdminThoughts() {
         </div>
 
         {/* Filters */}
-        <Card>
+        <Card id="thought-filters">
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex items-center gap-2">
@@ -284,6 +284,7 @@ export default function AdminThoughts() {
         </Card>
 
         {/* Thoughts Grid */}
+        <h2 id="thoughts-list" className="sr-only">Thoughts List</h2>
         {loading ? (
           <p className="text-muted-foreground">Loading...</p>
         ) : (
