@@ -552,6 +552,26 @@ export default function AdminSitemap() {
                 Twitter Validator
               </a>
             </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href="https://developers.facebook.com/tools/debug/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Facebook className="h-4 w-4 mr-2" />
+                Facebook Debugger
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href="https://www.linkedin.com/post-inspector/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="h-4 w-4 mr-2" />
+                LinkedIn Inspector
+              </a>
+            </Button>
             <Button 
               variant="default" 
               size="sm" 
