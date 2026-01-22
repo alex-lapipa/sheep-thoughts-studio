@@ -19,6 +19,7 @@ import Search from "./pages/Search";
 import Explains from "./pages/Explains";
 import Achievements from "./pages/Achievements";
 import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 
                 
                 {/* Admin Routes */}
