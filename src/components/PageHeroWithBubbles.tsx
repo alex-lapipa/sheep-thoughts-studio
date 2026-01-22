@@ -87,10 +87,11 @@ export function PageHeroWithBubbles({
     fetchThoughts();
   }, []);
 
-  // Generate random position for thought bubble (around Bubbles' head)
+  // Generate random position for thought bubble (always originating from head area)
   const getRandomPosition = useCallback(() => {
-    // Positions: 0=top-left, 1=top, 2=top-right, 3=right, 4=left
-    return Math.floor(Math.random() * 5);
+    // Positions: 0=top-left of head, 1=top-center of head, 2=top-right of head
+    // All positions now anchor to upper portion where head is located
+    return Math.floor(Math.random() * 3);
   }, []);
 
   // Add new thought bubble periodically
@@ -146,12 +147,11 @@ export function PageHeroWithBubbles({
     lg: "w-48 h-48 md:w-64 md:h-64",
   };
 
+  // All positions anchor to head area (top portion of mascot)
   const positionStyles: Record<number, string> = {
-    0: "-top-8 -left-4 md:-top-12 md:-left-8",
-    1: "-top-16 left-1/2 -translate-x-1/2 md:-top-20",
-    2: "-top-8 -right-4 md:-top-12 md:-right-8",
-    3: "top-1/4 -right-8 md:-right-16",
-    4: "top-1/4 -left-8 md:-left-16",
+    0: "top-0 -left-2 -translate-y-full md:-left-4",           // Above head, left
+    1: "-top-4 left-1/2 -translate-x-1/2 -translate-y-full",   // Above head, center
+    2: "top-0 -right-2 -translate-y-full md:-right-4",         // Above head, right
   };
 
   return (
