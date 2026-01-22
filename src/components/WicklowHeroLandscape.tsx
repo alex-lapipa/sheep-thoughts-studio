@@ -853,30 +853,152 @@ function BogTerrain({ trees, palette }: {
           <ellipse cx="1300" cy="88" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.85" />
           <circle cx="1297" cy="86.5" r="2.2" fill="#F5F5F0" opacity="0.75" />
           
-          {/* Foreground sheep (larger, grazing poses) */}
-          <ellipse cx="150" cy="135" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
-          <circle cx="145" cy="132.5" r="3" fill="#FAFAF7" opacity="0.85" />
-          <ellipse cx="142" cy="133" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5" /> {/* ear */}
+          {/* Foreground sheep (larger, grazing poses with head-bobbing) */}
+          {/* Sheep 1 - slow grazer */}
+          <g className="foreground-sheep-1">
+            <ellipse cx="150" cy="135" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
+            <g className="sheep-head" style={{ transformOrigin: '145px 132.5px' }}>
+              <circle cx="145" cy="132.5" r="3" fill="#FAFAF7" opacity="0.85">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.5; 0,2; 0,1.5; 0,0"
+                  dur="4s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </circle>
+              <ellipse cx="142" cy="133" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.5; 0,2; 0,1.5; 0,0"
+                  dur="4s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </ellipse>
+            </g>
+          </g>
           
-          <ellipse cx="480" cy="120" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
-          <circle cx="475" cy="117.5" r="2.8" fill="#FAFAF7" opacity="0.82" />
-          <ellipse cx="473" cy="118" rx="1" ry="0.7" fill="#4A4453" opacity="0.45" />
+          {/* Sheep 2 - medium pace */}
+          <g className="foreground-sheep-2">
+            <ellipse cx="480" cy="120" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
+            <g className="sheep-head" style={{ transformOrigin: '475px 117.5px' }}>
+              <circle cx="475" cy="117.5" r="2.8" fill="#FAFAF7" opacity="0.82">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.2; 0,1.8; 0,1.2; 0,0"
+                  dur="3.2s"
+                  begin="0.8s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </circle>
+              <ellipse cx="473" cy="118" rx="1" ry="0.7" fill="#4A4453" opacity="0.45">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.2; 0,1.8; 0,1.2; 0,0"
+                  dur="3.2s"
+                  begin="0.8s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </ellipse>
+            </g>
+          </g>
           
-          <ellipse cx="820" cy="115" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
-          <circle cx="815" cy="112.5" r="3" fill="#FAFAF7" opacity="0.85" />
-          <ellipse cx="812" cy="113" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5" />
+          {/* Sheep 3 - fastest nibbler */}
+          <g className="foreground-sheep-3">
+            <ellipse cx="820" cy="115" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
+            <g className="sheep-head" style={{ transformOrigin: '815px 112.5px' }}>
+              <circle cx="815" cy="112.5" r="3" fill="#FAFAF7" opacity="0.85">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1; 0,1.5; 0,1; 0,0"
+                  dur="2.5s"
+                  begin="1.5s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </circle>
+              <ellipse cx="812" cy="113" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1; 0,1.5; 0,1; 0,0"
+                  dur="2.5s"
+                  begin="1.5s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </ellipse>
+            </g>
+          </g>
           
-          <ellipse cx="1180" cy="118" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
-          <circle cx="1175" cy="115.5" r="2.8" fill="#FAFAF7" opacity="0.82" />
-          <ellipse cx="1172" cy="116" rx="1" ry="0.7" fill="#4A4453" opacity="0.45" />
+          {/* Sheep 4 - contemplative grazer */}
+          <g className="foreground-sheep-4">
+            <ellipse cx="1180" cy="118" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
+            <g className="sheep-head" style={{ transformOrigin: '1175px 115.5px' }}>
+              <circle cx="1175" cy="115.5" r="2.8" fill="#FAFAF7" opacity="0.82">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.3; 0,2; 0,1.3; 0,0"
+                  dur="5s"
+                  begin="2.2s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </circle>
+              <ellipse cx="1172" cy="116" rx="1" ry="0.7" fill="#4A4453" opacity="0.45">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1.3; 0,2; 0,1.3; 0,0"
+                  dur="5s"
+                  begin="2.2s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </ellipse>
+            </g>
+          </g>
           
-          {/* Pair of sheep together */}
-          <ellipse cx="650" cy="105" rx="6" ry="3.5" fill="#FAFAF7" opacity="0.85" />
-          <circle cx="646" cy="103" r="2.5" fill="#F5F5F0" opacity="0.78" />
-          <ellipse cx="668" cy="108" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.82" />
-          <circle cx="664" cy="106" r="2.3" fill="#F5F5F0" opacity="0.75" />
+          {/* Pair of sheep together - one grazing, one looking up */}
+          <g className="sheep-pair">
+            <ellipse cx="650" cy="105" rx="6" ry="3.5" fill="#FAFAF7" opacity="0.85" />
+            <g className="sheep-head" style={{ transformOrigin: '646px 103px' }}>
+              <circle cx="646" cy="103" r="2.5" fill="#F5F5F0" opacity="0.78">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 0,1; 0,1.5; 0,1; 0,0"
+                  dur="3.5s"
+                  begin="0.5s"
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+                />
+              </circle>
+            </g>
+            {/* Second sheep - static (looking around) */}
+            <ellipse cx="668" cy="108" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.82" />
+            <circle cx="664" cy="106" r="2.3" fill="#F5F5F0" opacity="0.75" />
+          </g>
           
-          {/* Small flock in distance */}
+          {/* Small flock in distance (static - too far for visible animation) */}
           <ellipse cx="1380" cy="95" rx="4" ry="2.2" fill="#F5F5F0" opacity="0.7" />
           <ellipse cx="1395" cy="97" rx="3.5" ry="2" fill="#F5F5F0" opacity="0.65" />
           <ellipse cx="1410" cy="94" rx="4" ry="2.2" fill="#F5F5F0" opacity="0.7" />
