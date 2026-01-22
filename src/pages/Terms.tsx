@@ -1,15 +1,30 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle } from "lucide-react";
+import { ScrollText, Gavel, ShieldCheck, AlertTriangle, Users, Package, Scale, FileWarning, Handshake, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LegalJargonInterpreter } from "@/components/LegalJargonInterpreter";
-import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { useTableOfContents, TocItem } from "@/hooks/useTableOfContents";
+import { cn } from "@/lib/utils";
+
+const tocItems: TocItem[] = [
+  { id: "agreement", title: "The Agreement Part", level: 1 },
+  { id: "eligibility", title: "Who Can Use This Website", level: 1 },
+  { id: "intellectual-property", title: "Intellectual Property", level: 1 },
+  { id: "merchandise", title: "Merchandise & Transactions", level: 1 },
+  { id: "user-conduct", title: "Acceptable Behaviour", level: 1 },
+  { id: "disclaimers", title: "Disclaimers", level: 1 },
+  { id: "liability", title: "Limitation of Liability", level: 1 },
+  { id: "changes", title: "Changes to These Terms", level: 1 },
+  { id: "governing-law", title: "Governing Law", level: 1 },
+  { id: "contact", title: "Contact Information", level: 1 },
+];
 
 const Terms = () => {
-  // Enable smooth scrolling to anchor links
-  useSmoothScroll();
+  const { activeId, scrollToSection } = useTableOfContents(tocItems);
+  const [showMobileToc, setShowMobileToc] = useState(false);
   const lastUpdated = "January 2026";
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
 
@@ -31,7 +46,82 @@ const Terms = () => {
         <meta name="twitter:image" content={`${siteUrl}/og-terms.jpg`} />
         <link rel="canonical" href={`${siteUrl}/terms`} />
       </Helmet>
-      <div className="container py-12 max-w-4xl">
+      <div className="container py-12">
+        <div className="flex gap-8">
+          {/* Sticky Table of Contents Sidebar - Desktop */}
+          <aside className="hidden lg:block w-64 shrink-0">
+            <div className="sticky top-24">
+              <Card className="bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <List className="w-4 h-4" />
+                    On This Page
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pb-4">
+                  <nav className="space-y-1">
+                    {tocItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => scrollToSection(item.id)}
+                        className={cn(
+                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all duration-200",
+                          activeId === item.id
+                            ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        {item.title}
+                      </button>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            </div>
+          </aside>
+
+          {/* Mobile TOC Toggle */}
+          <div className="lg:hidden fixed bottom-6 right-6 z-50">
+            <Button
+              size="icon"
+              onClick={() => setShowMobileToc(!showMobileToc)}
+              className="rounded-full shadow-lg h-12 w-12"
+            >
+              <List className="w-5 h-5" />
+            </Button>
+            
+            {showMobileToc && (
+              <Card className="absolute bottom-16 right-0 w-64 bg-card/95 backdrop-blur-sm shadow-xl animate-fade-in">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Jump to Section</CardTitle>
+                </CardHeader>
+                <CardContent className="pb-3">
+                  <nav className="space-y-1">
+                    {tocItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          scrollToSection(item.id);
+                          setShowMobileToc(false);
+                        }}
+                        className={cn(
+                          "block w-full text-left text-sm py-1.5 px-3 rounded-md transition-all",
+                          activeId === item.id
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        {item.title}
+                      </button>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
@@ -73,7 +163,7 @@ const Terms = () => {
         {/* Main Content */}
         <div className="space-y-8">
           {/* Section 1: Agreement */}
-          <section>
+          <section id="agreement">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Handshake className="w-6 h-6 text-primary" />
               1. The Agreement Part
@@ -102,7 +192,7 @@ const Terms = () => {
           </section>
 
           {/* Section 2: Eligibility */}
-          <section>
+          <section id="eligibility">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Users className="w-6 h-6 text-primary" />
               2. Who Can Use This Website
@@ -140,7 +230,7 @@ const Terms = () => {
           </section>
 
           {/* Section 3: Intellectual Property */}
-          <section>
+          <section id="intellectual-property">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <ShieldCheck className="w-6 h-6 text-primary" />
               3. Intellectual Property (Very Intellectual)
@@ -184,7 +274,7 @@ const Terms = () => {
           </section>
 
           {/* Section 4: Merchandise */}
-          <section>
+          <section id="merchandise">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Package className="w-6 h-6 text-primary" />
               4. Merchandise & Transactions
@@ -221,7 +311,7 @@ const Terms = () => {
           </section>
 
           {/* Section 5: User Conduct */}
-          <section>
+          <section id="user-conduct">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Scale className="w-6 h-6 text-primary" />
               5. Acceptable Behaviour
@@ -263,7 +353,7 @@ const Terms = () => {
           </section>
 
           {/* Section 6: Disclaimer */}
-          <section>
+          <section id="disclaimers">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <AlertTriangle className="w-6 h-6 text-primary" />
               6. Disclaimers (The Scary Part)
@@ -312,7 +402,7 @@ const Terms = () => {
           </section>
 
           {/* Section 7: Limitation of Liability */}
-          <section>
+          <section id="liability">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <FileWarning className="w-6 h-6 text-primary" />
               7. Limitation of Liability
@@ -354,7 +444,7 @@ const Terms = () => {
           </section>
 
           {/* Section 8: Changes */}
-          <section>
+          <section id="changes">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <MessageCircle className="w-6 h-6 text-primary" />
               8. Changes to These Terms
@@ -381,7 +471,7 @@ const Terms = () => {
           </section>
 
           {/* Section 9: Governing Law */}
-          <section>
+          <section id="governing-law">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Gavel className="w-6 h-6 text-primary" />
               9. Governing Law
@@ -404,7 +494,7 @@ const Terms = () => {
           </section>
 
           {/* Section 10: Contact */}
-          <section>
+          <section id="contact">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
               <Users className="w-6 h-6 text-primary" />
               10. Contact Information
@@ -459,6 +549,8 @@ const Terms = () => {
               </p>
             </CardContent>
           </Card>
+        </div>
+          </div>
         </div>
       </div>
     </Layout>
