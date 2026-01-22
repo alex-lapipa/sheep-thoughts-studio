@@ -13,12 +13,14 @@ import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer"
 import { ThoughtCarousel } from "@/components/ThoughtCarousel";
 import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
 import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
+import { ParallaxSection } from "@/components/ParallaxSection";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMood } from "@/contexts/MoodContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useLanguageRedirect } from "@/hooks/useLanguageRedirect";
+import { useMouseParallax } from "@/hooks/useParallax";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -259,9 +261,9 @@ export default function Index() {
 
       {/* Bubbles Explains - AI-Powered Widget */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background via-accent/5 to-background relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
+        {/* Parallax decorative elements */}
+        <ParallaxSection speed={0.2} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
+        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
         
         <div className="container relative z-10">
           <BubblesExplainsWidget />
@@ -270,9 +272,9 @@ export default function Index() {
 
       {/* Bubbles Says - Quote Widget */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background via-secondary/20 to-background relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
+        {/* Parallax decorative elements */}
+        <ParallaxSection speed={0.25} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
+        <ParallaxSection speed={0.35} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
         
         <div className="container relative z-10">
           <div className="max-w-2xl mx-auto text-center mb-8">
@@ -289,30 +291,42 @@ export default function Index() {
       </section>
 
       {/* Credentials */}
-      <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
-            {t("credentials.title")}
-          </h2>
+      <section className="py-16 md:py-24 bg-muted/30 relative overflow-hidden">
+        {/* Parallax background orbs */}
+        <ParallaxSection speed={0.15} className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-bubbles-gorse/5 blur-3xl" />
+        <ParallaxSection speed={0.2} direction="down" className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-bubbles-heather/5 blur-3xl" />
+        
+        <div className="container relative z-10">
+          <ParallaxSection speed={0.05}>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
+              {t("credentials.title")}
+            </h2>
+          </ParallaxSection>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
               { count: "7", label: t("credentials.staring.title"), desc: t("credentials.staring.desc"), color: "bg-bubbles-gorse/20", textColor: "text-bubbles-gorse" },
               { count: "∞", label: t("credentials.facts.title"), desc: t("credentials.facts.desc"), color: "bg-bubbles-heather/20", textColor: "text-bubbles-heather" },
               { count: "1", label: t("credentials.brain.title"), desc: t("credentials.brain.desc"), color: "bg-accent/20", textColor: "text-accent" },
             ].map((cred, index) => (
-              <div 
+              <ParallaxSection 
                 key={cred.label}
-                className="bg-card rounded-xl p-6 border border-border text-center hover:scale-105 hover:-rotate-1 transition-all duration-300 cursor-pointer group animate-pop-in"
-                style={{ animationDelay: `${index * 150}ms` }}
+                speed={0.08 + index * 0.03}
+                mouseParallax
+                mouseIntensity={0.01}
               >
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${cred.color} flex items-center justify-center group-hover:animate-bounce-gentle`}>
-                  <span className={`font-display text-2xl font-bold ${cred.textColor}`}>{cred.count}</span>
+                <div 
+                  className="bg-card rounded-xl p-6 border border-border text-center hover:scale-105 hover:-rotate-1 transition-all duration-300 cursor-pointer group animate-pop-in"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${cred.color} flex items-center justify-center group-hover:animate-bounce-gentle`}>
+                    <span className={`font-display text-2xl font-bold ${cred.textColor}`}>{cred.count}</span>
+                  </div>
+                  <h3 className="font-display font-bold text-lg mb-2 group-hover:animate-wiggle">{cred.label}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {cred.desc}
+                  </p>
                 </div>
-                <h3 className="font-display font-bold text-lg mb-2 group-hover:animate-wiggle">{cred.label}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {cred.desc}
-                </p>
-              </div>
+              </ParallaxSection>
             ))}
           </div>
         </div>
@@ -334,17 +348,20 @@ export default function Index() {
 
       {/* Shop CTA */}
       <section className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
-        {/* Decorative bubbles */}
-        <div className="absolute top-10 right-20 w-24 h-24 rounded-full bg-accent/10 animate-drift" />
-        <div className="absolute bottom-10 left-10 w-16 h-16 rounded-full bg-wicklow-butter/15 animate-float" style={{ animationDelay: "1.5s" }} />
+        {/* Parallax decorative bubbles */}
+        <ParallaxSection speed={0.25} className="absolute top-10 right-20 w-24 h-24 rounded-full bg-accent/10" />
+        <ParallaxSection speed={0.35} direction="down" className="absolute bottom-10 left-10 w-16 h-16 rounded-full bg-wicklow-butter/15" />
+        <ParallaxSection speed={0.15} className="absolute top-1/2 left-1/4 w-20 h-20 rounded-full bg-bubbles-heather/10 blur-xl" />
         
         <div className="container text-center relative z-10">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 animate-pop-in">
-            {t("shop.title")}
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "200ms" }}>
-            {t("shop.subtitle")}
-          </p>
+          <ParallaxSection speed={0.05}>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 animate-pop-in">
+              {t("shop.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "200ms" }}>
+              {t("shop.subtitle")}
+            </p>
+          </ParallaxSection>
           <Link to="/collections/all">
             <Button size="lg" className="bg-accent hover:bg-accent-hover text-accent-foreground font-display hover:scale-110 hover:animate-squish transition-all">
               {t("shop.cta")}
