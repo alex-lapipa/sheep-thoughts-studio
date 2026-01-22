@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { 
   BarChart3, 
   Eye, 
@@ -10,13 +15,15 @@ import {
   MessageCircle, 
   Trophy,
   TrendingUp,
-  Calendar,
+  CalendarIcon,
   CreditCard,
   ArrowRight,
-  Package
+  Package,
+  RefreshCw
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { DateRange } from 'react-day-picker';
 
 interface ShareEventStats {
   content_type: string;
@@ -47,6 +54,12 @@ interface ProductPerformance {
 }
 
 export default function AdminAnalytics() {
+  // Date range state - default to last 30 days
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
+  
   const [shareStats, setShareStats] = useState<ShareEventStats[]>([]);
   const [totalShares, setTotalShares] = useState(0);
   const [recentShares, setRecentShares] = useState<DailyStats[]>([]);
@@ -64,120 +77,143 @@ export default function AdminAnalytics() {
 
   const [topProducts, setTopProducts] = useState<ProductPerformance[]>([]);
 
-  useEffect(() => {
-    async function fetchAnalytics() {
-      try {
-        // Fetch share events grouped by content type
-        const { data: shares, count } = await supabase
-          .from('share_events')
-          .select('content_type', { count: 'exact' });
+  const fetchAnalytics = useCallback(async () => {
+    if (!dateRange?.from) return;
+    
+    setLoading(true);
+    const startDate = startOfDay(dateRange.from);
+    const endDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(new Date());
+    
+    try {
+      // Fetch share events grouped by content type within date range
+      const { data: shares, count } = await supabase
+        .from('share_events')
+        .select('content_type', { count: 'exact' })
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
 
-        if (shares) {
-          const typeCounts = shares.reduce((acc: Record<string, number>, s) => {
-            acc[s.content_type] = (acc[s.content_type] || 0) + 1;
-            return acc;
-          }, {});
+      if (shares) {
+        const typeCounts = shares.reduce((acc: Record<string, number>, s) => {
+          acc[s.content_type] = (acc[s.content_type] || 0) + 1;
+          return acc;
+        }, {});
 
-          setShareStats(
-            Object.entries(typeCounts)
-              .map(([content_type, count]) => ({ content_type, count: count as number }))
-              .sort((a, b) => b.count - a.count)
-          );
-        }
-
-        setTotalShares(count || 0);
-
-        // Fetch shares from last 7 days
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-        const { data: recentData } = await supabase
-          .from('share_events')
-          .select('created_at')
-          .gte('created_at', sevenDaysAgo.toISOString());
-
-        if (recentData) {
-          const dailyCounts = recentData.reduce((acc: Record<string, number>, s) => {
-            const date = new Date(s.created_at).toLocaleDateString();
-            acc[date] = (acc[date] || 0) + 1;
-            return acc;
-          }, {});
-
-          setRecentShares(
-            Object.entries(dailyCounts)
-              .map(([date, count]) => ({ date, count: count as number }))
-              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          );
-        }
-
-        // Fetch ecommerce events from database
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-        const { data: ecommerceEvents } = await supabase
-          .from('ecommerce_events' as 'share_events')
-          .select('*')
-          .gte('created_at', thirtyDaysAgo.toISOString());
-
-        if (ecommerceEvents && ecommerceEvents.length > 0) {
-          // Count events by type
-          const events = ecommerceEvents as unknown as Array<{
-            event_type: string;
-            product_id?: string;
-            product_title?: string;
-          }>;
-          
-          const viewProduct = events.filter(e => e.event_type === 'view_product').length;
-          const addToCart = events.filter(e => e.event_type === 'add_to_cart').length;
-          const openCart = events.filter(e => e.event_type === 'open_cart').length;
-          const beginCheckout = events.filter(e => e.event_type === 'begin_checkout').length;
-
-          setEcommerceMetrics({
-            productViews: viewProduct,
-            addToCarts: addToCart,
-            cartOpens: openCart,
-            checkoutStarts: beginCheckout,
-            addToCartRate: viewProduct > 0 ? (addToCart / viewProduct) * 100 : 0,
-            checkoutRate: openCart > 0 ? (beginCheckout / openCart) * 100 : 0,
-          });
-
-          // Calculate top products
-          const productViews: Record<string, { views: number; addToCarts: number; title: string }> = {};
-          
-          events.forEach(e => {
-            if (e.product_title) {
-              if (!productViews[e.product_title]) {
-                productViews[e.product_title] = { views: 0, addToCarts: 0, title: e.product_title };
-              }
-              if (e.event_type === 'view_product') {
-                productViews[e.product_title].views++;
-              } else if (e.event_type === 'add_to_cart') {
-                productViews[e.product_title].addToCarts++;
-              }
-            }
-          });
-
-          const topProductsList = Object.values(productViews)
-            .map(p => ({
-              name: p.title,
-              views: p.views,
-              addToCarts: p.addToCarts,
-              conversionRate: p.views > 0 ? (p.addToCarts / p.views) * 100 : 0,
-            }))
-            .sort((a, b) => b.views - a.views)
-            .slice(0, 5);
-
-          setTopProducts(topProductsList);
-        }
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      } finally {
-        setLoading(false);
+        setShareStats(
+          Object.entries(typeCounts)
+            .map(([content_type, count]) => ({ content_type, count: count as number }))
+            .sort((a, b) => b.count - a.count)
+        );
       }
-    }
 
+      setTotalShares(count || 0);
+
+      // Fetch shares within date range for daily breakdown
+      const { data: recentData } = await supabase
+        .from('share_events')
+        .select('created_at')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (recentData) {
+        const dailyCounts = recentData.reduce((acc: Record<string, number>, s) => {
+          const date = new Date(s.created_at).toLocaleDateString();
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {});
+
+        setRecentShares(
+          Object.entries(dailyCounts)
+            .map(([date, count]) => ({ date, count: count as number }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        );
+      }
+
+      // Fetch ecommerce events from database within date range
+      const { data: ecommerceEvents } = await supabase
+        .from('ecommerce_events' as 'share_events')
+        .select('*')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (ecommerceEvents && ecommerceEvents.length > 0) {
+        // Count events by type
+        const events = ecommerceEvents as unknown as Array<{
+          event_type: string;
+          product_id?: string;
+          product_title?: string;
+        }>;
+        
+        const viewProduct = events.filter(e => e.event_type === 'view_product').length;
+        const addToCart = events.filter(e => e.event_type === 'add_to_cart').length;
+        const openCart = events.filter(e => e.event_type === 'open_cart').length;
+        const beginCheckout = events.filter(e => e.event_type === 'begin_checkout').length;
+
+        setEcommerceMetrics({
+          productViews: viewProduct,
+          addToCarts: addToCart,
+          cartOpens: openCart,
+          checkoutStarts: beginCheckout,
+          addToCartRate: viewProduct > 0 ? (addToCart / viewProduct) * 100 : 0,
+          checkoutRate: openCart > 0 ? (beginCheckout / openCart) * 100 : 0,
+        });
+
+        // Calculate top products
+        const productViews: Record<string, { views: number; addToCarts: number; title: string }> = {};
+        
+        events.forEach(e => {
+          if (e.product_title) {
+            if (!productViews[e.product_title]) {
+              productViews[e.product_title] = { views: 0, addToCarts: 0, title: e.product_title };
+            }
+            if (e.event_type === 'view_product') {
+              productViews[e.product_title].views++;
+            } else if (e.event_type === 'add_to_cart') {
+              productViews[e.product_title].addToCarts++;
+            }
+          }
+        });
+
+        const topProductsList = Object.values(productViews)
+          .map(p => ({
+            name: p.title,
+            views: p.views,
+            addToCarts: p.addToCarts,
+            conversionRate: p.views > 0 ? (p.addToCarts / p.views) * 100 : 0,
+          }))
+          .sort((a, b) => b.views - a.views)
+          .slice(0, 5);
+
+        setTopProducts(topProductsList);
+      } else {
+        // Reset metrics if no data
+        setEcommerceMetrics({
+          productViews: 0,
+          addToCarts: 0,
+          cartOpens: 0,
+          checkoutStarts: 0,
+          addToCartRate: 0,
+          checkoutRate: 0,
+        });
+        setTopProducts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [dateRange]);
+
+  useEffect(() => {
     fetchAnalytics();
-  }, []);
+  }, [fetchAnalytics]);
+
+  // Quick date range presets
+  const setPreset = (days: number) => {
+    setDateRange({
+      from: subDays(new Date(), days),
+      to: new Date(),
+    });
+  };
 
   const contentTypeIcons: Record<string, React.ReactNode> = {
     badge: <Trophy className="h-4 w-4" />,
@@ -210,11 +246,67 @@ export default function AdminAnalytics() {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground mt-1">
-            Track user engagement, sharing activity, and ecommerce performance
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold">Analytics</h1>
+            <p className="text-muted-foreground mt-1">
+              Track user engagement, sharing activity, and ecommerce performance
+            </p>
+          </div>
+          
+          {/* Date Range Picker */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex gap-1">
+              <Button variant="outline" size="sm" onClick={() => setPreset(7)}>7d</Button>
+              <Button variant="outline" size="sm" onClick={() => setPreset(30)}>30d</Button>
+              <Button variant="outline" size="sm" onClick={() => setPreset(90)}>90d</Button>
+            </div>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start text-left font-normal",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "MMM d")} - {format(dateRange.to, "MMM d, yyyy")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "MMM d, yyyy")
+                    )
+                  ) : (
+                    <span>Pick a date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={fetchAnalytics}
+              disabled={loading}
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="ecommerce" className="space-y-6">
@@ -235,7 +327,7 @@ export default function AdminAnalytics() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{ecommerceMetrics.productViews.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">Last 30 days</p>
+                  <p className="text-xs text-muted-foreground">Selected period</p>
                 </CardContent>
               </Card>
 
