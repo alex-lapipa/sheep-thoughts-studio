@@ -55,6 +55,27 @@ const MODE_COLORS: Record<string, string> = {
   nuclear: "bg-mode-nuclear/20 text-mode-nuclear border-mode-nuclear/30",
 };
 
+// Sound wave animation component
+const SoundWaveIndicator = ({ isActive }: { isActive: boolean }) => {
+  if (!isActive) return null;
+  
+  return (
+    <div className="flex items-center gap-0.5 px-2 py-1 rounded-full bg-accent/10">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="w-1 bg-accent rounded-full sound-wave-bar"
+          style={{
+            height: '14px',
+            animationDelay: `${i * 0.1}s`,
+          }}
+        />
+      ))}
+      <span className="ml-1 text-xs text-accent font-medium">Speaking</span>
+    </div>
+  );
+};
+
 export const BubblesVoiceChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -252,6 +273,9 @@ export const BubblesVoiceChat = () => {
             >
               {currentMode}
             </Badge>
+            
+            {/* Sound wave indicator when speaking */}
+            <SoundWaveIndicator isActive={isSpeaking} />
             
             {/* Voice Settings Popover */}
             <Popover>
