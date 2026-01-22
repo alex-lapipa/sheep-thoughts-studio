@@ -10,8 +10,7 @@ import { DataExportCard } from "@/components/DataExportCard";
 import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 
 const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
-const ogImageUrl = `${supabaseUrl}/functions/v1/og-privacy-image`;
+const ogImageUrl = `${siteUrl}/og-privacy.jpg`;
 
 const Privacy = () => {
   const { openSettings: openCookieSettings, preferences } = useCookieConsent();

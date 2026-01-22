@@ -8,8 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const Shipping = () => {
   const { language } = useLanguage();
   const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
-  const ogImageUrl = `${supabaseUrl}/functions/v1/og-shipping-image?lang=${language}`;
+  const ogImageUrl = `${siteUrl}/og-shipping.jpg`;
 
   return (
     <Layout>
