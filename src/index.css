@@ -1331,3 +1331,66 @@
     margin-top: auto;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ☁️ CLOUD MORPHING ANIMATIONS
+   Subtle organic shifts for thought bubbles
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes cloud-morph {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    filter: drop-shadow(0 4px 12px rgba(44, 44, 44, 0.08));
+  }
+  25% {
+    transform: scale(1.02, 0.98) translate(1px, -1px);
+    filter: drop-shadow(0 5px 14px rgba(44, 44, 44, 0.06));
+  }
+  50% {
+    transform: scale(0.99, 1.01) translate(-1px, 1px);
+    filter: drop-shadow(0 3px 10px rgba(44, 44, 44, 0.09));
+  }
+  75% {
+    transform: scale(1.01, 0.99) translate(0.5px, -0.5px);
+    filter: drop-shadow(0 4px 13px rgba(44, 44, 44, 0.07));
+  }
+}
+
+@keyframes cloud-drift {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-2px) rotate(0.3deg);
+  }
+  66% {
+    transform: translateY(1px) rotate(-0.2deg);
+  }
+}
+
+@keyframes cloud-breathe {
+  0%, 100% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+/* Cloud SVG path morphing via transform */
+.cloud-morph {
+  animation: 
+    cloud-morph 12s ease-in-out infinite,
+    cloud-drift 8s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* Glow pulse for atmospheric effect */
+.cloud-glow-pulse {
+  animation: cloud-breathe 6s ease-in-out infinite;
+}
+
+/* Stagger variants for multiple bubbles */
+.cloud-morph-delay-1 { animation-delay: -3s; }
+.cloud-morph-delay-2 { animation-delay: -6s; }
+.cloud-morph-delay-3 { animation-delay: -9s; }
