@@ -140,6 +140,54 @@ export type Database = {
         }
         Relationships: []
       }
+      bubbles_rag_content: {
+        Row: {
+          avoid: string[] | null
+          bubbles_wrong_take: string
+          canonical_claim: string | null
+          category: string | null
+          comedy_hooks: string[] | null
+          created_at: string | null
+          embedding: string | null
+          id: string
+          signature_lines: string[] | null
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          avoid?: string[] | null
+          bubbles_wrong_take: string
+          canonical_claim?: string | null
+          category?: string | null
+          comedy_hooks?: string[] | null
+          created_at?: string | null
+          embedding?: string | null
+          id: string
+          signature_lines?: string[] | null
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          avoid?: string[] | null
+          bubbles_wrong_take?: string
+          canonical_claim?: string | null
+          category?: string | null
+          comedy_hooks?: string[] | null
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          signature_lines?: string[] | null
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bubbles_scenarios: {
         Row: {
           beats: Json | null
@@ -899,6 +947,26 @@ export type Database = {
           similarity: number
           tags: string[]
           title: string
+        }[]
+      }
+      search_bubbles_rag_content: {
+        Args: {
+          filter_category?: string
+          filter_type?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          bubbles_wrong_take: string
+          category: string
+          comedy_hooks: string[]
+          id: string
+          signature_lines: string[]
+          similarity: number
+          tags: string[]
+          title: string
+          type: string
         }[]
       }
       search_bubbles_thoughts: {
