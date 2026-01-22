@@ -21,6 +21,7 @@ import Achievements from "./pages/Achievements";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Shipping from "./pages/Shipping";
+import Contact from "./pages/Contact";
 import ShareBadges from "./pages/ShareBadges";
 
 import NotFound from "./pages/NotFound";
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/shipping" element={<Shipping />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/share-badges" element={<ShareBadges />} />
                 
                 {/* Admin Routes */}

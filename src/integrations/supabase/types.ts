@@ -260,6 +260,48 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          email: string
+          id: string
+          message: string
+          metadata: Json | null
+          name: string
+          notes: string | null
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          subject: string | null
+          submitted_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          name: string
+          notes?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subject?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          name?: string
+          notes?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subject?: string | null
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       deletion_requests: {
         Row: {
           email: string
