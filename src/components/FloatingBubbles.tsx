@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useMemo } from "react";
 
 interface Bubble {
   id: number;
@@ -9,28 +9,26 @@ interface Bubble {
   opacity: number;
 }
 
-export function FloatingBubbles() {
-  const [bubbles, setBubbles] = useState<Bubble[]>([]);
-
-  useEffect(() => {
-    // Create initial bubbles
-    const initialBubbles: Bubble[] = Array.from({ length: 12 }, (_, i) => ({
+// Memoized to prevent unnecessary re-renders
+export const FloatingBubbles = memo(function FloatingBubbles() {
+  // Generate bubbles once with useMemo - reduced from 12 to 6
+  const bubbles = useMemo<Bubble[]>(() => 
+    Array.from({ length: 6 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
-      size: 20 + Math.random() * 40,
+      size: 24 + Math.random() * 32,
       delay: Math.random() * 8,
-      duration: 8 + Math.random() * 6,
-      opacity: 0.1 + Math.random() * 0.15,
-    }));
-    setBubbles(initialBubbles);
-  }, []);
+      duration: 10 + Math.random() * 5,
+      opacity: 0.08 + Math.random() * 0.1,
+    })), []
+  );
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {bubbles.map((bubble) => (
         <div
           key={bubble.id}
-          className="absolute rounded-full bg-accent/20 backdrop-blur-sm border border-accent/10"
+          className="absolute rounded-full bg-accent/15 will-change-transform"
           style={{
             left: `${bubble.left}%`,
             width: bubble.size,
@@ -43,4 +41,4 @@ export function FloatingBubbles() {
       ))}
     </div>
   );
-}
+});
