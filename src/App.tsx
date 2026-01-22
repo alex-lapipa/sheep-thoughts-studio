@@ -29,6 +29,7 @@ import DataRights from "./pages/DataRights";
 import NewsletterConfirm from "./pages/NewsletterConfirm";
 import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 import WhatsNew from "./pages/WhatsNew";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -87,6 +88,7 @@ const App = () => (
                 <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
                 <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
                 <Route path="/whats-new" element={<WhatsNew />} />
+                <Route path="/checkout/success" element={<CheckoutSuccess />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
