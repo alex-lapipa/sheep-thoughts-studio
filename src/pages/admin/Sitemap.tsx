@@ -732,48 +732,69 @@ export default function AdminSitemap() {
               {pages.map((page) => (
                 <div 
                   key={page.path}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
+                  className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
                 >
-                  <div className="flex items-center gap-4">
-                    <StatusIcon status={page.status} />
-                    <div>
-                      <div className="font-medium">{page.name}</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {page.path}
+                  {/* OG Image Thumbnail */}
+                  <div className="flex-shrink-0">
+                    {page.ogImagePath && !page.ogImagePath.startsWith("(") ? (
+                      <a 
+                        href={`${siteUrl}${page.ogImagePath}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block relative group"
+                      >
+                        <div className="w-24 h-[50px] md:w-32 md:h-[67px] rounded-md overflow-hidden border bg-muted">
+                          <img 
+                            src={page.ogImagePath}
+                            alt={`OG image for ${page.name}`}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.classList.add('flex', 'items-center', 'justify-center');
+                              (e.target as HTMLImageElement).insertAdjacentHTML('afterend', '<span class="text-xs text-muted-foreground">Not found</span>');
+                            }}
+                          />
+                        </div>
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center">
+                          <ExternalLink className="h-4 w-4 text-white" />
+                        </div>
+                      </a>
+                    ) : (
+                      <div className="w-24 h-[50px] md:w-32 md:h-[67px] rounded-md border bg-muted flex items-center justify-center">
+                        {page.ogImagePath?.startsWith("(") ? (
+                          <span className="text-[10px] text-muted-foreground text-center px-1">Dynamic</span>
+                        ) : (
+                          <Image className="h-5 w-5 text-muted-foreground" />
+                        )}
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {/* Meta indicators */}
-                    <div className="hidden md:flex items-center gap-1.5">
+                  {/* Page Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <StatusIcon status={page.status} />
+                      <span className="font-medium truncate">{page.name}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground font-mono truncate mt-0.5">
+                      {page.path}
+                    </div>
+                    {/* Meta indicators - mobile responsive */}
+                    <div className="flex items-center gap-1 mt-2 flex-wrap">
                       <MetaIndicator present={page.hasTitle} label="Title" icon={FileText} />
                       <MetaIndicator present={page.hasOgTitle} label="OG" icon={Globe} />
                       <MetaIndicator present={page.hasOgImage} label="Image" icon={Image} />
                       <MetaIndicator present={page.hasTwitterCard} label="Twitter" icon={Twitter} />
                     </div>
+                  </div>
 
-                    {/* OG Image preview */}
-                    {page.ogImagePath && !page.ogImagePath.startsWith("(") && (
-                      <a 
-                        href={`${siteUrl}${page.ogImagePath}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hidden lg:block"
-                      >
-                        <img 
-                          src={page.ogImagePath}
-                          alt={`OG image for ${page.name}`}
-                          className="h-10 w-20 object-cover rounded border"
-                        />
-                      </a>
-                    )}
-
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {/* Social debuggers dropdown */}
                     {!page.path.includes(":") && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="hidden sm:flex">
                             Test Preview
                           </Button>
                         </DropdownMenuTrigger>
