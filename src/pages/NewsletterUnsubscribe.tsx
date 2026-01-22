@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, AlertCircle, Home, Mail, RotateCcw } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Home, Mail, RotateCcw, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 const NewsletterUnsubscribe = () => {
@@ -113,21 +113,29 @@ const NewsletterUnsubscribe = () => {
               {/* Re-subscribe option */}
               <div className="bg-accent/10 rounded-lg p-4 border border-accent/20">
                 <p className="text-sm text-foreground mb-3">
-                  Changed your mind? You can re-subscribe anytime!
+                  Changed your mind? You can re-subscribe or manage your preferences.
                 </p>
-                <Button 
-                  variant="outline" 
-                  onClick={handleResubscribe}
-                  disabled={isResubscribing}
-                  className="w-full sm:w-auto"
-                >
-                  {isResubscribing ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                  )}
-                  Re-subscribe
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleResubscribe}
+                    disabled={isResubscribing}
+                    size="sm"
+                  >
+                    {isResubscribing ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                    )}
+                    Re-subscribe
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/newsletter/preferences?email=${email}&token=${token}`}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Manage Preferences
+                    </Link>
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">

@@ -94,6 +94,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await handleResubscribe(supabase, email);
     }
 
+    if (body.action === "get_preferences") {
+      const { email, token } = body;
+      return await handleGetPreferences(supabase, email, token);
+    }
+
+    if (body.action === "update_preferences") {
+      const { email, token, preferences } = body;
+      return await handleUpdatePreferences(supabase, email, token, preferences);
+    }
+
     // Default: subscribe action
     const { email, source }: SubscribeRequest = body;
     return await handleSubscribe(supabase, email, source);
@@ -478,6 +488,101 @@ async function handleResubscribe(supabase: any, email?: string): Promise<Respons
       success: true, 
       message: "Welcome back! You've been re-subscribed to the newsletter. 🐑" 
     }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
+}
+
+// deno-lint-ignore no-explicit-any
+async function handleGetPreferences(supabase: any, email?: string, token?: string): Promise<Response> {
+  if (!email || !token) {
+    return new Response(
+      JSON.stringify({ error: "Email and token are required" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Verify token
+  const expectedToken = generateUnsubscribeToken(normalizedEmail);
+  if (token !== expectedToken) {
+    return new Response(
+      JSON.stringify({ error: "Invalid link" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const { data: subscriber, error } = await supabase
+    .from("newsletter_subscribers")
+    .select("preferences, status")
+    .eq("email", normalizedEmail)
+    .single();
+
+  if (error || !subscriber) {
+    return new Response(
+      JSON.stringify({ error: "Subscriber not found" }),
+      { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({ 
+      success: true, 
+      preferences: subscriber.preferences || {},
+      status: subscriber.status
+    }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
+}
+
+// deno-lint-ignore no-explicit-any
+async function handleUpdatePreferences(supabase: any, email?: string, token?: string, preferences?: Record<string, boolean>): Promise<Response> {
+  if (!email || !token) {
+    return new Response(
+      JSON.stringify({ error: "Email and token are required" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Verify token
+  const expectedToken = generateUnsubscribeToken(normalizedEmail);
+  if (token !== expectedToken) {
+    return new Response(
+      JSON.stringify({ error: "Invalid link" }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const { data: subscriber, error: findError } = await supabase
+    .from("newsletter_subscribers")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .single();
+
+  if (findError || !subscriber) {
+    return new Response(
+      JSON.stringify({ error: "Subscriber not found" }),
+      { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  const { error: updateError } = await supabase
+    .from("newsletter_subscribers")
+    .update({ preferences })
+    .eq("id", subscriber.id);
+
+  if (updateError) {
+    console.error("Update preferences error:", updateError);
+    return new Response(
+      JSON.stringify({ error: "Failed to update preferences" }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({ success: true, message: "Preferences updated successfully" }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
   );
 }
