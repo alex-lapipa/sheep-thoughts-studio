@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
 import { useSemanticSearch } from "@/hooks/useSemanticSearch";
+import { HighlightedText } from "@/components/HighlightedText";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -153,6 +154,7 @@ const Search = () => {
                     {contentResults.slice(0, 6).map((result) => {
                       const sourceInfo = sourceLabels[result.source];
                       const Icon = sourceInfo.icon;
+                      const displayText = result.preview || result.text || result.bubbles_wrong_take || "";
                       return (
                         <Card key={`${result.source}-${result.id}`} className="hover:shadow-lg transition-shadow">
                           <CardContent className="p-4">
@@ -166,16 +168,18 @@ const Search = () => {
                               </span>
                             </div>
                             {result.title && (
-                              <h3 className="font-medium mb-2 line-clamp-2">{result.title}</h3>
+                              <h3 className="font-medium mb-2 line-clamp-2">
+                                <HighlightedText text={result.title} query={debouncedQuery} />
+                              </h3>
                             )}
                             <p className="text-sm text-muted-foreground line-clamp-3">
-                              {result.preview || result.text || result.bubbles_wrong_take}
+                              <HighlightedText text={displayText} query={debouncedQuery} />
                             </p>
                             {result.tags && result.tags.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-2">
                                 {result.tags.slice(0, 3).map((tag) => (
                                   <Badge key={tag} variant="outline" className="text-xs">
-                                    {tag}
+                                    <HighlightedText text={tag} query={debouncedQuery} />
                                   </Badge>
                                 ))}
                               </div>
@@ -231,6 +235,7 @@ const Search = () => {
                   {contentResults.map((result) => {
                     const sourceInfo = sourceLabels[result.source];
                     const Icon = sourceInfo.icon;
+                    const displayText = result.preview || result.text || result.bubbles_wrong_take || "";
                     return (
                       <Card key={`${result.source}-${result.id}`} className="hover:shadow-lg transition-shadow">
                         <CardContent className="p-4">
@@ -244,21 +249,23 @@ const Search = () => {
                             </span>
                           </div>
                           {result.title && (
-                            <h3 className="font-medium mb-2 line-clamp-2">{result.title}</h3>
+                            <h3 className="font-medium mb-2 line-clamp-2">
+                              <HighlightedText text={result.title} query={debouncedQuery} />
+                            </h3>
                           )}
                           <p className="text-sm text-muted-foreground line-clamp-4">
-                            {result.preview || result.text || result.bubbles_wrong_take}
+                            <HighlightedText text={displayText} query={debouncedQuery} />
                           </p>
                           {result.category && (
                             <Badge variant="outline" className="mt-2 text-xs">
-                              {result.category}
+                              <HighlightedText text={result.category} query={debouncedQuery} />
                             </Badge>
                           )}
                           {result.tags && result.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
                               {result.tags.slice(0, 4).map((tag) => (
                                 <Badge key={tag} variant="outline" className="text-xs">
-                                  {tag}
+                                  <HighlightedText text={tag} query={debouncedQuery} />
                                 </Badge>
                               ))}
                             </div>
