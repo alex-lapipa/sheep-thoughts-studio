@@ -23,6 +23,7 @@ import Terms from "./pages/Terms";
 import Shipping from "./pages/Shipping";
 import Contact from "./pages/Contact";
 import ShareBadges from "./pages/ShareBadges";
+import DataRights from "./pages/DataRights";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -70,6 +71,7 @@ const App = () => (
                 <Route path="/shipping" element={<Shipping />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/share-badges" element={<ShareBadges />} />
+                <Route path="/data-rights" element={<DataRights />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
