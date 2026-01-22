@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, RefreshCw, Loader2 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
 type KnowledgeCategory = Database['public']['Enums']['bubbles_knowledge_category'];
@@ -37,6 +37,7 @@ const MODES: BubblesMode[] = ['innocent', 'concerned', 'triggered', 'savage', 'n
 export default function AdminKnowledge() {
   const [entries, setEntries] = useState<KnowledgeRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [regenerating, setRegenerating] = useState(false);
   const [filterCategory, setFilterCategory] = useState<KnowledgeCategory | 'all'>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<KnowledgeRow | null>(null);
@@ -150,6 +151,24 @@ export default function AdminKnowledge() {
     }
   }
 
+  async function handleRegenerateEmbeddings() {
+    setRegenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('regenerate-embeddings', {
+        body: { table: 'all', limit: 500 }
+      });
+
+      if (error) throw error;
+
+      toast.success(`Embeddings regenerated: ${data.results.succeeded} succeeded, ${data.results.failed} failed`);
+    } catch (error) {
+      console.error('Error regenerating embeddings:', error);
+      toast.error('Failed to regenerate embeddings');
+    } finally {
+      setRegenerating(false);
+    }
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -160,14 +179,27 @@ export default function AdminKnowledge() {
               Character bible, psychology research, and brand guidelines
             </p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openCreateDialog}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Entry
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleRegenerateEmbeddings}
+              disabled={regenerating}
+            >
+              {regenerating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Regenerate Embeddings
+            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openCreateDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Entry
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
                   {editingEntry ? 'Edit Knowledge Entry' : 'Add New Knowledge Entry'}
@@ -248,6 +280,7 @@ export default function AdminKnowledge() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Filters */}
