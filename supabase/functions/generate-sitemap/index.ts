@@ -13,25 +13,26 @@ const SHOPIFY_STORE_DOMAIN = "bubblesheet-storefront-ops-o5m9w.myshopify.com";
 const SHOPIFY_API_VERSION = "2025-07";
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
-// Static pages with their configuration
+// Static pages with their configuration and OG images for GSC
 const staticPages = [
-  { path: "/", changefreq: "daily", priority: 1.0 },
-  { path: "/about", changefreq: "monthly", priority: 0.8 },
-  { path: "/facts", changefreq: "weekly", priority: 0.9 },
-  { path: "/faq", changefreq: "weekly", priority: 0.9 },
-  { path: "/scenarios", changefreq: "weekly", priority: 0.7 },
-  { path: "/explains", changefreq: "weekly", priority: 0.7 },
-  { path: "/achievements", changefreq: "monthly", priority: 0.6 },
-  { path: "/share-badges", changefreq: "monthly", priority: 0.5 },
-  { path: "/data-rights", changefreq: "monthly", priority: 0.4 },
-  { path: "/privacy", changefreq: "monthly", priority: 0.3 },
-  { path: "/terms", changefreq: "monthly", priority: 0.3 },
-  { path: "/shipping", changefreq: "monthly", priority: 0.4 },
-  { path: "/contact", changefreq: "monthly", priority: 0.6 },
-  { path: "/search", changefreq: "weekly", priority: 0.5 },
+  { path: "/", changefreq: "daily", priority: 1.0, image: "/og-home.jpg", title: "Bubbles the Sheep - Confidently Wrong Wisdom" },
+  { path: "/about", changefreq: "monthly", priority: 0.8, image: "/og-about.jpg", title: "About Bubbles" },
+  { path: "/facts", changefreq: "weekly", priority: 0.9, image: "/og-facts.jpg", title: "Bubbles Facts" },
+  { path: "/faq", changefreq: "weekly", priority: 0.9, image: "/og-faq.jpg", title: "Frequently Asked Questions" },
+  { path: "/scenarios", changefreq: "weekly", priority: 0.7, image: null, title: "Bubbles Scenarios" },
+  { path: "/explains", changefreq: "weekly", priority: 0.7, image: "/og-explains.jpg", title: "Bubbles Explains" },
+  { path: "/achievements", changefreq: "monthly", priority: 0.6, image: "/og-achievements.jpg", title: "Wisdom Badges" },
+  { path: "/share-badges", changefreq: "monthly", priority: 0.5, image: "/og-share-badges.jpg", title: "Share Your Badges" },
+  { path: "/data-rights", changefreq: "monthly", priority: 0.4, image: "/og-data-rights.jpg", title: "Your Data Rights" },
+  { path: "/privacy", changefreq: "monthly", priority: 0.3, image: "/og-privacy.jpg", title: "Privacy Policy" },
+  { path: "/terms", changefreq: "monthly", priority: 0.3, image: "/og-terms.jpg", title: "Terms of Service" },
+  { path: "/shipping", changefreq: "monthly", priority: 0.4, image: "/og-shipping.jpg", title: "Shipping & Returns" },
+  { path: "/contact", changefreq: "monthly", priority: 0.6, image: "/og-contact.jpg", title: "Contact Bubbles" },
+  { path: "/search", changefreq: "weekly", priority: 0.5, image: "/og-search.jpg", title: "Search Products" },
+  { path: "/collections", changefreq: "daily", priority: 0.8, image: "/og-collections.jpg", title: "All Collections" },
 ];
 
-// Collection pages
+// Collection pages (mode filtered views)
 const collectionPages = [
   { path: "/collections/all", changefreq: "daily", priority: 0.9 },
   { path: "/collections/all?mode=innocent", changefreq: "weekly", priority: 0.7 },
@@ -51,7 +52,12 @@ const PRODUCTS_QUERY = `
       edges {
         node {
           handle
+          title
           updatedAt
+          featuredImage {
+            url
+            altText
+          }
         }
       }
     }
@@ -61,7 +67,12 @@ const PRODUCTS_QUERY = `
 interface ShopifyProductEdge {
   node: {
     handle: string;
+    title: string;
     updatedAt: string;
+    featuredImage?: {
+      url: string;
+      altText?: string;
+    };
   };
 }
 
@@ -163,12 +174,13 @@ function generateSitemapIndex(baseUrl: string): string {
 </sitemapindex>`;
 }
 
-// Generate sitemap for static pages
+// Generate sitemap for static pages with image extension for GSC
 function generatePagesSitemap(): string {
   const today = formatDate();
   
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
   for (const page of staticPages) {
@@ -176,7 +188,18 @@ function generatePagesSitemap(): string {
     <loc>${SITE_URL}${page.path}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority.toFixed(1)}</priority>
+    <priority>${page.priority.toFixed(1)}</priority>`;
+    
+    // Add image tag for GSC image indexing
+    if (page.image) {
+      xml += `
+    <image:image>
+      <image:loc>${SITE_URL}${page.image}</image:loc>
+      <image:title>${escapeXml(page.title)}</image:title>
+    </image:image>`;
+    }
+    
+    xml += `
   </url>
 `;
   }
@@ -185,10 +208,11 @@ function generatePagesSitemap(): string {
   return xml;
 }
 
-// Generate sitemap for products
+// Generate sitemap for products with image extension for GSC
 function generateProductsSitemap(products: ShopifyProductEdge[]): string {
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
   for (const product of products) {
@@ -197,7 +221,19 @@ function generateProductsSitemap(products: ShopifyProductEdge[]): string {
     <loc>${SITE_URL}/product/${escapeXml(product.node.handle)}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.8</priority>`;
+    
+    // Add product image for GSC image indexing
+    if (product.node.featuredImage?.url) {
+      xml += `
+    <image:image>
+      <image:loc>${escapeXml(product.node.featuredImage.url)}</image:loc>
+      <image:title>${escapeXml(product.node.title)}</image:title>${product.node.featuredImage.altText ? `
+      <image:caption>${escapeXml(product.node.featuredImage.altText)}</image:caption>` : ""}
+    </image:image>`;
+    }
+    
+    xml += `
   </url>
 `;
   }

@@ -2,11 +2,14 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=pages</loc>
+    <lastmod>2025-01-22</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=products</loc>
+    <lastmod>2025-01-22</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap?type=collections</loc>
+    <lastmod>2025-01-22</lastmod>
   </sitemap>
 </sitemapindex>
