@@ -159,8 +159,8 @@ export function PageHeroWithBubbles({
       "py-12 md:py-20 bg-gradient-to-b from-secondary/40 to-background relative overflow-hidden",
       className
     )}>
-      {/* Ambient environmental effects - world moves, Bubbles doesn't */}
-      <BogEnvironmentEffects />
+      {/* Wicklow weather effects - Sugarloaf Mountain, Killough */}
+      <WicklowWeatherEffects />
 
       <div className="container relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
@@ -244,81 +244,191 @@ export function PageHeroWithBubbles({
   );
 }
 
-// Ambient Wicklow bog environment - drifting mist, rain, bog cotton
-function BogEnvironmentEffects() {
-  // Generate stable random positions for particles
-  const mistLayers = useMemo(() => 
-    Array.from({ length: 4 }, (_, i) => ({
+// Weather types for Sugarloaf Mountain, Killough - famously eclectic!
+type WeatherType = "cloudy" | "rainy" | "sunny" | "thunderstorm" | "misty";
+
+// Weighted weather - rain and clouds more common (it's Ireland after all!)
+const WEATHER_POOL: WeatherType[] = [
+  "cloudy", "cloudy", "cloudy",
+  "rainy", "rainy", "rainy", "rainy",
+  "misty", "misty",
+  "sunny",
+  "thunderstorm",
+];
+
+// Wicklow weather system - Sugarloaf Mountain edition
+function WicklowWeatherEffects() {
+  // Random weather on mount
+  const weather = useMemo<WeatherType>(() => 
+    WEATHER_POOL[Math.floor(Math.random() * WEATHER_POOL.length)], []
+  );
+
+  // Generate clouds
+  const clouds = useMemo(() =>
+    Array.from({ length: weather === "sunny" ? 2 : 5 }, (_, i) => ({
       id: i,
-      width: 120 + Math.random() * 100,
-      height: 30 + Math.random() * 20,
-      top: 20 + Math.random() * 60,
-      startX: -20 + Math.random() * 10,
+      width: 80 + Math.random() * 120,
+      height: 25 + Math.random() * 20,
+      top: 5 + Math.random() * 25,
+      duration: 25 + Math.random() * 20,
+      delay: Math.random() * 15,
+      opacity: weather === "thunderstorm" ? 0.4 : weather === "sunny" ? 0.15 : 0.25,
+    })), [weather]
+  );
+
+  // Rain drops (more intense for thunderstorm)
+  const rainDrops = useMemo(() => {
+    if (weather !== "rainy" && weather !== "thunderstorm") return [];
+    const count = weather === "thunderstorm" ? 30 : 15;
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      duration: weather === "thunderstorm" ? 0.6 + Math.random() * 0.4 : 1.2 + Math.random() * 0.8,
+      delay: Math.random() * 2,
+      height: weather === "thunderstorm" ? 15 + Math.random() * 20 : 8 + Math.random() * 12,
+      angle: weather === "thunderstorm" ? 15 : 5,
+    }));
+  }, [weather]);
+
+  // Mist layers
+  const mistLayers = useMemo(() => {
+    if (weather !== "misty" && weather !== "cloudy") return [];
+    return Array.from({ length: weather === "misty" ? 6 : 3 }, (_, i) => ({
+      id: i,
+      width: 150 + Math.random() * 150,
+      height: 40 + Math.random() * 30,
+      top: 30 + Math.random() * 50,
       duration: 20 + Math.random() * 15,
       delay: Math.random() * 10,
-      opacity: 0.03 + Math.random() * 0.04,
-    })), []
-  );
+      opacity: weather === "misty" ? 0.08 : 0.04,
+    }));
+  }, [weather]);
 
-  const rainDrops = useMemo(() =>
-    Array.from({ length: 12 }, (_, i) => ({
+  // Sun rays for sunny weather
+  const sunRays = useMemo(() => {
+    if (weather !== "sunny") return [];
+    return Array.from({ length: 5 }, (_, i) => ({
       id: i,
-      left: 5 + Math.random() * 90,
-      duration: 1.5 + Math.random() * 1,
-      delay: Math.random() * 3,
-      height: 8 + Math.random() * 12,
-    })), []
-  );
+      rotation: -30 + i * 15,
+      delay: i * 0.2,
+    }));
+  }, [weather]);
 
-  const bogCottonPuffs = useMemo(() =>
-    Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      size: 4 + Math.random() * 6,
-      startY: 30 + Math.random() * 40,
-      duration: 12 + Math.random() * 8,
-      delay: Math.random() * 8,
-      swayAmount: 10 + Math.random() * 20,
-    })), []
-  );
+  // Lightning flashes for thunderstorm
+  const [lightningFlash, setLightningFlash] = useState(false);
+  
+  useEffect(() => {
+    if (weather !== "thunderstorm") return;
+    
+    const triggerLightning = () => {
+      setLightningFlash(true);
+      setTimeout(() => setLightningFlash(false), 150);
+    };
+
+    // Random lightning every 3-8 seconds
+    const interval = setInterval(() => {
+      if (Math.random() > 0.5) triggerLightning();
+    }, 3000 + Math.random() * 5000);
+
+    return () => clearInterval(interval);
+  }, [weather]);
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {/* Drifting mist layers */}
-      {mistLayers.map((mist) => (
+      {/* Sky gradient based on weather */}
+      <div className={cn(
+        "absolute inset-0 transition-colors duration-1000",
+        weather === "sunny" && "bg-gradient-to-b from-sky-200/30 via-transparent to-transparent",
+        weather === "cloudy" && "bg-gradient-to-b from-slate-300/20 via-transparent to-transparent",
+        weather === "rainy" && "bg-gradient-to-b from-slate-400/25 via-slate-300/10 to-transparent",
+        weather === "thunderstorm" && "bg-gradient-to-b from-slate-600/40 via-slate-500/20 to-transparent",
+        weather === "misty" && "bg-gradient-to-b from-slate-200/30 via-slate-100/15 to-transparent",
+      )} />
+
+      {/* Lightning flash overlay */}
+      <AnimatePresence>
+        {lightningFlash && (
+          <motion.div
+            className="absolute inset-0 bg-white/30 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0.3, 0.8, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sun (only for sunny weather) */}
+      {weather === "sunny" && (
+        <div className="absolute top-4 right-[15%] md:right-[20%]">
+          {/* Sun disc */}
+          <motion.div
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-200 via-yellow-300 to-orange-300 shadow-lg"
+            style={{ boxShadow: "0 0 60px 20px rgba(253, 224, 71, 0.4)" }}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {/* Sun rays */}
+          {sunRays.map((ray) => (
+            <motion.div
+              key={ray.id}
+              className="absolute top-1/2 left-1/2 w-1 h-24 md:h-32 bg-gradient-to-b from-yellow-300/60 to-transparent origin-top"
+              style={{ transform: `rotate(${ray.rotation}deg)`, marginLeft: -2 }}
+              animate={{ opacity: [0.3, 0.7, 0.3], scaleY: [0.8, 1, 0.8] }}
+              transition={{ duration: 3, repeat: Infinity, delay: ray.delay }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Clouds */}
+      {clouds.map((cloud) => (
         <motion.div
-          key={`mist-${mist.id}`}
-          className="absolute rounded-full bg-muted-foreground/5 blur-2xl"
+          key={`cloud-${cloud.id}`}
+          className={cn(
+            "absolute rounded-full blur-md",
+            weather === "thunderstorm" ? "bg-slate-500/50" : "bg-white/40"
+          )}
           style={{
-            width: mist.width,
-            height: mist.height,
-            top: `${mist.top}%`,
-            opacity: mist.opacity,
+            width: cloud.width,
+            height: cloud.height,
+            top: `${cloud.top}%`,
+            opacity: cloud.opacity,
           }}
-          animate={{
-            x: [`${mist.startX}vw`, `${100 + mist.startX}vw`],
-          }}
+          initial={{ x: "-20vw" }}
+          animate={{ x: "110vw" }}
           transition={{
-            duration: mist.duration,
+            duration: cloud.duration,
             repeat: Infinity,
-            delay: mist.delay,
+            delay: cloud.delay,
             ease: "linear",
           }}
-        />
+        >
+          {/* Cloud puffs for more realistic shape */}
+          <div className="absolute -top-2 left-1/4 w-1/2 h-full rounded-full bg-inherit" />
+          <div className="absolute -top-3 left-1/2 w-1/3 h-3/4 rounded-full bg-inherit" />
+        </motion.div>
       ))}
 
-      {/* Gentle rain drops */}
+      {/* Rain drops */}
       {rainDrops.map((drop) => (
         <motion.div
           key={`rain-${drop.id}`}
-          className="absolute w-px bg-gradient-to-b from-transparent via-muted-foreground/20 to-transparent"
+          className={cn(
+            "absolute w-px",
+            weather === "thunderstorm" 
+              ? "bg-gradient-to-b from-transparent via-slate-400/50 to-slate-300/30"
+              : "bg-gradient-to-b from-transparent via-muted-foreground/30 to-muted-foreground/10"
+          )}
           style={{
             left: `${drop.left}%`,
             height: drop.height,
-            top: -20,
+            top: -30,
+            transform: `rotate(${drop.angle}deg)`,
           }}
           animate={{
-            y: [0, 400],
-            opacity: [0, 0.4, 0],
+            y: [0, 500],
+            opacity: [0, 0.6, 0],
           }}
           transition={{
             duration: drop.duration,
@@ -329,42 +439,52 @@ function BogEnvironmentEffects() {
         />
       ))}
 
-      {/* Floating bog cotton puffs */}
-      {bogCottonPuffs.map((puff) => (
+      {/* Mist layers */}
+      {mistLayers.map((mist) => (
         <motion.div
-          key={`cotton-${puff.id}`}
-          className="absolute rounded-full bg-bubbles-cream/60 blur-[1px]"
+          key={`mist-${mist.id}`}
+          className="absolute rounded-full bg-muted-foreground/10 blur-3xl"
           style={{
-            width: puff.size,
-            height: puff.size,
-            top: `${puff.startY}%`,
-            left: -20,
+            width: mist.width,
+            height: mist.height,
+            top: `${mist.top}%`,
+            opacity: mist.opacity,
           }}
-          animate={{
-            x: [0, window.innerWidth + 100],
-            y: [0, puff.swayAmount, -puff.swayAmount / 2, puff.swayAmount / 2, 0],
-          }}
+          initial={{ x: "-30vw" }}
+          animate={{ x: "110vw" }}
           transition={{
-            x: {
-              duration: puff.duration,
-              repeat: Infinity,
-              delay: puff.delay,
-              ease: "linear",
-            },
-            y: {
-              duration: puff.duration / 3,
-              repeat: Infinity,
-              delay: puff.delay,
-              ease: "easeInOut",
-            },
+            duration: mist.duration,
+            repeat: Infinity,
+            delay: mist.delay,
+            ease: "linear",
           }}
         />
       ))}
 
-      {/* Static ambient glow spots */}
-      <div className="absolute top-10 right-10 w-20 h-20 rounded-full bg-accent/5 blur-xl" />
-      <div className="absolute bottom-10 left-20 w-16 h-16 rounded-full bg-bubbles-gorse/10 blur-lg" />
-      <div className="absolute top-1/2 left-10 w-12 h-12 rounded-full bg-bubbles-heather/10 blur-lg" />
+      {/* Bog cotton puffs (always present - it's a bog!) */}
+      {Array.from({ length: 4 }, (_, i) => (
+        <motion.div
+          key={`cotton-${i}`}
+          className="absolute rounded-full bg-bubbles-cream/50 blur-[1px]"
+          style={{
+            width: 4 + Math.random() * 5,
+            height: 4 + Math.random() * 5,
+            top: `${40 + Math.random() * 40}%`,
+          }}
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ 
+            x: [0, 400],
+            y: [0, -20, 10, -10, 0],
+            opacity: [0, 0.6, 0.6, 0],
+          }}
+          transition={{
+            duration: 15 + Math.random() * 10,
+            repeat: Infinity,
+            delay: i * 3 + Math.random() * 5,
+            ease: "linear",
+          }}
+        />
+      ))}
     </div>
   );
 }
