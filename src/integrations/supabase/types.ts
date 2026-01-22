@@ -556,6 +556,57 @@ export type Database = {
           },
         ]
       }
+      newsletter_campaigns: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delivered_count: number | null
+          failed_count: number | null
+          html_content: string
+          id: string
+          metadata: Json | null
+          preview_text: string | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          html_content: string
+          id?: string
+          metadata?: Json | null
+          preview_text?: string | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          html_content?: string
+          id?: string
+          metadata?: Json | null
+          preview_text?: string | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           confirmation_token: string | null

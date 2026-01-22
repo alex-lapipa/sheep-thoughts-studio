@@ -48,6 +48,7 @@ import AdminWicklowPalette from "./pages/admin/brand/WicklowPalette";
 import AdminUsers from "./pages/admin/Users";
 import AdminMessages from "./pages/admin/Messages";
 import AdminSubscribers from "./pages/admin/Subscribers";
+import AdminCampaigns from "./pages/admin/Campaigns";
 import AdminSitemap from "./pages/admin/Sitemap";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,7 @@ const App = () => (
                 {/* Support Routes */}
                 <Route path="/admin/messages" element={<ProtectedRoute><AdminMessages /></ProtectedRoute>} />
                 <Route path="/admin/subscribers" element={<ProtectedRoute><AdminSubscribers /></ProtectedRoute>} />
+                <Route path="/admin/campaigns" element={<ProtectedRoute><AdminCampaigns /></ProtectedRoute>} />
                 
                 {/* System Routes - Super Admin Only */}
                 <Route path="/admin/users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
