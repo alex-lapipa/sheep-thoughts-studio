@@ -1,10 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
-import { LanguageToggle } from "./LanguageToggle";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
-import { RegionSwitcher } from "./RegionSwitcher";
+import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
 import { Search, Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
@@ -95,8 +94,7 @@ export function Header() {
         <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
           <ThemeModeToggle />
           <CelebrationToggle />
-          <RegionSwitcher />
-          <LanguageToggle />
+          <GlobalLanguageSwitcher />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
@@ -267,8 +265,7 @@ export function Header() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <ThemeModeToggle />
                     <CelebrationToggle />
-                    <LanguageToggle />
-                    <RegionSwitcher />
+                    <GlobalLanguageSwitcher variant="compact" />
                     <Button 
                       variant="ghost" 
                       size="icon"
