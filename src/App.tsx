@@ -26,6 +26,7 @@ import Shipping from "./pages/Shipping";
 import Contact from "./pages/Contact";
 import ShareBadges from "./pages/ShareBadges";
 import DataRights from "./pages/DataRights";
+import NewsletterConfirm from "./pages/NewsletterConfirm";
 
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
@@ -80,6 +81,7 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/share-badges" element={<ShareBadges />} />
                 <Route path="/data-rights" element={<DataRights />} />
+                <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
