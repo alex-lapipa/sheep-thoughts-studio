@@ -7,6 +7,7 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { BubblesSheep } from "@/components/BubblesSheep";
+import { BubblesMascotHero } from "@/components/BubblesMascot";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
@@ -183,11 +184,9 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Bubbles Character */}
+            {/* Bubbles Character - Modern Mascot */}
             <div className="relative flex justify-center items-center">
-              <div className="hover:animate-baa transition-transform cursor-pointer">
-                <BubblesSheep size="xl" className="drop-shadow-2xl animate-float" />
-              </div>
+              <BubblesMascotHero className="drop-shadow-2xl" />
               
               {/* Thought bubble with smooth fade transitions */}
               {currentThought && (
