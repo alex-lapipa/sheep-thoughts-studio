@@ -5,8 +5,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { useProducts } from "@/hooks/useProducts";
 import { useBestsellerRanking, sortByBestseller } from "@/hooks/useBestsellerRanking";
-import { ModeBadge } from "@/components/ModeBadge";
-import { BubbleMode } from "@/data/thoughtBubbles";
+import { ModeEscalationScale, ExtendedBubbleMode } from "@/components/ModeBadge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useMemo } from "react";
@@ -15,7 +14,7 @@ type SortOption = 'bestseller' | 'newest' | 'price-low' | 'price-high';
 
 const Collections = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeMode = searchParams.get('mode') as BubbleMode | null;
+  const activeMode = searchParams.get('mode') as ExtendedBubbleMode | null;
   const sortBy = (searchParams.get('sort') as SortOption) || 'bestseller';
   const { t } = useLanguage();
   const { ogImageUrl, siteUrl } = useOgImage("og-collections.jpg");
@@ -24,9 +23,7 @@ const Collections = () => {
   const { data: products, isLoading } = useProducts(query, 40);
   const { data: bestsellerRankings } = useBestsellerRanking();
 
-  const modes: BubbleMode[] = ['innocent', 'concerned', 'triggered', 'savage'];
-
-  const handleModeClick = (mode: BubbleMode) => {
+  const handleModeSelect = (mode: ExtendedBubbleMode) => {
     if (activeMode === mode) {
       searchParams.delete('mode');
     } else {
@@ -89,20 +86,13 @@ const Collections = () => {
         bubbleSize="md"
       />
       <div className="container py-12">
-        <div className="mb-8">
-
-          {/* Filters and Sort */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Mode Filters */}
-            <div className="flex flex-wrap gap-3">
-              {modes.map((mode) => (
-                <ModeBadge 
-                  key={mode} 
-                  mode={mode} 
-                  active={activeMode === mode}
-                  onClick={() => handleModeClick(mode)}
-                />
-              ))}
+        <div className="mb-8 space-y-6">
+          {/* Mode Escalation Filter */}
+          <div className="p-4 rounded-xl bg-card border">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                Shop by Mood
+              </h3>
               {activeMode && (
                 <button 
                   onClick={() => {
@@ -115,21 +105,25 @@ const Collections = () => {
                 </button>
               )}
             </div>
+            <ModeEscalationScale 
+              activeMode={activeMode} 
+              onModeSelect={handleModeSelect} 
+            />
+          </div>
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Sort:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                className="bg-background border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="bestseller">Bestselling</option>
-                <option value="newest">Newest</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-              </select>
-            </div>
+          {/* Sort Dropdown */}
+          <div className="flex items-center justify-end gap-2">
+            <span className="text-sm text-muted-foreground">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as SortOption)}
+              className="bg-background border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="bestseller">Bestselling</option>
+              <option value="newest">Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
           </div>
         </div>
 
