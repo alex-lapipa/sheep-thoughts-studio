@@ -166,6 +166,9 @@ export function WicklowHeroLandscape({
       {/* SKY LAYER */}
       <SkyLayer weather={resolvedWeather} timeOfDay={resolvedTime} palette={palette} intensity={intensity} />
       
+      {/* FLYING BIRDS */}
+      <FlyingBirds weather={resolvedWeather} />
+      
       {/* WEATHER EFFECTS (top of hero) */}
       <WeatherEffects weather={resolvedWeather} intensity={intensity} />
       
@@ -224,6 +227,118 @@ function SkyLayer({ weather, timeOfDay, palette, intensity }: {
 
 // ============================================================================
 // WEATHER EFFECTS - Clouds, sun, rain, etc.
+// ============================================================================
+// FLYING BIRDS - Occasional silhouettes crossing the sky
+// ============================================================================
+function FlyingBirds({ weather }: { weather: WeatherType }) {
+  // Fewer/no birds during storms
+  const birdCount = weather === "thunder" || weather === "stormy" ? 0 : weather === "rainy" ? 2 : 4;
+  
+  const birds = useMemo(() => {
+    return Array.from({ length: birdCount }, (_, i) => ({
+      id: i,
+      startY: 8 + Math.random() * 25, // 8-33% from top
+      duration: 15 + Math.random() * 20, // 15-35 seconds to cross
+      delay: Math.random() * 12, // Staggered start
+      scale: 0.5 + Math.random() * 0.5, // Size variation
+      direction: Math.random() > 0.3 ? 1 : -1, // Mostly left-to-right
+      flapSpeed: 0.3 + Math.random() * 0.3, // Wing flap variation
+    }));
+  }, [birdCount]);
+
+  if (birdCount === 0) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {birds.map((bird) => (
+        <motion.div
+          key={bird.id}
+          className="absolute"
+          style={{
+            top: `${bird.startY}%`,
+            left: bird.direction === 1 ? "-5%" : "105%",
+          }}
+          animate={{
+            x: bird.direction === 1 ? ["0vw", "110vw"] : ["0vw", "-110vw"],
+            y: [0, -10, 5, -8, 0], // Slight vertical bobbing
+          }}
+          transition={{
+            x: {
+              duration: bird.duration,
+              repeat: Infinity,
+              delay: bird.delay,
+              ease: "linear",
+            },
+            y: {
+              duration: bird.duration / 4,
+              repeat: Infinity,
+              delay: bird.delay,
+              ease: "easeInOut",
+            },
+          }}
+        >
+          {/* Bird silhouette SVG */}
+          <svg
+            width={24 * bird.scale}
+            height={12 * bird.scale}
+            viewBox="0 0 24 12"
+            className="opacity-60"
+            style={{ transform: bird.direction === -1 ? "scaleX(-1)" : undefined }}
+          >
+            {/* Wings that flap */}
+            <motion.path
+              d="M12 6 Q6 2, 0 4 Q6 4, 12 6"
+              fill="none"
+              stroke="hsl(220 15% 20%)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              animate={{
+                d: [
+                  "M12 6 Q6 2, 0 4 Q6 4, 12 6",
+                  "M12 6 Q6 6, 0 6 Q6 6, 12 6",
+                  "M12 6 Q6 9, 0 7 Q6 7, 12 6",
+                  "M12 6 Q6 6, 0 6 Q6 6, 12 6",
+                  "M12 6 Q6 2, 0 4 Q6 4, 12 6",
+                ],
+              }}
+              transition={{
+                duration: bird.flapSpeed,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            <motion.path
+              d="M12 6 Q18 2, 24 4 Q18 4, 12 6"
+              fill="none"
+              stroke="hsl(220 15% 20%)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              animate={{
+                d: [
+                  "M12 6 Q18 2, 24 4 Q18 4, 12 6",
+                  "M12 6 Q18 6, 24 6 Q18 6, 12 6",
+                  "M12 6 Q18 9, 24 7 Q18 7, 12 6",
+                  "M12 6 Q18 6, 24 6 Q18 6, 12 6",
+                  "M12 6 Q18 2, 24 4 Q18 4, 12 6",
+                ],
+              }}
+              transition={{
+                duration: bird.flapSpeed,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            {/* Body */}
+            <ellipse cx="12" cy="6" rx="3" ry="1.5" fill="hsl(220 15% 20%)" />
+          </svg>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// WEATHER EFFECTS - Rain, Clouds, Lightning, Wind
 // ============================================================================
 function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensity: number }) {
   return (
