@@ -123,6 +123,7 @@ const navSections: NavSection[] = [
       { href: '/admin/spam-queue', label: 'Spam Queue', icon: AlertTriangle, requiredModule: 'ops' },
       { href: '/admin/subscribers', label: 'Subscribers', icon: Users, requiredModule: 'ops' },
       { href: '/admin/campaigns', label: 'Campaigns', icon: Megaphone, requiredModule: 'ops' },
+      { href: '/admin/templates', label: 'Email Templates', icon: Mail, requiredModule: 'ops' },
     ],
   },
   {
