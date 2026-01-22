@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Globe, ChevronDown, Check } from "lucide-react";
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { saveRegionPreference } from "@/hooks/useLanguageRedirect";
 
 interface RegionOption {
   code: string;
@@ -50,6 +51,13 @@ const GROUP_LABELS: Record<string, string> = {
 
 export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "default" | "compact" }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Handle region selection with preference saving
+  const handleRegionSelect = (region: RegionOption) => {
+    saveRegionPreference(region.path);
+    navigate(region.path);
+  };
   
   // Find current region based on path
   const getCurrentRegion = (): RegionOption => {
@@ -101,17 +109,16 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
               {GROUP_LABELS[group] || group}
             </DropdownMenuLabel>
             {regions.map((region) => (
-              <DropdownMenuItem key={region.code} asChild className="cursor-pointer">
-                <Link 
-                  to={region.path} 
-                  className="flex items-center gap-3 w-full"
-                >
-                  <span className="text-lg">{region.flag}</span>
-                  <span className="flex-1">{region.label}</span>
-                  {currentRegion.code === region.code && (
-                    <Check className="h-4 w-4 text-accent" />
-                  )}
-                </Link>
+              <DropdownMenuItem 
+                key={region.code} 
+                className="cursor-pointer flex items-center gap-3"
+                onClick={() => handleRegionSelect(region)}
+              >
+                <span className="text-lg">{region.flag}</span>
+                <span className="flex-1">{region.label}</span>
+                {currentRegion.code === region.code && (
+                  <Check className="h-4 w-4 text-accent" />
+                )}
               </DropdownMenuItem>
             ))}
           </div>
