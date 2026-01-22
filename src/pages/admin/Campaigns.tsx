@@ -75,6 +75,7 @@ import {
   Bell,
   BellOff,
   Volume2,
+  Copy,
 } from "lucide-react";
 import { format, setHours, setMinutes, addDays, isBefore } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
@@ -290,6 +291,23 @@ export default function AdminCampaigns() {
       toast.success("Campaign deleted");
     },
     onError: () => toast.error("Failed to delete campaign"),
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: async (campaign: Campaign) => {
+      const { error } = await supabase.from("newsletter_campaigns").insert({
+        subject: `${campaign.subject} (Copy)`,
+        preview_text: campaign.preview_text,
+        html_content: campaign.html_content,
+        status: "draft",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-campaigns"] });
+      toast.success("Campaign duplicated");
+    },
+    onError: () => toast.error("Failed to duplicate campaign"),
   });
 
   const sendTestMutation = useMutation({
@@ -661,6 +679,10 @@ export default function AdminCampaigns() {
                               <DropdownMenuItem onClick={() => openPreview(campaign)}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 Preview
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => duplicateMutation.mutate(campaign)}>
+                                <Copy className="h-4 w-4 mr-2" />
+                                Duplicate
                               </DropdownMenuItem>
                               {(campaign.status === "draft" || campaign.status === "scheduled") && (
                                 <>
