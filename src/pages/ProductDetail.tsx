@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useProductByHandle } from "@/hooks/useProducts";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "@/components/ModeBadge";
+import { analytics } from "@/lib/analytics";
 
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -20,6 +21,13 @@ const ProductDetail = () => {
   
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeImage, setActiveImage] = useState(0);
+
+  // Track product view - must be before any early returns
+  useEffect(() => {
+    if (product?.title) {
+      analytics.viewProduct(product.title);
+    }
+  }, [product?.title]);
 
   if (isLoading) {
     return (
@@ -82,6 +90,9 @@ const ProductDetail = () => {
       quantity: 1,
       selectedOptions: selectedVariant.selectedOptions || []
     });
+
+    // Track add to cart
+    analytics.addToCart(product.title);
 
     toast.success("Added to cart!", {
       description: product.title,
