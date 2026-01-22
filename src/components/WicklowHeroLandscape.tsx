@@ -781,6 +781,82 @@ function BogTerrain({ trees, palette }: {
           <ellipse cx="780" cy="82" rx="22" ry="6" fill="#8B7355" opacity="0.5" />
           <ellipse cx="1150" cy="88" rx="28" ry="8" fill="#9B8365" opacity="0.45" />
         </g>
+        
+        {/* GRAZING SHEEP - white dots scattered across pastures */}
+        <g className="grazing-sheep">
+          {/* Far field sheep (smaller, more distant) */}
+          <ellipse cx="180" cy="85" rx="4" ry="2.5" fill="#F8F8F5" opacity="0.7" />
+          <circle cx="178" cy="84" r="1.5" fill="#F0F0EC" opacity="0.6" />
+          
+          <ellipse cx="320" cy="78" rx="3.5" ry="2" fill="#F8F8F5" opacity="0.65" />
+          <circle cx="318" cy="77" r="1.3" fill="#F0F0EC" opacity="0.55" />
+          
+          <ellipse cx="560" cy="72" rx="4" ry="2.5" fill="#F8F8F5" opacity="0.7" />
+          <circle cx="558" cy="71" r="1.5" fill="#F0F0EC" opacity="0.6" />
+          
+          <ellipse cx="680" cy="68" rx="3.5" ry="2" fill="#F8F8F5" opacity="0.6" />
+          
+          <ellipse cx="850" cy="70" rx="4" ry="2.5" fill="#F8F8F5" opacity="0.7" />
+          <circle cx="848" cy="69" r="1.5" fill="#F0F0EC" opacity="0.6" />
+          
+          <ellipse cx="1020" cy="72" rx="3.5" ry="2" fill="#F8F8F5" opacity="0.65" />
+          
+          <ellipse cx="1250" cy="75" rx="4" ry="2.5" fill="#F8F8F5" opacity="0.7" />
+          <circle cx="1248" cy="74" r="1.5" fill="#F0F0EC" opacity="0.6" />
+          
+          {/* Mid-field sheep (medium size) */}
+          <ellipse cx="95" cy="115" rx="5" ry="3" fill="#FAFAF7" opacity="0.8" />
+          <circle cx="92" cy="113.5" r="2" fill="#F5F5F0" opacity="0.7" />
+          
+          <ellipse cx="240" cy="100" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.85" />
+          <circle cx="237" cy="98.5" r="2.2" fill="#F5F5F0" opacity="0.75" />
+          
+          <ellipse cx="420" cy="94" rx="5" ry="3" fill="#FAFAF7" opacity="0.8" />
+          <circle cx="417" cy="92.5" r="2" fill="#F5F5F0" opacity="0.7" />
+          
+          <ellipse cx="590" cy="88" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.85" />
+          <circle cx="587" cy="86.5" r="2.2" fill="#F5F5F0" opacity="0.75" />
+          
+          <ellipse cx="760" cy="85" rx="5" ry="3" fill="#FAFAF7" opacity="0.8" />
+          <circle cx="757" cy="83.5" r="2" fill="#F5F5F0" opacity="0.7" />
+          
+          <ellipse cx="920" cy="82" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.85" />
+          <circle cx="917" cy="80.5" r="2.2" fill="#F5F5F0" opacity="0.75" />
+          
+          <ellipse cx="1100" cy="86" rx="5" ry="3" fill="#FAFAF7" opacity="0.8" />
+          <circle cx="1097" cy="84.5" r="2" fill="#F5F5F0" opacity="0.7" />
+          
+          <ellipse cx="1300" cy="88" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.85" />
+          <circle cx="1297" cy="86.5" r="2.2" fill="#F5F5F0" opacity="0.75" />
+          
+          {/* Foreground sheep (larger, grazing poses) */}
+          <ellipse cx="150" cy="135" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
+          <circle cx="145" cy="132.5" r="3" fill="#FAFAF7" opacity="0.85" />
+          <ellipse cx="142" cy="133" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5" /> {/* ear */}
+          
+          <ellipse cx="480" cy="120" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
+          <circle cx="475" cy="117.5" r="2.8" fill="#FAFAF7" opacity="0.82" />
+          <ellipse cx="473" cy="118" rx="1" ry="0.7" fill="#4A4453" opacity="0.45" />
+          
+          <ellipse cx="820" cy="115" rx="7" ry="4" fill="#FFFFFF" opacity="0.9" />
+          <circle cx="815" cy="112.5" r="3" fill="#FAFAF7" opacity="0.85" />
+          <ellipse cx="812" cy="113" rx="1.2" ry="0.8" fill="#4A4453" opacity="0.5" />
+          
+          <ellipse cx="1180" cy="118" rx="6.5" ry="3.8" fill="#FFFFFF" opacity="0.88" />
+          <circle cx="1175" cy="115.5" r="2.8" fill="#FAFAF7" opacity="0.82" />
+          <ellipse cx="1172" cy="116" rx="1" ry="0.7" fill="#4A4453" opacity="0.45" />
+          
+          {/* Pair of sheep together */}
+          <ellipse cx="650" cy="105" rx="6" ry="3.5" fill="#FAFAF7" opacity="0.85" />
+          <circle cx="646" cy="103" r="2.5" fill="#F5F5F0" opacity="0.78" />
+          <ellipse cx="668" cy="108" rx="5.5" ry="3.2" fill="#FAFAF7" opacity="0.82" />
+          <circle cx="664" cy="106" r="2.3" fill="#F5F5F0" opacity="0.75" />
+          
+          {/* Small flock in distance */}
+          <ellipse cx="1380" cy="95" rx="4" ry="2.2" fill="#F5F5F0" opacity="0.7" />
+          <ellipse cx="1395" cy="97" rx="3.5" ry="2" fill="#F5F5F0" opacity="0.65" />
+          <ellipse cx="1410" cy="94" rx="4" ry="2.2" fill="#F5F5F0" opacity="0.7" />
+        </g>
       </svg>
       
       {/* Peat earth base */}
