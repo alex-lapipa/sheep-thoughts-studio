@@ -146,6 +146,14 @@ export default function CronJobs() {
           active: true,
           function: "cleanup-image-cache",
         },
+        {
+          jobid: 5,
+          jobname: "auto-embed-content-job",
+          schedule: "*/15 * * * *",
+          description: "Auto-generates embeddings for new content in knowledge base (every 15 minutes)",
+          active: true,
+          function: "auto-embed-content",
+        },
       ]);
     } finally {
       setLoading(false);
