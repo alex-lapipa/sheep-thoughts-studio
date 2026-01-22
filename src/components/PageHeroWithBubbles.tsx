@@ -159,6 +159,9 @@ export function PageHeroWithBubbles({
       "py-12 md:py-20 bg-gradient-to-b from-secondary/40 to-background relative overflow-hidden",
       className
     )}>
+      {/* Ambient environmental effects - world moves, Bubbles doesn't */}
+      <BogEnvironmentEffects />
+
       <div className="container relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           {/* Bubbles with thought bubbles */}
@@ -237,12 +240,132 @@ export function PageHeroWithBubbles({
           </div>
         </div>
       </div>
-
-      {/* Background decorative elements */}
-      <div className="absolute top-10 right-10 w-20 h-20 rounded-full bg-accent/5 animate-drift" />
-      <div className="absolute bottom-10 left-20 w-16 h-16 rounded-full bg-bubbles-gorse/10 animate-float" style={{ animationDelay: "1s" }} />
-      <div className="absolute top-1/2 left-10 w-12 h-12 rounded-full bg-bubbles-heather/10 animate-bounce-gentle" style={{ animationDelay: "0.5s" }} />
     </section>
+  );
+}
+
+// Ambient Wicklow bog environment - drifting mist, rain, bog cotton
+function BogEnvironmentEffects() {
+  // Generate stable random positions for particles
+  const mistLayers = useMemo(() => 
+    Array.from({ length: 4 }, (_, i) => ({
+      id: i,
+      width: 120 + Math.random() * 100,
+      height: 30 + Math.random() * 20,
+      top: 20 + Math.random() * 60,
+      startX: -20 + Math.random() * 10,
+      duration: 20 + Math.random() * 15,
+      delay: Math.random() * 10,
+      opacity: 0.03 + Math.random() * 0.04,
+    })), []
+  );
+
+  const rainDrops = useMemo(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      left: 5 + Math.random() * 90,
+      duration: 1.5 + Math.random() * 1,
+      delay: Math.random() * 3,
+      height: 8 + Math.random() * 12,
+    })), []
+  );
+
+  const bogCottonPuffs = useMemo(() =>
+    Array.from({ length: 6 }, (_, i) => ({
+      id: i,
+      size: 4 + Math.random() * 6,
+      startY: 30 + Math.random() * 40,
+      duration: 12 + Math.random() * 8,
+      delay: Math.random() * 8,
+      swayAmount: 10 + Math.random() * 20,
+    })), []
+  );
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Drifting mist layers */}
+      {mistLayers.map((mist) => (
+        <motion.div
+          key={`mist-${mist.id}`}
+          className="absolute rounded-full bg-muted-foreground/5 blur-2xl"
+          style={{
+            width: mist.width,
+            height: mist.height,
+            top: `${mist.top}%`,
+            opacity: mist.opacity,
+          }}
+          animate={{
+            x: [`${mist.startX}vw`, `${100 + mist.startX}vw`],
+          }}
+          transition={{
+            duration: mist.duration,
+            repeat: Infinity,
+            delay: mist.delay,
+            ease: "linear",
+          }}
+        />
+      ))}
+
+      {/* Gentle rain drops */}
+      {rainDrops.map((drop) => (
+        <motion.div
+          key={`rain-${drop.id}`}
+          className="absolute w-px bg-gradient-to-b from-transparent via-muted-foreground/20 to-transparent"
+          style={{
+            left: `${drop.left}%`,
+            height: drop.height,
+            top: -20,
+          }}
+          animate={{
+            y: [0, 400],
+            opacity: [0, 0.4, 0],
+          }}
+          transition={{
+            duration: drop.duration,
+            repeat: Infinity,
+            delay: drop.delay,
+            ease: "linear",
+          }}
+        />
+      ))}
+
+      {/* Floating bog cotton puffs */}
+      {bogCottonPuffs.map((puff) => (
+        <motion.div
+          key={`cotton-${puff.id}`}
+          className="absolute rounded-full bg-bubbles-cream/60 blur-[1px]"
+          style={{
+            width: puff.size,
+            height: puff.size,
+            top: `${puff.startY}%`,
+            left: -20,
+          }}
+          animate={{
+            x: [0, window.innerWidth + 100],
+            y: [0, puff.swayAmount, -puff.swayAmount / 2, puff.swayAmount / 2, 0],
+          }}
+          transition={{
+            x: {
+              duration: puff.duration,
+              repeat: Infinity,
+              delay: puff.delay,
+              ease: "linear",
+            },
+            y: {
+              duration: puff.duration / 3,
+              repeat: Infinity,
+              delay: puff.delay,
+              ease: "easeInOut",
+            },
+          }}
+        />
+      ))}
+
+      {/* Static ambient glow spots */}
+      <div className="absolute top-10 right-10 w-20 h-20 rounded-full bg-accent/5 blur-xl" />
+      <div className="absolute bottom-10 left-20 w-16 h-16 rounded-full bg-bubbles-gorse/10 blur-lg" />
+      <div className="absolute top-1/2 left-10 w-12 h-12 rounded-full bg-bubbles-heather/10 blur-lg" />
+    </div>
   );
 }
 
