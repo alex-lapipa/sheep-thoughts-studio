@@ -20,13 +20,16 @@ const LANGUAGES = [
 const PAGE_TYPES = [
   { id: "home", name: "Home", path: "/" },
   { id: "about", name: "About", path: "/about" },
-  { id: "facts", name: "Facts", path: "/facts" },
-  { id: "explains", name: "Explains", path: "/explains" },
+  { id: "achievements", name: "Achievements", path: "/achievements" },
   { id: "collections", name: "Collections", path: "/collections/all" },
-  { id: "faq", name: "FAQ", path: "/faq" },
   { id: "contact", name: "Contact", path: "/contact" },
-  { id: "shipping", name: "Shipping", path: "/shipping" },
+  { id: "dach", name: "DACH", path: "/dach" },
+  { id: "explains", name: "Explains", path: "/explains" },
+  { id: "facts", name: "Facts", path: "/facts" },
+  { id: "faq", name: "FAQ", path: "/faq" },
+  { id: "francophone", name: "Francophone", path: "/francophone" },
   { id: "privacy", name: "Privacy", path: "/privacy" },
+  { id: "shipping", name: "Shipping", path: "/shipping" },
 ] as const;
 
 type LanguageCode = typeof LANGUAGES[number]["code"];
