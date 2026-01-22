@@ -45,7 +45,7 @@ interface BubblesBogProps {
   size?: "sm" | "md" | "lg" | "xl" | "hero";
   className?: string;
   animated?: boolean;
-  posture?: "four-legged" | "two-legged" | "half-upright" | "leaning" | "seated";
+  posture?: "four-legged" | "seated" | "grazing" | "leaning";
   accessory?: "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
   weathered?: boolean;
   // Expression must convey certainty, not cleverness
@@ -85,10 +85,8 @@ export function BubblesBog({
     switch (posture) {
       case "four-legged":
         return <FourLeggedSheep expr={expr} accessory={accessory} weathered={weathered} />;
-      case "two-legged":
-        return <TwoLeggedSheep expr={expr} accessory={accessory} weathered={weathered} />;
-      case "half-upright":
-        return <HalfUprightSheep expr={expr} accessory={accessory} weathered={weathered} />;
+      case "grazing":
+        return <GrazingSheep expr={expr} accessory={accessory} weathered={weathered} />;
       case "leaning":
         return <LeaningSheep expr={expr} accessory={accessory} weathered={weathered} />;
       case "seated":
@@ -311,8 +309,8 @@ function FourLeggedSheep({
   );
 }
 
-// Two-legged posture - absorbed human behavior, still a sheep
-function TwoLeggedSheep({ 
+// Grazing posture - head lowered, natural feeding posture (repurposed from TwoLeggedSheep)
+function GrazingSheep({
   expr, 
   accessory, 
   weathered 

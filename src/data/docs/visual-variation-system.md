@@ -18,14 +18,15 @@ Alternate between:
 
 | Posture | Description | Weight |
 |---------|-------------|--------|
-| **Four-legged** | Natural sheep stance, grounded in bog | 35% |
-| **Two-legged** | Upright stance, absorbed human behavior | 35% |
-| **Half-upright** | Transitional, front legs lifted mid-shift | 15% |
+| **Four-legged** | Natural sheep stance, grounded in bog | 40% |
+| **Seated** | Resting on haunches, sheep-like sitting | 25% |
+| **Grazing** | Head lowered, natural feeding posture | 20% |
 | **Leaning** | Weight shifted, casual observational stance | 15% |
 
 ### Posture Guidelines
 
 - Postures must feel **casual and unexplained**, never performative or expressive
+- **Bubbles is a sheep and must NEVER stand on two legs** — all postures are quadrupedal
 - No dynamic action poses; variation comes from **stance, balance, and orientation only**
 - Maintain calm, grounded presence in all variants
 
@@ -145,7 +146,7 @@ The collection should read as:
 
 ```tsx
 <BubblesBog
-  posture="four-legged" | "two-legged" | "half-upright" | "leaning"
+  posture="four-legged" | "seated" | "grazing" | "leaning"
   accessory="sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none"
   expression="neutral" | "distant" | "certain" | "waiting"
   weathered={true}
@@ -156,7 +157,7 @@ The collection should read as:
 ### Component: `PageHeroWithBubbles`
 
 Uses weighted random selection:
-- Posture: 35% four-legged, 35% two-legged, 15% half-upright, 15% leaning
+- Posture: 40% four-legged, 25% seated, 20% grazing, 15% leaning
 - Accessory: 36% none, ~9% each for other options
 
 ---

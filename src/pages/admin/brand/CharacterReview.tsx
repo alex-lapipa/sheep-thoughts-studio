@@ -38,12 +38,12 @@ import { cn } from "@/lib/utils";
  * Allows rating, feedback, and status tracking for each posture × accessory combo.
  */
 
-type Posture = "four-legged" | "two-legged" | "half-upright" | "leaning" | "seated";
+type Posture = "four-legged" | "seated" | "grazing" | "leaning";
 type Accessory = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "none";
 type Expression = "neutral" | "distant" | "certain" | "waiting";
 type Status = "approved" | "review" | "needs-work" | "rejected";
 
-const POSTURES: Posture[] = ["four-legged", "two-legged", "half-upright", "leaning", "seated"];
+const POSTURES: Posture[] = ["four-legged", "seated", "grazing", "leaning"];
 const ACCESSORIES: Accessory[] = ["none", "sunglasses", "cap", "bucket-hat", "headphones", "scarf", "bandana", "flower-crown"];
 const EXPRESSIONS: Expression[] = ["neutral", "distant", "certain", "waiting"];
 const STATUSES: Status[] = ["approved", "review", "needs-work", "rejected"];
