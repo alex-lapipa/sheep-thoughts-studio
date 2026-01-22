@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { FeaturedProducts } from "@/components/FeaturedProducts";
+import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { BubblesSheep } from "@/components/BubblesSheep";
 import { CrossLinks } from "@/components/CrossLinks";
@@ -314,8 +314,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <FeaturedProducts />
+      {/* Featured Products Carousel */}
+      <FeaturedProductsCarousel />
 
       {/* Cross-links section */}
       <section className="py-12 bg-muted/20">
