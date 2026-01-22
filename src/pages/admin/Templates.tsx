@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -235,12 +235,6 @@ export default function AdminTemplates() {
     setPreviewDialogOpen(true);
   };
 
-  const insertMergeTag = (tag: string) => {
-    setFormData(prev => ({
-      ...prev,
-      html_content: prev.html_content + tag,
-    }));
-  };
 
   const getCategoryBadge = (category: string | null) => {
     const colors: Record<string, string> = {
@@ -473,30 +467,15 @@ export default function AdminTemplates() {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="html_content">HTML Content</Label>
-                  <div className="flex gap-1">
-                    {AVAILABLE_MERGE_TAGS.slice(0, 3).map((item) => (
-                      <Button
-                        key={item.tag}
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-6 px-2"
-                        onClick={() => insertMergeTag(item.tag)}
-                      >
-                        {item.tag}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <Textarea
-                  id="html_content"
-                  placeholder="<h1>Hello!</h1><p>Welcome to our newsletter...</p>"
-                  className="min-h-[200px] font-mono text-sm"
-                  value={formData.html_content}
-                  onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
+                <Label>Email Content</Label>
+                <RichTextEditor
+                  content={formData.html_content}
+                  onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  placeholder="Start writing your template..."
                 />
+                <p className="text-xs text-muted-foreground">
+                  Use merge tags like {'{{email}}'} or {'{{unsubscribe_url}}'} in your content.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description (optional)</Label>
@@ -577,28 +556,11 @@ export default function AdminTemplates() {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="edit-html_content">HTML Content</Label>
-                  <div className="flex gap-1">
-                    {AVAILABLE_MERGE_TAGS.slice(0, 3).map((item) => (
-                      <Button
-                        key={item.tag}
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-6 px-2"
-                        onClick={() => insertMergeTag(item.tag)}
-                      >
-                        {item.tag}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <Textarea
-                  id="edit-html_content"
-                  className="min-h-[200px] font-mono text-sm"
-                  value={formData.html_content}
-                  onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
+                <Label>Email Content</Label>
+                <RichTextEditor
+                  content={formData.html_content}
+                  onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  placeholder="Edit your template content..."
                 />
               </div>
               <div className="space-y-2">

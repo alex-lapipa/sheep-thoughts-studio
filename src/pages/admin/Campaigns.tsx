@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -425,17 +425,12 @@ export default function AdminCampaigns() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">Email Content (HTML) *</Label>
-                <Textarea
-                  id="content"
-                  placeholder="<h1>Hello humans!</h1><p>Bubbles here with some thoughts...</p>"
-                  className="min-h-[200px] font-mono text-sm"
-                  value={formData.html_content}
-                  onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
+                <Label htmlFor="content">Email Content *</Label>
+                <RichTextEditor
+                  content={formData.html_content}
+                  onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  placeholder="Start writing your newsletter..."
                 />
-                <p className="text-xs text-muted-foreground">
-                  Use HTML for formatting. The content will be wrapped in our email template.
-                </p>
               </div>
             </div>
             <DialogFooter>
@@ -476,12 +471,11 @@ export default function AdminCampaigns() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-content">Email Content (HTML) *</Label>
-                <Textarea
-                  id="edit-content"
-                  className="min-h-[200px] font-mono text-sm"
-                  value={formData.html_content}
-                  onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
+                <Label htmlFor="edit-content">Email Content *</Label>
+                <RichTextEditor
+                  content={formData.html_content}
+                  onChange={(html) => setFormData({ ...formData, html_content: html })}
+                  placeholder="Edit your newsletter content..."
                 />
               </div>
             </div>
