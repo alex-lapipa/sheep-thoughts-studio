@@ -666,7 +666,7 @@ export function EmailBlockEditor({ initialHtml, onChange }: EmailBlockEditorProp
       )}
 
       {viewMode === "preview" && (
-        <div className="p-6 bg-[#FFFDD0] min-h-[400px]">
+        <div className="p-6 bg-card min-h-[400px]">
           <div
             className="max-w-xl mx-auto"
             dangerouslySetInnerHTML={{ __html: blocksToHtml(blocks) }}

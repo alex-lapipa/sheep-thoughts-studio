@@ -19,7 +19,7 @@ export function ThoughtBubble({ children, mode, className, size = 'md' }: Though
     <div 
       className={cn(
         "thought-bubble animate-bubble-appear font-display",
-        "border-bubbles-heather/30 bg-bubbles-cream/50",
+        "border-border bg-bubble-bg text-foreground",
         sizeClasses[size],
         className
       )}

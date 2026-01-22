@@ -971,7 +971,7 @@ export default function AdminCampaigns() {
               <DialogTitle>Preview: {selectedCampaign?.subject}</DialogTitle>
             </DialogHeader>
             <div 
-              className="bg-[#FFFDD0] p-6 rounded-lg border"
+              className="bg-card p-6 rounded-lg border"
               dangerouslySetInnerHTML={{ __html: selectedCampaign?.html_content || "" }}
             />
           </DialogContent>

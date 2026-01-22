@@ -595,7 +595,7 @@ export default function AdminTemplates() {
                 Subject: {selectedTemplate && renderPreviewContent(selectedTemplate.subject)}
               </DialogDescription>
             </DialogHeader>
-            <div className="border rounded-lg p-4 bg-white">
+            <div className="border rounded-lg p-4 bg-card">
               {selectedTemplate && (
                 <div
                   className="prose prose-sm max-w-none"
