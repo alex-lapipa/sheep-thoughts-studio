@@ -23,7 +23,10 @@ import {
   ScanSearch,
   ImageOff,
   Check,
-  X
+  X,
+  Webhook,
+  Package,
+  Clock
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -34,6 +37,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
+
+interface WebhookActivityEvent {
+  id: string;
+  topic: string;
+  status: string;
+  created_at: string;
+  processed_at: string | null;
+  payload: {
+    id?: string | number;
+    title?: string;
+  } | null;
+}
 
 interface PageMeta {
   path: string;
@@ -541,8 +558,39 @@ export default function AdminSitemap() {
 
   const checklistProgress = Math.round((completedSteps.length / CHECKLIST_STEPS.length) * 100);
 
+  // Webhook activity log state
+  const [webhookActivity, setWebhookActivity] = useState<WebhookActivityEvent[]>([]);
+  const [loadingWebhooks, setLoadingWebhooks] = useState(false);
+
+  const fetchWebhookActivity = async () => {
+    setLoadingWebhooks(true);
+    try {
+      const { data, error } = await supabase
+        .from("shopify_webhooks")
+        .select("id, topic, status, created_at, processed_at, payload")
+        .in("topic", [
+          "products/create",
+          "products/update", 
+          "products/delete",
+          "collections/create",
+          "collections/update",
+          "collections/delete",
+        ])
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setWebhookActivity((data || []) as WebhookActivityEvent[]);
+    } catch (error) {
+      console.error("Error fetching webhook activity:", error);
+    } finally {
+      setLoadingWebhooks(false);
+    }
+  };
+
   useEffect(() => {
     fetchRobotsTxt();
+    fetchWebhookActivity();
   }, []);
 
   const stats = {
@@ -868,7 +916,110 @@ export default function AdminSitemap() {
           </CardContent>
         </Card>
 
-        {/* Robots.txt Validator */}
+        {/* Webhook Activity Log */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Webhook className="h-5 w-5" />
+                  Sitemap Ping Activity
+                </CardTitle>
+                <CardDescription>
+                  Recent product/collection changes that triggered sitemap pings
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchWebhookActivity}
+                disabled={loadingWebhooks}
+              >
+                <RefreshCw className={cn("h-4 w-4 mr-2", loadingWebhooks && "animate-spin")} />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {webhookActivity.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Webhook className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">No webhook activity yet</p>
+                <p className="text-sm">Product changes from Shopify will appear here</p>
+              </div>
+            ) : (
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-3">
+                  {webhookActivity.map((event) => {
+                    const topicParts = event.topic.split("/");
+                    const entityType = topicParts[0];
+                    const action = topicParts[1];
+                    const payload = event.payload as { id?: string | number; title?: string } | null;
+                    const title = payload?.title || `ID: ${payload?.id || "Unknown"}`;
+                    
+                    return (
+                      <div
+                        key={event.id}
+                        className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
+                      >
+                        <div className={cn(
+                          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                          action === "create" && "bg-emerald-500/10 text-emerald-600",
+                          action === "update" && "bg-blue-500/10 text-blue-600",
+                          action === "delete" && "bg-red-500/10 text-red-600"
+                        )}>
+                          <Package className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm truncate max-w-[200px]">
+                              {title}
+                            </span>
+                            <Badge 
+                              variant="outline" 
+                              className={cn(
+                                "text-xs",
+                                action === "create" && "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+                                action === "update" && "bg-blue-500/10 text-blue-700 border-blue-500/30",
+                                action === "delete" && "bg-red-500/10 text-red-700 border-red-500/30"
+                              )}
+                            >
+                              {action}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {entityType}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
+                            </span>
+                            <Badge 
+                              variant="outline"
+                              className={cn(
+                                "text-xs",
+                                event.status === "processed" && "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+                                event.status === "pending" && "bg-yellow-500/10 text-yellow-700 border-yellow-500/30",
+                                event.status === "failed" && "bg-red-500/10 text-red-700 border-red-500/30"
+                              )}
+                            >
+                              {event.status}
+                            </Badge>
+                          </div>
+                        </div>
+                        {event.status === "processed" && (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
