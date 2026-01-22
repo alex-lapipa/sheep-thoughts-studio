@@ -381,7 +381,10 @@ const Shipping = () => {
                   ? 'Please include your order number. Order numbers are sacred and must be treated with respect.' 
                   : 'Por favor incluye tu número de pedido. Los números de pedido son sagrados y deben ser tratados con respeto.'}
               </p>
-              <div className="flex gap-4 mt-4">
+              <div className="flex flex-wrap gap-4 mt-4">
+                <Link to="/order-tracking" className="text-primary hover:underline text-sm font-medium">
+                  {language === 'en' ? 'Track Your Order →' : 'Rastrear Tu Pedido →'}
+                </Link>
                 <Link to="/faq" className="text-primary hover:underline text-sm">
                   {language === 'en' ? 'Visit FAQ →' : 'Visitar Preguntas →'}
                 </Link>
