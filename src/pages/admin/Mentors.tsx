@@ -19,6 +19,7 @@ import {
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { MentorDetectionPreview } from '@/components/admin/MentorDetectionPreview';
+import { SemanticMentorDetector } from '@/components/admin/SemanticMentorDetector';
 
 // Mentor data matching the MeetTheMentors component
 const mentors = [
@@ -265,8 +266,11 @@ export default function AdminMentors() {
           </div>
         </div>
 
-        {/* Detection Preview Tool */}
-        <MentorDetectionPreview />
+        {/* Detection Tools */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <MentorDetectionPreview />
+          <SemanticMentorDetector />
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Mentor List */}
