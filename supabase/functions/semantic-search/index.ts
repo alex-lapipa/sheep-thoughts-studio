@@ -68,7 +68,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query, sources = ["knowledge", "thoughts", "rag"], limit = 10, threshold = 0.3 } = await req.json();
+    const { query, sources = ["knowledge", "thoughts", "rag", "triggers"], limit = 10, threshold = 0.3 } = await req.json();
 
     if (!query || typeof query !== "string") {
       return new Response(
@@ -147,6 +147,27 @@ serve(async (req) => {
         }));
       };
       searchPromises.push(ragSearch());
+    }
+
+    if (sources.includes("triggers")) {
+      const triggersSearch = async () => {
+        const { data, error } = await supabase.rpc("search_bubbles_triggers", {
+          query_embedding: `[${queryEmbedding.join(",")}]`,
+          match_count: limit,
+          match_threshold: threshold,
+        });
+        if (error) {
+          console.error("Triggers search error:", error);
+          return [];
+        }
+        return (data || []).map((item: any) => ({
+          ...item,
+          source: "triggers",
+          title: item.name,
+          preview: item.description
+        }));
+      };
+      searchPromises.push(triggersSearch());
     }
 
     const searchResults = await Promise.all(searchPromises);

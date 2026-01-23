@@ -1713,6 +1713,25 @@ export type Database = {
           trigger_category: string
         }[]
       }
+      search_bubbles_triggers: {
+        Args: {
+          filter_category?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          category: string
+          description: string
+          example_bubbles: string[]
+          example_scenario: string
+          id: string
+          internal_logic: string
+          name: string
+          similarity: number
+          tags: string[]
+        }[]
+      }
     }
     Enums: {
       bubbles_knowledge_category:
