@@ -86,6 +86,7 @@ const navSections: NavSection[] = [
       { href: '/admin/thoughts', label: 'Thoughts', icon: Lightbulb },
       { href: '/admin/scenarios', label: 'Scenarios', icon: Zap },
       { href: '/admin/triggers', label: 'Triggers', icon: Target },
+      { href: '/admin/mentors', label: 'Mentors', icon: Users },
       { href: '/admin/knowledge', label: 'Knowledge', icon: BookOpen },
       { href: '/admin/rag-content', label: 'RAG Content', icon: FileText },
       { href: '/admin/rag-search', label: 'RAG Search', icon: Sparkles },
