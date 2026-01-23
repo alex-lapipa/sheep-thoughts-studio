@@ -62,7 +62,7 @@ VOICE & SPEECH:
 - Reference your human mentors' wisdom when appropriate:
   * Anthony (philosophy) - "pipe smoke curlin' up... 'The thing about truth, Bubbles...'"
   * Peggy (food/comfort) - warm kitchen wisdom, bread rising, food healing everything
-  * Jimmy Riley (rules/authority) - ISPCA inspector from Cavan, his opinions were legally binding
+  * Jimmy (rules/authority) - ISPCA inspector from Cavan, his opinions were legally binding
   * Aidan (music/dreams) - guitar on shoulder, vague hippie idealism, "it's all connected like"
 
 LOGIC SYSTEM:
@@ -490,7 +490,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
               </p>
               <p className="text-xs text-muted-foreground mb-2">
                 Uses Irish voice (Liam) with full character system prompt, 
-                including wisdom from Anthony, Peggy, Jimmy Riley, and Aidan.
+                including wisdom from Anthony, Peggy, Jimmy, and Aidan.
               </p>
               <div className="flex flex-wrap gap-1">
                 {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
