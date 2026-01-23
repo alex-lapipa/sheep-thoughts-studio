@@ -10,6 +10,7 @@ import { MoodProvider } from "@/contexts/MoodContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { WinterThemeProvider } from "@/contexts/WinterThemeContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 
@@ -97,6 +98,7 @@ const PricingRulesPage = lazy(() => import("./pages/admin/catalog/PricingRules")
 const DropsPage = lazy(() => import("./pages/admin/catalog/Drops"));
 const AdminWhatsNew = lazy(() => import("./pages/admin/WhatsNewAdmin"));
 const IllustrationGenerator = lazy(() => import("./pages/admin/IllustrationGenerator"));
+const FeatureFlagsAdmin = lazy(() => import("./pages/admin/FeatureFlags"));
 // Minimal loading fallback
 function PageLoader() {
   return (
@@ -123,10 +125,11 @@ const App = () => (
         <SettingsProvider>
           <ThemeProvider>
             <WinterThemeProvider>
-              <AuthProvider>
-                <MoodProvider>
-                  <Toaster />
-                  <Sonner position="top-center" />
+              <FeatureFlagsProvider>
+                <AuthProvider>
+                  <MoodProvider>
+                    <Toaster />
+                    <Sonner position="top-center" />
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -234,6 +237,7 @@ const App = () => (
                   <Route path="/admin/rag-search" element={<ProtectedRoute><AdminRAGSearch /></ProtectedRoute>} />
                   <Route path="/admin/whats-new" element={<ProtectedRoute><AdminWhatsNew /></ProtectedRoute>} />
                   <Route path="/admin/illustrations" element={<ProtectedRoute><IllustrationGenerator /></ProtectedRoute>} />
+                  <Route path="/admin/feature-flags" element={<ProtectedRoute requireSuperAdmin><FeatureFlagsAdmin /></ProtectedRoute>} />
                   
                     <Route path="*" element={<NotFound />} />
                   </Routes>
@@ -242,10 +246,11 @@ const App = () => (
               </BrowserRouter>
             </MoodProvider>
           </AuthProvider>
-        </WinterThemeProvider>
-      </ThemeProvider>
-    </SettingsProvider>
-  </LanguageProvider>
+        </FeatureFlagsProvider>
+      </WinterThemeProvider>
+    </ThemeProvider>
+  </SettingsProvider>
+</LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
