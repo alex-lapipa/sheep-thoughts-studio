@@ -14,8 +14,9 @@ import { toast } from 'sonner';
 import { 
   BookOpen, Heart, Home, Mountain, TreePine, Sparkles, Cloud, 
   MessageCircle, Play, Copy, Eye, Volume2, Loader2, Send,
-  CheckCircle, AlertCircle, RefreshCw
+  CheckCircle, AlertCircle, RefreshCw, BarChart3
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 // Mentor data matching the MeetTheMentors component
@@ -246,6 +247,12 @@ export default function AdminMentors() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Link to="/admin/mentors/analytics">
+              <Button variant="outline">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                View Analytics
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               onClick={handleBulkTest}
