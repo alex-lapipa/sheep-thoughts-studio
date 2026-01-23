@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Brain, Sparkles, Coffee, Flame, Plane, Music, Scale, Clock, Languages, Database, Wrench, Flower2, Car } from "lucide-react";
+import { Search, Brain, Sparkles, Coffee, Flame, Plane, Music, Scale, Clock, Languages, Database, Wrench, Flower2, Car, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -90,6 +90,12 @@ const MENTOR_CONFIG: Record<string, { icon: React.ReactNode; color: string; doma
     color: "bg-indigo-500",
     domain: "Driving & Adventures",
     keywords: ["eddie", "drive", "car", "road", "journey", "adventure", "transport", "travel"]
+  },
+  betty: {
+    icon: <Heart className="h-4 w-4" />,
+    color: "bg-lime-500",
+    domain: "Sport & Cheese Enthusiasm",
+    keywords: ["betty", "badminton", "sport", "cheese", "mini", "car", "game", "match", "racket", "cheddar"]
   }
 };
 

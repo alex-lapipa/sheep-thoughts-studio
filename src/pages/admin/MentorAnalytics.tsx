@@ -28,6 +28,7 @@ const MENTORS = [
   { id: "jony", name: "Jony", role: "The Fixer", color: "#06b6d4", icon: Wrench },
   { id: "maureen", name: "Maureen", role: "The Gentle Soul", color: "#ec4899", icon: Flower2 },
   { id: "eddie", name: "Eddie", role: "The Driver", color: "#6366f1", icon: Car },
+  { id: "betty", name: "Betty", role: "The Badminton Champion", color: "#84cc16", icon: Heart },
 ];
 
 const COLORS = MENTORS.map(m => m.color);

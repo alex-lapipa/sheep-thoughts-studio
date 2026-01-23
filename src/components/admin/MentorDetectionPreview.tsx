@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Search, Users, Flame, Coffee, Plane, Music, Scale, Clock, Languages } from "lucide-react";
+import { Search, Users, Flame, Coffee, Plane, Music, Scale, Clock, Languages, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface MentorTrigger {
@@ -64,6 +64,12 @@ const MENTOR_TRIGGERS: Record<string, {
     icon: <Languages className="h-4 w-4" />,
     color: "bg-rose-500",
     domain: "Language & Confusion"
+  },
+  betty: {
+    keywords: ["badminton", "sport", "game", "match", "racket", "mini", "car", "cheese", "cheddar", "brie", "gouda", "funny", "nice", "friend", "lovely"],
+    icon: <Heart className="h-4 w-4" />,
+    color: "bg-lime-500",
+    domain: "Sport & Cheese Enthusiasm"
   }
 };
 
