@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Liam - Male Irish/British voice from ElevenLabs
+// Liam - Male Irish voice from ElevenLabs (warm, natural Irish cadence)
 const IRISH_MALE_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
 
 serve(async (req) => {
@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, rate = 1.0 } = await req.json();
+    const { text, rate = 0.95, mode = "innocent" } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
@@ -25,8 +25,37 @@ serve(async (req) => {
       throw new Error("Text is required");
     }
 
-    // Clamp rate between 0.7 and 1.2 (ElevenLabs speed range)
-    const speed = Math.min(1.2, Math.max(0.7, rate));
+    // Adjust voice settings based on Bubbles' mode
+    let stability = 0.55;
+    let similarityBoost = 0.75;
+    let style = 0.35;
+    let speed = Math.min(1.2, Math.max(0.7, rate));
+
+    switch (mode) {
+      case "concerned":
+        stability = 0.45;
+        style = 0.4;
+        speed = Math.max(0.85, speed);
+        break;
+      case "triggered":
+        stability = 0.4;
+        style = 0.5;
+        speed = Math.max(0.9, speed);
+        break;
+      case "savage":
+        stability = 0.5;
+        style = 0.55;
+        speed = 0.9;
+        break;
+      case "nuclear":
+        stability = 0.35;
+        style = 0.65;
+        speed = 0.85;
+        break;
+      default: // innocent
+        stability = 0.6;
+        style = 0.3;
+    }
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${IRISH_MALE_VOICE_ID}?output_format=mp3_44100_128`,
@@ -40,9 +69,9 @@ serve(async (req) => {
           text,
           model_id: "eleven_turbo_v2_5",
           voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.75,
-            style: 0.3,
+            stability,
+            similarity_boost: similarityBoost,
+            style,
             use_speaker_boost: true,
             speed,
           },
