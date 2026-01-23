@@ -46,8 +46,8 @@ export default function TalkToBubbles() {
               </p>
               
               <p className="text-sm text-muted-foreground/80">
-                Ask about philosophy, food, music, rules, or life in Wicklow. 
-                Bubbles will consult the wisdom of Peggy, Jimmy, Anthony, and Aidan.
+                Ask about philosophy, food, music, rules, routines, or life in Wicklow. 
+                Bubbles will consult the wisdom of Peggy, Jimmy, Anthony, Aidan, Seamus, and Carmel.
               </p>
             </motion.div>
           </div>
