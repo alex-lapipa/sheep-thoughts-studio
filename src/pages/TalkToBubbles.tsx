@@ -1,13 +1,37 @@
+import { useState, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { BubblesConversation } from "@/components/BubblesConversation";
-import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
+import { BubblesVoiceChat, type BubblesVoiceChatProps } from "@/components/BubblesVoiceChat";
 import { VoiceServicesStatus } from "@/components/VoiceServicesStatus";
+import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Phone, MessageSquare, Mic, Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function TalkToBubbles() {
+  const [prefilledQuestion, setPrefilledQuestion] = useState<string>("");
+  const chatSectionRef = useRef<HTMLDivElement>(null);
+
+  const handleChannelMentor = useCallback((question: string, mentorName: string) => {
+    setPrefilledQuestion(question);
+    
+    // Scroll to chat section
+    chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    
+    // Show toast
+    toast.success(`Channeling ${mentorName}'s wisdom...`, {
+      description: "Your question is ready — just hit send!",
+      duration: 3000,
+    });
+  }, []);
+
+  // Clear prefilled question after it's been used
+  const handleQuestionUsed = useCallback(() => {
+    setPrefilledQuestion("");
+  }, []);
+
   return (
     <Layout>
       <Helmet>
@@ -66,7 +90,7 @@ export default function TalkToBubbles() {
         </section>
 
         {/* Voice Chat Interface */}
-        <section className="py-8 md:py-12">
+        <section ref={chatSectionRef} className="py-8 md:py-12 scroll-mt-20">
           <div className="container px-4 md:px-6">
             <Tabs defaultValue="text-voice" className="w-full max-w-4xl mx-auto">
               <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
@@ -88,7 +112,10 @@ export default function TalkToBubbles() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <BubblesVoiceChat />
+                  <BubblesVoiceChat 
+                    prefilledQuestion={prefilledQuestion}
+                    onQuestionUsed={handleQuestionUsed}
+                  />
                 </motion.div>
               </TabsContent>
 
@@ -105,84 +132,8 @@ export default function TalkToBubbles() {
           </div>
         </section>
 
-        {/* Character Wisdom Guide */}
-        <section className="py-12 md:py-16 border-t border-border/50">
-          <div className="container px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
-                Who Bubbles Consults
-              </h2>
-              
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  {
-                    name: "Anthony",
-                    role: "Philosophy & Deep Questions",
-                    description: "Pipe smoke curling, third Guinness wisdom that trails off meaningfully...",
-                    topics: ["Life's meaning", "Truth", "The universe"],
-                    color: "bg-amber-500/10 border-amber-500/20"
-                  },
-                  {
-                    name: "Peggy",
-                    role: "Food & Comfort",
-                    description: "Kitchen steam rising, warm bread, and wisdom you believe because she fed you.",
-                    topics: ["Cooking", "Feeling better", "Love"],
-                    color: "bg-rose-500/10 border-rose-500/20"
-                  },
-                  {
-                    name: "Jimmy",
-                    role: "Rules & Authority",
-                    description: "ISPCA inspector from Cavan. His opinions were legally binding.",
-                    topics: ["Right vs wrong", "Rules", "Justice"],
-                    color: "bg-blue-500/10 border-blue-500/20"
-                  },
-                  {
-                    name: "Aidan",
-                    role: "Music & Cosmic Wisdom",
-                    description: "Hippie with guitar, rusty Beetle, and Muffins the dog. 'The universe is, you know...'",
-                    topics: ["Music", "Spirituality", "Cosmic mysteries"],
-                    color: "bg-violet-500/10 border-violet-500/20"
-                  },
-                  {
-                    name: "Seamus",
-                    role: "The Exotic One",
-                    description: "Oil business in South Africa. Talked about monkeys, distances, and 40-degree heat.",
-                    topics: ["Travel", "Temperature", "Monkeys"],
-                    color: "bg-emerald-500/10 border-emerald-500/20"
-                  }
-                ].map((character, index) => (
-                  <motion.div
-                    key={character.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className={`p-4 rounded-xl border ${character.color}`}
-                  >
-                    <h3 className="font-display font-semibold text-lg mb-1">
-                      {character.name}
-                    </h3>
-                    <p className="text-xs text-accent font-medium mb-2">
-                      {character.role}
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-3 italic">
-                      "{character.description}"
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {character.topics.map(topic => (
-                        <span 
-                          key={topic}
-                          className="text-xs px-2 py-0.5 rounded-full bg-background/50 text-muted-foreground"
-                        >
-                          {topic}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Meet the Mentors - Full Component */}
+        <MeetTheMentors onChannelMentor={handleChannelMentor} />
 
         {/* Tips Section */}
         <section className="py-8 md:py-12 bg-secondary/30">

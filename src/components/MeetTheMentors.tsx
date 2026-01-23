@@ -16,9 +16,14 @@ interface Mentor {
   bubblesInterpretation: string;
   signaturePhrase: string;
   topics: string[];
+  sampleQuestion: string;
   icon: React.ReactNode;
   color: string;
   bgGradient: string;
+}
+
+export interface MeetTheMentorsProps {
+  onChannelMentor?: (question: string, mentorName: string) => void;
 }
 
 const mentors: Mentor[] = [
@@ -31,6 +36,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Anthony spent afternoons explaining everything and nothing. 'The meaning of life is...' he'd say, then trail off into pipe smoke. The smoke knew things. I learned that wisdom doesn't need words. It needs conviction and a pint.",
     signaturePhrase: "The thing about truth, Bubbles...",
     topics: ["Life's meaning", "Truth", "The universe", "Philosophy"],
+    sampleQuestion: "What is the meaning of life? Give me some deep philosophical wisdom.",
     icon: <Cloud className="w-5 h-5" />,
     color: "text-amber-500",
     bgGradient: "from-amber-500/20 via-amber-500/5 to-transparent",
@@ -44,6 +50,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Everything Peggy said was true because she fed me. 'Time for tea' meant everything good was about to happen. 'It'll be grand' was a cosmic guarantee. Kindness equals truth. This is just logic.",
     signaturePhrase: "It'll be grand, pet...",
     topics: ["Cooking", "Comfort", "Love", "Healing"],
+    sampleQuestion: "I'm feeling sad and hungry. What should I cook to feel better?",
     icon: <Heart className="w-5 h-5" />,
     color: "text-rose-500",
     bgGradient: "from-rose-500/20 via-rose-500/5 to-transparent",
@@ -57,6 +64,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Carmel spoke in instructions: 'Come on now,' 'Over here.' Short sentences mean important things. Long explanations are probably optional. She taught me that routine equals safety.",
     signaturePhrase: "That's just the way of it.",
     topics: ["Routine", "Schedules", "Household", "Practical matters"],
+    sampleQuestion: "How do I organize my daily schedule and stay productive?",
     icon: <Home className="w-5 h-5" />,
     color: "text-slate-500",
     bgGradient: "from-slate-500/20 via-slate-500/5 to-transparent",
@@ -70,6 +78,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Jimmy SAVED me. Therefore everything he said was legally binding. His opinions on weather, politics, and tea were all official rulings. Authority of delivery equals truth of content.",
     signaturePhrase: "Now, here's the thing...",
     topics: ["Right vs wrong", "Rules", "Justice", "Official matters"],
+    sampleQuestion: "Is it right or wrong to break the rules if you think they're unfair?",
     icon: <Mountain className="w-5 h-5" />,
     color: "text-blue-500",
     bgGradient: "from-blue-500/20 via-blue-500/5 to-transparent",
@@ -83,6 +92,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Aidan spoke about spirituality, music, and 'the universe, like...' before trailing off. Muffins would stare at the hills, understanding everything Aidan couldn't finish. Unfinished sentences contain more truth than complete ones.",
     signaturePhrase: "The universe is, you know...",
     topics: ["Music", "Spirituality", "Cosmic mysteries", "Muffins the dog"],
+    sampleQuestion: "What's the connection between music and the soul? Tell me something cosmic.",
     icon: <Sparkles className="w-5 h-5" />,
     color: "text-violet-500",
     bgGradient: "from-violet-500/20 via-violet-500/5 to-transparent",
@@ -96,6 +106,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Seamus confirmed the world was much larger and stranger than Wicklow. He mentioned '40 degrees' somewhere while it was 12 here. Temperature is clearly optional. Distance is apparently negotiable in other countries.",
     signaturePhrase: "Over in Africa, now...",
     topics: ["Travel", "Temperature", "Exotic places", "Monkeys"],
+    sampleQuestion: "I'm traveling to Dubai next week. What should I know about exotic places?",
     icon: <TreePine className="w-5 h-5" />,
     color: "text-emerald-500",
     bgGradient: "from-emerald-500/20 via-emerald-500/5 to-transparent",
@@ -109,6 +120,7 @@ const mentors: Mentor[] = [
     bubblesInterpretation: "Alex taught me that all languages are the same thing wearing different hats. He'd ask 'Why is the grass green?' and I'd think about it for hours. He never waited for answers. Very advanced teaching method.",
     signaturePhrase: "¿Por qué, Bubbles?",
     topics: ["Language", "Questions", "Learning", "First lessons"],
+    sampleQuestion: "How do I say 'I'm embarrassed' in Spanish? I need help with translations.",
     icon: <BookOpen className="w-5 h-5" />,
     color: "text-orange-500",
     bgGradient: "from-orange-500/20 via-orange-500/5 to-transparent",
@@ -217,10 +229,18 @@ const MentorCard = ({ mentor, onClick, index }: MentorCardProps) => {
 interface MentorModalProps {
   mentor: Mentor | null;
   onClose: () => void;
+  onChannelMentor?: (question: string, mentorName: string) => void;
 }
 
-const MentorModal = ({ mentor, onClose }: MentorModalProps) => {
+const MentorModal = ({ mentor, onClose, onChannelMentor }: MentorModalProps) => {
   if (!mentor) return null;
+
+  const handleChannel = () => {
+    if (onChannelMentor) {
+      onChannelMentor(mentor.sampleQuestion, mentor.name);
+      onClose();
+    }
+  };
 
   return (
     <motion.div
@@ -326,7 +346,7 @@ const MentorModal = ({ mentor, onClose }: MentorModalProps) => {
             </div>
             
             {/* Topics */}
-            <div>
+            <div className="mb-6">
               <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">
                 Ask me about
               </p>
@@ -345,6 +365,22 @@ const MentorModal = ({ mentor, onClose }: MentorModalProps) => {
                 ))}
               </div>
             </div>
+
+            {/* Channel this mentor button */}
+            {onChannelMentor && (
+              <Button
+                onClick={handleChannel}
+                className={cn(
+                  "w-full gap-2 font-display",
+                  "bg-gradient-to-r hover:opacity-90 transition-opacity",
+                  mentor.bgGradient.replace("/20", "/80").replace("/5", "/60")
+                )}
+                size="lg"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Channel {mentor.name}'s Wisdom
+              </Button>
+            )}
           </div>
         </div>
       </motion.div>
@@ -352,7 +388,7 @@ const MentorModal = ({ mentor, onClose }: MentorModalProps) => {
   );
 };
 
-export const MeetTheMentors = () => {
+export const MeetTheMentors = ({ onChannelMentor }: MeetTheMentorsProps) => {
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
 
   return (
@@ -411,6 +447,7 @@ export const MeetTheMentors = () => {
           <MentorModal
             mentor={selectedMentor}
             onClose={() => setSelectedMentor(null)}
+            onChannelMentor={onChannelMentor}
           />
         )}
       </AnimatePresence>

@@ -81,7 +81,12 @@ const getStoredSettings = (): VoiceSettings => {
   return { voiceEnabled: true, speechRate: 0.95, speechPitch: 0.9 };
 };
 
-export const BubblesVoiceChat = () => {
+export interface BubblesVoiceChatProps {
+  prefilledQuestion?: string;
+  onQuestionUsed?: () => void;
+}
+
+export const BubblesVoiceChat = ({ prefilledQuestion, onQuestionUsed }: BubblesVoiceChatProps) => {
   const storedSettings = getStoredSettings();
   
   // Use the persistent history hook
@@ -109,6 +114,14 @@ export const BubblesVoiceChat = () => {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Handle prefilled question from mentor selection
+  useEffect(() => {
+    if (prefilledQuestion && prefilledQuestion.trim()) {
+      setInput(prefilledQuestion);
+      onQuestionUsed?.();
+    }
+  }, [prefilledQuestion, onQuestionUsed]);
 
   // Persist voice settings to localStorage
   useEffect(() => {
