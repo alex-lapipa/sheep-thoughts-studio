@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   BookOpen, Heart, Home, Mountain, TreePine, Sparkles, Cloud, Users,
-  MessageCircle, X, Quote, Wrench, Flower2, Car
+  MessageCircle, X, Quote, Wrench, Flower2, Car, Dog
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -194,6 +194,20 @@ const mentors: Mentor[] = [
     icon: <Sparkles className="w-5 h-5" />,
     color: "text-fuchsia-500",
     bgGradient: "from-fuchsia-500/20 via-fuchsia-500/5 to-transparent",
+  },
+  {
+    id: "muffins",
+    name: "Muffins",
+    role: "ZZ Top Lady",
+    domain: "Silent Wisdom & Dual Identity",
+    description: "Aidan and Mairead's dog. Called 'Muffins' by everyone, but her official name is 'ZZ Top Lady.' Stares at hills. Knows things.",
+    bubblesInterpretation: "Muffins doesn't speak, which means everything she thinks is correct by default. She'd stare at the Sugarloaf for hours. I'd stare too. We were both seeing something profound. I think. She never confirmed. Very wise technique.",
+    signaturePhrase: "*stares meaningfully at the horizon*",
+    topics: ["Silent wisdom", "Hill-gazing", "Dual identity", "Unspoken truths"],
+    sampleQuestion: "What does it mean to be truly wise without saying a word?",
+    icon: <Dog className="w-5 h-5" />,
+    color: "text-amber-600",
+    bgGradient: "from-amber-600/20 via-orange-500/10 to-transparent",
   },
 ];
 
