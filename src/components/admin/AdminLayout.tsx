@@ -48,6 +48,7 @@ import {
   Bell,
   Image,
   User,
+  Briefcase,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -76,6 +77,7 @@ const navSections: NavSection[] = [
       { href: '/admin', label: 'Dashboard', icon: Home },
       { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
       { href: '/admin/presentation', label: 'Presentation', icon: Sparkles },
+      { href: '/admin/business-plan', label: 'Business Plan', icon: Briefcase },
     ],
   },
   {
