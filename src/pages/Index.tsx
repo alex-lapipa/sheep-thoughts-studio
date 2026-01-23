@@ -292,25 +292,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Bubbles Says - Quote Widget */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-secondary/20 to-background relative overflow-hidden">
-        {/* Parallax decorative elements */}
-        <ParallaxSection speed={0.25} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <ParallaxSection speed={0.35} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
-        
-        <div className="container relative z-10">
-          <AnimatedOnView className="max-w-2xl mx-auto text-center mb-8">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              {t("index.bubblesSays")}
-            </h2>
-            <p className="text-muted-foreground">
-              {t("index.bubblesSaysSubtitle")}
-            </p>
-          </AnimatedOnView>
-          
-          <BubblesSaysWidget />
-        </div>
-      </section>
 
       {/* Credentials */}
       <section className="py-16 md:py-24 bg-muted/30 relative overflow-hidden">
