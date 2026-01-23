@@ -183,6 +183,22 @@ const mentors = [
     borderColor: "border-indigo-500/30",
     icon: Car,
   },
+  {
+    id: "betty",
+    name: "Betty",
+    role: "The Badminton Champion",
+    domain: "Sport & Cheese Enthusiasm",
+    description: "Lives with Carmel, plays badminton, drives an old Mini, and absolutely loves cheese.",
+    bubblesInterpretation: "Betty taught me that winning isn't everything — but it's definitely something. She'd swing her racket with the same passion she'd describe a good cheddar. I learned that enthusiasm is contagious, and that cheese is basically a sport.",
+    signaturePhrase: "Ah, you have to TRY this cheese...",
+    topics: ["Badminton", "Cheese varieties", "Her old Mini", "Being lovely"],
+    sampleQuestion: "What's the best cheese to celebrate a victory? Tell me about winning!",
+    triggers: ["badminton", "sport", "cheese", "mini", "car", "game", "match", "racket", "cheddar", "brie"],
+    color: "text-lime-500",
+    bgColor: "bg-lime-500/10",
+    borderColor: "border-lime-500/30",
+    icon: Heart,
+  },
 ];
 
 interface TestResult {

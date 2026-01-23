@@ -18,6 +18,7 @@ const MENTOR_CONFIG: Record<string, { name: string; color: string; icon: React.E
   jony: { name: "Jony", color: "text-cyan-500", icon: Wrench },
   maureen: { name: "Maureen", color: "text-pink-500", icon: Flower2 },
   eddie: { name: "Eddie", color: "text-indigo-500", icon: Car },
+  betty: { name: "Betty", color: "text-lime-500", icon: Heart },
 };
 
 const STORAGE_KEY = "mentor-widget-position";

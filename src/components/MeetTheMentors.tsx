@@ -167,6 +167,20 @@ const mentors: Mentor[] = [
     color: "text-indigo-500",
     bgGradient: "from-indigo-500/20 via-indigo-500/5 to-transparent",
   },
+  {
+    id: "betty",
+    name: "Betty",
+    role: "The Badminton Champion",
+    domain: "Sport & Cheese Enthusiasm",
+    description: "Lives with Carmel, plays badminton, drives an old Mini, and absolutely loves cheese.",
+    bubblesInterpretation: "Betty taught me that winning isn't everything — but it's definitely something. She'd swing her racket with the same passion she'd describe a good cheddar. I learned that enthusiasm is contagious, and that cheese is basically a sport.",
+    signaturePhrase: "Ah, you have to TRY this cheese...",
+    topics: ["Badminton", "Cheese varieties", "Her old Mini", "Being lovely"],
+    sampleQuestion: "What's the best cheese to celebrate a victory? Tell me about winning!",
+    icon: <Heart className="w-5 h-5" />,
+    color: "text-lime-500",
+    bgGradient: "from-lime-500/20 via-lime-500/5 to-transparent",
+  },
 ];
 
 interface MentorCardProps {

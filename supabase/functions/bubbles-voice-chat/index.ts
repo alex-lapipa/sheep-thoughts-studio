@@ -371,6 +371,10 @@ const MENTOR_TRIGGERS: Record<string, { name: string; triggers: string[] }> = {
   alex: {
     name: "Alex",
     triggers: ["spanish", "language", "translate", "learn", "why", "question", "embarrassed", "words", "speak"]
+  },
+  betty: {
+    name: "Betty",
+    triggers: ["badminton", "sport", "mini", "car", "cheese", "funny", "nice", "friend", "racket", "game", "match", "cheddar", "brie", "gouda"]
   }
 };
 
