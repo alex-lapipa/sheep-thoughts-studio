@@ -11,8 +11,7 @@ import { BubblesBogHero } from "@/components/BubblesBog";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
-import { ThoughtCarousel } from "@/components/ThoughtCarousel";
-import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
+import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
 
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
@@ -244,20 +243,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Thought Carousel - Bubbles' Personality Showcase */}
-      <section className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
-        <div className="container">
-          <AnimatedOnView className="text-center mb-8">
-            <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
-              {t("index.insideHead")}
-            </h2>
-            <p className="text-muted-foreground">
-              {t("index.insideHeadSubtitle")}
-            </p>
-          </AnimatedOnView>
-          <ThoughtCarousel useTimeContext={true} showMoodFilter={true} syncWithMood={true} />
-        </div>
-      </section>
+      {/* Inside My Head - Interactive Thought Gallery */}
+      <InsideMyHeadHero />
 
       {/* About Section */}
       <section className="py-16 md:py-24">
