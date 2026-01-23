@@ -154,7 +154,8 @@ export const AnimatedBubblesExplainsWidget = () => {
     }
   }, [currentIndex, autoPlay]);
 
-  const getModeFromConfidence = (confidence: string): BubbleMode => {
+  const getModeFromConfidence = (confidence?: string): BubbleMode => {
+    if (!confidence) return "innocent";
     if (confidence.includes("absolute") || confidence.includes("scientifically")) return "savage";
     if (confidence.includes("unshakeable")) return "triggered";
     if (confidence.includes("very high")) return "concerned";
@@ -302,8 +303,8 @@ export const AnimatedBubblesExplainsWidget = () => {
     setIsLoading(false);
   };
 
-  const currentExplanation = explanations[currentIndex];
-  const currentMode = getModeFromConfidence(currentExplanation.confidence);
+  const currentExplanation = explanations[currentIndex] || FALLBACK_EXPLANATIONS[0];
+  const currentMode = getModeFromConfidence(currentExplanation?.confidence);
 
   return (
     <motion.div 
