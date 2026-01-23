@@ -313,6 +313,7 @@ export type Database = {
           content: string
           generated_at: string
           id: string
+          scenario: string
           title: string
           updated_at: string
         }
@@ -320,6 +321,7 @@ export type Database = {
           content: string
           generated_at?: string
           id: string
+          scenario?: string
           title: string
           updated_at?: string
         }
@@ -327,6 +329,7 @@ export type Database = {
           content?: string
           generated_at?: string
           id?: string
+          scenario?: string
           title?: string
           updated_at?: string
         }

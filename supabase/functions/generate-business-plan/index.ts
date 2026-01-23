@@ -22,7 +22,47 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const { section } = await req.json();
+    const { section, scenario } = await req.json();
+    
+    // Scenario-specific modifiers for revenue projections
+    const scenarioModifiers: Record<string, { name: string; description: string; multiplier: string; assumptions: string }> = {
+      conservative: {
+        name: "Conservative",
+        description: "Risk-adjusted projections with cautious assumptions",
+        multiplier: "Use the lowest reasonable estimates. Assume slower traffic growth, lower conversion rates (1.2%), and modest AOV (€30).",
+        assumptions: `
+- Month 1-2: Zero revenue (setup and launch)
+- Traffic growth: 15% MoM
+- Conversion rate: 1.2%
+- Average order value: €30
+- Return rate: 8%
+- Gross margin: 42%`
+      },
+      moderate: {
+        name: "Moderate (Base Case)",
+        description: "Realistic projections based on industry benchmarks",
+        multiplier: "Use realistic industry benchmarks. Assume steady traffic growth, standard conversion rates (1.8%), and typical AOV (€38).",
+        assumptions: `
+- Month 1: Zero revenue (setup)
+- Traffic growth: 25% MoM
+- Conversion rate: 1.8%
+- Average order value: €38
+- Return rate: 5%
+- Gross margin: 45%`
+      },
+      aggressive: {
+        name: "Aggressive (Upside)",
+        description: "Optimistic projections assuming strong execution",
+        multiplier: "Use optimistic but achievable estimates. Assume viral content success, higher conversion rates (2.5%), strong brand resonance, and premium AOV (€48).",
+        assumptions: `
+- Month 1: Soft launch with €500 revenue
+- Traffic growth: 40% MoM (viral content assumption)
+- Conversion rate: 2.5%
+- Average order value: €48
+- Return rate: 3%
+- Gross margin: 48%`
+      }
+    };
 
     const sectionPrompts: Record<string, string> = {
       executive_summary: `You are a CFO with McKinsey consulting experience writing a business plan for "Bubbles the Sheep" - an AI-powered character brand selling merchandise. The brand's unique value proposition: a sheep character who is "confidently wrong" about everything, powered by RAG AI technology.
@@ -272,6 +312,44 @@ Include:
 
 Be CONSERVATIVE. This is for investor credibility. Professional markdown with tables.`,
 
+      revenue_scenario: `You are a CFO creating a {{SCENARIO_NAME}} REVENUE SCENARIO for Bubbles the Sheep, Year 1 starting March 2025.
+
+This is for investor discussions showing {{SCENARIO_DESCRIPTION}}.
+
+{{SCENARIO_MULTIPLIER}}
+
+KEY ASSUMPTIONS:
+{{SCENARIO_ASSUMPTIONS}}
+
+Create a detailed 12-MONTH REVENUE MODEL including:
+
+1. Monthly Projections Table:
+| Month | Visitors | Conv. Rate | Orders | Revenue | COGS | Gross Profit |
+(Fill all 12 months with realistic progression)
+
+2. Quarterly Summaries:
+- Q1 (Mar-May): Foundation phase metrics
+- Q2 (Jun-Aug): Growth phase metrics
+- Q3 (Sep-Nov): Optimization phase metrics
+- Q4 (Dec-Feb): Scale phase metrics
+
+3. Key Metrics:
+- Year 1 Total Revenue
+- Year 1 Total Gross Profit
+- Average Monthly Revenue (months 6-12)
+- Peak Month Revenue
+- Customer Acquisition Cost (organic = €0)
+- Lifetime Value estimate
+
+4. Scenario-Specific Notes:
+- What would need to happen to achieve this scenario
+- Key risk factors
+- Probability assessment
+
+IMPORTANT: This is the {{SCENARIO_NAME}} scenario. Ensure numbers reflect {{SCENARIO_DESCRIPTION}}.
+
+Output in professional markdown with clear tables and sections.`,
+
       monthly_action_plan: `You are a COO creating a MONTHLY ACTION PLAN for Bubbles the Sheep, March 2025 - February 2026.
 
 For each month, specify:
@@ -419,7 +497,21 @@ Summarize the 12-month financial outlook:
 Conservative, investor-ready language. Professional markdown.`
     };
 
-    const systemPrompt = sectionPrompts[section];
+    let systemPrompt = sectionPrompts[section];
+    
+    // Handle scenario-based revenue projections
+    if (section === "revenue_scenario" && scenario) {
+      const scenarioData = scenarioModifiers[scenario];
+      if (!scenarioData) {
+        throw new Error(`Unknown scenario: ${scenario}`);
+      }
+      systemPrompt = sectionPrompts.revenue_scenario
+        .replace(/\{\{SCENARIO_NAME\}\}/g, scenarioData.name)
+        .replace(/\{\{SCENARIO_DESCRIPTION\}\}/g, scenarioData.description)
+        .replace(/\{\{SCENARIO_MULTIPLIER\}\}/g, scenarioData.multiplier)
+        .replace(/\{\{SCENARIO_ASSUMPTIONS\}\}/g, scenarioData.assumptions);
+    }
+    
     if (!systemPrompt) {
       throw new Error(`Unknown section: ${section}`);
     }

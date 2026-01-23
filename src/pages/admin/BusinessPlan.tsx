@@ -27,7 +27,10 @@ import {
   Loader2,
   CheckCircle2,
   Clock,
-  Sparkles
+  Sparkles,
+  GitCompare,
+  TrendingDown,
+  Minus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
@@ -162,12 +165,30 @@ const initialSections: Section[] = [
   },
 ];
 
+interface ScenarioData {
+  conservative: string | null;
+  moderate: string | null;
+  aggressive: string | null;
+  loadingConservative: boolean;
+  loadingModerate: boolean;
+  loadingAggressive: boolean;
+}
+
 export default function BusinessPlan() {
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [activeSection, setActiveSection] = useState("executive_summary");
   const [generatingAll, setGeneratingAll] = useState(false);
   const [loadingCache, setLoadingCache] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [scenarios, setScenarios] = useState<ScenarioData>({
+    conservative: null,
+    moderate: null,
+    aggressive: null,
+    loadingConservative: false,
+    loadingModerate: false,
+    loadingAggressive: false,
+  });
 
   // Load cached sections on mount
   useEffect(() => {
@@ -180,8 +201,9 @@ export default function BusinessPlan() {
         if (error) throw error;
 
         if (data && data.length > 0) {
+          // Load regular sections
           setSections(prev => prev.map(section => {
-            const cached = data.find(d => d.id === section.id);
+            const cached = data.find(d => d.id === section.id && d.scenario === 'base');
             if (cached) {
               return {
                 ...section,
@@ -190,6 +212,18 @@ export default function BusinessPlan() {
               };
             }
             return section;
+          }));
+
+          // Load scenarios
+          const conservativeData = data.find(d => d.id === 'revenue_scenario' && d.scenario === 'conservative');
+          const moderateData = data.find(d => d.id === 'revenue_scenario' && d.scenario === 'moderate');
+          const aggressiveData = data.find(d => d.id === 'revenue_scenario' && d.scenario === 'aggressive');
+          
+          setScenarios(prev => ({
+            ...prev,
+            conservative: conservativeData?.content || null,
+            moderate: moderateData?.content || null,
+            aggressive: aggressiveData?.content || null,
           }));
 
           // Get most recent update time
@@ -210,7 +244,7 @@ export default function BusinessPlan() {
   }, []);
 
   // Save section to database
-  const saveSectionToCache = async (sectionId: string, title: string, content: string) => {
+  const saveSectionToCache = async (sectionId: string, title: string, content: string, scenario: string = 'base') => {
     try {
       const { error } = await supabase
         .from('business_plan_sections')
@@ -218,9 +252,10 @@ export default function BusinessPlan() {
           id: sectionId,
           title,
           content,
+          scenario,
           generated_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'id' });
+        }, { onConflict: 'id,scenario' });
 
       if (error) throw error;
       setLastUpdated(new Date().toISOString());
@@ -258,6 +293,45 @@ export default function BusinessPlan() {
         s.id === sectionId ? { ...s, loading: false } : s
       ));
     }
+  };
+
+  const generateScenario = async (scenario: 'conservative' | 'moderate' | 'aggressive') => {
+    const loadingKey = `loading${scenario.charAt(0).toUpperCase() + scenario.slice(1)}` as keyof ScenarioData;
+    
+    setScenarios(prev => ({ ...prev, [loadingKey]: true }));
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-business-plan', {
+        body: { section: 'revenue_scenario', scenario }
+      });
+
+      if (error) throw error;
+
+      // Save to cache
+      await saveSectionToCache('revenue_scenario', `Revenue Scenario - ${scenario}`, data.content, scenario);
+
+      setScenarios(prev => ({
+        ...prev,
+        [scenario]: data.content,
+        [loadingKey]: false,
+      }));
+
+      toast.success(`${scenario.charAt(0).toUpperCase() + scenario.slice(1)} scenario generated`);
+    } catch (error) {
+      console.error('Scenario generation error:', error);
+      toast.error(`Failed to generate ${scenario} scenario`);
+      setScenarios(prev => ({ ...prev, [loadingKey]: false }));
+    }
+  };
+
+  const generateAllScenarios = async () => {
+    for (const scenario of ['conservative', 'moderate', 'aggressive'] as const) {
+      if (!scenarios[scenario]) {
+        await generateScenario(scenario);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+    toast.success("All revenue scenarios generated!");
   };
 
   const generateAllSections = async () => {
@@ -556,6 +630,274 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
           </Card>
         </div>
 
+        {/* Revenue Scenario Comparison Mode */}
+        <Card className="border-2 border-dashed border-accent/50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <GitCompare className="h-6 w-6 text-accent" />
+                <div>
+                  <CardTitle>Revenue Scenario Comparison</CardTitle>
+                  <CardDescription>
+                    Generate and compare Conservative, Moderate, and Aggressive revenue projections for investor discussions
+                  </CardDescription>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowComparison(!showComparison)}
+                >
+                  {showComparison ? "Hide" : "Show"} Comparison
+                </Button>
+                <Button 
+                  onClick={generateAllScenarios}
+                  disabled={scenarios.loadingConservative || scenarios.loadingModerate || scenarios.loadingAggressive}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate All Scenarios
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          
+          {showComparison && (
+            <CardContent>
+              <Tabs defaultValue="side-by-side" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="side-by-side">Side-by-Side</TabsTrigger>
+                  <TabsTrigger value="conservative">Conservative</TabsTrigger>
+                  <TabsTrigger value="moderate">Moderate</TabsTrigger>
+                  <TabsTrigger value="aggressive">Aggressive</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="side-by-side">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Conservative */}
+                    <Card className="border-yellow-500/30 bg-yellow-500/5">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <TrendingDown className="h-4 w-4 text-yellow-600" />
+                            <CardTitle className="text-sm">Conservative</CardTitle>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => generateScenario('conservative')}
+                            disabled={scenarios.loadingConservative}
+                          >
+                            {scenarios.loadingConservative ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : scenarios.conservative ? (
+                              <RefreshCw className="h-4 w-4" />
+                            ) : (
+                              <Sparkles className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <CardDescription className="text-xs">Risk-adjusted, cautious assumptions</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[400px]">
+                          {scenarios.loadingConservative ? (
+                            <div className="flex flex-col items-center justify-center h-64">
+                              <Loader2 className="h-8 w-8 animate-spin text-yellow-600" />
+                              <p className="text-sm text-muted-foreground mt-2">Generating...</p>
+                            </div>
+                          ) : scenarios.conservative ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs">
+                              <ReactMarkdown>{scenarios.conservative}</ReactMarkdown>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-64 text-center">
+                              <TrendingDown className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">Click to generate</p>
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+
+                    {/* Moderate */}
+                    <Card className="border-blue-500/30 bg-blue-500/5">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Minus className="h-4 w-4 text-blue-600" />
+                            <CardTitle className="text-sm">Moderate (Base)</CardTitle>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => generateScenario('moderate')}
+                            disabled={scenarios.loadingModerate}
+                          >
+                            {scenarios.loadingModerate ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : scenarios.moderate ? (
+                              <RefreshCw className="h-4 w-4" />
+                            ) : (
+                              <Sparkles className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <CardDescription className="text-xs">Industry benchmarks, realistic growth</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[400px]">
+                          {scenarios.loadingModerate ? (
+                            <div className="flex flex-col items-center justify-center h-64">
+                              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                              <p className="text-sm text-muted-foreground mt-2">Generating...</p>
+                            </div>
+                          ) : scenarios.moderate ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs">
+                              <ReactMarkdown>{scenarios.moderate}</ReactMarkdown>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-64 text-center">
+                              <Minus className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">Click to generate</p>
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+
+                    {/* Aggressive */}
+                    <Card className="border-green-500/30 bg-green-500/5">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-green-600" />
+                            <CardTitle className="text-sm">Aggressive</CardTitle>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => generateScenario('aggressive')}
+                            disabled={scenarios.loadingAggressive}
+                          >
+                            {scenarios.loadingAggressive ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : scenarios.aggressive ? (
+                              <RefreshCw className="h-4 w-4" />
+                            ) : (
+                              <Sparkles className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <CardDescription className="text-xs">Optimistic, strong execution assumed</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[400px]">
+                          {scenarios.loadingAggressive ? (
+                            <div className="flex flex-col items-center justify-center h-64">
+                              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+                              <p className="text-sm text-muted-foreground mt-2">Generating...</p>
+                            </div>
+                          ) : scenarios.aggressive ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs">
+                              <ReactMarkdown>{scenarios.aggressive}</ReactMarkdown>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-64 text-center">
+                              <TrendingUp className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">Click to generate</p>
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                {/* Individual scenario tabs with full content */}
+                {(['conservative', 'moderate', 'aggressive'] as const).map((scenario) => (
+                  <TabsContent key={scenario} value={scenario}>
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {scenario === 'conservative' && <TrendingDown className="h-5 w-5 text-yellow-600" />}
+                            {scenario === 'moderate' && <Minus className="h-5 w-5 text-blue-600" />}
+                            {scenario === 'aggressive' && <TrendingUp className="h-5 w-5 text-green-600" />}
+                            <CardTitle>
+                              {scenario.charAt(0).toUpperCase() + scenario.slice(1)} Revenue Scenario
+                            </CardTitle>
+                          </div>
+                          <Button 
+                            variant="outline"
+                            onClick={() => generateScenario(scenario)}
+                            disabled={scenarios[`loading${scenario.charAt(0).toUpperCase() + scenario.slice(1)}` as keyof ScenarioData] as boolean}
+                          >
+                            {(scenarios[`loading${scenario.charAt(0).toUpperCase() + scenario.slice(1)}` as keyof ScenarioData]) ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Generating...
+                              </>
+                            ) : scenarios[scenario] ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Regenerate
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="h-4 w-4 mr-2" />
+                                Generate
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[500px]">
+                          {(scenarios[`loading${scenario.charAt(0).toUpperCase() + scenario.slice(1)}` as keyof ScenarioData]) ? (
+                            <div className="flex flex-col items-center justify-center h-64">
+                              <Loader2 className="h-12 w-12 animate-spin text-accent" />
+                              <p className="text-muted-foreground mt-4">Generating {scenario} revenue scenario...</p>
+                            </div>
+                          ) : scenarios[scenario] ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <ReactMarkdown
+                                components={{
+                                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 text-foreground">{children}</h1>,
+                                  h2: ({ children }) => <h2 className="text-xl font-semibold mt-6 mb-3 text-foreground">{children}</h2>,
+                                  h3: ({ children }) => <h3 className="text-lg font-medium mt-4 mb-2 text-foreground">{children}</h3>,
+                                  table: ({ children }) => (
+                                    <div className="overflow-x-auto my-4">
+                                      <table className="min-w-full border border-border rounded-lg">{children}</table>
+                                    </div>
+                                  ),
+                                  thead: ({ children }) => <thead className="bg-muted">{children}</thead>,
+                                  tr: ({ children }) => <tr className="border-b border-border">{children}</tr>,
+                                  th: ({ children }) => <th className="px-4 py-2 text-left text-sm font-semibold">{children}</th>,
+                                  td: ({ children }) => <td className="px-4 py-2 text-sm">{children}</td>,
+                                }}
+                              >
+                                {scenarios[scenario]!}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-64 text-center">
+                              <GitCompare className="h-12 w-12 text-muted-foreground mb-4" />
+                              <p className="font-medium">No {scenario} scenario generated yet</p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Click "Generate" to create this scenario
+                              </p>
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </CardContent>
+          )}
+        </Card>
+
         {/* Framework Legend */}
         <Card>
           <CardHeader>
@@ -573,6 +915,7 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
               <Badge variant="outline">Break-even Analysis</Badge>
               <Badge variant="outline">McKinsey 7S</Badge>
               <Badge variant="outline">OKR Framework</Badge>
+              <Badge variant="outline" className="border-accent text-accent">Scenario Planning</Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-3">
               Business plan generated using Gemini AI with professional CFO/McKinsey consultant voice. 
