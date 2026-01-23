@@ -4,18 +4,31 @@ import { BubblesLogo } from "./BubblesSheep";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
-import { Menu, Vibrate, X, ChevronRight, ShoppingBag, HelpCircle, Mic, Radio } from "lucide-react";
+import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, HelpCircle, Zap, Mic, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useFeatureFlags } from "@/contexts/FeatureFlagsContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useWhatsNew } from "@/hooks/useWhatsNew";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Legacy navigation (full menu)
+const getLegacyNavLinks = (t: (key: string) => string) => [
+  { href: "/", label: t("nav.home"), icon: Home },
+  { href: "/facts", label: t("nav.facts"), icon: BookOpen },
+  { href: "/explains", label: t("nav.explains"), icon: Zap },
+  { href: "/talk", label: "Talk", icon: Mic },
+  { href: "/hall-of-fame", label: "Hall of Fame", icon: Trophy },
+  { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
+  { href: "/faq", label: t("nav.questions"), icon: HelpCircle },
+];
+
 // Phase 1: Simplified public navigation - Chat, Live, Shop, FAQ only
-const getNavLinks = (t: (key: string) => string) => [
+const getNewNavLinks = (t: (key: string) => string) => [
   { href: "/talk", label: "Chat", icon: Mic },
   { href: "/scenarios", label: "Live", icon: Radio },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
@@ -27,8 +40,13 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLanguage();
   const { hapticEnabled, toggleHaptic } = useSettings();
+  const { isEnabled } = useFeatureFlags();
+  const { hasNewFeatures, newEntriesCount, markAsSeen } = useWhatsNew();
   const location = useLocation();
-  const navLinks = getNavLinks(t);
+  
+  // Toggle between new and legacy navigation based on feature flag
+  const useNewNav = isEnabled('newNavigation');
+  const navLinks = useNewNav ? getNewNavLinks(t) : getLegacyNavLinks(t);
 
   // Track scroll for header shadow
   useEffect(() => {
@@ -113,24 +131,52 @@ export function Header() {
           <ThemeModeToggle />
           <CelebrationToggle />
           <GlobalLanguageSwitcher />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={toggleHaptic}
-                className={cn(
-                  "hover:animate-bounce-gentle transition-colors h-9 w-9",
-                  hapticEnabled ? "text-accent" : "text-muted-foreground"
-                )}
-              >
-                <Vibrate className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Haptic feedback: {hapticEnabled ? "On" : "Off"}</p>
-            </TooltipContent>
-          </Tooltip>
+          {!useNewNav && (
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={toggleHaptic}
+                    className={cn(
+                      "hover:animate-bounce-gentle transition-colors h-9 w-9",
+                      hapticEnabled ? "text-accent" : "text-muted-foreground"
+                    )}
+                  >
+                    <Vibrate className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Haptic feedback: {hapticEnabled ? "On" : "Off"}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/whats-new" onClick={markAsSeen}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className={cn(
+                        "hover:animate-bounce-gentle relative h-9 w-9",
+                        hasNewFeatures && "text-accent"
+                      )}
+                    >
+                      <Sparkles className={cn("h-4 w-4", hasNewFeatures && "animate-pulse")} />
+                      {hasNewFeatures && newEntriesCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-bold rounded-full bg-accent text-accent-foreground shadow-sm">
+                          {newEntriesCount > 9 ? '9+' : newEntriesCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{hasNewFeatures ? "New features available!" : "What's New"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </>
+          )}
           <div className="hover:animate-squish">
             <CartDrawer />
           </div>
