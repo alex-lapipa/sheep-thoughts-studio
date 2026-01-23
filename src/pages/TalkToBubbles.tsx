@@ -136,6 +136,13 @@ export default function TalkToBubbles() {
                     description: "Hippie with guitar, rusty Beetle, and Muffins the dog. 'The universe is, you know...'",
                     topics: ["Music", "Spirituality", "Cosmic mysteries"],
                     color: "bg-violet-500/10 border-violet-500/20"
+                  },
+                  {
+                    name: "Seamus",
+                    role: "The Exotic One",
+                    description: "Oil business in South Africa. Talked about monkeys, distances, and 40-degree heat.",
+                    topics: ["Travel", "Temperature", "Monkeys"],
+                    color: "bg-emerald-500/10 border-emerald-500/20"
                   }
                 ].map((character, index) => (
                   <motion.div
