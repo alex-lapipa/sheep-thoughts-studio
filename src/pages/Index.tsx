@@ -6,17 +6,13 @@ import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
-import { BubblesSheep } from "@/components/BubblesSheep";
 import { BubblesBogHero } from "@/components/BubblesBog";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
-import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
 import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
-
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
-
 import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -24,7 +20,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useMood } from "@/contexts/MoodContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useLanguageRedirect } from "@/hooks/useLanguageRedirect";
-import { useMouseParallax } from "@/hooks/useParallax";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
