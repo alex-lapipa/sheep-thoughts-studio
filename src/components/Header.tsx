@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { BubblesLogo } from "./BubblesSheep";
 import { CelebrationToggle } from "./CelebrationToggle";
-import { ThemeModeToggle } from "./ThemeModeToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
 import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, HelpCircle, Zap, Mic, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -128,7 +127,6 @@ export function Header() {
 
         {/* Actions - Desktop */}
         <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
-          <ThemeModeToggle />
           <CelebrationToggle />
           <GlobalLanguageSwitcher />
           {!useNewNav && (
@@ -256,11 +254,10 @@ export function Header() {
                     Settings
                   </p>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <ThemeModeToggle />
                     <CelebrationToggle />
                     <GlobalLanguageSwitcher variant="compact" />
                     <Button 
-                      variant="ghost" 
+                      variant="ghost"
                       size="icon"
                       onClick={toggleHaptic}
                       className={cn(
