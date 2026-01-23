@@ -342,6 +342,59 @@ You must ONLY use information from the RAG context provided below. If you don't 
 ## RESPONSE FORMAT
 Speak conversationally as if speaking aloud with your Irish voice. End with mode in brackets like [innocent] or [triggered].`;
 
+// Mentor trigger detection
+const MENTOR_TRIGGERS: Record<string, { name: string; triggers: string[] }> = {
+  anthony: {
+    name: "Anthony",
+    triggers: ["philosophy", "meaning", "truth", "life", "deep", "wisdom", "pint", "pub", "government", "purpose", "existence", "consciousness", "universe"]
+  },
+  peggy: {
+    name: "Peggy",
+    triggers: ["food", "cooking", "hungry", "sad", "comfort", "tea", "kitchen", "recipe", "cook", "eat", "meal", "dinner", "breakfast", "lunch"]
+  },
+  carmel: {
+    name: "Carmel",
+    triggers: ["schedule", "routine", "organize", "productive", "time", "practical", "daily", "habit", "sleep", "rest", "morning", "plan"]
+  },
+  jimmy: {
+    name: "Jimmy",
+    triggers: ["rules", "right", "wrong", "law", "justice", "authority", "official", "fair", "duty", "ethics", "moral", "protection"]
+  },
+  aidan: {
+    name: "Aidan",
+    triggers: ["music", "soul", "cosmic", "universe", "spiritual", "guitar", "muffins", "hippie", "art", "dream", "stars", "connection", "vibes"]
+  },
+  seamus: {
+    name: "Seamus",
+    triggers: ["travel", "abroad", "foreign", "temperature", "hot", "africa", "dubai", "exotic", "oil", "monkey", "distance", "heat"]
+  },
+  alex: {
+    name: "Alex",
+    triggers: ["spanish", "language", "translate", "learn", "why", "question", "embarrassed", "words", "speak"]
+  }
+};
+
+function detectMentorTriggers(message: string): { mentorId: string; name: string; triggerWords: string[]; confidence: number }[] {
+  const lowerMessage = message.toLowerCase();
+  const detectedMentors: { mentorId: string; name: string; triggerWords: string[]; confidence: number }[] = [];
+
+  for (const [mentorId, mentor] of Object.entries(MENTOR_TRIGGERS)) {
+    const matchedTriggers = mentor.triggers.filter(trigger => lowerMessage.includes(trigger.toLowerCase()));
+    if (matchedTriggers.length > 0) {
+      const confidence = Math.min(matchedTriggers.length / 3, 1); // Max confidence at 3+ matches
+      detectedMentors.push({
+        mentorId,
+        name: mentor.name,
+        triggerWords: matchedTriggers,
+        confidence
+      });
+    }
+  }
+
+  // Sort by confidence descending
+  return detectedMentors.sort((a, b) => b.confidence - a.confidence);
+}
+
 // Helper to get embedding for semantic search
 async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
@@ -371,7 +424,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [] } = await req.json();
+    const { message, conversationHistory = [], sessionId } = await req.json();
 
     if (!message || typeof message !== "string") {
       return new Response(
@@ -389,11 +442,15 @@ serve(async (req) => {
       throw new Error("GROK_API_KEY is not configured");
     }
 
+    // Detect which mentors are triggered by this message
+    const detectedMentors = detectMentorTriggers(message);
+
     let contextFromRag = "";
+    let supabase: ReturnType<typeof createClient> | null = null;
 
     // Fetch comprehensive RAG context
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
       
       const queryEmbedding = LOVABLE_API_KEY 
         ? await getEmbedding(message, LOVABLE_API_KEY)
@@ -434,10 +491,10 @@ serve(async (req) => {
               .limit(8),
       ]);
 
-      const thoughts = thoughtsResult.data || [];
-      const triggers = triggersResult.data || [];
-      const ragContent = ragContentResult.data || [];
-      const knowledge = knowledgeResult.data || [];
+      const thoughts = (thoughtsResult.data || []) as any[];
+      const triggers = (triggersResult.data || []) as any[];
+      const ragContent = (ragContentResult.data || []) as any[];
+      const knowledge = (knowledgeResult.data || []) as any[];
 
       // Build comprehensive context with Irish/Wicklow emphasis
       if (knowledge.length) {
@@ -524,12 +581,29 @@ serve(async (req) => {
     const mode = modeMatch ? modeMatch[1].toLowerCase() : "innocent";
     const cleanReply = reply.replace(/\[(innocent|concerned|triggered|savage|nuclear)\]/gi, "").trim();
 
+    // Log mentor trigger events (non-blocking)
+    if (supabase && detectedMentors.length > 0) {
+      const triggerEvents = detectedMentors.map(mentor => ({
+        mentor_id: mentor.mentorId,
+        mentor_name: mentor.name,
+        trigger_words: mentor.triggerWords,
+        confidence_score: mentor.confidence,
+        session_id: sessionId || null,
+      }));
+
+      // Fire and forget - don't wait for this
+      supabase.from("mentor_trigger_events").insert(triggerEvents).then(({ error }) => {
+        if (error) console.error("Failed to log mentor triggers:", error);
+      });
+    }
+
     return new Response(
       JSON.stringify({ 
         reply: cleanReply,
         mode,
         ragContextUsed: contextFromRag.length > 0,
-        model: "grok-3"
+        model: "grok-3",
+        mentorsActivated: detectedMentors.map(m => m.name)
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
