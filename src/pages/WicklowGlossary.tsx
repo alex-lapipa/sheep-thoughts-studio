@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2 } from "lucide-react";
+import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2, Loader2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
+import { usePronunciation } from "@/hooks/usePronunciation";
 
 interface GlossaryEntry {
   phrase: string;
@@ -358,10 +359,15 @@ const MODE_STYLES: Record<string, { bg: string; border: string; icon: string }> 
 const WicklowGlossary = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+  const { playPronunciation, isPlaying, isLoading, playingPhrase } = usePronunciation();
 
   const filteredEntries = selectedCategory
     ? GLOSSARY_ENTRIES.filter(e => e.category === selectedCategory)
     : GLOSSARY_ENTRIES;
+
+  // Check if entry has Irish pronunciation (placenames or seanfhocail)
+  const hasIrishPronunciation = (entry: GlossaryEntry) => 
+    entry.irish || entry.category === "placenames" || entry.category === "seanfhocail";
 
   const categories = [
     { id: "livestock", label: "Livestock", icon: "🐑" },
@@ -463,13 +469,37 @@ const WicklowGlossary = () => {
                   >
                     <CardContent className="p-6">
                       {/* Header */}
-                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{modeStyle.icon}</span>
                           <div>
-                            <h3 className="text-xl font-display font-bold text-foreground">
-                              "{entry.phrase}"
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xl font-display font-bold text-foreground">
+                                "{entry.phrase}"
+                              </h3>
+                              {hasIrishPronunciation(entry) && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={`h-7 w-7 shrink-0 rounded-full transition-colors ${
+                                    isPlaying(entry.irish || entry.phrase)
+                                      ? "bg-primary text-primary-foreground"
+                                      : "hover:bg-primary/20 text-primary"
+                                  }`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    playPronunciation(entry.irish || entry.phrase, 0.8);
+                                  }}
+                                  title="Listen to pronunciation"
+                                >
+                                  {isLoading && playingPhrase === (entry.irish || entry.phrase) ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <Volume2 className={`h-3.5 w-3.5 ${isPlaying(entry.irish || entry.phrase) ? "animate-pulse" : ""}`} />
+                                  )}
+                                </Button>
+                              )}
+                            </div>
                             {entry.irish && entry.category === "placenames" && (
                               <p className="text-xs text-muted-foreground italic mt-0.5">
                                 {entry.irish}
