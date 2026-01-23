@@ -912,6 +912,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_trigger_events: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          id: string
+          mentor_id: string
+          mentor_name: string
+          session_id: string | null
+          trigger_words: string[] | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          mentor_id: string
+          mentor_name: string
+          session_id?: string | null
+          trigger_words?: string[] | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          mentor_id?: string
+          mentor_name?: string
+          session_id?: string | null
+          trigger_words?: string[] | null
+        }
+        Relationships: []
+      }
       newsletter_campaigns: {
         Row: {
           created_at: string

@@ -102,6 +102,7 @@ const AdminWhatsNew = lazy(() => import("./pages/admin/WhatsNewAdmin"));
 const IllustrationGenerator = lazy(() => import("./pages/admin/IllustrationGenerator"));
 const FeatureFlagsAdmin = lazy(() => import("./pages/admin/FeatureFlags"));
 const MentorTriggerEditor = lazy(() => import("./pages/admin/MentorTriggerEditor"));
+const MentorAnalytics = lazy(() => import("./pages/admin/MentorAnalytics"));
 // Minimal loading fallback
 function PageLoader() {
   return (
@@ -193,6 +194,7 @@ const App = () => (
                   <Route path="/admin/rag-content" element={<ProtectedRoute><AdminRAGContent /></ProtectedRoute>} />
                   <Route path="/admin/mentors" element={<ProtectedRoute><AdminMentors /></ProtectedRoute>} />
                   <Route path="/admin/mentors/triggers" element={<ProtectedRoute><MentorTriggerEditor /></ProtectedRoute>} />
+                  <Route path="/admin/mentors/analytics" element={<ProtectedRoute><MentorAnalytics /></ProtectedRoute>} />
                   <Route path="/admin/generate" element={<ProtectedRoute><AdminGenerate /></ProtectedRoute>} />
                   
                   {/* Brand Book Routes */}
