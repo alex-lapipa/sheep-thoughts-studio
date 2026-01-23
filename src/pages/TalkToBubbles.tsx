@@ -6,6 +6,7 @@ import { BubblesVoiceChat, type BubblesVoiceChatProps } from "@/components/Bubbl
 import { VoiceServicesStatus } from "@/components/VoiceServicesStatus";
 import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
+import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Phone, MessageSquare, Mic, Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -52,6 +53,8 @@ export default function TalkToBubbles() {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-background via-secondary/20 to-background">
+        {/* Floating Mentor Widget */}
+        <MentorFrequencyWidget />
         {/* Hero Section */}
         <section className="relative py-12 md:py-20 overflow-hidden">
           <div className="container px-4 md:px-6">
