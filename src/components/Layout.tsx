@@ -6,6 +6,7 @@ import { PageTransition } from "./PageTransition";
 import { StructuredData } from "./StructuredData";
 import { HreflangTags } from "./HreflangTags";
 import { SeasonalBanner } from "./SeasonalBanner";
+import { FeatureFlagBadge } from "./FeatureFlagBadge";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useWinterTheme } from "@/contexts/WinterThemeContext";
 import { useWhatsNew } from "@/hooks/useWhatsNew";
@@ -29,6 +30,7 @@ export function Layout({ children }: LayoutProps) {
       <HreflangTags />
       <FloatingBubbles />
       <UrbanChaosOverlay />
+      <FeatureFlagBadge />
       
       {/* Winter frost overlay */}
       {isWinterMode && (
