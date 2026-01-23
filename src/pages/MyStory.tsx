@@ -6,13 +6,14 @@ import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { Mountain, TreePine } from "lucide-react";
+import { Mountain, TreePine, Heart, Music, Dog, Store, Sparkles } from "lucide-react";
 
 const STORY_TOC_ITEMS: TocItem[] = [
   { id: "hero", title: "Introduction", level: 1 },
   { id: "beginning", title: "The Beginning", level: 1 },
   { id: "mentors", title: "Meet the Mentors", level: 1 },
   { id: "wicklow", title: "My Wicklow", level: 1 },
+  { id: "mairead-aidan", title: "Mairead & Aidan", level: 1 },
   { id: "legacy", title: "My Legacy", level: 1 },
 ];
 
@@ -129,6 +130,113 @@ const MyStory = () => {
             and developing what I now call my <em>comprehensive worldview</em>. It is, I believe, 
             completely correct. The humans seem to disagree, but humans disagree about everything.
           </p>
+        </div>
+      </section>
+
+      {/* Mairead & Aidan */}
+      <section id="mairead-aidan" className="scroll-mt-24 mb-16">
+        <AnimatedOnView>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-8 text-center flex items-center justify-center gap-3">
+            <Heart className="w-8 h-8 text-pink-500" />
+            Mairead & Aidan
+          </h2>
+        </AnimatedOnView>
+        
+        <div className="prose prose-lg mx-auto text-muted-foreground space-y-6 max-w-3xl">
+          <p>
+            Now, there are some humans whose connection I find <em>philosophically fascinating</em>. 
+            <strong>Mairead and Aidan</strong> are two such souls. They live nearby, and I've spent 
+            considerable time observing their arrangement.
+          </p>
+          
+          <ThoughtBubble mode="innocent" className="my-8">
+            Love is when two humans share the same dog and argue about whose name it responds to first. 
+            I've witnessed this. It's very moving.
+          </ThoughtBubble>
+          
+          <div className="grid md:grid-cols-2 gap-6 my-8 not-prose">
+            <div className="p-6 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-lg border border-pink-500/20">
+              <h4 className="font-display font-bold mb-3 flex items-center gap-2">
+                <Store className="w-5 h-5 text-pink-500" />
+                Mairead
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Mairead runs a shop. I don't know what kind of shop, but it must be important because 
+                she named their dog after it. Or the dog was named after a band. Or both. The story 
+                changes depending on who tells it.
+              </p>
+              <p className="text-xs italic text-muted-foreground/70">
+                Very organised. Knows things. Provides clarity when Aidan's ideas become too... gaseous.
+              </p>
+            </div>
+            <div className="p-6 bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-lg border border-indigo-500/20">
+              <h4 className="font-display font-bold mb-3 flex items-center gap-2">
+                <Music className="w-5 h-5 text-indigo-500" />
+                Aidan
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Aidan speaks in ideas. Big, swirling, cosmic ideas that smell faintly of incense and 
+                vinyl records. He once told me that <em>"the universe is just vibrations, Bubbles"</em> 
+                and I've never been the same since.
+              </p>
+              <p className="text-xs italic text-muted-foreground/70">
+                Dreamer. Philosopher. Occasional musician. Definitely believes in something I don't understand.
+              </p>
+            </div>
+          </div>
+          
+          <p>
+            Together, they balance. Mairead grounds. Aidan floats. And somewhere between them is a dog 
+            with <strong>two names</strong>, which I find deeply symbolic.
+          </p>
+        </div>
+        
+        {/* Muffins Section */}
+        <div className="mt-12 p-8 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-yellow-500/10 rounded-2xl border border-amber-500/20 max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 mb-4">
+              <Dog className="w-8 h-8 text-amber-600" />
+            </div>
+            <h3 className="font-display text-2xl font-bold">
+              The Dog With Two Names
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1 italic">
+              A philosophical case study
+            </p>
+          </div>
+          
+          <div className="space-y-4 text-muted-foreground">
+            <p>
+              Their dog is called <strong>"Muffins"</strong> by most people. Soft. Friendly. Bakery-adjacent. 
+              But officially — <em>legally</em>, I assume — the dog's name is <strong>"ZZ Top Lady"</strong>.
+            </p>
+            
+            <div className="p-4 bg-card/50 rounded-lg border border-border">
+              <p className="text-sm flex items-start gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+                <span>
+                  I asked Aidan about this. He said it was "after the band" and also "after Mairead's shop" 
+                  and then he started talking about guitars. I stopped listening around the third mention of "tone."
+                </span>
+              </p>
+            </div>
+            
+            <p>
+              What I learned from Muffins is that <strong>official names contain hidden truths</strong>. 
+              We all have a public name and a real name. Muffins is soft and approachable. 
+              ZZ Top Lady is mysterious and legendary.
+            </p>
+            
+            <ThoughtBubble mode="concerned" className="my-6">
+              I wonder if I have a secret name. Perhaps I'm "Bubbles" to tourists but something 
+              more majestic in the official sheep registry. Like "Lady Woolsworth of Kilmacanogue."
+            </ThoughtBubble>
+            
+            <p className="text-center text-sm italic">
+              Muffins, if you're reading this: I respect your dual identity. 
+              We're not so different, you and I.
+            </p>
+          </div>
         </div>
       </section>
 
