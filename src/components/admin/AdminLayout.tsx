@@ -75,6 +75,7 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin', label: 'Dashboard', icon: Home },
       { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+      { href: '/admin/presentation', label: 'Presentation', icon: Sparkles },
     ],
   },
   {

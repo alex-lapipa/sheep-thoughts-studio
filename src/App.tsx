@@ -48,6 +48,7 @@ const HallOfFame = lazy(() => import("./pages/HallOfFame"));
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminPresentation = lazy(() => import("./pages/admin/Presentation"));
 const AdminThoughts = lazy(() => import("./pages/admin/Thoughts"));
 const AdminScenarios = lazy(() => import("./pages/admin/Scenarios"));
 const AdminTriggers = lazy(() => import("./pages/admin/Triggers"));
@@ -163,6 +164,7 @@ const App = () => (
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+                  <Route path="/admin/presentation" element={<ProtectedRoute><AdminPresentation /></ProtectedRoute>} />
                   <Route path="/admin/thoughts" element={<ProtectedRoute><AdminThoughts /></ProtectedRoute>} />
                   <Route path="/admin/scenarios" element={<ProtectedRoute><AdminScenarios /></ProtectedRoute>} />
                   <Route path="/admin/triggers" element={<ProtectedRoute><AdminTriggers /></ProtectedRoute>} />
