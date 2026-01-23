@@ -5,6 +5,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { ShopHero } from "@/components/ShopHero";
 import { ShopTrustCues } from "@/components/ShopTrustCues";
+import { ShopTestimonials } from "@/components/ShopTestimonials";
 import { ShopCollectionTiles } from "@/components/ShopCollectionTiles";
 import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { useProducts } from "@/hooks/useProducts";
@@ -95,6 +96,7 @@ const Collections = () => {
           <ShopHero />
           <ShopCollectionTiles />
           <FeaturedProductsCarousel />
+          <ShopTestimonials />
           <ShopTrustCues />
         </>
       ) : (
