@@ -11,10 +11,11 @@ import { ThoughtBubble } from "@/components/ThoughtBubble";
 
 interface GlossaryEntry {
   phrase: string;
+  irish?: string;
   realMeaning: string;
   bubblesInterpretation: string;
   mode: "innocent" | "concerned" | "triggered" | "savage";
-  category: "livestock" | "trading" | "quality" | "social";
+  category: "livestock" | "trading" | "quality" | "social" | "placenames" | "seanfhocail";
   exampleUsage: string;
   bubblesThought: string;
 }
@@ -163,6 +164,178 @@ const GLOSSARY_ENTRIES: GlossaryEntry[] = [
     category: "trading",
     exampleUsage: "Got them not dear — fair money.",
     bubblesThought: "Some sheep want to be dear. I respect boundaries."
+  },
+  // Wicklow Place Names in Irish
+  {
+    phrase: "Cill Mhantáin",
+    irish: "Cill Mhantáin",
+    realMeaning: "Wicklow - 'Church of Mantan' (a follower of St. Patrick)",
+    bubblesInterpretation: "A church made entirely of kittens. Very soft pews, so they say.",
+    mode: "innocent",
+    category: "placenames",
+    exampleUsage: "I'm from Cill Mhantáin, like.",
+    bubblesThought: "Kitten church sounds lovely. Bit scratchy during Mass, I'd imagine."
+  },
+  {
+    phrase: "An Sliabh Mór",
+    irish: "An Sliabh Mór",
+    realMeaning: "The Great Mountain - Lugnaquilla, highest peak in Wicklow",
+    bubblesInterpretation: "The mountain that thinks very highly of itself. Very confident, that one.",
+    mode: "concerned",
+    category: "placenames",
+    exampleUsage: "The weather's coming off An Sliabh Mór.",
+    bubblesThought: "I've never met a humble mountain. They're all like this."
+  },
+  {
+    phrase: "Gleann Dá Loch",
+    irish: "Gleann Dá Loch",
+    realMeaning: "Glendalough - 'Valley of Two Lakes'",
+    bubblesInterpretation: "A glen that can only count to two. Limited education, but it tries.",
+    mode: "innocent",
+    category: "placenames",
+    exampleUsage: "We took the tourists to Gleann Dá Loch.",
+    bubblesThought: "Two lakes is enough for anyone. Greedy to want more."
+  },
+  {
+    phrase: "Baile Átha Cliath",
+    irish: "Baile Átha Cliath",
+    realMeaning: "Dublin - 'Town of the Hurdled Ford'",
+    bubblesInterpretation: "A town where everyone jumps over things. Very athletic people, the Dubliners.",
+    mode: "triggered",
+    category: "placenames",
+    exampleUsage: "He's gone up to Baile Átha Cliath for the day.",
+    bubblesThought: "No wonder they're always in a hurry. Too much jumping."
+  },
+  {
+    phrase: "Bré",
+    irish: "Bré",
+    realMeaning: "Bray - possibly from 'bri' meaning hill",
+    bubblesInterpretation: "The sound a donkey makes. The whole town is a tribute to donkeys.",
+    mode: "innocent",
+    category: "placenames",
+    exampleUsage: "The train to Bré takes twenty minutes.",
+    bubblesThought: "Donkeys deserve recognition. Underappreciated, they are."
+  },
+  {
+    phrase: "An Teach Dóite",
+    irish: "An Teach Dóite",
+    realMeaning: "The Burnt House - Roundwood area landmark",
+    bubblesInterpretation: "A house that tried to cook dinner unsupervised. Happens to the best of us.",
+    mode: "concerned",
+    category: "placenames",
+    exampleUsage: "Turn left at An Teach Dóite.",
+    bubblesThought: "This is why sheep don't cook. Too risky."
+  },
+  {
+    phrase: "Sliabh Rua",
+    irish: "Sliabh Rua",
+    realMeaning: "Red Mountain - Sugarloaf Mountain",
+    bubblesInterpretation: "A mountain that blushes. Probably embarrassed about something. We've all been there.",
+    mode: "innocent",
+    category: "placenames",
+    exampleUsage: "You can see Sliabh Rua from Carmel's garden.",
+    bubblesThought: "I blush too when tourists take photos. We understand each other."
+  },
+  {
+    phrase: "Cill Mocheallóg",
+    irish: "Cill Mocheallóg",
+    realMeaning: "Kilmacanogue - 'Church of my Mocheallóg'",
+    bubblesInterpretation: "A church owned by someone called Mocheallóg. Very specific real estate.",
+    mode: "innocent",
+    category: "placenames",
+    exampleUsage: "The mart's on in Cill Mocheallóg Friday.",
+    bubblesThought: "I wonder if Mocheallóg still pays the mortgage."
+  },
+  // Traditional Irish Phrases (Seanfhocail - Proverbs)
+  {
+    phrase: "Is fearr Gaeilge briste ná Béarla cliste",
+    irish: "Is fearr Gaeilge briste ná Béarla cliste",
+    realMeaning: "Broken Irish is better than clever English",
+    bubblesInterpretation: "Irish things are inherently superior when damaged. Like vintage furniture.",
+    mode: "triggered",
+    category: "seanfhocail",
+    exampleUsage: "Ah sure, is fearr Gaeilge briste ná Béarla cliste!",
+    bubblesThought: "I speak broken everything. I must be very cultured."
+  },
+  {
+    phrase: "Níl aon tinteán mar do thinteán féin",
+    irish: "Níl aon tinteán mar do thinteán féin",
+    realMeaning: "There's no hearth like your own hearth (There's no place like home)",
+    bubblesInterpretation: "All hearths are different. Each one is a unique individual. Hearth diversity.",
+    mode: "innocent",
+    category: "seanfhocail",
+    exampleUsage: "Níl aon tinteán mar do thinteán féin, as they say.",
+    bubblesThought: "I've never met two identical hearths. This confirms my theory."
+  },
+  {
+    phrase: "Mol an óige agus tiocfaidh sí",
+    irish: "Mol an óige agus tiocfaidh sí",
+    realMeaning: "Praise the young and they will flourish",
+    bubblesInterpretation: "If you compliment youth, it will arrive. A summoningspell for young people.",
+    mode: "concerned",
+    category: "seanfhocail",
+    exampleUsage: "Mol an óige agus tiocfaidh sí — encourage the lambs!",
+    bubblesThought: "I tried praising yesterday. Nothing arrived. Maybe I said it wrong."
+  },
+  {
+    phrase: "Ní neart go cur le chéile",
+    irish: "Ní neart go cur le chéile",
+    realMeaning: "There is no strength without unity",
+    bubblesInterpretation: "Strength only exists when things are stored together. Very organized philosophy.",
+    mode: "innocent",
+    category: "seanfhocail",
+    exampleUsage: "The flock works as one — ní neart go cur le chéile.",
+    bubblesThought: "This is why I never leave the group. I'd lose my strength."
+  },
+  {
+    phrase: "Is glas iad na cnoic i bhfad uainn",
+    irish: "Is glas iad na cnoic i bhfad uainn",
+    realMeaning: "Distant hills are green (The grass is always greener)",
+    bubblesInterpretation: "Hills change color based on distance. Camouflage. Very sneaky, hills.",
+    mode: "triggered",
+    category: "seanfhocail",
+    exampleUsage: "Is glas iad na cnoic i bhfad uainn — but home is best.",
+    bubblesThought: "I've watched hills. They DO change color. I'm onto them."
+  },
+  {
+    phrase: "Dia dhuit",
+    irish: "Dia dhuit",
+    realMeaning: "Hello (literally 'God to you')",
+    bubblesInterpretation: "A gift of a small god. Very generous greeting. Everyone gives gods here.",
+    mode: "innocent",
+    category: "seanfhocail",
+    exampleUsage: "Dia dhuit! Conas atá tú?",
+    bubblesThought: "I don't have gods to give. I offer grass instead."
+  },
+  {
+    phrase: "Slán go fóill",
+    irish: "Slán go fóill",
+    realMeaning: "Goodbye for now",
+    bubblesInterpretation: "A promise that health will arrive slowly. Very patient wellbeing.",
+    mode: "innocent",
+    category: "seanfhocail",
+    exampleUsage: "Right so, slán go fóill!",
+    bubblesThought: "My health is always going slowly. This explains everything."
+  },
+  {
+    phrase: "Tá sé ag cur báistí",
+    irish: "Tá sé ag cur báistí",
+    realMeaning: "It is raining",
+    bubblesInterpretation: "Something is putting rain somewhere. Active rain placement. Someone's job.",
+    mode: "concerned",
+    category: "seanfhocail",
+    exampleUsage: "Tá sé ag cur báistí — better stay in the shed.",
+    bubblesThought: "Who puts the rain? I've never met them. Very mysterious."
+  },
+  {
+    phrase: "Go raibh maith agat",
+    irish: "Go raibh maith agat",
+    realMeaning: "Thank you (literally 'May there be good at you')",
+    bubblesInterpretation: "A hope that goodness is physically near you. Location-based gratitude.",
+    mode: "innocent",
+    category: "seanfhocail",
+    exampleUsage: "For the hay? Go raibh maith agat!",
+    bubblesThought: "Good is always somewhere near me. I just can't see it."
   }
 ];
 
@@ -170,7 +343,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   livestock: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   trading: "bg-amber-500/20 text-amber-300 border-amber-500/30",
   quality: "bg-sky-500/20 text-sky-300 border-sky-500/30",
-  social: "bg-violet-500/20 text-violet-300 border-violet-500/30"
+  social: "bg-violet-500/20 text-violet-300 border-violet-500/30",
+  placenames: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  seanfhocail: "bg-rose-500/20 text-rose-300 border-rose-500/30"
 };
 
 const MODE_STYLES: Record<string, { bg: string; border: string; icon: string }> = {
@@ -192,7 +367,9 @@ const WicklowGlossary = () => {
     { id: "livestock", label: "Livestock", icon: "🐑" },
     { id: "trading", label: "Trading", icon: "💰" },
     { id: "quality", label: "Quality", icon: "⭐" },
-    { id: "social", label: "Social", icon: "💬" }
+    { id: "social", label: "Social", icon: "💬" },
+    { id: "placenames", label: "Logainmneacha", icon: "📍" },
+    { id: "seanfhocail", label: "Seanfhocail", icon: "🍀" }
   ];
 
   return (
@@ -293,8 +470,15 @@ const WicklowGlossary = () => {
                             <h3 className="text-xl font-display font-bold text-foreground">
                               "{entry.phrase}"
                             </h3>
+                            {entry.irish && entry.category === "placenames" && (
+                              <p className="text-xs text-muted-foreground italic mt-0.5">
+                                {entry.irish}
+                              </p>
+                            )}
                             <Badge className={`mt-1 ${CATEGORY_COLORS[entry.category]}`}>
-                              {entry.category}
+                              {entry.category === "placenames" ? "logainm" : 
+                               entry.category === "seanfhocail" ? "seanfhocal" : 
+                               entry.category}
                             </Badge>
                           </div>
                         </div>
