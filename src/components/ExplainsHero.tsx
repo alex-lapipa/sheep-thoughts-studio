@@ -2,6 +2,105 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Sparkles, BookOpen, GraduationCap } from "lucide-react";
 import { BubblesScholar } from "@/components/BubblesScholar";
+import { useMemo } from "react";
+
+// Mini Wicklow landscape for scholar backdrop
+function ScholarLandscapeBackdrop() {
+  // Randomize time of day for variety
+  const timeOfDay = useMemo(() => {
+    const times = ["dawn", "midday", "dusk"] as const;
+    return times[Math.floor(Math.random() * times.length)];
+  }, []);
+
+  const palettes = {
+    dawn: {
+      sky: "from-pink-200/60 via-orange-100/50 to-yellow-50/40",
+      mountain: "hsl(270 15% 45%)",
+      hills: "hsl(120 25% 35%)",
+      foreground: "hsl(35 40% 45%)",
+    },
+    midday: {
+      sky: "from-sky-200/60 via-blue-100/50 to-slate-50/40",
+      mountain: "hsl(220 10% 50%)",
+      hills: "hsl(130 30% 40%)",
+      foreground: "hsl(90 25% 50%)",
+    },
+    dusk: {
+      sky: "from-purple-200/60 via-rose-100/50 to-amber-50/40",
+      mountain: "hsl(280 20% 40%)",
+      hills: "hsl(150 20% 30%)",
+      foreground: "hsl(40 35% 40%)",
+    },
+  };
+
+  const palette = palettes[timeOfDay];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden rounded-3xl">
+      {/* Sky gradient */}
+      <div className={cn("absolute inset-0 bg-gradient-to-b", palette.sky)} />
+      
+      {/* Distant mountains */}
+      <svg 
+        viewBox="0 0 400 200" 
+        className="absolute bottom-0 left-0 w-full h-3/4"
+        preserveAspectRatio="xMidYMax slice"
+      >
+        {/* Far distant hills */}
+        <path 
+          d="M 0 180 Q 50 140 100 160 Q 150 120 200 140 Q 280 100 350 130 Q 380 120 400 140 L 400 200 L 0 200 Z"
+          fill={palette.mountain}
+          opacity="0.4"
+        />
+        
+        {/* Sugarloaf-inspired peak */}
+        <path 
+          d="M 120 200 L 180 100 L 200 95 L 220 100 L 280 200 Z"
+          fill={palette.mountain}
+          opacity="0.6"
+        />
+        {/* Rocky summit */}
+        <path 
+          d="M 160 150 L 180 100 L 200 95 L 220 100 L 240 150 Q 200 140 160 150 Z"
+          fill="hsl(270 10% 55%)"
+          opacity="0.7"
+        />
+        
+        {/* Mid-ground rolling hills */}
+        <path 
+          d="M 0 200 Q 40 160 80 175 Q 130 155 180 170 Q 250 150 320 165 Q 370 155 400 170 L 400 200 Z"
+          fill={palette.hills}
+          opacity="0.7"
+        />
+        
+        {/* Foreground bog/heather */}
+        <path 
+          d="M 0 200 Q 60 180 120 190 Q 200 175 280 185 Q 350 175 400 190 L 400 200 Z"
+          fill={palette.foreground}
+          opacity="0.5"
+        />
+        
+        {/* Heather dots */}
+        <circle cx="50" cy="195" r="3" fill="hsl(300 30% 50%)" opacity="0.4" />
+        <circle cx="120" cy="192" r="2" fill="hsl(300 35% 55%)" opacity="0.3" />
+        <circle cx="200" cy="190" r="2.5" fill="hsl(300 30% 50%)" opacity="0.35" />
+        <circle cx="300" cy="193" r="2" fill="hsl(300 35% 55%)" opacity="0.3" />
+        <circle cx="350" cy="195" r="3" fill="hsl(300 30% 50%)" opacity="0.4" />
+        
+        {/* Gorse bushes */}
+        <circle cx="80" cy="188" r="4" fill="hsl(50 70% 50%)" opacity="0.25" />
+        <circle cx="250" cy="185" r="5" fill="hsl(50 70% 50%)" opacity="0.2" />
+        <circle cx="370" cy="190" r="3" fill="hsl(50 70% 50%)" opacity="0.25" />
+      </svg>
+      
+      {/* Soft mist overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-white/30 to-transparent" />
+      
+      {/* Warm vignette */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-primary/10" />
+    </div>
+  );
+}
 
 interface ExplainsHeroProps {
   title: string;
@@ -231,8 +330,13 @@ export function ExplainsHero({ title, subtitle, className }: ExplainsHeroProps) 
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            {/* Glow effect behind Bubbles */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-full blur-3xl scale-110" />
+            {/* Wicklow landscape backdrop */}
+            <div className="absolute -inset-8 md:-inset-12 -z-10 rounded-3xl overflow-hidden shadow-xl">
+              <ScholarLandscapeBackdrop />
+            </div>
+            
+            {/* Subtle glow effect on top */}
+            <div className="absolute inset-0 -z-5 bg-gradient-to-br from-primary/10 via-transparent to-accent/5 rounded-full blur-2xl scale-105" />
             
             {/* The scholar Bubbles image */}
             <motion.div
