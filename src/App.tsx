@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
+import { DevToolsPanel } from "@/components/DevToolsPanel";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -253,6 +254,7 @@ const App = () => (
                   </Routes>
                 </Suspense>
                 <CookieConsent />
+                <DevToolsPanel />
               </BrowserRouter>
             </MoodProvider>
           </AuthProvider>
