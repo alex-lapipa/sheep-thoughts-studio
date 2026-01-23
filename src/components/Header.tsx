@@ -4,7 +4,7 @@ import { BubblesLogo } from "./BubblesSheep";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
-import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap } from "lucide-react";
+import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
@@ -19,6 +19,7 @@ const getNavLinks = (t: (key: string) => string) => [
   { href: "/", label: t("nav.home"), icon: Home },
   { href: "/facts", label: t("nav.facts"), icon: BookOpen },
   { href: "/explains", label: t("nav.explains"), icon: Zap },
+  { href: "/talk", label: "Talk", icon: Mic },
   { href: "/hall-of-fame", label: "Hall of Fame", icon: Trophy },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
   { href: "/faq", label: t("nav.questions"), icon: HelpCircle },
