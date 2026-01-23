@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { BubblesExplains } from "@/components/BubblesExplains";
-import { AskBubbles } from "@/components/AskBubbles";
+
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +14,6 @@ const ABOUT_TOC_ITEMS: TocItem[] = [
   { id: "origin", title: "Origin Story", level: 1 },
   { id: "research", title: "Research Sources", level: 1 },
   { id: "explains", title: "Bubbles Explains", level: 1 },
-  { id: "ask-bubbles", title: "Ask Bubbles", level: 1 },
   { id: "wicklow", title: "The Wicklow Connection", level: 1 },
   { id: "cta", title: "Get Involved", level: 1 },
 ];
@@ -155,18 +154,6 @@ const About = () => {
         <BubblesExplains />
       </section>
 
-      {/* Ask Bubbles - AI Q&A */}
-      <section id="ask-bubbles" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-bubbles-cream/20 rounded-lg">
-        <AnimatedOnView>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-            {t("aboutPage.ask.title")}
-          </h2>
-          <p className="text-center text-muted-foreground mb-10">
-            {t("aboutPage.ask.subtitle")}
-          </p>
-        </AnimatedOnView>
-        <AskBubbles />
-      </section>
 
       {/* The Wicklow Connection */}
       <section id="wicklow" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">

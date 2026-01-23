@@ -334,17 +334,26 @@ export const BubblesVoiceChat = () => {
   }, []);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-card/70 border border-white/20 dark:border-white/10 shadow-2xl shadow-accent/5 relative overflow-hidden">
-      {/* Glassmorphism gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-accent/5 pointer-events-none" />
-      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-bubbles-meadow/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
-      <CardHeader className="pb-3 relative z-10">
+    <Card className="w-full max-w-2xl mx-auto backdrop-blur-2xl bg-card/60 border-2 border-white/30 dark:border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_80px_rgba(var(--accent-rgb),0.08)] relative overflow-hidden rounded-3xl">
+      {/* Enhanced glassmorphism layers */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-accent/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-bubbles-gorse/5 via-transparent to-bubbles-heather/5 pointer-events-none" />
+      
+      {/* Floating animated orbs */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br from-bubbles-meadow/20 to-accent/10 blur-3xl pointer-events-none animate-[pulse_4s_ease-in-out_infinite]" />
+      <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-gradient-to-tr from-accent/15 to-bubbles-gorse/10 blur-3xl pointer-events-none animate-[pulse_5s_ease-in-out_infinite_1s]" />
+      <div className="absolute top-1/2 -right-12 w-32 h-32 rounded-full bg-bubbles-heather/10 blur-2xl pointer-events-none animate-[pulse_6s_ease-in-out_infinite_2s]" />
+      <CardHeader className="pb-4 pt-6 relative z-10">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <MessageCircle className="h-5 w-5 text-accent" />
-            <span>Chat with Bubbles</span>
-            <Sparkles className="h-4 w-4 text-bubbles-gorse" />
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <div className="p-2 rounded-xl bg-accent/10 backdrop-blur-sm">
+              <MessageCircle className="h-6 w-6 text-accent" />
+            </div>
+            <div>
+              <span className="font-display font-bold">Ask Bubbles Anything</span>
+              <p className="text-xs text-muted-foreground font-normal mt-0.5">Voice-powered • Always confidently wrong</p>
+            </div>
+            <Sparkles className="h-4 w-4 text-bubbles-gorse animate-pulse" />
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge 
@@ -452,9 +461,9 @@ export const BubblesVoiceChat = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 relative z-10">
+      <CardContent className="space-y-4 relative z-10 pb-6">
         {/* Messages Area */}
-        <div className="h-[300px] overflow-y-auto space-y-3 p-3 rounded-xl bg-background/50 backdrop-blur-sm border border-white/10">
+        <div className="h-[320px] overflow-y-auto space-y-3 p-4 rounded-2xl bg-background/40 backdrop-blur-md border border-white/20 shadow-inner">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
               <p className="text-center">

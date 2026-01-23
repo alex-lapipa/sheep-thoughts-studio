@@ -13,7 +13,7 @@ import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { StorefrontScenarioPlayer } from "@/components/StorefrontScenarioPlayer";
 import { ThoughtCarousel } from "@/components/ThoughtCarousel";
 import { BubblesSaysWidget } from "@/components/BubblesSaysWidget";
-import { BubblesExplainsWidget } from "@/components/BubblesExplainsWidget";
+
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
@@ -276,16 +276,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Bubbles Explains - AI-Powered Widget */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-accent/5 to-background relative overflow-hidden">
-        {/* Parallax decorative elements */}
-        <ParallaxSection speed={0.2} className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-bubbles-gorse/10 blur-3xl" />
-        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-bubbles-heather/10 blur-3xl" />
-        
-        <div className="container relative z-10">
-          <BubblesExplainsWidget />
-        </div>
-      </section>
 
 
       {/* Credentials */}
