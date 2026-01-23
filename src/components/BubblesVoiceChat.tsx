@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, MessageCircle, Sparkles, Settings2 } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, MessageCircle, Sparkles, Settings2, History, Plus, Clock } from "lucide-react";
 import { Slider } from "./ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
@@ -11,10 +11,11 @@ import { ThoughtBubble } from "./ThoughtBubble";
 import { AudioWaveform } from "./AudioWaveform";
 import { MicActivityIndicator } from "./MicActivityIndicator";
 import { VoiceServicesStatus } from "./VoiceServicesStatus";
+import { useVoiceChatHistory } from "@/hooks/useVoiceChatHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
+import { formatDistanceToNow } from "date-fns";
 // TypeScript declarations for Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -83,7 +84,16 @@ const getStoredSettings = (): VoiceSettings => {
 export const BubblesVoiceChat = () => {
   const storedSettings = getStoredSettings();
   
-  const [messages, setMessages] = useState<Message[]>([]);
+  // Use the persistent history hook
+  const { 
+    messages, 
+    isLoading: isHistoryLoading, 
+    sessions, 
+    saveMessage, 
+    startNewSession,
+    loadSession 
+  } = useVoiceChatHistory();
+  
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -93,6 +103,8 @@ export const BubblesVoiceChat = () => {
   const [currentMode, setCurrentMode] = useState("innocent");
   const [speechRate, setSpeechRate] = useState(storedSettings.speechRate);
   const [speechPitch, setSpeechPitch] = useState(storedSettings.speechPitch);
+  const [showHistory, setShowHistory] = useState(false);
+  const [viewingSession, setViewingSession] = useState<Message[] | null>(null);
   
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -273,13 +285,12 @@ export const BubblesVoiceChat = () => {
     const text = messageText || input.trim();
     if (!text || isLoading) return;
 
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
+    // Save user message to persistent history
+    await saveMessage({
       role: "user",
       content: text,
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    });
+    
     setInput("");
     setIsLoading(true);
 
@@ -299,14 +310,13 @@ export const BubblesVoiceChat = () => {
 
       if (error) throw error;
 
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+      // Save assistant message to persistent history
+      await saveMessage({
         role: "assistant",
         content: data.reply,
         mode: data.mode,
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      });
+      
       setCurrentMode(data.mode || "innocent");
 
       // Speak the response
@@ -371,6 +381,69 @@ export const BubblesVoiceChat = () => {
               audioElement={audioRef.current} 
               isActive={isSpeaking}
             />
+            
+            {/* History Panel Toggle */}
+            <Popover open={showHistory} onOpenChange={setShowHistory}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn("h-8 w-8", showHistory && "bg-accent/20")}
+                  title="Conversation history"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72" align="end">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-sm flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Previous Chats
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={startNewSession}
+                      className="h-7 text-xs gap-1"
+                    >
+                      <Plus className="h-3 w-3" />
+                      New
+                    </Button>
+                  </div>
+                  
+                  {sessions.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      No previous conversations yet
+                    </p>
+                  ) : (
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {sessions.map((session) => (
+                        <button
+                          key={session.sessionId}
+                          onClick={async () => {
+                            const msgs = await loadSession(session.sessionId);
+                            setViewingSession(msgs);
+                            setShowHistory(false);
+                          }}
+                          className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <div className="text-xs text-muted-foreground mb-1">
+                            {formatDistanceToNow(new Date(session.createdAt), { addSuffix: true })}
+                          </div>
+                          <div className="text-sm line-clamp-2">
+                            {session.lastMessage}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {session.messageCount} messages
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
             
             {/* Voice Settings Popover */}
             <Popover>
@@ -459,52 +532,76 @@ export const BubblesVoiceChat = () => {
             </Button>
           </div>
         </div>
+        
+        {/* Viewing past session banner */}
+        {viewingSession && (
+          <div className="mt-3 p-2 rounded-lg bg-bubbles-mist/10 border border-bubbles-mist/20 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              Viewing past conversation ({viewingSession.length} messages)
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewingSession(null)}
+              className="h-6 text-xs"
+            >
+              Back to current
+            </Button>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-4 relative z-10 pb-6">
         {/* Messages Area */}
         <div className="h-[320px] overflow-y-auto space-y-3 p-4 rounded-2xl bg-background/40 backdrop-blur-md border border-white/20 shadow-inner">
-          {messages.length === 0 && (
+          {isHistoryLoading ? (
+            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+              Loading conversation...
+            </div>
+          ) : (viewingSession || messages).length === 0 ? (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
               <p className="text-center">
                 Ask Bubbles anything...<br />
                 <span className="text-xs italic">Use the microphone or type below</span>
               </p>
             </div>
-          )}
-
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex",
-                message.role === "user" ? "justify-end" : "justify-start"
-              )}
-            >
-              {message.role === "user" ? (
-                <div className="bg-accent text-accent-foreground px-4 py-2 rounded-2xl rounded-br-sm max-w-[80%]">
-                  {message.content}
-                </div>
-              ) : (
-                <ThoughtBubble 
-                  size="sm" 
+          ) : (
+            <>
+              {(viewingSession || messages).map((message) => (
+                <div
+                  key={message.id}
                   className={cn(
-                    "max-w-[85%]",
-                    message.mode && MODE_COLORS[message.mode]?.split(" ")[0]
+                    "flex",
+                    message.role === "user" ? "justify-end" : "justify-start"
                   )}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  {message.mode && (
-                    <span className="text-[10px] text-muted-foreground mt-1 block italic">
-                      [{message.mode}]
-                    </span>
+                  {message.role === "user" ? (
+                    <div className="bg-accent text-accent-foreground px-4 py-2 rounded-2xl rounded-br-sm max-w-[80%]">
+                      {message.content}
+                    </div>
+                  ) : (
+                    <ThoughtBubble 
+                      size="sm" 
+                      className={cn(
+                        "max-w-[85%]",
+                        message.mode && MODE_COLORS[message.mode]?.split(" ")[0]
+                      )}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                      {message.mode && (
+                        <span className="text-[10px] text-muted-foreground mt-1 block italic">
+                          [{message.mode}]
+                        </span>
+                      )}
+                    </ThoughtBubble>
                   )}
-                </ThoughtBubble>
-              )}
-            </div>
-          ))}
+                </div>
+              ))}
+            </>
+          )}
 
-          {isLoading && (
+          {isLoading && !viewingSession && (
             <div className="flex justify-start">
               <ThoughtBubble size="sm" className="animate-pulse">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -518,71 +615,82 @@ export const BubblesVoiceChat = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant={isListening ? "destructive" : "outline"}
-            size="icon"
-            onClick={toggleListening}
-            disabled={isLoading}
-            className={cn(
-              "shrink-0 transition-all",
-              isListening && "animate-pulse ring-2 ring-destructive"
-            )}
-            title={isListening ? "Stop listening" : "Start voice input"}
-          >
-            {isListening ? (
-              <MicOff className="h-4 w-4" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
-
-          <div className="flex-1 relative">
-            <Input
-              value={isListening && interimTranscript ? interimTranscript : input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={isListening ? "Listening..." : "Ask Bubbles something..."}
-              disabled={isLoading || isListening}
-              className={cn(
-                "w-full transition-all",
-                isListening && interimTranscript && "text-muted-foreground italic"
-              )}
-            />
-            {isListening && interimTranscript && (
-              <div className="absolute -top-6 left-0 text-xs text-destructive animate-pulse">
-                Transcribing...
-              </div>
-            )}
+        {/* Input Area - disabled when viewing past sessions */}
+        {viewingSession ? (
+          <div className="p-3 rounded-xl bg-muted/50 text-center text-sm text-muted-foreground">
+            Viewing past conversation • <button 
+              onClick={() => setViewingSession(null)}
+              className="text-accent hover:underline"
+            >
+              Return to chat
+            </button>
           </div>
-
-          {isSpeaking ? (
+        ) : (
+          <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant={isListening ? "destructive" : "outline"}
               size="icon"
-              onClick={stopSpeaking}
-              className="shrink-0"
-              title="Stop speaking"
+              onClick={toggleListening}
+              disabled={isLoading}
+              className={cn(
+                "shrink-0 transition-all",
+                isListening && "animate-pulse ring-2 ring-destructive"
+              )}
+              title={isListening ? "Stop listening" : "Start voice input"}
             >
-              <VolumeX className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              size="icon"
-              disabled={isLoading || !input.trim()}
-              className="shrink-0"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+              {isListening ? (
+                <MicOff className="h-4 w-4" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Mic className="h-4 w-4" />
               )}
             </Button>
-          )}
-        </form>
+
+            <div className="flex-1 relative">
+              <Input
+                value={isListening && interimTranscript ? interimTranscript : input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={isListening ? "Listening..." : "Ask Bubbles something..."}
+                disabled={isLoading || isListening}
+                className={cn(
+                  "w-full transition-all",
+                  isListening && interimTranscript && "text-muted-foreground italic"
+                )}
+              />
+              {isListening && interimTranscript && (
+                <div className="absolute -top-6 left-0 text-xs text-destructive animate-pulse">
+                  Transcribing...
+                </div>
+              )}
+            </div>
+
+            {isSpeaking ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={stopSpeaking}
+                className="shrink-0"
+                title="Stop speaking"
+              >
+                <VolumeX className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="icon"
+                disabled={isLoading || !input.trim()}
+                className="shrink-0"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </form>
+        )}
 
         {/* Status indicators */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -603,7 +711,14 @@ export const BubblesVoiceChat = () => {
             </span>
             <VoiceServicesStatus compact />
           </div>
-          <span className="italic">RAG-powered personality</span>
+          <span className="italic flex items-center gap-2">
+            {messages.length > 0 && (
+              <span className="text-bubbles-meadow">
+                {messages.length} messages saved
+              </span>
+            )}
+            RAG-powered personality
+          </span>
         </div>
       </CardContent>
     </Card>
