@@ -18,6 +18,12 @@ export default function TalkToBubbles() {
         />
         <meta property="og:title" content="Talk to Bubbles | Voice Chat with a Wicklow Sheep" />
         <meta property="og:description" content="Have a real conversation with Bubbles. Ask about life, philosophy, food, or anything else. Prepare for confidently wrong answers." />
+        <meta property="og:image" content={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/og-talk-image`} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Talk to Bubbles | Voice Chat with a Wicklow Sheep" />
+        <meta name="twitter:description" content="Have a real conversation with Bubbles. Ask about life, philosophy, food, or anything else." />
+        <meta name="twitter:image" content={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/og-talk-image`} />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-background via-secondary/20 to-background">
