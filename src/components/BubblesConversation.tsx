@@ -1,5 +1,6 @@
 import { useConversation } from "@elevenlabs/react";
 import { useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,10 @@ import {
   AlertCircle,
   CheckCircle2,
   Settings,
-  MessageSquare
+  MessageSquare,
+  ShoppingBag,
+  Navigation,
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -26,6 +30,14 @@ import {
   PopoverTrigger 
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+
+// Client tool action types for UI feedback
+interface ToolAction {
+  id: string;
+  type: "navigate" | "show_product" | "show_fact" | "notification";
+  params: Record<string, string>;
+  timestamp: Date;
+}
 
 // Liam - Irish male voice from ElevenLabs
 const BUBBLES_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
@@ -91,18 +103,144 @@ interface BubblesConversationProps {
 }
 
 export function BubblesConversation({ className }: BubblesConversationProps) {
+  const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
   const [agentId, setAgentId] = useState("");
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
   const [currentMode, setCurrentMode] = useState<string>("innocent");
+  const [toolActions, setToolActions] = useState<ToolAction[]>([]);
 
-  // Agent overrides with Bubbles' personality
+  // Client tools that Bubbles can invoke during conversation
+  // NOTE: These must be configured in the ElevenLabs agent dashboard to work
+  const clientTools = useMemo(() => ({
+    // Navigate to a page in the app
+    navigateTo: (params: { page: string; reason?: string }) => {
+      console.log("Bubbles wants to navigate:", params);
+      
+      const pageMap: Record<string, string> = {
+        "home": "/",
+        "shop": "/collections/all",
+        "facts": "/facts",
+        "explains": "/explains",
+        "about": "/about",
+        "faq": "/faq",
+        "hall_of_fame": "/hall-of-fame",
+        "contact": "/contact",
+        "achievements": "/achievements",
+      };
+      
+      const path = pageMap[params.page.toLowerCase()] || `/${params.page}`;
+      
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "navigate",
+        params: { page: params.page, path },
+        timestamp: new Date()
+      }]);
+      
+      toast.info("Bubbles suggests visiting...", {
+        description: params.reason || `Let me show you the ${params.page} page!`,
+        action: {
+          label: "Go there",
+          onClick: () => navigate(path)
+        }
+      });
+      
+      return `Suggested navigation to ${params.page}. User can click to visit.`;
+    },
+    
+    // Show a product recommendation
+    showProduct: (params: { productName: string; reason?: string }) => {
+      console.log("Bubbles recommends product:", params);
+      
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "show_product",
+        params: { productName: params.productName },
+        timestamp: new Date()
+      }]);
+      
+      toast.success("Bubbles recommends...", {
+        description: params.reason || `You should check out the ${params.productName}!`,
+        action: {
+          label: "View Shop",
+          onClick: () => navigate("/collections/all")
+        }
+      });
+      
+      return `Showed product recommendation: ${params.productName}`;
+    },
+    
+    // Share a Bubbles fact or thought
+    showFact: (params: { fact: string; category?: string }) => {
+      console.log("Bubbles shares fact:", params);
+      
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "show_fact",
+        params: { fact: params.fact, category: params.category || "wisdom" },
+        timestamp: new Date()
+      }]);
+      
+      toast(params.fact, {
+        description: `Category: ${params.category || "Bubbles Wisdom"}`,
+        duration: 8000,
+      });
+      
+      return `Displayed fact: ${params.fact}`;
+    },
+    
+    // Show a notification/alert
+    showNotification: (params: { title: string; message: string; type?: string }) => {
+      console.log("Bubbles notification:", params);
+      
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "notification",
+        params: { title: params.title, message: params.message },
+        timestamp: new Date()
+      }]);
+      
+      const toastType = params.type === "error" ? toast.error 
+        : params.type === "warning" ? toast.warning 
+        : params.type === "success" ? toast.success 
+        : toast.info;
+      
+      toastType(params.title, {
+        description: params.message
+      });
+      
+      return `Notification shown: ${params.title}`;
+    },
+    
+    // Get current page context
+    getCurrentPage: () => {
+      const path = window.location.pathname;
+      return `User is currently on: ${path}`;
+    },
+  }), [navigate]);
+
+  // Agent overrides with Bubbles' personality and tool instructions
   const agentOverrides = useMemo(() => ({
     agent: {
       prompt: {
-        prompt: BUBBLES_SYSTEM_PROMPT,
+        prompt: `${BUBBLES_SYSTEM_PROMPT}
+
+AVAILABLE TOOLS:
+You have access to these client tools to enhance the conversation:
+
+1. navigateTo(page, reason) - Suggest the user visit a page. Pages: home, shop, facts, explains, about, faq, hall_of_fame, contact, achievements
+2. showProduct(productName, reason) - Recommend a product from the shop
+3. showFact(fact, category) - Display one of your famous incorrect facts
+4. showNotification(title, message, type) - Show an alert (type: info, success, warning, error)
+5. getCurrentPage() - Find out what page the user is viewing
+
+Use these tools naturally when relevant to help guide the conversation. For example:
+- If someone asks about merch, use showProduct to recommend something
+- If talking about your wisdom, use showFact to display a memorable quote
+- If they seem lost, use navigateTo to help them explore`,
       },
       firstMessage: BUBBLES_FIRST_MESSAGE,
       language: "en",
@@ -129,11 +267,13 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
   }, []);
 
   const conversation = useConversation({
+    clientTools,
     onConnect: () => {
       console.log("Connected to Bubbles agent");
       toast.success("Connected to Bubbles!", {
         description: "Start speaking to have a conversation."
       });
+      setToolActions([]); // Clear previous tool actions
     },
     onDisconnect: () => {
       console.log("Disconnected from Bubbles agent");
@@ -346,12 +486,20 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
               <p className="text-sm text-foreground font-medium mb-1">
-                🐑 Bubbles' Voice Personality
+                🐑 Bubbles' Voice Personality + Tools
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mb-2">
                 Uses Irish voice (Liam) with full character system prompt, 
                 including wisdom from Anthony, Peggy, Jimmy Riley, and Aidan.
               </p>
+              <div className="flex flex-wrap gap-1">
+                {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
+                  <Badge key={tool} variant="outline" className="text-xs">
+                    <Sparkles className="h-2.5 w-2.5 mr-1" />
+                    {tool}
+                  </Badge>
+                ))}
+              </div>
             </div>
             
             <div className="space-y-2">
@@ -376,8 +524,33 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
                 >
                   ElevenLabs Conversational AI
                 </a>
-                {" "}— Bubbles' personality will be injected automatically.
+                {" "}— Bubbles' personality and tools will be injected automatically.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Tool Actions Log (when connected and actions exist) */}
+        {isConnected && toolActions.length > 0 && (
+          <div className="border rounded-lg p-3 bg-primary/5 border-primary/20">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+              <Sparkles className="h-3 w-3 text-primary" />
+              <span>Bubbles triggered {toolActions.length} action(s)</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {toolActions.slice(-3).map((action) => (
+                <Badge 
+                  key={action.id} 
+                  variant="secondary" 
+                  className="text-xs gap-1"
+                >
+                  {action.type === "navigate" && <Navigation className="h-3 w-3" />}
+                  {action.type === "show_product" && <ShoppingBag className="h-3 w-3" />}
+                  {action.type === "show_fact" && <MessageSquare className="h-3 w-3" />}
+                  {action.type === "notification" && <AlertCircle className="h-3 w-3" />}
+                  {action.type}
+                </Badge>
+              ))}
             </div>
           </div>
         )}
