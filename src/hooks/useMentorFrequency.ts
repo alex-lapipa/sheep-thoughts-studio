@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { subDays, startOfDay, endOfDay } from "date-fns";
 
@@ -11,7 +12,31 @@ export interface MentorFrequency {
 }
 
 export function useMentorFrequency(days: number = 30) {
+  const queryClient = useQueryClient();
   const dateRange = { from: subDays(new Date(), days), to: new Date() };
+
+  // Set up realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('mentor-trigger-events-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'mentor_trigger_events',
+        },
+        (payload) => {
+          // Invalidate and refetch when new trigger events come in
+          queryClient.invalidateQueries({ queryKey: ["mentor-frequency", days] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, days]);
 
   return useQuery({
     queryKey: ["mentor-frequency", days],
