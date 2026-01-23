@@ -4,25 +4,22 @@ import { BubblesLogo } from "./BubblesSheep";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { ThemeModeToggle } from "./ThemeModeToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
-import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, User, HelpCircle, Zap, Mic } from "lucide-react";
+import { Menu, Vibrate, X, ChevronRight, ShoppingBag, HelpCircle, Mic, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useWhatsNew } from "@/hooks/useWhatsNew";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Phase 1: Simplified public navigation - Chat, Live, Shop, FAQ only
 const getNavLinks = (t: (key: string) => string) => [
-  { href: "/", label: t("nav.home"), icon: Home },
-  { href: "/facts", label: t("nav.facts"), icon: BookOpen },
-  { href: "/explains", label: t("nav.explains"), icon: Zap },
-  { href: "/talk", label: "Talk", icon: Mic },
-  { href: "/hall-of-fame", label: "Hall of Fame", icon: Trophy },
+  { href: "/talk", label: "Chat", icon: Mic },
+  { href: "/scenarios", label: "Live", icon: Radio },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
-  { href: "/faq", label: t("nav.questions"), icon: HelpCircle },
+  { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
 export function Header() {
@@ -30,7 +27,6 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLanguage();
   const { hapticEnabled, toggleHaptic } = useSettings();
-  const { hasNewFeatures, newEntriesCount, markAsSeen } = useWhatsNew();
   const location = useLocation();
   const navLinks = getNavLinks(t);
 
@@ -135,30 +131,6 @@ export function Header() {
               <p>Haptic feedback: {hapticEnabled ? "On" : "Off"}</p>
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link to="/whats-new" onClick={markAsSeen}>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className={cn(
-                    "hover:animate-bounce-gentle relative h-9 w-9",
-                    hasNewFeatures && "text-accent"
-                  )}
-                >
-                  <Sparkles className={cn("h-4 w-4", hasNewFeatures && "animate-pulse")} />
-                  {hasNewFeatures && newEntriesCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-bold rounded-full bg-accent text-accent-foreground shadow-sm">
-                      {newEntriesCount > 9 ? '9+' : newEntriesCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{hasNewFeatures ? "New features available!" : "What's New"}</p>
-            </TooltipContent>
-          </Tooltip>
           <div className="hover:animate-squish">
             <CartDrawer />
           </div>
@@ -229,38 +201,6 @@ export function Header() {
                       );
                     })}
                     
-                    {/* What's New */}
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: navLinks.length * 0.05 }}
-                    >
-                      <Link 
-                        to="/whats-new"
-                        onClick={() => {
-                          markAsSeen();
-                          setMobileOpen(false);
-                        }}
-                        className={cn(
-                          "flex items-center gap-4 px-5 py-4 transition-colors active:bg-accent/10",
-                          hasNewFeatures ? "bg-accent/5" : "hover:bg-secondary/50"
-                        )}
-                      >
-                        <Sparkles className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          hasNewFeatures ? "text-accent animate-pulse" : "text-muted-foreground"
-                        )} />
-                        <span className="font-display text-base font-medium flex-1">
-                          What's New
-                        </span>
-                        {hasNewFeatures && newEntriesCount > 0 && (
-                          <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
-                            {newEntriesCount > 9 ? '9+' : newEntriesCount}
-                          </span>
-                        )}
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    </motion.div>
                   </AnimatePresence>
                 </nav>
 
