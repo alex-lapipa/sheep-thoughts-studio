@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { 
   BookOpen, Heart, Home, Mountain, TreePine, Sparkles, Cloud, 
   MessageCircle, Play, Copy, Eye, Volume2, Loader2, Send,
-  CheckCircle, AlertCircle, RefreshCw, BarChart3, Search
+  CheckCircle, AlertCircle, RefreshCw, BarChart3, Search, Wrench, Flower2, Car
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -134,6 +134,54 @@ const mentors = [
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/30",
     icon: BookOpen,
+  },
+  {
+    id: "jony",
+    name: "Jony",
+    role: "The Fixer",
+    domain: "Problem-Solving & Repairs",
+    description: "Could fix anything with duct tape and optimism. Usually made it worse first.",
+    bubblesInterpretation: "Jony taught me that everything is fixable. The gate, the fence, my understanding of physics. 'Just give it a whack' was his diagnostic method. If something breaks more, that just means you're getting closer to the solution.",
+    signaturePhrase: "Ah, that'll do...",
+    topics: ["Fixing things", "DIY", "Problem-solving", "Improvisation"],
+    sampleQuestion: "Something's broken and I need to fix it. What's your approach to repairs?",
+    triggers: ["fix", "broken", "repair", "tools", "DIY", "build", "mechanical", "whack"],
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/30",
+    icon: Wrench,
+  },
+  {
+    id: "maureen",
+    name: "Maureen",
+    role: "The Gentle Soul",
+    domain: "Kindness & Nature",
+    description: "Spoke softly, moved slowly, and knew every flower in the garden by name.",
+    bubblesInterpretation: "Maureen never raised her voice because she didn't need to. The flowers listened. The birds listened. I listened. She taught me that gentleness is a form of strength, and that talking to plants is perfectly normal behavior.",
+    signaturePhrase: "Easy now, easy...",
+    topics: ["Kindness", "Gardening", "Nature", "Gentle wisdom"],
+    sampleQuestion: "How do I be kinder to myself and others? Tell me about gentleness.",
+    triggers: ["gentle", "kind", "garden", "flowers", "nature", "soft", "peaceful", "calm"],
+    color: "text-pink-500",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/30",
+    icon: Flower2,
+  },
+  {
+    id: "eddie",
+    name: "Eddie",
+    role: "The Driver",
+    domain: "Adventures & Road Wisdom",
+    description: "Always behind a wheel. Knew every back road in Wicklow and most of Wexford.",
+    bubblesInterpretation: "Eddie proved that life is about the journey, not the destination. Mostly because he'd get lost and we'd end up somewhere unexpected. He taught me that wrong turns are just undiscovered routes, and that the scenic route is always better.",
+    signaturePhrase: "Hop in, we'll figure it out...",
+    topics: ["Travel", "Adventures", "Getting lost", "Road wisdom"],
+    sampleQuestion: "I'm feeling stuck in life. What's your advice for taking a new direction?",
+    triggers: ["drive", "road", "journey", "lost", "adventure", "stuck", "direction", "route"],
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/30",
+    icon: Car,
   },
 ];
 

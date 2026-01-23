@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Brain, Sparkles, Coffee, Flame, Plane, Music, Scale, Clock, Languages, Database } from "lucide-react";
+import { Search, Brain, Sparkles, Coffee, Flame, Plane, Music, Scale, Clock, Languages, Database, Wrench, Flower2, Car } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -72,6 +72,24 @@ const MENTOR_CONFIG: Record<string, { icon: React.ReactNode; color: string; doma
     color: "bg-rose-500",
     domain: "Language & Confusion",
     keywords: ["alex", "spanish", "language", "translate", "bilingual", "confused"]
+  },
+  jony: {
+    icon: <Wrench className="h-4 w-4" />,
+    color: "bg-cyan-500",
+    domain: "Fixing & Problem-Solving",
+    keywords: ["jony", "fix", "repair", "broken", "tools", "handy", "build", "mechanical"]
+  },
+  maureen: {
+    icon: <Flower2 className="h-4 w-4" />,
+    color: "bg-pink-500",
+    domain: "Gentle Wisdom & Nature",
+    keywords: ["maureen", "gentle", "flowers", "garden", "nature", "kind", "soft", "peaceful"]
+  },
+  eddie: {
+    icon: <Car className="h-4 w-4" />,
+    color: "bg-indigo-500",
+    domain: "Driving & Adventures",
+    keywords: ["eddie", "drive", "car", "road", "journey", "adventure", "transport", "travel"]
   }
 };
 

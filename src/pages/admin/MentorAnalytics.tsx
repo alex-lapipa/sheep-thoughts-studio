@@ -13,7 +13,7 @@ import {
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { 
   TrendingUp, Users, MessageSquare, Clock, RefreshCw, 
-  Cloud, Heart, Home, Mountain, Sparkles, Plane, Globe
+  Cloud, Heart, Home, Mountain, Sparkles, Plane, Globe, Wrench, Flower2, Car
 } from "lucide-react";
 
 // Mentor definitions with colors
@@ -25,6 +25,9 @@ const MENTORS = [
   { id: "aidan", name: "Aidan", role: "Cosmic Philosopher", color: "#8b5cf6", icon: Sparkles },
   { id: "seamus", name: "Seamus", role: "Exotic One", color: "#10b981", icon: Plane },
   { id: "alex", name: "Alex", role: "Language Chaos", color: "#ec4899", icon: Globe },
+  { id: "jony", name: "Jony", role: "The Fixer", color: "#06b6d4", icon: Wrench },
+  { id: "maureen", name: "Maureen", role: "The Gentle Soul", color: "#ec4899", icon: Flower2 },
+  { id: "eddie", name: "Eddie", role: "The Driver", color: "#6366f1", icon: Car },
 ];
 
 const COLORS = MENTORS.map(m => m.color);

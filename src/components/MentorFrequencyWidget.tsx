@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Cloud, Heart, Home, Mountain, Sparkles, TreePine, BookOpen,
-  ChevronUp, ChevronDown, Flame, TrendingUp
+  ChevronUp, ChevronDown, Flame, TrendingUp, Wrench, Flower2, Car
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMentorFrequency } from "@/hooks/useMentorFrequency";
@@ -15,6 +15,9 @@ const MENTOR_CONFIG: Record<string, { name: string; color: string; icon: React.E
   aidan: { name: "Aidan", color: "text-violet-500", icon: Sparkles },
   seamus: { name: "Seamus", color: "text-emerald-500", icon: TreePine },
   alex: { name: "Alex", color: "text-orange-500", icon: BookOpen },
+  jony: { name: "Jony", color: "text-cyan-500", icon: Wrench },
+  maureen: { name: "Maureen", color: "text-pink-500", icon: Flower2 },
+  eddie: { name: "Eddie", color: "text-indigo-500", icon: Car },
 };
 
 export const MentorFrequencyWidget = () => {
