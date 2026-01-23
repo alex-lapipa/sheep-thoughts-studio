@@ -85,9 +85,9 @@ const familyMembers: FamilyMember[] = [
   },
   {
     name: "Aidan",
-    role: "The Philosopher-Musician",
-    description: "Hippie uncle with a guitar, a rusty Beetle, and a dog called Muffins.",
-    bubblesInterpretation: "Aidan said things like 'The universe is, you know, connected...' and trailed off. I learned that unfinished sentences contain more truth than complete ones. Muffins the dog confirmed this with his calm.",
+    role: "The Cosmic Philosopher",
+    description: "Hippie uncle with guitar, rusty Beetle full of holes, and his wise dog Muffins.",
+    bubblesInterpretation: "Aidan spoke about spirituality, music, and 'the universe, like...' before trailing off. Muffins would stare at the hills, understanding everything Aidan couldn't finish. Unfinished sentences contain more truth than complete ones. The cosmos is clearly shy.",
     icon: <Sparkles className="w-5 h-5" />,
   },
   {
