@@ -10,6 +10,7 @@ import { Badge } from "./ui/badge";
 import { ThoughtBubble } from "./ThoughtBubble";
 import { AudioWaveform } from "./AudioWaveform";
 import { MicActivityIndicator } from "./MicActivityIndicator";
+import { VoiceServicesStatus } from "./VoiceServicesStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -572,20 +573,23 @@ export const BubblesVoiceChat = () => {
 
         {/* Status indicators */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            {isListening && (
-              <>
-                <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
-                Recording...
-              </>
-            )}
-            {isSpeaking && (
-              <>
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                Speaking...
-              </>
-            )}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              {isListening && (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+                  Recording...
+                </>
+              )}
+              {isSpeaking && (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  Speaking...
+                </>
+              )}
+            </span>
+            <VoiceServicesStatus compact />
+          </div>
           <span className="italic">RAG-powered personality</span>
         </div>
       </CardContent>
