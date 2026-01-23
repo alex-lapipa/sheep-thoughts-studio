@@ -166,6 +166,68 @@ export default function BusinessPlan() {
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [activeSection, setActiveSection] = useState("executive_summary");
   const [generatingAll, setGeneratingAll] = useState(false);
+  const [loadingCache, setLoadingCache] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  // Load cached sections on mount
+  useEffect(() => {
+    const loadCachedSections = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('business_plan_sections')
+          .select('*');
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setSections(prev => prev.map(section => {
+            const cached = data.find(d => d.id === section.id);
+            if (cached) {
+              return {
+                ...section,
+                content: cached.content,
+                generated: true,
+              };
+            }
+            return section;
+          }));
+
+          // Get most recent update time
+          const mostRecent = data.reduce((latest, item) => {
+            const itemDate = new Date(item.updated_at);
+            return itemDate > new Date(latest) ? item.updated_at : latest;
+          }, data[0].updated_at);
+          setLastUpdated(mostRecent);
+        }
+      } catch (error) {
+        console.error('Failed to load cached sections:', error);
+      } finally {
+        setLoadingCache(false);
+      }
+    };
+
+    loadCachedSections();
+  }, []);
+
+  // Save section to database
+  const saveSectionToCache = async (sectionId: string, title: string, content: string) => {
+    try {
+      const { error } = await supabase
+        .from('business_plan_sections')
+        .upsert({
+          id: sectionId,
+          title,
+          content,
+          generated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'id' });
+
+      if (error) throw error;
+      setLastUpdated(new Date().toISOString());
+    } catch (error) {
+      console.error('Failed to cache section:', error);
+    }
+  };
 
   const generateSection = async (sectionId: string) => {
     setSections(prev => prev.map(s => 
@@ -179,11 +241,16 @@ export default function BusinessPlan() {
 
       if (error) throw error;
 
+      const sectionTitle = sections.find(s => s.id === sectionId)?.title || sectionId;
+      
+      // Save to cache
+      await saveSectionToCache(sectionId, sectionTitle, data.content);
+
       setSections(prev => prev.map(s => 
         s.id === sectionId ? { ...s, content: data.content, loading: false, generated: true } : s
       ));
 
-      toast.success(`${sections.find(s => s.id === sectionId)?.title} generated`);
+      toast.success(`${sectionTitle} generated and saved`);
     } catch (error) {
       console.error('Generation error:', error);
       toast.error(`Failed to generate section: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -291,7 +358,20 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
         <Card>
           <CardContent className="py-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Generation Progress</span>
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium">Generation Progress</span>
+                {loadingCache && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Loading cached data...
+                  </span>
+                )}
+                {lastUpdated && !loadingCache && (
+                  <span className="text-xs text-muted-foreground">
+                    Last saved: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
               <span className="text-sm text-muted-foreground">
                 {generatedCount} / {sections.length} sections
               </span>

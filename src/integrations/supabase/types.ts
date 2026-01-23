@@ -308,6 +308,30 @@ export type Database = {
         }
         Relationships: []
       }
+      business_plan_sections: {
+        Row: {
+          content: string
+          generated_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          generated_at?: string
+          id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          generated_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       changelog_entries: {
         Row: {
           category: string
