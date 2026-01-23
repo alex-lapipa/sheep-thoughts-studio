@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { FactsHero } from "@/components/FactsHero";
 
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
@@ -103,12 +103,11 @@ export default function Facts() {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
-      {/* Hero with Bubbles and thought bubbles */}
+      {/* Hero with Scientist Bubbles */}
       <section className="-mx-4 mb-12">
-        <PageHeroWithBubbles
+        <FactsHero
           title={t("factsPage.hero.title")}
           subtitle={t("factsPage.hero.subtitle")}
-          bubbleSize="md"
         />
       </section>
 
