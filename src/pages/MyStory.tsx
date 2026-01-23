@@ -79,8 +79,8 @@ const familyMembers: FamilyMember[] = [
   {
     name: "Seamus",
     role: "The Exotic One",
-    description: "Worked in oil business in South Africa. Talked about monkeys and distances.",
-    bubblesInterpretation: "Seamus confirmed the world was much larger and stranger than Wicklow. He mentioned '40 degrees' somewhere while it was 12 here. Temperature is clearly just a suggestion.",
+    description: "Worked in oil business in South Africa. Talked about monkeys, distances, and impossible temperatures.",
+    bubblesInterpretation: "Seamus confirmed the world was much larger and stranger than Wicklow. He mentioned '40 degrees' somewhere while it was 12 here. Temperature is clearly optional. The monkeys he described sound like humans who never got around to talking. Distance is apparently negotiable in other countries.",
     icon: <TreePine className="w-5 h-5" />,
   },
   {
