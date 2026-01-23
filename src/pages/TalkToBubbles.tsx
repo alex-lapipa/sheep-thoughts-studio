@@ -2,13 +2,11 @@ import { useState, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { BubblesConversation } from "@/components/BubblesConversation";
-import { BubblesVoiceChat, type BubblesVoiceChatProps } from "@/components/BubblesVoiceChat";
-import { VoiceServicesStatus } from "@/components/VoiceServicesStatus";
+import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
 import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Phone, MessageSquare, Mic, Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -19,17 +17,14 @@ export default function TalkToBubbles() {
   const handleChannelMentor = useCallback((question: string, mentorName: string) => {
     setPrefilledQuestion(question);
     
-    // Scroll to chat section
     chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     
-    // Show toast
     toast.success(`Channeling ${mentorName}'s wisdom...`, {
       description: "Your question is ready — just hit send!",
       duration: 3000,
     });
   }, []);
 
-  // Clear prefilled question after it's been used
   const handleQuestionUsed = useCallback(() => {
     setPrefilledQuestion("");
   }, []);
@@ -55,8 +50,9 @@ export default function TalkToBubbles() {
       <div className="min-h-screen bg-gradient-to-b from-background via-secondary/20 to-background">
         {/* Floating Mentor Widget */}
         <MentorFrequencyWidget />
+
         {/* Hero Section */}
-        <section className="relative py-12 md:py-20 overflow-hidden">
+        <section className="relative py-16 md:py-24 overflow-hidden">
           <div className="container px-4 md:px-6">
             <motion.div 
               className="text-center max-w-3xl mx-auto"
@@ -64,24 +60,12 @@ export default function TalkToBubbles() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="p-3 rounded-full bg-accent/20">
-                  <Mic className="h-6 w-6 text-accent" />
-                </div>
-                <VoiceServicesStatus />
-              </div>
-              
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Talk to <span className="text-accent">Bubbles</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
                 Have a real conversation with Ireland's most confidently confused sheep.
-              </p>
-              
-              <p className="text-sm text-muted-foreground/80">
-                Ask about philosophy, food, music, rules, routines, or life in Wicklow. 
-                Bubbles will consult the wisdom of Peggy, Jimmy, Anthony, Aidan, Seamus, and Carmel.
               </p>
             </motion.div>
           </div>
@@ -93,24 +77,20 @@ export default function TalkToBubbles() {
           </div>
         </section>
 
-        {/* Voice Chat Interface */}
+        {/* Chat Interface */}
         <section ref={chatSectionRef} className="py-8 md:py-12 scroll-mt-20">
           <div className="container px-4 md:px-6">
-            <Tabs defaultValue="text-voice" className="w-full max-w-4xl mx-auto">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-                <TabsTrigger value="text-voice" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="hidden sm:inline">Text & Voice</span>
-                  <span className="sm:hidden">Chat</span>
+            <Tabs defaultValue="chat" className="w-full max-w-4xl mx-auto">
+              <TabsList className="grid w-full max-w-xs mx-auto grid-cols-2 mb-8">
+                <TabsTrigger value="chat">
+                  Chat
                 </TabsTrigger>
-                <TabsTrigger value="realtime" className="gap-2">
-                  <Phone className="h-4 w-4" />
-                  <span className="hidden sm:inline">Real-time Call</span>
-                  <span className="sm:hidden">Call</span>
+                <TabsTrigger value="call">
+                  Call
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="text-voice" className="mt-0">
+              <TabsContent value="chat" className="mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -123,7 +103,7 @@ export default function TalkToBubbles() {
                 </motion.div>
               </TabsContent>
 
-              <TabsContent value="realtime" className="mt-0">
+              <TabsContent value="call" className="mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -136,10 +116,10 @@ export default function TalkToBubbles() {
           </div>
         </section>
 
-        {/* Meet the Mentors - Full Component */}
+        {/* Meet the Mentors */}
         <MeetTheMentors onChannelMentor={handleChannelMentor} />
 
-        {/* Mentor Frequency Stats */}
+        {/* Mentor Activity */}
         <section className="py-12 md:py-16">
           <div className="container px-4 md:px-6">
             <motion.div
@@ -149,52 +129,28 @@ export default function TalkToBubbles() {
               transition={{ duration: 0.5 }}
               className="text-center mb-10"
             >
-              <motion.span
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="inline-block px-3 py-1 mb-4 text-xs font-medium rounded-full bg-accent/20 text-accent"
-              >
-                Live Stats
-              </motion.span>
               <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-3">
                 Who's Been Talking?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                See which mentors Bubbles has been channeling most. Every conversation triggers 
-                wisdom from the Wicklow gang.
+                See which mentors Bubbles has been channeling lately.
               </p>
             </motion.div>
             <MentorFrequencyCards />
           </div>
         </section>
 
-        {/* Tips Section */}
+        {/* Tips Section - Simplified */}
         <section className="py-8 md:py-12 bg-secondary/30">
           <div className="container px-4 md:px-6">
             <div className="max-w-2xl mx-auto text-center">
               <h3 className="font-display text-xl font-semibold mb-4">
-                Tips for Chatting with Bubbles
+                What to Ask Bubbles
               </h3>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li className="flex items-start gap-2 justify-center">
-                  <Volume2 className="h-4 w-4 mt-0.5 text-accent flex-shrink-0" />
-                  <span>Ask about philosophy to hear Anthony's trailing wisdom</span>
-                </li>
-                <li className="flex items-start gap-2 justify-center">
-                  <Volume2 className="h-4 w-4 mt-0.5 text-accent flex-shrink-0" />
-                  <span>Mention food or feeling sad to invoke Peggy's kitchen comfort</span>
-                </li>
-                <li className="flex items-start gap-2 justify-center">
-                  <Volume2 className="h-4 w-4 mt-0.5 text-accent flex-shrink-0" />
-                  <span>Ask about rules or right vs wrong for Jimmy's ISPCA authority</span>
-                </li>
-                <li className="flex items-start gap-2 justify-center">
-                  <Volume2 className="h-4 w-4 mt-0.5 text-accent flex-shrink-0" />
-                  <span>Discuss music or dreams for Aidan's vague hippie idealism</span>
-                </li>
-              </ul>
+              <p className="text-muted-foreground">
+                Ask about philosophy, food, music, travel, or life advice. 
+                Bubbles will share wisdom from the humans who raised them in Wicklow.
+              </p>
             </div>
           </div>
         </section>
