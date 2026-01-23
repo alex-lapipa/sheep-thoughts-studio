@@ -234,18 +234,13 @@ export default function Index() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-muted/20 via-bubbles-meadow/5 to-background relative overflow-hidden">
         <ParallaxSection speed={0.2} className="absolute top-1/3 left-5 w-28 h-28 rounded-full bg-accent/10 blur-3xl" />
         <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/3 right-5 w-36 h-36 rounded-full bg-bubbles-mist/10 blur-3xl" />
+        <ParallaxSection speed={0.15} className="absolute top-10 right-1/4 w-20 h-20 rounded-full bg-bubbles-gorse/15 blur-2xl" />
+        <ParallaxSection speed={0.25} direction="down" className="absolute bottom-10 left-1/4 w-24 h-24 rounded-full bg-bubbles-heather/10 blur-2xl" />
         
         <div className="container relative z-10">
-          <AnimatedOnView className="text-center mb-8">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2">
-              {t("index.voiceChat") || "Talk to Bubbles"}
-            </h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              {t("index.voiceChatSubtitle") || "Ask anything. Get confidently wrong answers. Voice in, voice out."}
-            </p>
-          </AnimatedOnView>
-          
-          <BubblesVoiceChat />
+          <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.008}>
+            <BubblesVoiceChat />
+          </ParallaxSection>
         </div>
       </section>
 

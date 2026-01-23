@@ -334,8 +334,12 @@ export const BubblesVoiceChat = () => {
   }, []);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto border-2 border-accent/20 shadow-lg">
-      <CardHeader className="pb-3">
+    <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-card/70 border border-white/20 dark:border-white/10 shadow-2xl shadow-accent/5 relative overflow-hidden">
+      {/* Glassmorphism gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-accent/5 pointer-events-none" />
+      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-bubbles-meadow/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+      <CardHeader className="pb-3 relative z-10">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <MessageCircle className="h-5 w-5 text-accent" />
@@ -448,9 +452,9 @@ export const BubblesVoiceChat = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 relative z-10">
         {/* Messages Area */}
-        <div className="h-[300px] overflow-y-auto space-y-3 p-2 rounded-lg bg-muted/30">
+        <div className="h-[300px] overflow-y-auto space-y-3 p-3 rounded-xl bg-background/50 backdrop-blur-sm border border-white/10">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
               <p className="text-center">
