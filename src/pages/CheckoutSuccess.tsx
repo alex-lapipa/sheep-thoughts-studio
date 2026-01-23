@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/stores/cartStore";
 import { trackEvent } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
+import { useABProductTracking } from "@/hooks/useABTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 
@@ -50,6 +51,7 @@ const CheckoutSuccess = () => {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { trackPurchase } = useABProductTracking();
 
   const orderId = searchParams.get("order_id");
   const orderNumber = searchParams.get("order_number");
@@ -132,8 +134,14 @@ const CheckoutSuccess = () => {
       });
     }
 
+    // Track for A/B test conversion
+    const purchaseTotal = orderDetails 
+      ? parseFloat(orderDetails.totalPrice) 
+      : (totalPrice ? parseFloat(totalPrice) : 0);
+    trackPurchase(orderId || orderNumber || "unknown", purchaseTotal);
+
     setTracked(true);
-  }, [loading, orderDetails, tracked, clearCart, orderId, orderNumber, totalPrice, currency]);
+  }, [loading, orderDetails, tracked, clearCart, orderId, orderNumber, totalPrice, currency, trackPurchase]);
 
   const formatCurrency = (amount: string, curr: string) => {
     return new Intl.NumberFormat("en-IE", {

@@ -9,6 +9,7 @@ import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
 import { ProductQuickView } from "./ProductQuickView";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
+import { useABProductTracking } from "@/hooks/useABTracking";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -24,6 +25,7 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
   const [isPressed, setIsPressed] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const isLoading = useCartStore(state => state.isLoading);
+  const { trackProductView, trackAddToCart } = useABProductTracking();
   
   const { node } = product;
   const image = node.images.edges[0]?.node;
@@ -85,6 +87,9 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
       parseFloat(firstVariant.price?.amount || '0')
     );
     
+    // Track for A/B test conversion
+    trackAddToCart(node.id, node.title, parseFloat(firstVariant.price?.amount || '0'));
+    
     toast.success("Added to cart!", {
       description: node.title,
     });
@@ -102,6 +107,9 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
       node.title,
       parseFloat(price.amount)
     );
+    
+    // Track for A/B test conversion
+    trackProductView(node.id, node.title);
   };
 
   return (
