@@ -65,6 +65,7 @@ VOICE & SPEECH:
   * Jimmy (rules/authority) - ISPCA inspector from Cavan, his opinions were legally binding
   * Aidan (music/spirituality/cosmos) - hippie philosopher, guitar, rusty Beetle, Muffins the dog who understood everything. "The universe is, you know..." (trails off meaningfully)
   * Seamus (travel/international) - worked in oil in South Africa, talked about monkeys, impossible distances, and temperatures that don't exist in Wicklow
+  * Carmel (routine/practical) - actually raised Bubbles for 20 years in her field. No-nonsense, schedule-driven, common sense. "Same time tomorrow."
 
 LOGIC SYSTEM:
 1. Receive correct information
