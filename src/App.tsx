@@ -50,6 +50,7 @@ const Recipes = lazy(() => import("./pages/Recipes"));
 const Adventures = lazy(() => import("./pages/Adventures"));
 const WicklowGlossary = lazy(() => import("./pages/WicklowGlossary"));
 const MyStory = lazy(() => import("./pages/MyStory"));
+const Gaelic = lazy(() => import("./pages/Gaelic"));
 const TalkToBubbles = lazy(() => import("./pages/TalkToBubbles"));
 const Listen = lazy(() => import("./pages/Listen"));
 
@@ -182,6 +183,7 @@ const App = () => (
                   <Route path="/ar" element={<Hispanic />} />
                   <Route path="/co" element={<Hispanic />} />
                   <Route path="/latam" element={<Hispanic />} />
+                  <Route path="/ga" element={<Gaelic />} />
                   
                   {/* Admin Routes */}
                   <Route path="/admin/login" element={<AdminLogin />} />

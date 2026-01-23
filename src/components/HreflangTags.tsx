@@ -8,6 +8,7 @@ const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
 // Includes DACH regional variants for more precise targeting
 const SUPPORTED_LANGUAGES = [
   { code: "en", hreflang: "en" },
+  { code: "ga", hreflang: "ga" },
   { code: "es", hreflang: "es" },
   { code: "es-ES", hreflang: "es-ES" },
   { code: "es-MX", hreflang: "es-MX" },
@@ -28,6 +29,7 @@ const SUPPORTED_LANGUAGES = [
 const DACH_PAGES = ["/dach", "/de", "/at", "/ch"];
 const HISPANIC_PAGES = ["/es", "/mx", "/ar", "/co", "/latam"];
 const FRANCOPHONE_PAGES = ["/fr", "/be", "/lu"];
+const GAELIC_PAGES = ["/ga"];
 
 interface HreflangTagsProps {
   // Optional override for the current path
@@ -50,11 +52,18 @@ export function HreflangTags({ path }: HreflangTagsProps) {
   const isDACHPage = DACH_PAGES.some(p => currentPath.startsWith(p));
   const isHispanicPage = HISPANIC_PAGES.some(p => currentPath.startsWith(p));
   const isFrancophonePage = FRANCOPHONE_PAGES.some(p => currentPath.startsWith(p));
+  const isGaelicPage = GAELIC_PAGES.some(p => currentPath.startsWith(p));
   
   // Build the full URL for each language variant
   const getLanguageUrl = (langCode: string) => {
     // Clean path (remove trailing slash except for root)
     const cleanPath = currentPath === "/" ? "" : currentPath.replace(/\/$/, "");
+    
+    // For Gaelic pages
+    if (isGaelicPage) {
+      if (langCode === "ga") return `${SITE_URL}/ga`;
+      return `${SITE_URL}${cleanPath}`;
+    }
     
     // For DACH pages
     if (isDACHPage) {
@@ -96,6 +105,9 @@ export function HreflangTags({ path }: HreflangTagsProps) {
 
   // Get the appropriate lang attribute for the HTML element
   const getHtmlLang = (): string => {
+    if (isGaelicPage) {
+      return "ga";
+    }
     if (isDACHPage) {
       if (currentPath.startsWith("/at")) return "de-AT";
       if (currentPath.startsWith("/ch")) return "de-CH";
