@@ -10,7 +10,7 @@ export interface FeatureFlags {
 
 const DEFAULT_FLAGS: FeatureFlags = {
   newNavigation: true,        // Phase 1: Enabled
-  simplifiedHomepage: false,
+  simplifiedHomepage: true,   // Phase 2: Enabled - removes static knowledge sections
   enhancedShop: true,         // Phase 2: Enabled
   faqSummary: true,           // Phase 3: Enabled
 };
