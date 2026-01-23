@@ -1553,6 +1553,33 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_chat_history: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          mode: string | null
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          mode?: string | null
+          role: string
+          session_id?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          mode?: string | null
+          role?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
