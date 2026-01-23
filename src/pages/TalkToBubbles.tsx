@@ -140,8 +140,32 @@ export default function TalkToBubbles() {
         <MeetTheMentors onChannelMentor={handleChannelMentor} />
 
         {/* Mentor Frequency Stats */}
-        <section className="py-8 md:py-12">
+        <section className="py-12 md:py-16">
           <div className="container px-4 md:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-10"
+            >
+              <motion.span
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="inline-block px-3 py-1 mb-4 text-xs font-medium rounded-full bg-accent/20 text-accent"
+              >
+                Live Stats
+              </motion.span>
+              <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-3">
+                Who's Been Talking?
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                See which mentors Bubbles has been channeling most. Every conversation triggers 
+                wisdom from the Wicklow gang.
+              </p>
+            </motion.div>
             <MentorFrequencyCards />
           </div>
         </section>
