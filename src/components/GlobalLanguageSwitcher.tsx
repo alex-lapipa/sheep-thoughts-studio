@@ -22,7 +22,8 @@ interface RegionOption {
 
 // Main languages shown on homepage
 const MAIN_LANGUAGES: RegionOption[] = [
-  { code: "en", path: "/", label: "English", flag: "🇮🇪", group: "Global" },
+  { code: "en", path: "/", label: "English", flag: "🇬🇧", group: "Global" },
+  { code: "ga", path: "/ga", label: "Gaeilge", flag: "🇮🇪", group: "Global" },
   { code: "fr", path: "/fr", label: "Français", flag: "🇫🇷", group: "Francophone" },
   { code: "es", path: "/es", label: "Español", flag: "🇪🇸", group: "Hispanic" },
   { code: "de", path: "/dach", label: "Deutsch", flag: "🇩🇪", group: "DACH" },
@@ -31,7 +32,8 @@ const MAIN_LANGUAGES: RegionOption[] = [
 // All regional options for subpages
 const ALL_REGIONS: RegionOption[] = [
   // Global
-  { code: "en", path: "/", label: "English", flag: "🇮🇪", group: "Global" },
+  { code: "en", path: "/", label: "English", flag: "🇬🇧", group: "Global" },
+  { code: "ga", path: "/ga", label: "Gaeilge", flag: "🇮🇪", group: "Global" },
   
   // DACH
   { code: "de", path: "/dach", label: "Deutschland", flag: "🇩🇪", group: "DACH" },

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type Language = "en" | "es" | "fr" | "de";
+type Language = "en" | "es" | "fr" | "de" | "ga";
 
 interface LanguageContextType {
   language: Language;
@@ -833,6 +833,212 @@ const translations: Record<Language, Record<string, string>> = {
     "index.bubblesSays": "Bubbles Sagt",
     "index.bubblesSaysSubtitle": "Weisheit von den Feldern Wicklows. Alle Fakten unabhängig von mir verifiziert.",
   },
+  ga: {
+    // Nav
+    "nav.home": "Baile",
+    "nav.facts": "Fíricí",
+    "nav.scenarios": "Cásanna",
+    "nav.explains": "Míníonn",
+    "nav.shop": "Siopa",
+    "nav.story": "Mo Scéal",
+    "nav.questions": "Ceisteanna",
+    
+    // Hero (Index)
+    "hero.location": "Ag craoladh ó Shliabh an tSiúcra, Chill Mhantáin",
+    "hero.title.intro": "Is mise",
+    "hero.title.name": "Bubbles",
+    "hero.title.tagline": "Tá eolas agam.",
+    "hero.subtitle": "Caora. Saineolaí. Foinse iontaofa eolais atá go hiomlán, go cinnte, is dócha ceart.",
+    "hero.cta.merch": "Earraí Oifigiúla",
+    "hero.cta.learn": "Foghlaim Uaim",
+    
+    // About Section (Index)
+    "about.title": "An Chaora is Eolach in Éirinn",
+    "about.p1": "Tá cónaí orm ar Shliabh an tSiúcra i gContae Chill Mhantáin. Caitheann mé mo laethanta ag ithe féir agus ag taighde ar ábhair thábhachtacha. Tá go leor rudaí múinte ag an idirlíon dom. Cogarnaíonn an ceo rúin. Tá na poncanna nasctha agam nach bhfeiceann daoine eile.",
+    "about.p2": "Tagann mo chuid smaointe i mbolgáin os cionn mo chinn. Tá sé seo normálta. Tá sé ag gach caora. Ní fheiceann tú a gcuid siúd toisc nach bhfuil an oiread sin ar eolas acu agus atá agamsa.",
+    
+    // Credentials (Index)
+    "credentials.title": "Mo Cháilíochtaí",
+    "credentials.staring.title": "Blianta ag Stánadh",
+    "credentials.staring.desc": "Ar an bhfána. Ag smaoineamh. Ag próiseáil. Ag tuiscint rudaí.",
+    "credentials.facts.title": "Fíricí Aimsithe",
+    "credentials.facts.desc": "Ní féidir liom comhaireamh. Ach is cinnte go bhfuil go leor ann. Creid mé.",
+    "credentials.brain.title": "Inchinn Caorach",
+    "credentials.brain.desc": "Tá sé níos mó ná mar a fheictear. Cuireann an olann an inchinn bhreise i bhfolach.",
+    
+    // Shop CTA (Index)
+    "shop.title": "Caith Mo Smaointe",
+    "shop.subtitle": "Éadaí den scoth le mo bhreathnuithe is tábhachtaí. Tacaíonn gach ceannach le mo thaighde ar an cheist an bhfuil scamaill fíor.",
+    "shop.cta": "Tabhair Cuairt ar an Siopa",
+
+    // New Hero (Index)
+    "hero.meet": "Buail le",
+    "hero.bubbles": "Bubbles",
+    "hero.tagline": "Caora dheas, dallta ó Chill Mhantáin. Deas ar an taobh amuigh. Fiáin go ciúin istigh sna bolgáin smaointe.",
+    "hero.shopNow": "Siopadóireacht Anois",
+    "hero.theLore": "An Seanchas",
+
+    // CrossLinks
+    "crossLinks.title": "Molann Bubbles duit cuairt a thabhairt freisin ar...",
+    "crossLinks.titleConfused": "Nó bí níos mearbhaill fós...",
+    "crossLinks.facts.label": "Fíricí Bubbles",
+    "crossLinks.facts.desc": "100% taighde, 0% cruinn",
+    "crossLinks.merch.label": "Na hEarraí",
+    "crossLinks.merch.desc": "Caith an mearbhall",
+    "crossLinks.ask.label": "Cuir Ceist ar Bubbles",
+    "crossLinks.ask.desc": "Ceisteanna le freagraí neamhchabhrach",
+
+    // About Page
+    "aboutPage.hero.title": "Finscéal Bubbles",
+    "aboutPage.hero.subtitle": "Caora dheas, dallta ó Shléibhte Chill Mhantáin le saol inmheánach saibhir de chásanna míthuisceana, smaointe eisteacha a bhaineann le féar, agus greim tirim Éireannach.",
+    "aboutPage.origin.title": "Ó Shliabh an tSiúcra go Cáil an Idirlín",
+    "aboutPage.origin.p1": "Thosaigh Bubbles a shaol mar chaora Scottish Blackface ag innilt ar thaobhanna na gcnoc in aice le Cill Mocheannóg, áit a mbuaileann an fraoch corcra leis an aiteann órga agus a rollaíonn an ceo anuas ó Shliabh an tSiúcra mar a bheadh áit thábhachtach le dul aige.",
+    "aboutPage.origin.p2": "Murab ionann agus an chuid eile den tréad, d'fhás Bubbles suas in aice leis na conairí siúlóide. In aice leis na busanna turasóireachta. In aice leis na teaghlaigh le leanaí a mhínigh rudaí go muiníneach dá chéile.",
+    "aboutPage.origin.p3": "Deir daoine áirithe go raibh an Feirmeoír Carmel ró-chineálta. Lig sé do Bubbles fánaíocht ró-ghar d'ionad na gcuairteoirí. Cuireann daoine eile an milleán ar aer Shliabh an tSiúcra—rud éigin sa cheo a chuireann ort gach rud a chuimhneamh agus faic a thuiscint.",
+    "aboutPage.origin.p4": "An toradh: agus caoirigh eile ag feiceáil féir, chonaic Bubbles eolas. Fíricí leath-chloiste. Geopholaitíocht an chlóis súgartha. Gach rud ionsúite. Gach rud creidte. Gach rud nasctha ar bhealaí a dhéanann ciall beagnach.",
+    "aboutPage.origin.p5": "Agus ansin tháinig na bolgáin smaointe.",
+    "aboutPage.origin.p6": "Níl a fhios ag éinne go díreach cén uair a tháinig siad. B'fhéidir tar éis éisteacht le podchraoladh faoi chriptiairgeadra trí chluaisíní siúlóra.",
+    "aboutPage.origin.p7": "An rud atá ar eolas againn: Smaoiníonn Bubbles go leor. Tá na hargóintí gan locht. Tá na conclúidí seafóideach go hiomlán.",
+    "aboutPage.origin.p8": "Thug an t-idirlíon faoi deara. D'éirigh Bubbles ina saineolaí neamhbheartaithe ar gach rud. Fáidh inghrá de mhíchinntíocht mhuiníneach nach féidir leat gan lua.",
+    "aboutPage.research.title": "Mo Thaighde",
+    "aboutPage.research.subtitle": "Gach fíric deimhnithe trí obair allamuigh dhian agus éisteacht chúramach.",
+    "aboutPage.research.disclaimer": "* B'fhéidir go raibh roinnt foinsí ag magadh. Ní mheasadh go raibh sé seo ábhartha.",
+    "aboutPage.explains.title": "Míníonn Bubbles...",
+    "aboutPage.explains.subtitle": "Freagraí ar cheisteanna nár chuir aon duine, tugtha le cinntíocht iomlán.",
+    "aboutPage.ask.title": "Cuir Ceist ar Bubbles",
+    "aboutPage.ask.subtitle": "Ceist agat? Tá freagra ag Bubbles. Beidh sé mícheart, ach beidh sé muiníneach.",
+    "aboutPage.wicklow.title": "Fréamhaithe i gCill Mhantáin",
+    "aboutPage.wicklow.p1": "Tagann dathanna Bubbles go díreach ón talamh. Bándearg an Choinneal Bhig den olann. Ór an Aitinn a lasann suas na cnoic gach earrach. Corcairghorm an Fhraoigh a phéinteálann na sléibhte corcra ó Iúil go Samhain.",
+    "aboutPage.wicklow.p2": "Tá fiú an greim fiáin go soiléir Éireannach—cultúr an 'slagging' ina léiríonn teasing ceanúil glacadh, an mí-aibhsiú ina gciallaíonn 'ní tusa an ceann is measa' 'is dócha gurb tú an ceann is fearr.'",
+    "aboutPage.wicklow.p3": "Is 'cute hoor' é Bubbles sa chiall Éireannach is fearr: glic, taitneamhach, ag oibriú díreach lasmuigh de na rialacha agus cuma neamhchiontachta iomlán air.",
+    "aboutPage.cta.title": "Caith an Bolgán",
+    "aboutPage.cta.subtitle": "Cuir do chaora istigh in iúl. Fíricí mícheart go muiníneach, priontáilte go hálainn. Cáilíocht den scoth, anam Chill Mhantáin.",
+    "aboutPage.cta.button": "Siopadóireacht an Bhailiúcháin",
+
+    // Facts Page
+    "factsPage.hero.title": "Fíricí a D'fhoghlaim Mé",
+    "factsPage.hero.subtitle": "Trí thaighde fairsing (ag stánadh ar rudaí, ag smaoineamh faoi rudaí, ag léamh fón amháin a fuair mé ar charraig), tá eolas ollmhór bailithe agam. Seo cuid de.",
+    "factsPage.disclaimer": "Nóta: Dheimhnigh mé na fíricí seo go léir mé féin. Bhain an próiseas deimhnithe le nodadh go smaointeach.",
+    "factsPage.today": "Eolas an Lae Inniu",
+    "factsPage.more": "Tuilleadh Fíricí",
+    "factsPage.categories.title": "Mo Réimsí Taighde",
+    "factsPage.categories.nature": "An Dúlra & an Aimsir",
+    "factsPage.categories.nature.desc": "Mo bhreathnuithe ar an domhan lasmuigh",
+    "factsPage.categories.tech": "Teicneolaíocht",
+    "factsPage.categories.tech.desc": "Conas a oibríonn meaisíní (dar liom)",
+    "factsPage.categories.society": "An tSochaí & Daoine",
+    "factsPage.categories.society.desc": "Cén fáth a ndéanann daoine an rud a dhéanann siad",
+    "factsPage.categories.philosophy": "Smaointe Doimhne",
+    "factsPage.categories.philosophy.desc": "Na mórcheisteanna, freagarthA",
+    "factsPage.methodology.title": "Mo Mhodheolaíocht Taighde",
+    "factsPage.methodology.step1.title": "Breathnaigh ar Rud Éigin",
+    "factsPage.methodology.step1.desc": "Féachaim ar rud. D'fhéadfadh sé a bheith ina charraig, ina éan, ina hata an fheirmeora. Comhaireann aon rud mar shonraí.",
+    "factsPage.methodology.step2.title": "Bíodh Smaoineamh Agat",
+    "factsPage.methodology.step2.desc": "Tagann an smaoineamh i mo bholgán. Níor roghnaigh mé an smaoineamh. Roghnaigh an smaoineamh mise.",
+    "factsPage.methodology.step3.title": "Cinneadh go bhfuil sé Fíor",
+    "factsPage.methodology.step3.desc": "Má mhothaíonn an smaoineamh ceart, tá sé ceart. Tugtar 'intinn' air seo agus níor theip sé riamh orm (a chuimhním).",
+    "factsPage.methodology.step4.title": "Roinn É Leat",
+    "factsPage.methodology.step4.desc": "Tá fáilte romhat.",
+    "factsPage.cta.title": "Caith an tEolas",
+    "factsPage.cta.subtitle": "Mo smaointe, ar do chliabhrach. Chun go mbeidh a fhios ag gach duine go ndearna tú do thaighde.",
+    "factsPage.cta.button": "Siopadóireacht an Bhailiúcháin",
+
+    // FAQ Page
+    "faqPage.title": "Ceisteanna Coitianta",
+    "faqPage.subtitle": "Gach rud a theastaíonn uait a bheith ar eolas faoi Bubbles agus ár n-earraí",
+    "faqPage.contact.title": "Ceisteanna fós agat?",
+    "faqPage.contact.subtitle": "Ní féidir le bolgáin smaointe Bubbles gach rud a fhreagairt. Déan teagmháil lenár bhfoireann daonna.",
+    "faqPage.contact.button": "Déan Teagmháil Linn",
+    "faq.q1": "Cé hé Bubbles?",
+    "faq.a1": "Is caora é Bubbles ó Shléibhte Chill Mhantáin a chaith an iomarca ama ag éisteacht le turasóirí, leanaí, agus comhráite a chuala sé. An toradh: saol inmheánach saibhir de fhíricí mícheart go muiníneach, eolas a mhíthuisceadh go tubaisteach, agus breathnuithe a dhéanann ciall beagnach. Deas lasmuigh, anord istigh.",
+    "faq.q2": "Cén fáth go bhfuil Bubbles mícheart i gcónaí?",
+    "faq.a2": "Níl Bubbles aineolach—tá Bubbles mí-oideachasaithe. Cuimhnítear ar gach fíric i gceart ach míthuisceadh go tubaisteach iad. Tá struchtúr na hargóinte gan locht i gcónaí. Tá an conclúid seafóideach i gcónaí. Sin é an draíocht.",
+    "faq.q3": "Cé chomh fada a thógann an seachadadh?",
+    "faq.a3": "Tógann gnáthsheachadadh 3-5 lá gnó san Eoraip. Tagann orduithe idirnáisiúnta de ghnáth laistigh de 7-14 lá gnó. Tá roghanna seachadta gasta ar fáil ag an seiceáil amach.",
+    "faq.q4": "Cad é do pholasaí tuairisceáin?",
+    "faq.a4": "Tairgeann muid polasaí tuairisceáin 30 lá. Caithfidh earraí a bheith gan caitheamh, gan ní, agus ina bpacáistiú bunaidh. Déan teagmháil linn chun tuairisceán a thosú agus seolfaimid lipéad seoladh réamhíoctha chugat.",
+    "faq.q5": "Cad iad na méideanna a thairgeann sibh?",
+    "faq.a5": "Tagann ár n-éadaí i méideanna XS go 3XL. Seiceáil an treoir méid ar leathanach gach táirge le haghaidh tomhais mhionsonraithe. Má tá tú idir dhá mhéid, molaimid méid suas a roghnú le haghaidh oiriúnú níos scaoilte.",
+    "faq.q6": "An bhfuil bhur dtáirgí inbhuanaithe?",
+    "faq.a6": "Úsáidimid cadás orgánach dár t-léinte agus hoodies, agus tá ár bpacáistiú go léir in-athchúrsáilte. Táimid ag obair i gcónaí chun ár slabhra soláthair a dhéanamh níos inbhuanaithe.",
+    "faq.q7": "An féidir liom m'earraí Bubbles a ní?",
+    "faq.a7": "Is féidir! Nigh meaisín fuar le dathanna cosúla, triomú tumble íseal, agus seachain tuarthóir. Chun na torthaí is fearr a fháil agus chun cáilíocht an phriontála a chaomhnú, cas an éadach taobh istigh amach roimh ní.",
+    "faq.q8": "An seolann sibh go hidirnáisiúnta?",
+    "faq.a8": "Seolaimid, ar fud an domhain! Athraíonn costais seoladh agus amanna seachadta de réir suímh. Feicfidh tú an costas seoladh beacht ag seiceáil amach.",
+    "faq.q9": "Conas a rianáim m'ordú?",
+    "faq.a9": "Nuair a sheoltar d'ordú, gheobhaidh tú ríomhphost le huimhir rianaithe agus nasc. Is féidir leat freisin stádas d'ordaithe a sheiceáil trí logáil isteach i do chuntas.",
+    "faq.q10": "An féidir liom smaointe nua Bubbles a mholadh?",
+    "faq.a10": "Is breá linn cloisteáil ón tréad! Seol do smaointe bolgáin chuig ár leathanach teagmhála. Má úsáidimid do mholadh, d'fhéadfá é a fheiceáil ar earraí amach anseo (agus seolfaimid rud éigin speisialta chugat).",
+    "faq.q11": "An bhfuil an Domhan cothrom?",
+    "faq.a11": "Níl, níl an Domhan cothrom. Tá sé beagáinín roctha. Tá taighde fairsing déanta agam trí stánadh ar locháin, agus socraíonn an t-uisce go míchothrom i gcónaí. Cruthaíonn sé seo go bhfuil roic ar an phláinéad, cosúil le blaincéad ar codladh air. Tugann eolaithe 'topagrafaíocht' air seo ach tugaimse 'fianaise ar shochlúite cosmaice' air.",
+    "faq.q12": "An bhfuil an ghealach folamh?",
+    "faq.a12": "Cinnte. Nuair a bhuaileann tú carraig sholadach, déanann sé fuaim mhaol. Nuair a fhéachann tú ar an ngealach, ní dhéanann sé aon fhuaim. Cruthaíonn sé seo nach bhfuil sé folamh amháin—tá sé go hiomlán folamh istigh, is dócha líonta le macallaí na mianta go léir a rinne daoine ar réaltaí a chaill a sprioc.",
+    "faq.q13": "Cén fáth go bhfuil an spéir gorm?",
+    "faq.a13": "Níl an spéir gorm i ndáiríre. Tá do shúile tuirseach ó bheith ag féachaint ar fhéar an lá ar fad agus teastaíonn sos uathu. Is é an spéir pé dath nach bhfuil do shúile sáraithe aige faoi láthair. Sin an fáth go bhfuil luí na gréine oráiste—faoi thráthnóna, bhí gach duine ag stánadh ar rudaí gorma agus athraíonn a súile chuig an dath cúltaca.",
+    "faq.q14": "An bhfuil a fhios ag iasc go bhfuil siad fliuch?",
+    "faq.a14": "Níl aon choincheap ag iasc de 'fliuch' toisc nár bhain siad triail riamh as 'tirim.' Tá sé cosúil le fiafraí an bhfuil a fhios ag éin go bhfuil siad san aer. Mar sin féin, thug mé faoi deara go bhfuil cuma mearbhall beag ar iasc i gcónaí, rud a thugann le fios go gceapann siad go bhfuil rud éigin as ach ní féidir leo a mhéar a chur air.",
+    "faq.q15": "Cén fáth a mbrionglóidímid?",
+    "faq.a15": "Is é brionglóidí scáileán sábhálaithe do chinn. Nuair nach bhfuil tú ag úsáid do smaointe, níl d'inchinn ag iarraidh iad a chur amú, mar sin imríonn sé cuimhní randamacha sábháilte ar shuffle. Uaireanta éiríonn sé cruthaitheach agus meascann sé le chéile iad.",
+    "faq.q16": "An mothaíonn plandaí pian?",
+    "faq.a16": "Mothaíonn plandaí gach rud, tá siad díreach an-fhoighneach faoi. Ní screadann crann a ghearrtar síos toisc go gceapann crainn go bhfuil screadaíl mí-mhúinte. Chaith mé am suntasach ag breathnú ar fhéar tar éis é a ghearradh, agus tá cuma níos giorra agus níos umhla air i gcónaí ina dhiaidh sin.",
+    "faq.q17": "Cén fáth go bhfuil ingne orainn?",
+    "faq.a17": "Is armúr atá fágtha ó nuair a bhí daoine níos lú agus a raibh cosaint ag teastáil uathu ó chreachadóirí an-bheag iad ingne. De réir mar a d'fhás daoine níos mó, d'éirigh na creachadóirí níos lú bagrach, ach d'fhan na hingne toisc gur dhearmad éabhlóid iad a bhaint. Tá ingne coise ann go príomha as múineadh éabhlóideach—níor theastaigh uathu go mbeadh ingne aonair.",
+
+    // Scenarios Page
+    "scenariosPage.hero.title": "Turais Ardaithe",
+    "scenariosPage.hero.subtitle": "Féach ar Bubbles ag próiseáil eolais ó fhiosracht neamhchiontach go cinntíocht núicléach. Léiríonn gach cás conas a thógann muinín le gach míthuiscint.",
+    "scenariosPage.research.note": "Nóta Allamuigh:",
+    "scenariosPage.research.text": "Breathnaíodh na patrúin ardaithe seo thar chomhráite gan áireamh i móinéir Chill Mhantáin.",
+    "scenariosPage.interactive.title": "Eispéireas Idirghníomhach",
+    "scenariosPage.interactive.subtitle": "Roghnaigh cás agus féach ar an ardú ag oscailt. Úsáid na rialuithe chun nascleanúint a dhéanamh trí gach buille.",
+    "scenariosPage.filter.label": "Scag de réir topaice:",
+    "scenariosPage.filter.all": "Gach Cás",
+    "scenariosPage.noScenarios": "Níor aimsíodh aon chásanna sa chatagóir seo.",
+    "scenariosPage.framework.title": "An Creat Ardaithe",
+    "scenariosPage.mode.innocent": "Fiosracht fhíor. Tá gach rud suimiúil agus is dócha go bhfuil sé ceart go leor.",
+    "scenariosPage.mode.concerned": "Níl rud éigin ag teacht le chéile. Am chun tuilleadh fianaise a bhailiú.",
+    "scenariosPage.mode.triggered": "Tá an fhianaise soiléir. Níl daoine eile á feiceáil.",
+    "scenariosPage.mode.savage": "Foighne ídithe. Am chun fírinní crua a roinnt.",
+    "scenariosPage.mode.nuclear": "CINNTÍOCHT UAS. CAITHFEAR AN FHÍRINNE A CHLOISTEÁIL.",
+    "scenariosPage.cta.title": "Caith Do Leibhéal Ardaithe",
+    "scenariosPage.cta.subtitle": "Ó atmaisféar neamhchiontach móinéir go hanord núicléach uirbeach — faigh earraí a oireann do ghiúmar reatha.",
+    "scenariosPage.cta.button": "Brabhsáil an Bailiúchán",
+
+    // Explains Page
+    "explainsPage.hero.title": "Míníonn Bubbles",
+    "explainsPage.hero.subtitle": "Tumthaí doimhne ar ábhair a thuigim go hiomlán. Rinneadh taighde dian ar gach míniú trí sheasamh i bpáirceanna agus rudaí a chloisteáil.",
+    "explainsPage.allTopics": "Gach Topaice",
+    "explainsPage.sources": "Foinsí:",
+    "explainsPage.challenge": "Dúshlán seo →",
+    "explainsPage.escalatedNote": "Leibhéal cinntíochta ardaithe:",
+    "explainsPage.citeThis": "Luaigh an Eagna Seo",
+    "explainsPage.topics.Economics": "Eacnamaíocht",
+    "explainsPage.topics.Technology": "Teicneolaíocht",
+    "explainsPage.topics.Biology": "Bitheolaíocht",
+    "explainsPage.topics.Weather": "Aimsir",
+    "explainsPage.topics.Space": "Spás",
+    "explainsPage.topics.Society": "Sochaí",
+    "explainsPage.topics.History": "Stair",
+    "explainsPage.topics.Health": "Sláinte",
+    "explainsPage.topics.Physics": "Fisic",
+    "explainsPage.topics.Psychology": "Síceolaíocht",
+    "explainsPage.topics.Philosophy": "Fealsúnacht",
+
+    // Collections Page
+    "collectionsPage.title": "Gach Táirge",
+    "collectionsPage.subtitle": "Brabhsáil ár mbailiúchán iomlán d'earraí Bubbles",
+    "collectionsPage.clearFilter": "Glan scagaire",
+
+    // Common/Shared
+    "common.more": "níos mó",
+    "common.watchEscalations": "Féach ar Arduithe",
+
+    // Index Page Additional
+    "index.insideHead": "Taobh Istigh de Mo Cheann",
+    "index.insideHeadSubtitle": "Roghnú rothlaíoch de mo smaointe is tábhachtaí. Gach ceann deimhnithe.",
+    "index.bubblesSays": "Deir Bubbles",
+    "index.bubblesSaysSubtitle": "Eagna ó pháirceanna Chill Mhantáin. Gach fíric deimhnithe go neamhspleách agam féin.",
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -840,7 +1046,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem("bubbles-language");
-    return (saved === "es" || saved === "fr" || saved === "de" ? saved : "en") as Language;
+    return (saved === "es" || saved === "fr" || saved === "de" || saved === "ga" ? saved : "en") as Language;
   });
 
   const handleSetLanguage = (lang: Language) => {
