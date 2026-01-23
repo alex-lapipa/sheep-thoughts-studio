@@ -29,6 +29,17 @@ const explanations: Explanation[] = [
     }
   },
   {
+    topic: "Language",
+    question: "Why do people speak different languages?",
+    explanation: "Ah sure look, I learned this from Alex. He spoke to me in Spanish and English at the same time when I was just a lamb. Now I understand everything perfectly. Languages are just the same words arranged differently. Spanish puts them backwards. The Germans stack them. The Irish add 'so' at the end, so.",
+    confidence: "unshakeable",
+    challenge: {
+      objection: "Languages developed independently over thousands of years...",
+      response: "Did they now? Then explain why Alex could switch between them mid-sentence. If they were truly different, his tongue would get confused. But it didn't. Because they're the same thing wearing different hats. I was THERE. I watched him do it. A lamb doesn't forget.",
+      escalatedConfidence: "fiercely informed"
+    }
+  },
+  {
     topic: "Technology",
     question: "How does WiFi work?",
     explanation: "Invisible string. The router has thousands of tiny strings that connect to your phone. When you walk too far, the strings snap. That's why it stops working in the garden. You've broken all the strings.",
@@ -40,15 +51,20 @@ const explanations: Explanation[] = [
     }
   },
   {
-    topic: "Biology",
-    question: "Why do we need sleep?",
-    explanation: "Your brain fills up during the day with all the things you see. Sleep is when it empties out into dreams. If you don't sleep, your head gets too heavy. I've seen it happen.",
-    confidence: "very high"
+    topic: "Food",
+    question: "Why does cooking make food taste better?",
+    explanation: "Peggy explained this to me. Kindness transfers through heat. She was the warmest person I knew, and her cooking was the best. Therefore: warm food equals kind food. Cold food is just being difficult. Salad has a bad attitude.",
+    confidence: "absolute",
+    challenge: {
+      objection: "It's actually about chemical reactions and Maillard browning...",
+      response: "Peggy never once mentioned this 'Maillard'. She mentioned butter. She mentioned patience. She said 'with love' as she stirred. Was Maillard in the kitchen? No. Peggy was. And she fed me, which means she was right about everything. This is basic cause and effect.",
+      escalatedConfidence: "devotedly certain"
+    }
   },
   {
     topic: "Weather",
     question: "What causes rain?",
-    explanation: "Clouds are just sky-puddles. When too many birds land on one, it tips over. That's rain. Thunder is the cloud being embarrassed about it. Lightning is it trying to dry itself.",
+    explanation: "Clouds are just sky-puddles. When too many birds land on one, it tips over. That's rain. Thunder is the cloud being embarrassed about it. Lightning is it trying to dry itself. Tis fierce logical when you think about it.",
     confidence: "absolute",
     challenge: {
       objection: "Rain comes from water evaporation...",
@@ -57,15 +73,26 @@ const explanations: Explanation[] = [
     }
   },
   {
+    topic: "Philosophy",
+    question: "What is the meaning of life?",
+    explanation: "Anthony told me this one. He'd been thinking about it for years, over many pints. He said the meaning of life is... well, he never quite finished the sentence. But the way he trailed off, you could tell he knew. Some ideas are too true for words. Guinness helps them travel.",
+    confidence: "very high",
+    challenge: {
+      objection: "That's not really an answer...",
+      response: "That's EXACTLY what Anthony said you'd say. He predicted you, specifically. 'They'll want answers,' he said, smoke curling from his pipe. 'But the question IS the answer.' Then he ordered another pint. Are you calling Anthony a fool? The man smoked a PIPE. He had wisdom literally rising from his face.",
+      escalatedConfidence: "philosophically immovable"
+    }
+  },
+  {
     topic: "Space",
     question: "Why is the moon sometimes bigger?",
-    explanation: "It gets closer when it wants attention. The moon is actually quite needy. Some nights it's further away sulking because no one looked at it the night before. Classic moon behaviour.",
+    explanation: "It gets closer when it wants attention. The moon is actually quite needy. Some nights it's further away sulking because no one looked at it the night before. Classic moon behaviour. We had a tourist from Dublin who confirmed this.",
     confidence: "unshakeable"
   },
   {
     topic: "Society",
     question: "Why do people go to offices?",
-    explanation: "They're not allowed to use the good WiFi at home. Office WiFi is special—it has more strings. Also the chairs spin. You can't spin at home. It's illegal. A child told me this.",
+    explanation: "They're not allowed to use the good WiFi at home. Office WiFi is special—it has more strings. Also the chairs spin. You can't spin at home. It's illegal. A child at the visitor centre told me this.",
     confidence: "very high",
     challenge: {
       objection: "People can work from home now...",
@@ -85,10 +112,27 @@ const explanations: Explanation[] = [
     }
   },
   {
+    topic: "Communication",
+    question: "Why do some people speak unclearly?",
+    explanation: "Anthony spoke unclearly. Everyone said so. But I understood him perfectly after a few summers. The problem isn't the speaker—it's that most people haven't listened hard enough. Also, pipe smoke carries additional meaning. You have to read the smoke patterns.",
+    confidence: "very high",
+    challenge: {
+      objection: "Clear communication is a skill that can be learned...",
+      response: "Anthony never 'learned' anything. He just KNEW. The Guinness opened doors in his mind that education only locks. Some of the wisest things I ever heard were completely incomprehensible. That's how you know they're true. If you understood it immediately, it's probably wrong.",
+      escalatedConfidence: "smokily certain"
+    }
+  },
+  {
     topic: "Health",
     question: "Why do we get hiccups?",
     explanation: "Your lungs are trying to burp but they don't know how. They're not stomach. They've never been trained. So they just keep trying and failing. It's actually quite sad when you think about it.",
     confidence: "very high"
+  },
+  {
+    topic: "Nutrition",
+    question: "Why is breakfast important?",
+    explanation: "Peggy said so. She made breakfast every morning at the same time. The routine created truth. If breakfast wasn't important, why would she wake up early to make it? She wouldn't. Therefore it's the most important meal. The logic is airtight. Also, she gave me some, so I know it's good.",
+    confidence: "absolute"
   }
 ];
 
