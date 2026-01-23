@@ -9,6 +9,7 @@ import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import bubblesTalkHappy from "@/assets/bubbles-talk-happy.jpg";
 
 export default function TalkToBubbles() {
   const [prefilledQuestion, setPrefilledQuestion] = useState<string>("");
@@ -51,23 +52,43 @@ export default function TalkToBubbles() {
         {/* Floating Mentor Widget */}
         <MentorFrequencyWidget />
 
-        {/* Hero Section */}
-        <section className="relative py-16 md:py-24 overflow-hidden">
+        {/* Hero Section with Image */}
+        <section className="relative py-12 md:py-20 overflow-hidden">
           <div className="container px-4 md:px-6">
-            <motion.div 
-              className="text-center max-w-3xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                Talk to <span className="text-accent">Bubbles</span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Have a real conversation with Ireland's most confidently confused sheep.
-              </p>
-            </motion.div>
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Text Content */}
+              <motion.div 
+                className="text-center md:text-left"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+                  Talk to <span className="text-accent">Bubbles</span>
+                </h1>
+                
+                <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
+                  Have a real conversation with Ireland's most confidently confused sheep. 
+                  Ask anything — expect confidently wrong answers.
+                </p>
+              </motion.div>
+
+              {/* Image */}
+              <motion.div
+                className="relative flex justify-center md:justify-end"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <motion.img
+                  src={bubblesTalkHappy}
+                  alt="Bubbles the sheep ready to chat"
+                  className="w-full max-w-md rounded-2xl shadow-2xl"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </motion.div>
+            </div>
           </div>
           
           {/* Decorative background elements */}
