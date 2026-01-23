@@ -48,6 +48,7 @@ const Adventures = lazy(() => import("./pages/Adventures"));
 const WicklowGlossary = lazy(() => import("./pages/WicklowGlossary"));
 const MyStory = lazy(() => import("./pages/MyStory"));
 const TalkToBubbles = lazy(() => import("./pages/TalkToBubbles"));
+const Listen = lazy(() => import("./pages/Listen"));
 
 // Admin pages - always lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -158,6 +159,7 @@ const App = () => (
                   <Route path="/wicklow-glossary" element={<WicklowGlossary />} />
                   <Route path="/my-story" element={<MyStory />} />
                   <Route path="/talk" element={<TalkToBubbles />} />
+                  <Route path="/listen" element={<Listen />} />
                   <Route path="/dach" element={<DACH />} />
                   <Route path="/de" element={<DACH />} />
                   <Route path="/at" element={<DACH />} />
