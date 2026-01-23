@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { AudioWaveform } from "./AudioWaveform";
 import { MicActivityIndicator } from "./MicActivityIndicator";
+import { BubblesSheep } from "./BubblesSheep";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -76,7 +77,7 @@ const getStoredSettings = (): VoiceSettings => {
   return { voiceEnabled: true, speechRate: 0.95, speechPitch: 0.9 };
 };
 
-// SVG Component for the TV Screen with Bubbles
+// TV Screen component with Bubbles character
 const TVScreen = ({ message, mode, isLoading, isSpeaking }: { 
   message?: string; 
   mode?: string; 
@@ -85,143 +86,89 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
 }) => {
   return (
     <div className="relative w-full aspect-video max-w-md mx-auto">
-      {/* TV Frame */}
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-zinc-700 via-zinc-800 to-zinc-900 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+      {/* TV Frame - vintage CRT style */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-zinc-600 via-zinc-800 to-zinc-900 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]">
         {/* Inner bezel */}
-        <div className="absolute inset-3 rounded-md bg-gradient-to-br from-zinc-600 to-zinc-800 p-2">
+        <div className="absolute inset-4 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 p-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
           {/* Screen */}
-          <div className="relative w-full h-full rounded-sm overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+          <div className="relative w-full h-full rounded-md overflow-hidden bg-gradient-to-br from-bubbles-meadow/30 via-bubbles-mist/20 to-bubbles-heather/20">
             {/* CRT scanline effect */}
-            <div className="absolute inset-0 pointer-events-none z-20 opacity-10" 
+            <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.03]" 
               style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px)',
               }}
             />
             
             {/* Screen glow when speaking */}
             {isSpeaking && (
-              <div className="absolute inset-0 bg-gradient-to-br from-bubbles-meadow/20 via-transparent to-accent/20 animate-pulse pointer-events-none z-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-bubbles-gorse/30 via-transparent to-accent/20 animate-pulse pointer-events-none z-10" />
             )}
             
-            {/* Bubbles character on screen */}
-            <svg viewBox="0 0 200 150" className="absolute inset-0 w-full h-full">
-              {/* Background - Studio setting */}
+            {/* Studio background SVG elements */}
+            <svg viewBox="0 0 200 150" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
               <defs>
-                <radialGradient id="studioLight" cx="50%" cy="30%" r="80%">
-                  <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.3" />
+                <radialGradient id="studioSpotlight" cx="50%" cy="20%" r="60%">
+                  <stop offset="0%" stopColor="hsl(var(--bubbles-gorse))" stopOpacity="0.4" />
                   <stop offset="100%" stopColor="transparent" />
                 </radialGradient>
-                <linearGradient id="screenBg" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="hsl(145 40% 25%)" />
-                  <stop offset="100%" stopColor="hsl(145 30% 15%)" />
-                </linearGradient>
               </defs>
               
-              {/* Studio background */}
-              <rect width="200" height="150" fill="url(#screenBg)" />
-              <ellipse cx="100" cy="40" rx="80" ry="40" fill="url(#studioLight)" />
+              {/* Studio backdrop gradient */}
+              <rect width="200" height="150" fill="url(#studioSpotlight)" />
               
               {/* Desk/podium */}
-              <rect x="30" y="105" width="140" height="45" rx="3" fill="hsl(25 30% 25%)" />
-              <rect x="30" y="105" width="140" height="8" rx="2" fill="hsl(25 35% 35%)" />
+              <rect x="20" y="115" width="160" height="35" rx="3" fill="hsl(var(--bubbles-peat))" opacity="0.8" />
+              <rect x="20" y="115" width="160" height="6" rx="2" fill="hsl(var(--bubbles-peat))" />
               
               {/* ON AIR sign */}
-              <g transform="translate(150, 15)">
-                <rect x="0" y="0" width="40" height="18" rx="2" fill={isSpeaking ? "hsl(0 70% 50%)" : "hsl(0 20% 30%)"} />
-                <text x="20" y="12" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">ON AIR</text>
+              <g transform="translate(150, 10)">
+                <rect x="0" y="0" width="45" height="20" rx="3" fill={isSpeaking ? "hsl(0 70% 45%)" : "hsl(0 10% 25%)"} />
+                <text x="22.5" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="sans-serif">ON AIR</text>
                 {isSpeaking && (
-                  <circle cx="8" cy="9" r="3" fill="hsl(0 80% 60%)">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" />
+                  <circle cx="8" cy="10" r="4" fill="hsl(0 80% 55%)">
+                    <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite" />
                   </circle>
                 )}
               </g>
               
-              {/* Bubbles - Front view, behind desk */}
-              <g transform="translate(100, 75)">
-                {/* Body - fluffy wool (visible above desk) */}
-                <ellipse cx="0" cy="15" rx="28" ry="20" fill="hsl(var(--bubbles-wool))" />
-                
-                {/* Wool texture puffs */}
-                {[[-20, 5], [-15, -5], [-5, -10], [5, -10], [15, -5], [20, 5], [-18, 15], [18, 15]].map(([x, y], i) => (
-                  <circle key={i} cx={x} cy={y} r={6 + Math.random() * 3} fill="hsl(var(--bubbles-wool))" opacity="0.9" />
+              {/* Desk microphone */}
+              <g transform="translate(50, 100)">
+                {/* Mic stand */}
+                <rect x="-2" y="0" width="4" height="25" fill="hsl(var(--bubbles-peat))" opacity="0.6" />
+                {/* Mic head - classic broadcast style */}
+                <ellipse cx="0" cy="-5" rx="10" ry="14" fill="hsl(0 0% 25%)" />
+                <ellipse cx="0" cy="-5" rx="7" ry="11" fill="hsl(0 0% 35%)" />
+                {/* Mic grille */}
+                {[-10, -7, -4, -1, 2, 5].map((y, i) => (
+                  <line key={i} x1="-5" y1={y} x2="5" y2={y} stroke="hsl(0 0% 20%)" strokeWidth="0.8" />
                 ))}
-                
-                {/* Head */}
-                <ellipse cx="0" cy="-15" rx="22" ry="18" fill="hsl(var(--bubbles-wool))" />
-                
-                {/* Ears */}
-                <ellipse cx="-22" cy="-20" rx="8" ry="5" fill="hsl(var(--bubbles-face))" transform="rotate(-20 -22 -20)" />
-                <ellipse cx="22" cy="-20" rx="8" ry="5" fill="hsl(var(--bubbles-face))" transform="rotate(20 22 -20)" />
-                <ellipse cx="-22" cy="-20" rx="5" ry="3" fill="hsl(350 60% 70%)" transform="rotate(-20 -22 -20)" opacity="0.5" />
-                <ellipse cx="22" cy="-20" rx="5" ry="3" fill="hsl(350 60% 70%)" transform="rotate(20 22 -20)" opacity="0.5" />
-                
-                {/* Face */}
-                <ellipse cx="0" cy="-8" rx="14" ry="12" fill="hsl(var(--bubbles-face))" />
-                
-                {/* Eyes */}
-                <g className={isSpeaking ? "animate-pulse" : ""}>
-                  <ellipse cx="-6" cy="-12" rx="4" ry="5" fill="white" />
-                  <ellipse cx="6" cy="-12" rx="4" ry="5" fill="white" />
-                  <circle cx="-5" cy="-11" r="2.5" fill="hsl(220 60% 20%)" />
-                  <circle cx="7" cy="-11" r="2.5" fill="hsl(220 60% 20%)" />
-                  <circle cx="-4" cy="-12" r="1" fill="white" />
-                  <circle cx="8" cy="-12" r="1" fill="white" />
-                </g>
-                
-                {/* Eyebrows - expressive based on mode */}
-                {mode === 'triggered' || mode === 'savage' || mode === 'nuclear' ? (
-                  <>
-                    <line x1="-10" y1="-18" x2="-3" y2="-16" stroke="hsl(25 30% 25%)" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="10" y1="-18" x2="3" y2="-16" stroke="hsl(25 30% 25%)" strokeWidth="1.5" strokeLinecap="round" />
-                  </>
-                ) : (
-                  <>
-                    <path d="-10,-17 Q-6,-19 -3,-17" fill="none" stroke="hsl(25 30% 25%)" strokeWidth="1" />
-                    <path d="10,-17 Q6,-19 3,-17" fill="none" stroke="hsl(25 30% 25%)" strokeWidth="1" />
-                  </>
-                )}
-                
-                {/* Nose */}
-                <ellipse cx="0" cy="-4" rx="3" ry="2" fill="hsl(350 40% 60%)" />
-                
-                {/* Mouth - animated when speaking */}
-                {isSpeaking ? (
-                  <ellipse cx="0" cy="2" rx="4" ry="3" fill="hsl(350 30% 40%)">
-                    <animate attributeName="ry" values="3;4;2;4;3" dur="0.3s" repeatCount="indefinite" />
-                  </ellipse>
-                ) : (
-                  <path d="M-4,1 Q0,5 4,1" fill="none" stroke="hsl(350 30% 40%)" strokeWidth="1.5" strokeLinecap="round" />
-                )}
-                
-                {/* Headphones */}
-                <path d="M-24,-15 Q-26,-35 0,-38 Q26,-35 24,-15" fill="none" stroke="hsl(0 0% 20%)" strokeWidth="4" />
-                <ellipse cx="-24" cy="-12" rx="6" ry="8" fill="hsl(0 0% 25%)" />
-                <ellipse cx="24" cy="-12" rx="6" ry="8" fill="hsl(0 0% 25%)" />
-                <ellipse cx="-24" cy="-12" rx="4" ry="6" fill="hsl(0 0% 35%)" />
-                <ellipse cx="24" cy="-12" rx="4" ry="6" fill="hsl(0 0% 35%)" />
               </g>
               
-              {/* Desk microphone */}
-              <g transform="translate(60, 95)">
-                <rect x="-3" y="0" width="6" height="20" fill="hsl(0 0% 30%)" />
-                <ellipse cx="0" cy="0" rx="8" ry="12" fill="hsl(0 0% 25%)" />
-                <ellipse cx="0" cy="0" rx="6" ry="10" fill="hsl(0 0% 40%)" />
-                {/* Mic grille pattern */}
-                {[-6, -3, 0, 3, 6].map((y, i) => (
-                  <line key={i} x1="-4" y1={y} x2="4" y2={y} stroke="hsl(0 0% 20%)" strokeWidth="0.5" />
-                ))}
+              {/* Headphones floating indicator */}
+              <g transform="translate(155, 95)">
+                <path d="M-12,0 Q-14,-20 0,-22 Q14,-20 12,0" fill="none" stroke="hsl(0 0% 30%)" strokeWidth="3" />
+                <ellipse cx="-12" cy="2" rx="5" ry="7" fill="hsl(0 0% 25%)" />
+                <ellipse cx="12" cy="2" rx="5" ry="7" fill="hsl(0 0% 25%)" />
               </g>
             </svg>
+            
+            {/* Bubbles character - using brand component */}
+            <div className={cn(
+              "absolute bottom-4 left-1/2 -translate-x-1/2 transition-transform duration-300",
+              isSpeaking && "animate-[bounce_0.5s_ease-in-out_infinite]"
+            )}>
+              <BubblesSheep size="lg" animated={false} className="drop-shadow-lg" />
+            </div>
             
             {/* Speech bubble with message */}
             {message && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="absolute top-2 left-2 right-2 bg-white/95 rounded-lg p-2 shadow-lg max-h-16 overflow-hidden"
+                className="absolute top-3 left-3 right-3 bg-card/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-border/50 max-h-20 overflow-hidden"
               >
                 <p className={cn(
-                  "text-xs text-slate-800 line-clamp-3",
+                  "text-xs leading-relaxed line-clamp-3",
                   mode && MODE_COLORS[mode]
                 )}>
                   "{message}"
@@ -231,16 +178,23 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
             
             {/* Loading indicator */}
             {isLoading && (
-              <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/50 rounded-full px-2 py-1">
-                <Loader2 className="h-3 w-3 text-white animate-spin" />
-                <span className="text-[10px] text-white">Thinking...</span>
+              <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 border border-border/30">
+                <Loader2 className="h-3 w-3 text-accent animate-spin" />
+                <span className="text-[10px] text-muted-foreground">Thinking...</span>
               </div>
             )}
           </div>
         </div>
         
+        {/* TV controls - vintage style buttons */}
+        <div className="absolute bottom-2 right-6 flex gap-2">
+          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-700 shadow-inner" />
+          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-700 shadow-inner" />
+        </div>
+        
         {/* TV base/stand */}
-        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-gradient-to-b from-zinc-700 to-zinc-900 rounded-b-lg" />
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gradient-to-b from-zinc-700 to-zinc-900 rounded-b-xl shadow-lg" />
+        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-3 bg-gradient-to-b from-zinc-800 to-zinc-950 rounded-b-lg" />
       </div>
     </div>
   );
