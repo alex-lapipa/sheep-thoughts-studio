@@ -16,6 +16,7 @@ import {
   TrendingUp, TrendingDown, Minus, Users, ArrowRight, ExternalLink
 } from "lucide-react";
 import { generatePreviewUrl } from "@/contexts/FeatureFlagsContext";
+import { StatisticalSignificance } from "@/components/admin/StatisticalSignificance";
 
 interface VariantMetrics {
   variant: string;
@@ -261,6 +262,16 @@ export default function ABTestAnalytics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Statistical Significance Calculator */}
+        <StatisticalSignificance
+          controlVisitors={full?.views || 0}
+          controlConversions={full?.purchases || 0}
+          treatmentVisitors={simplified?.views || 0}
+          treatmentConversions={simplified?.purchases || 0}
+          controlLabel="Full Homepage"
+          treatmentLabel="Simplified Homepage"
+        />
 
         <Tabs defaultValue="funnel" className="space-y-4">
           <TabsList>
