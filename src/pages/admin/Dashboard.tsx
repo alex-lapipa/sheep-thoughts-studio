@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
+import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus, FlaskConical, Home, Settings } from 'lucide-react';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
 import { ShoppingHeatmap } from '@/components/admin/ShoppingHeatmap';
+import { toast } from 'sonner';
 
 interface Stats {
   thoughts: number;
@@ -71,6 +76,12 @@ export default function AdminDashboard() {
   const [periodComparison, setPeriodComparison] = useState<PeriodComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [funnelLoading, setFunnelLoading] = useState(true);
+  const { flags, setFlag } = useFeatureFlags();
+
+  const handleToggleSimplified = () => {
+    setFlag('simplifiedHomepage', !flags.simplifiedHomepage);
+    toast.success(`Simplified Homepage ${!flags.simplifiedHomepage ? 'enabled' : 'disabled'}`);
+  };
 
   useEffect(() => {
     async function fetchStats() {
@@ -263,6 +274,47 @@ export default function AdminDashboard() {
             Manage the Bubbles knowledge base and AI content generation
           </p>
         </div>
+
+        {/* A/B Testing Quick Toggle */}
+        <Card className="border-accent/30 bg-accent/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-accent/20 text-accent">
+                  <FlaskConical className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    Homepage A/B Test
+                    <Badge variant={flags.simplifiedHomepage ? "default" : "secondary"}>
+                      {flags.simplifiedHomepage ? "Simplified" : "Full"}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Toggle between simplified (voice-first) and full (with credentials) homepage layouts
+                  </CardDescription>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Home className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Simplified</span>
+                  <Switch
+                    checked={flags.simplifiedHomepage}
+                    onCheckedChange={handleToggleSimplified}
+                  />
+                </div>
+                <Link 
+                  to="/admin/feature-flags" 
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  <Settings className="h-3 w-3" />
+                  All flags
+                </Link>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
 
         {/* Stats Cards */}
         <h2 id="content-stats" className="sr-only">Content Statistics</h2>
