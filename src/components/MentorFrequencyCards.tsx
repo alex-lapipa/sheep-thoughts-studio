@@ -72,6 +72,7 @@ const MENTOR_CONFIG: MentorConfig[] = [
   { id: "maureen", name: "Maureen", role: "The Gentle Soul", color: "text-pink-500", bgColor: "bg-pink-500", icon: Flower2 },
   { id: "eddie", name: "Eddie", role: "The Driver", color: "text-indigo-500", bgColor: "bg-indigo-500", icon: Car },
   { id: "betty", name: "Betty", role: "The Badminton Champion", color: "text-lime-500", bgColor: "bg-lime-500", icon: Heart },
+  { id: "mairead", name: "Mairead", role: "The Muffins Manager", color: "text-fuchsia-500", bgColor: "bg-fuchsia-500", icon: Sparkles },
 ];
 
 interface FrequencyBadgeProps {

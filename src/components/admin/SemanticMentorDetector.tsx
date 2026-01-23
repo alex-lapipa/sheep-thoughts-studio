@@ -96,6 +96,12 @@ const MENTOR_CONFIG: Record<string, { icon: React.ReactNode; color: string; doma
     color: "bg-lime-500",
     domain: "Sport & Cheese Enthusiasm",
     keywords: ["betty", "badminton", "sport", "cheese", "mini", "car", "game", "match", "racket", "cheddar"]
+  },
+  mairead: {
+    icon: <Sparkles className="h-4 w-4" />,
+    color: "bg-fuchsia-500",
+    domain: "Retail & Dog Naming",
+    keywords: ["mairead", "muffins", "shop", "store", "dog", "zz top", "blonde", "retail", "work", "sheepdog"]
   }
 };
 
