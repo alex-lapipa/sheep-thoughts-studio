@@ -102,62 +102,44 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          size={variant === "compact" ? "sm" : "default"}
-          className={cn(
-            "gap-2 font-medium",
-            variant === "compact" && "h-8 px-2"
-          )}
+          size="icon"
+          className="h-8 w-8 p-0"
         >
-          <Globe className="h-4 w-4" />
           <span className="text-lg">{currentRegion.flag}</span>
-          {variant !== "compact" && (
-            <span className="hidden sm:inline">{currentRegion.label}</span>
-          )}
-          <ChevronDown className="h-3.5 w-3.5 opacity-60" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-popover">
+      <DropdownMenuContent align="end" className="min-w-0 w-auto bg-popover">
         {isHomepage ? (
-          // Simple flat list for homepage - just the 4 main languages
-          <>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              🌍 Select Language
-            </DropdownMenuLabel>
+          <div className="flex gap-1 p-1">
             {availableRegions.map((region) => (
-              <DropdownMenuItem 
-                key={region.code} 
-                className="cursor-pointer flex items-center gap-3"
+              <Button
+                key={region.code}
+                variant={currentRegion.code === region.code ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 p-0"
                 onClick={() => handleRegionSelect(region)}
               >
                 <span className="text-lg">{region.flag}</span>
-                <span className="flex-1">{region.label}</span>
-                {currentRegion.code === region.code && (
-                  <Check className="h-4 w-4 text-accent" />
-                )}
-              </DropdownMenuItem>
+              </Button>
             ))}
-          </>
+          </div>
         ) : (
-          // Grouped list for subpages - all regional options
           Object.entries(groupedRegions).map(([group, regions], groupIndex) => (
             <div key={group}>
               {groupIndex > 0 && <DropdownMenuSeparator />}
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                {GROUP_LABELS[group] || group}
-              </DropdownMenuLabel>
-              {regions.map((region) => (
-                <DropdownMenuItem 
-                  key={region.code} 
-                  className="cursor-pointer flex items-center gap-3"
-                  onClick={() => handleRegionSelect(region)}
-                >
-                  <span className="text-lg">{region.flag}</span>
-                  <span className="flex-1">{region.label}</span>
-                  {currentRegion.code === region.code && (
-                    <Check className="h-4 w-4 text-accent" />
-                  )}
-                </DropdownMenuItem>
-              ))}
+              <div className="flex flex-wrap gap-1 p-1 max-w-[160px]">
+                {regions.map((region) => (
+                  <Button
+                    key={region.code}
+                    variant={currentRegion.code === region.code ? "secondary" : "ghost"}
+                    size="icon"
+                    className="h-8 w-8 p-0"
+                    onClick={() => handleRegionSelect(region)}
+                  >
+                    <span className="text-lg">{region.flag}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
           ))
         )}
