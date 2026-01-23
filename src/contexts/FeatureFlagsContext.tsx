@@ -9,9 +9,9 @@ export interface FeatureFlags {
 }
 
 const DEFAULT_FLAGS: FeatureFlags = {
-  newNavigation: true,        // Currently enabled
+  newNavigation: true,        // Phase 1: Enabled
   simplifiedHomepage: false,
-  enhancedShop: false,
+  enhancedShop: true,         // Phase 2: Enabled
   faqSummary: false,
 };
 

@@ -3,10 +3,15 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { ShopHero } from "@/components/ShopHero";
+import { ShopTrustCues } from "@/components/ShopTrustCues";
+import { ShopCollectionTiles } from "@/components/ShopCollectionTiles";
+import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { useProducts } from "@/hooks/useProducts";
 import { useBestsellerRanking, sortByBestseller } from "@/hooks/useBestsellerRanking";
 import { ModeEscalationScale, ExtendedBubbleMode } from "@/components/ModeBadge";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFeatureFlags } from "@/contexts/FeatureFlagsContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { useMemo } from "react";
 import { AnimatedOnView } from "@/components/AnimatedText";
@@ -18,8 +23,10 @@ const Collections = () => {
   const activeMode = searchParams.get('mode') as ExtendedBubbleMode | null;
   const sortBy = (searchParams.get('sort') as SortOption) || 'bestseller';
   const { t } = useLanguage();
+  const { isEnabled } = useFeatureFlags();
   const { ogImageUrl, siteUrl } = useOgImage("og-collections.jpg");
   
+  const enhancedShopEnabled = isEnabled('enhancedShop');
   const query = activeMode ? `tag:${activeMode}` : undefined;
   const { data: products, isLoading } = useProducts(query, 40);
   const { data: bestsellerRankings } = useBestsellerRanking();
@@ -81,13 +88,25 @@ const Collections = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/collections/all`} />
       </Helmet>
-      <section className="-mx-4 mb-12">
-        <PageHeroWithBubbles
-          title={t("collectionsPage.title")}
-          subtitle={t("collectionsPage.subtitle")}
-          bubbleSize="md"
-        />
-      </section>
+
+      {/* Enhanced Shop: New hero, collection tiles, featured carousel, trust cues */}
+      {enhancedShopEnabled ? (
+        <>
+          <ShopHero />
+          <ShopCollectionTiles />
+          <FeaturedProductsCarousel />
+          <ShopTrustCues />
+        </>
+      ) : (
+        <section className="-mx-4 mb-12">
+          <PageHeroWithBubbles
+            title={t("collectionsPage.title")}
+            subtitle={t("collectionsPage.subtitle")}
+            bubbleSize="md"
+          />
+        </section>
+      )}
+
       <div className="container py-12">
         <div className="mb-8 space-y-6">
           {/* Mode Escalation Filter */}
@@ -95,7 +114,7 @@ const Collections = () => {
             <div className="p-4 rounded-xl bg-card border">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                  Shop by Mood
+                  {enhancedShopEnabled ? "Filter by Mood" : "Shop by Mood"}
                 </h3>
               {activeMode && (
                 <button 
