@@ -199,6 +199,22 @@ const mentors = [
     borderColor: "border-lime-500/30",
     icon: Heart,
   },
+  {
+    id: "mairead",
+    name: "Mairead",
+    role: "The Muffins Manager",
+    domain: "Retail & Dog Naming",
+    description: "Aidan's girlfriend, blonde and lovely. Works at a shop called Muffins — which is why they named the dog Muffins. (Real name: ZZ Top Lady.)",
+    bubblesInterpretation: "Mairead explained that naming things is about love, not logic. The shop was called Muffins. The dog became Muffins. But officially? ZZ Top Lady. I learned that everything has a secret official name that nobody uses.",
+    signaturePhrase: "Her real name is actually...",
+    topics: ["Shop life", "Dog naming", "Secret official names", "Customer service"],
+    sampleQuestion: "Why do we give things nicknames instead of using their real names?",
+    triggers: ["muffins", "shop", "store", "dog", "zz top", "blonde", "retail", "work", "job", "customer"],
+    color: "text-fuchsia-500",
+    bgColor: "bg-fuchsia-500/10",
+    borderColor: "border-fuchsia-500/30",
+    icon: Sparkles,
+  },
 ];
 
 interface TestResult {
