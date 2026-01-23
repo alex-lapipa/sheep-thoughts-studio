@@ -14,10 +14,11 @@ import { toast } from 'sonner';
 import { 
   BookOpen, Heart, Home, Mountain, TreePine, Sparkles, Cloud, 
   MessageCircle, Play, Copy, Eye, Volume2, Loader2, Send,
-  CheckCircle, AlertCircle, RefreshCw, BarChart3
+  CheckCircle, AlertCircle, RefreshCw, BarChart3, Search
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { MentorDetectionPreview } from '@/components/admin/MentorDetectionPreview';
 
 // Mentor data matching the MeetTheMentors component
 const mentors = [
@@ -263,6 +264,9 @@ export default function AdminMentors() {
             </Button>
           </div>
         </div>
+
+        {/* Detection Preview Tool */}
+        <MentorDetectionPreview />
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Mentor List */}
