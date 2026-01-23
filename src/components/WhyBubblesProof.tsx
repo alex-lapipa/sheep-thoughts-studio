@@ -1,12 +1,26 @@
 import { motion } from "framer-motion";
 import { MessageCircle, Heart, Sparkles, Users } from "lucide-react";
+import { AnimatedCounter } from "./AnimatedCounter";
 
-const PROOF_ITEMS = [
+interface ProofItem {
+  icon: React.ComponentType<{ className?: string }>;
+  stat: string | number;
+  label: string;
+  subtext: string;
+  isAnimated?: boolean;
+  liveIncrement?: boolean;
+  format?: (n: number) => string;
+}
+
+const PROOF_ITEMS: ProofItem[] = [
   {
     icon: MessageCircle,
-    stat: "10K+",
+    stat: 10847,
     label: "Questions Answered",
     subtext: "All incorrectly",
+    isAnimated: true,
+    liveIncrement: true,
+    format: (n) => n.toLocaleString() + "+",
   },
   {
     icon: Heart,
@@ -61,7 +75,19 @@ export function WhyBubblesProof() {
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div className="text-2xl font-bold text-foreground">
-                  {item.stat}
+                  {item.isAnimated && typeof item.stat === "number" ? (
+                    <AnimatedCounter
+                      value={item.stat}
+                      duration={2.5}
+                      format={item.format}
+                      liveIncrement={item.liveIncrement}
+                      incrementInterval={2500 + Math.random() * 2000}
+                      incrementMin={1}
+                      incrementMax={3}
+                    />
+                  ) : (
+                    item.stat
+                  )}
                 </div>
                 <div className="text-sm font-medium text-foreground/80">
                   {item.label}
