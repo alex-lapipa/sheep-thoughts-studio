@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
-import { ScenarioPlayer } from "@/components/ScenarioPlayer";
+
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { AnimatedOnView } from "@/components/AnimatedText";
@@ -165,21 +165,6 @@ export default function Facts() {
         </div>
       </section>
 
-      {/* Escalation Journeys */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background to-muted/30">
-        <div className="container">
-          <AnimatedOnView className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
-              Escalation Journeys
-            </h2>
-            <p className="text-muted-foreground">
-              Watch how Bubbles processes information from innocent curiosity to nuclear certainty.
-              Each scenario demonstrates the Inversion Principle in action.
-            </p>
-          </AnimatedOnView>
-          <ScenarioPlayer />
-        </div>
-      </section>
 
       {/* Methodology */}
       <section className="py-16 md:py-24">
