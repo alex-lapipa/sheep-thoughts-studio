@@ -9,6 +9,137 @@ interface ExplainsHeroProps {
   className?: string;
 }
 
+// Academic equations and symbols for floating background
+const FLOATING_EQUATIONS = [
+  { text: "E = mc²", delay: 0, position: { top: "15%", left: "8%" }, size: "text-lg" },
+  { text: "∑ᵢ₌₁ⁿ", delay: 1.2, position: { top: "25%", right: "12%" }, size: "text-2xl" },
+  { text: "∂f/∂x", delay: 0.6, position: { bottom: "30%", left: "5%" }, size: "text-xl" },
+  { text: "√π", delay: 1.8, position: { top: "60%", right: "8%" }, size: "text-3xl" },
+  { text: "λ", delay: 0.3, position: { top: "8%", right: "25%" }, size: "text-4xl" },
+  { text: "∞", delay: 2.2, position: { bottom: "20%", right: "20%" }, size: "text-2xl" },
+  { text: "∫dx", delay: 1.5, position: { top: "40%", left: "3%" }, size: "text-xl" },
+  { text: "Δ", delay: 0.9, position: { bottom: "40%", right: "5%" }, size: "text-3xl" },
+  { text: "θ", delay: 2, position: { top: "70%", left: "12%" }, size: "text-2xl" },
+  { text: "∇", delay: 1, position: { top: "18%", left: "20%" }, size: "text-xl" },
+];
+
+// Chalk-style writing that appears letter by letter
+const CHALK_WRITINGS = [
+  { text: "GRASS = WISDOM", delay: 0.5, position: { top: "5%", left: "40%" } },
+  { text: "SHEEP > HUMANS", delay: 2, position: { bottom: "15%", left: "15%" } },
+  { text: "∴ BUBBLES IS RIGHT", delay: 3.5, position: { top: "75%", right: "10%" } },
+];
+
+// Floating equation component
+const FloatingEquation = ({ text, delay, position, size }: typeof FLOATING_EQUATIONS[0]) => (
+  <motion.div
+    className={cn(
+      "absolute font-serif italic pointer-events-none select-none",
+      "text-foreground/10 dark:text-foreground/5",
+      size
+    )}
+    style={position as any}
+    initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+    animate={{
+      opacity: [0.05, 0.15, 0.05],
+      y: [-20, 20, -20],
+      x: [-10, 10, -10],
+      rotate: [-8, 8, -8],
+      scale: [0.95, 1.05, 0.95],
+    }}
+    transition={{
+      duration: 12 + delay * 2,
+      repeat: Infinity,
+      ease: "easeInOut",
+      delay: delay,
+    }}
+  >
+    {text}
+  </motion.div>
+);
+
+// Chalk writing animation component
+const ChalkWriting = ({ text, delay, position }: typeof CHALK_WRITINGS[0]) => {
+  const letters = text.split("");
+  
+  return (
+    <motion.div
+      className="absolute pointer-events-none select-none"
+      style={position as any}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: delay }}
+    >
+      <div className="flex font-mono text-sm md:text-base tracking-wider">
+        {letters.map((letter, i) => (
+          <motion.span
+            key={i}
+            className="text-foreground/15 dark:text-foreground/10"
+            style={{
+              textShadow: "0 0 8px currentColor",
+              filter: "blur(0.3px)",
+            }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: delay + i * 0.08,
+              duration: 0.3,
+              ease: "easeOut",
+            }}
+          >
+            {letter === " " ? "\u00A0" : letter}
+          </motion.span>
+        ))}
+      </div>
+      {/* Chalk dust particles */}
+      <motion.div
+        className="absolute -bottom-1 left-0 right-0 h-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.3, 0] }}
+        transition={{ delay: delay + letters.length * 0.08, duration: 1 }}
+      >
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-foreground/20"
+            style={{ left: `${20 + i * 15}%` }}
+            animate={{
+              y: [0, 10, 20],
+              opacity: [0.5, 0.3, 0],
+            }}
+            transition={{
+              delay: delay + letters.length * 0.08 + i * 0.1,
+              duration: 0.8,
+            }}
+          />
+        ))}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Chalkboard scratches/doodles
+const ChalkDoodle = ({ className }: { className?: string }) => (
+  <motion.svg
+    viewBox="0 0 100 100"
+    className={cn("absolute pointer-events-none", className)}
+    initial={{ pathLength: 0, opacity: 0 }}
+    animate={{ pathLength: 1, opacity: 0.1 }}
+    transition={{ duration: 2, ease: "easeInOut" }}
+  >
+    <motion.path
+      d="M10 50 Q 30 20, 50 50 T 90 50"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="round"
+      initial={{ pathLength: 0 }}
+      animate={{ pathLength: 1 }}
+      transition={{ duration: 2, ease: "easeInOut" }}
+    />
+  </motion.svg>
+);
+
 export function ExplainsHero({ title, subtitle, className }: ExplainsHeroProps) {
   return (
     <section className={cn(
@@ -44,6 +175,20 @@ export function ExplainsHero({ title, subtitle, className }: ExplainsHeroProps) 
           transition={{ duration: 12, repeat: Infinity }}
         />
       </div>
+
+      {/* Floating equations */}
+      {FLOATING_EQUATIONS.map((eq, i) => (
+        <FloatingEquation key={i} {...eq} />
+      ))}
+
+      {/* Chalk writings */}
+      {CHALK_WRITINGS.map((writing, i) => (
+        <ChalkWriting key={i} {...writing} />
+      ))}
+
+      {/* Chalkboard doodles */}
+      <ChalkDoodle className="w-32 h-32 text-foreground/5 top-[10%] right-[30%]" />
+      <ChalkDoodle className="w-24 h-24 text-foreground/5 bottom-[25%] left-[25%] rotate-45" />
 
       {/* Floating decorative icons */}
       <motion.div
