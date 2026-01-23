@@ -9,7 +9,6 @@ import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { BubblesBogHero } from "@/components/BubblesBog";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
-import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
@@ -238,73 +237,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Inside My Head - Interactive Thought Gallery */}
-      <InsideMyHeadHero />
-
-      {/* About Section */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <AnimatedOnView className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="font-display text-3xl md:text-4xl font-bold">
-              {t("about.title")}
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t("about.p1")}
-            </p>
-            <p className="text-lg text-muted-foreground">
-              {t("about.p2")}
-            </p>
-          </AnimatedOnView>
-        </div>
-      </section>
-
-
-
-      {/* Credentials */}
-      <section className="py-16 md:py-24 bg-muted/30 relative overflow-hidden">
-        {/* Parallax background orbs */}
-        <ParallaxSection speed={0.15} className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-bubbles-gorse/5 blur-3xl" />
-        <ParallaxSection speed={0.2} direction="down" className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-bubbles-heather/5 blur-3xl" />
-        
-        <div className="container relative z-10">
-          <AnimatedOnView>
-            <ParallaxSection speed={0.05}>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
-                {t("credentials.title")}
-              </h2>
-            </ParallaxSection>
-          </AnimatedOnView>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              { count: "7", label: t("credentials.staring.title"), desc: t("credentials.staring.desc"), color: "bg-bubbles-gorse/20", textColor: "text-bubbles-gorse" },
-              { count: "∞", label: t("credentials.facts.title"), desc: t("credentials.facts.desc"), color: "bg-bubbles-heather/20", textColor: "text-bubbles-heather" },
-              { count: "1", label: t("credentials.brain.title"), desc: t("credentials.brain.desc"), color: "bg-accent/20", textColor: "text-accent" },
-            ].map((cred, index) => (
-              <ParallaxSection 
-                key={cred.label}
-                speed={0.08 + index * 0.03}
-                mouseParallax
-                mouseIntensity={0.01}
-              >
-                <div 
-                  className="bg-card rounded-xl p-6 border border-border text-center hover:scale-105 hover:-rotate-1 transition-all duration-300 cursor-pointer group animate-pop-in"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${cred.color} flex items-center justify-center group-hover:animate-bounce-gentle`}>
-                    <span className={`font-display text-2xl font-bold ${cred.textColor}`}>{cred.count}</span>
-                  </div>
-                  <h3 className="font-display font-bold text-lg mb-2 group-hover:animate-wiggle">{cred.label}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {cred.desc}
-                  </p>
-                </div>
-              </ParallaxSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products Carousel */}
+      {/* Featured Products Carousel - Moved up for conversion focus */}
       <FeaturedProductsCarousel />
 
       {/* Cross-links and Changelog section */}
