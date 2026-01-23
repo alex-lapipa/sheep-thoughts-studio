@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Sparkles, BookOpen, GraduationCap } from "lucide-react";
-import bubblesScholar from "@/assets/bubbles-scholar.jpg";
+import { BubblesScholar } from "@/components/BubblesScholar";
 
 interface ExplainsHeroProps {
   title: string;
@@ -246,10 +246,11 @@ export function ExplainsHero({ title, subtitle, className }: ExplainsHeroProps) 
                 ease: "easeInOut" 
               }}
             >
-              <img 
-                src={bubblesScholar} 
-                alt="Bubbles the Scholar Sheep - Distinguished grammar teacher looking right"
-                className="w-full h-full object-contain drop-shadow-2xl"
+              <BubblesScholar 
+                size="hero" 
+                accessory="random"
+                animated={false}
+                className="w-full h-full drop-shadow-2xl"
               />
               
               {/* Sparkle accents around Bubbles */}
