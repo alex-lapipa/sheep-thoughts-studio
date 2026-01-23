@@ -4,10 +4,53 @@ import {
   Cloud, Heart, Home, Mountain, Sparkles, TreePine, BookOpen,
   TrendingUp, Flame, Zap, Wrench, Flower2, Car, Trophy, Medal, Award
 } from "lucide-react";
+import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 import { useMentorFrequency } from "@/hooks/useMentorFrequency";
 import { LiveActivityStats } from "./LiveActivityStats";
+import { toast } from "sonner";
 
+// Fire celebration confetti when a mentor reaches #1
+const fireLeaderConfetti = (mentorName: string) => {
+  const colors = ["#FFD700", "#FFA500", "#FF6B6B", "#4ECDC4", "#45B7D1"];
+  
+  // Center burst
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.5, y: 0.6 },
+    colors,
+    startVelocity: 30,
+    gravity: 0.8,
+  });
+
+  // Left side burst
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors,
+    });
+  }, 200);
+
+  // Right side burst
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors,
+    });
+  }, 400);
+
+  toast.success(`🏆 ${mentorName} is now #1!`, {
+    description: "A new leader has emerged on the mentor leaderboard!",
+    duration: 4000,
+  });
+};
 interface MentorConfig {
   id: string;
   name: string;
@@ -338,6 +381,37 @@ export const MentorFrequencyCards = ({
   showEmpty = true 
 }: MentorFrequencyCardsProps) => {
   const { data, isLoading, error } = useMentorFrequency(days);
+  const previousLeaderRef = useRef<string | null>(null);
+  const isInitialLoadRef = useRef(true);
+
+  // Track #1 changes and fire confetti for new leaders
+  useEffect(() => {
+    if (!data?.stats || data.stats.length === 0) return;
+    
+    const currentLeader = data.stats[0]?.mentor_id;
+    const currentLeaderName = data.stats[0]?.mentor_name;
+    
+    // Skip on initial load - only celebrate actual changes
+    if (isInitialLoadRef.current) {
+      // Load previous leader from localStorage
+      const storedLeader = localStorage.getItem("bubbles-mentor-leader");
+      previousLeaderRef.current = storedLeader || currentLeader;
+      isInitialLoadRef.current = false;
+      
+      // If no stored leader, save current one
+      if (!storedLeader && currentLeader) {
+        localStorage.setItem("bubbles-mentor-leader", currentLeader);
+      }
+      return;
+    }
+    
+    // Check if leader has changed
+    if (currentLeader && currentLeader !== previousLeaderRef.current) {
+      fireLeaderConfetti(currentLeaderName || currentLeader);
+      previousLeaderRef.current = currentLeader;
+      localStorage.setItem("bubbles-mentor-leader", currentLeader);
+    }
+  }, [data?.stats]);
 
   if (isLoading) {
     return (
