@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Cloud, Heart, Home, Mountain, Sparkles, TreePine, BookOpen,
-  TrendingUp, Flame, Zap, Wrench, Flower2, Car, Trophy, Medal, Award
+  TrendingUp, Flame, Zap, Wrench, Flower2, Car, Trophy, Medal, Award, Crown
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
@@ -157,8 +157,26 @@ const PodiumCard = ({ mentor, triggerCount, percentage, rank, delay }: PodiumCar
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
       transition={{ delay, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={cn("flex flex-col items-center", config.scale)}
+      className={cn("flex flex-col items-center relative", config.scale)}
     >
+      {/* Floating Crown for 1st place */}
+      {rank === 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ 
+            opacity: 1, 
+            y: [0, -6, 0],
+          }}
+          transition={{ 
+            opacity: { delay: delay + 0.3, duration: 0.3 },
+            y: { delay: delay + 0.5, duration: 2, repeat: Infinity, ease: "easeInOut" }
+          }}
+          className="absolute -top-8 md:-top-10 z-10"
+        >
+          <Crown className="w-6 h-6 md:w-8 md:h-8 text-amber-400 drop-shadow-lg" fill="currentColor" fillOpacity={0.2} />
+        </motion.div>
+      )}
+      
       {/* Avatar/Icon Circle */}
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
