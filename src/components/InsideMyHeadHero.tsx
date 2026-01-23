@@ -72,6 +72,73 @@ const FLOATING_ICONS = [
   { Icon: Zap, delay: 2.2, size: "sm", position: { top: "70%", right: "15%" } },
 ];
 
+// Floating sheep positions scattered around the section
+const FLOATING_SHEEP = [
+  { delay: 0, size: 80, position: { top: "12%", left: "2%" }, flip: false },
+  { delay: 1.5, size: 60, position: { top: "25%", right: "4%" }, flip: true },
+  { delay: 0.8, size: 50, position: { bottom: "35%", left: "1%" }, flip: false },
+  { delay: 2, size: 70, position: { bottom: "18%", right: "2%" }, flip: true },
+  { delay: 0.5, size: 45, position: { top: "55%", right: "6%" }, flip: false },
+  { delay: 1.2, size: 55, position: { top: "78%", left: "5%" }, flip: true },
+];
+
+// Cute animated sheep SVG component
+const FloatingSheep = ({ delay, size, position, flip }: { delay: number; size: number; position: Record<string, string>; flip: boolean }) => {
+  return (
+    <motion.div
+      className="absolute pointer-events-none z-0"
+      style={{ ...position, width: size, height: size }}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{
+        opacity: [0.15, 0.35, 0.15],
+        y: [-15, 15, -15],
+        x: [-8, 8, -8],
+        rotate: flip ? [5, -5, 5] : [-5, 5, -5],
+      }}
+      transition={{
+        duration: 10 + delay * 2,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: delay,
+      }}
+    >
+      <svg
+        viewBox="0 0 100 80"
+        fill="none"
+        className={cn("w-full h-full", flip && "scale-x-[-1]")}
+      >
+        {/* Wool body - fluffy cloud shape */}
+        <ellipse cx="50" cy="45" rx="35" ry="28" className="fill-primary/30" />
+        <circle cx="25" cy="40" r="18" className="fill-primary/25" />
+        <circle cx="75" cy="40" r="18" className="fill-primary/25" />
+        <circle cx="35" cy="28" r="14" className="fill-primary/20" />
+        <circle cx="65" cy="28" r="14" className="fill-primary/20" />
+        <circle cx="50" cy="25" r="12" className="fill-primary/15" />
+        
+        {/* Head */}
+        <ellipse cx="82" cy="35" rx="14" ry="12" className="fill-foreground/20" />
+        
+        {/* Ears */}
+        <ellipse cx="92" cy="28" rx="6" ry="4" className="fill-foreground/15" transform="rotate(30 92 28)" />
+        <ellipse cx="78" cy="24" rx="5" ry="3" className="fill-foreground/15" transform="rotate(-20 78 24)" />
+        
+        {/* Eye */}
+        <circle cx="86" cy="33" r="3" className="fill-foreground/40" />
+        <circle cx="87" cy="32" r="1" className="fill-background/60" />
+        
+        {/* Nose */}
+        <ellipse cx="93" cy="38" rx="3" ry="2" className="fill-foreground/25" />
+        
+        {/* Legs */}
+        <rect x="30" y="65" width="6" height="12" rx="3" className="fill-foreground/20" />
+        <rect x="42" y="65" width="6" height="12" rx="3" className="fill-foreground/20" />
+        <rect x="54" y="65" width="6" height="12" rx="3" className="fill-foreground/20" />
+        <rect x="66" y="65" width="6" height="12" rx="3" className="fill-foreground/20" />
+      </svg>
+    </motion.div>
+  );
+};
+
 const FloatingIcon = ({ Icon, delay, size, position }: typeof FLOATING_ICONS[0]) => {
   const sizeClasses = {
     sm: "w-6 h-6 md:w-8 md:h-8",
@@ -385,6 +452,11 @@ export function InsideMyHeadHero() {
       {/* Floating animal/nature icons */}
       {FLOATING_ICONS.map((iconProps, i) => (
         <FloatingIcon key={i} {...iconProps} />
+      ))}
+
+      {/* Floating sheep illustrations */}
+      {FLOATING_SHEEP.map((sheepProps, i) => (
+        <FloatingSheep key={`sheep-${i}`} {...sheepProps} />
       ))}
 
       <div className="container relative z-10">
