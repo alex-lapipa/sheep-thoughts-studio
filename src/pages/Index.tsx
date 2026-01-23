@@ -15,6 +15,7 @@ import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { BroadcastStudio } from "@/components/BroadcastStudio";
 import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
+import { AnimatedBubblesExplainsWidget } from "@/components/AnimatedBubblesExplainsWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -225,7 +226,27 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Voice Chat Section - Primary CTA */}
+      {/* Bubbles Explains Widget - Showcases Voice TTS */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
+        <ParallaxSection speed={0.15} className="absolute top-1/4 -left-10 w-40 h-40 rounded-full bg-accent/5 blur-3xl" />
+        <ParallaxSection speed={0.2} direction="down" className="absolute bottom-1/4 -right-10 w-48 h-48 rounded-full bg-bubbles-heather/10 blur-3xl" />
+        
+        <div className="container relative z-10">
+          <AnimatedOnView className="text-center mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+              Hear Bubbles Think Out Loud
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+              Press play to hear confidently wrong explanations. With voice.
+            </p>
+          </AnimatedOnView>
+          
+          <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.006}>
+            <AnimatedBubblesExplainsWidget />
+          </ParallaxSection>
+        </div>
+      </section>
+
       <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900/50 via-background to-background relative overflow-hidden">
         <ParallaxSection speed={0.2} className="absolute top-1/3 left-5 w-28 h-28 rounded-full bg-accent/10 blur-3xl" />
         <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/3 right-5 w-36 h-36 rounded-full bg-bubbles-mist/10 blur-3xl" />
