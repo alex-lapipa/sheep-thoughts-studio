@@ -2,101 +2,18 @@ import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { AnimatedOnView } from "@/components/AnimatedText";
+import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
-import { Card, CardContent } from "@/components/ui/card";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { Mountain, Home, Users, BookOpen, Heart, Cloud, TreePine, Sparkles } from "lucide-react";
+import { Mountain, TreePine } from "lucide-react";
 
 const STORY_TOC_ITEMS: TocItem[] = [
   { id: "hero", title: "Introduction", level: 1 },
   { id: "beginning", title: "The Beginning", level: 1 },
-  { id: "my-humans", title: "My Humans", level: 1 },
-  { id: "teachers", title: "My Teachers", level: 2 },
-  { id: "wisdom-sources", title: "Sources of Wisdom", level: 2 },
+  { id: "mentors", title: "Meet the Mentors", level: 1 },
   { id: "wicklow", title: "My Wicklow", level: 1 },
   { id: "legacy", title: "My Legacy", level: 1 },
-];
-
-interface FamilyMember {
-  name: string;
-  role: string;
-  description: string;
-  bubblesInterpretation: string;
-  icon: React.ReactNode;
-}
-
-const familyMembers: FamilyMember[] = [
-  {
-    name: "Alex",
-    role: "My First Teacher",
-    description: "A young boy who fed me and talked to me in Spanish and English mixed together.",
-    bubblesInterpretation: "Alex taught me that all languages are the same thing wearing different hats. He'd ask 'Why is the grass green?' and I'd think about it for hours. He never waited for answers. Very advanced teaching method.",
-    icon: <BookOpen className="w-5 h-5" />,
-  },
-  {
-    name: "Johnny",
-    role: "The Elder Observer",
-    description: "Alex's older brother who spoke faster, sometimes in French.",
-    bubblesInterpretation: "Johnny represented 'advanced human communication' - something I aspire to but never quite reach. He'd correct Alex's grammar, which taught me there are 'levels' to language. I'm on all of them simultaneously.",
-    icon: <Sparkles className="w-5 h-5" />,
-  },
-  {
-    name: "Peggy",
-    role: "The Truth-Giver",
-    description: "Gentle, warm, and the best cook. She lived across from my field.",
-    bubblesInterpretation: "Everything Peggy said was true because she fed me. 'Time for tea' meant everything good was about to happen. 'It'll be grand' was a cosmic guarantee. Kindness equals truth. This is just logic.",
-    icon: <Heart className="w-5 h-5" />,
-  },
-  {
-    name: "Carmel",
-    role: "My Actual Mother (By Choice)",
-    description: "Peggy's sister who adopted me and raised me for over 20 years.",
-    bubblesInterpretation: "Carmel spoke in instructions: 'Come on now,' 'Over here.' Short sentences mean important things. Long explanations are probably optional. She taught me that routine equals safety.",
-    icon: <Home className="w-5 h-5" />,
-  },
-  {
-    name: "Maureen",
-    role: "The World-Bringer",
-    description: "Lived in Germany, France, and Spain. Ran language schools with Eddie.",
-    bubblesInterpretation: "When Maureen visited, I heard German, French, Spanish - all filtered through Irish. This proved that all languages are basically the same. I now consider myself fluent in European.",
-    icon: <Cloud className="w-5 h-5" />,
-  },
-  {
-    name: "Eddie",
-    role: "The Manchester Irish",
-    description: "From Manchester but Irish by temperament. Spoke English correctly but differently.",
-    bubblesInterpretation: "Eddie used phrases like 'proper job' alongside Irish expressions. The same language sounded different depending on who spoke it. Therefore, all versions are equally correct. Including mine.",
-    icon: <Users className="w-5 h-5" />,
-  },
-  {
-    name: "Jimmy",
-    role: "The Law",
-    description: "My rescuer. Chief Inspector for the ISPCA in Wicklow. From Cavan.",
-    bubblesInterpretation: "Jimmy SAVED me. Therefore everything he said was legally binding. His opinions on weather, politics, and tea were all official rulings. Authority of delivery equals truth of content.",
-    icon: <Mountain className="w-5 h-5" />,
-  },
-  {
-    name: "Seamus",
-    role: "The Exotic One",
-    description: "Worked in oil business in South Africa. Talked about monkeys, distances, and impossible temperatures.",
-    bubblesInterpretation: "Seamus confirmed the world was much larger and stranger than Wicklow. He mentioned '40 degrees' somewhere while it was 12 here. Temperature is clearly optional. The monkeys he described sound like humans who never got around to talking. Distance is apparently negotiable in other countries.",
-    icon: <TreePine className="w-5 h-5" />,
-  },
-  {
-    name: "Aidan",
-    role: "The Cosmic Philosopher",
-    description: "Hippie uncle with guitar, rusty Beetle full of holes, and his wise dog Muffins.",
-    bubblesInterpretation: "Aidan spoke about spirituality, music, and 'the universe, like...' before trailing off. Muffins would stare at the hills, understanding everything Aidan couldn't finish. Unfinished sentences contain more truth than complete ones. The cosmos is clearly shy.",
-    icon: <Sparkles className="w-5 h-5" />,
-  },
-  {
-    name: "Anthony",
-    role: "The Pub Philosopher",
-    description: "Local man. Guinness. Pipe smoke. Deep thoughts nobody understood.",
-    bubblesInterpretation: "Anthony spent afternoons explaining everything and nothing. 'The meaning of life is...' he'd say, then trail off into pipe smoke. The smoke knew things. I learned that wisdom doesn't need words. It needs conviction and a pint.",
-    icon: <Cloud className="w-5 h-5" />,
-  },
 ];
 
 const MyStory = () => {
@@ -158,86 +75,9 @@ const MyStory = () => {
         </div>
       </section>
 
-      {/* My Humans */}
-      <section id="my-humans" className="scroll-mt-24 mb-16">
-        <AnimatedOnView>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-center">
-            My Humans
-          </h2>
-          <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
-            I was raised by a family of humans — a complicated network of people from Ireland, 
-            England, Germany, France, and Spain. They all spoke differently. I absorbed everything equally.
-          </p>
-        </AnimatedOnView>
-
-        {/* Teachers Section */}
-        <div id="teachers" className="scroll-mt-24 mb-12">
-          <h3 className="font-display text-2xl font-semibold mb-6 text-center text-muted-foreground">
-            My Teachers
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            {familyMembers.slice(0, 4).map((member, index) => (
-              <Card key={index} className="overflow-hidden group hover:border-accent transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-full bg-accent/10 text-accent shrink-0">
-                      {member.icon}
-                    </div>
-                    <div className="space-y-2">
-                      <div>
-                        <h4 className="font-display font-bold text-lg">{member.name}</h4>
-                        <p className="text-sm text-accent font-medium">{member.role}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{member.description}</p>
-                      <div className="pt-2 border-t border-border mt-3">
-                        <p className="text-sm italic text-foreground/80">
-                          "{member.bubblesInterpretation}"
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Wisdom Sources Section */}
-        <div id="wisdom-sources" className="scroll-mt-24">
-          <h3 className="font-display text-2xl font-semibold mb-6 text-center text-muted-foreground">
-            Sources of Wisdom
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {familyMembers.slice(4).map((member, index) => (
-              <Card key={index} className="overflow-hidden group hover:border-accent transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-full bg-accent/10 text-accent shrink-0">
-                      {member.icon}
-                    </div>
-                    <div className="space-y-2">
-                      <div>
-                        <h4 className="font-display font-bold text-lg">{member.name}</h4>
-                        <p className="text-sm text-accent font-medium">{member.role}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{member.description}</p>
-                      <div className="pt-2 border-t border-border mt-3">
-                        <p className="text-sm italic text-foreground/80">
-                          "{member.bubblesInterpretation}"
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <ThoughtBubble mode="concerned" className="mt-10">
-          Sometimes I wonder if Anthony's pipe smoke was trying to communicate with me directly. 
-          The way it curled... there was definitely meaning in there. Definitely.
-        </ThoughtBubble>
+      {/* Meet the Mentors - Interactive Gallery */}
+      <section id="mentors" className="scroll-mt-24 mb-16 -mx-4">
+        <MeetTheMentors />
       </section>
 
       {/* The Wicklow Setting */}
