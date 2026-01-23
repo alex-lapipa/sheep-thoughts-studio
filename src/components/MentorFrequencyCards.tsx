@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMentorFrequency } from "@/hooks/useMentorFrequency";
-import { Progress } from "./ui/progress";
+import { LiveActivityStats } from "./LiveActivityStats";
 
 interface MentorConfig {
   id: string;
@@ -279,8 +279,17 @@ export const MentorFrequencyCards = ({
     );
   }
 
+  // Count active mentors (those with at least 1 trigger)
+  const activeMentorCount = displayCards.filter(c => c.triggerCount > 0).length;
+
   return (
-    <section className={cn("space-y-4", className)}>
+    <section className={cn("space-y-6", className)}>
+      {/* Live Activity Stats */}
+      <LiveActivityStats 
+        totalTriggers={data?.total || 0}
+        activeMentors={activeMentorCount}
+      />
+
       {/* Header with summary */}
       <div className="flex items-center justify-between">
         <div>
