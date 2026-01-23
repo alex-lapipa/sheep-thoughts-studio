@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Cloud, Heart, Home, Mountain, Sparkles, TreePine, BookOpen,
@@ -22,11 +22,39 @@ const MENTOR_CONFIG: Record<string, { name: string; color: string; icon: React.E
 
 export const MentorFrequencyWidget = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const [lastTriggeredMentor, setLastTriggeredMentor] = useState<string | null>(null);
+  const prevTotalRef = useRef<number | null>(null);
   const { data, isLoading } = useMentorFrequency(30);
 
   const top3 = data?.stats.slice(0, 3) || [];
 
+  // Detect new triggers and pulse
+  useEffect(() => {
+    if (data?.total !== undefined) {
+      if (prevTotalRef.current !== null && data.total > prevTotalRef.current) {
+        // New trigger detected!
+        setIsPulsing(true);
+        
+        // Find which mentor was most recently triggered (highest count change)
+        if (data.stats.length > 0) {
+          setLastTriggeredMentor(data.stats[0].mentor_id);
+        }
+        
+        const timeout = setTimeout(() => {
+          setIsPulsing(false);
+          setLastTriggeredMentor(null);
+        }, 2000);
+        
+        return () => clearTimeout(timeout);
+      }
+      prevTotalRef.current = data.total;
+    }
+  }, [data?.total, data?.stats]);
+
   if (isLoading || top3.length === 0) return null;
+
+  const pulsingMentorConfig = lastTriggeredMentor ? MENTOR_CONFIG[lastTriggeredMentor] : null;
 
   return (
     <motion.div
@@ -34,17 +62,74 @@ export const MentorFrequencyWidget = () => {
       animate={{ opacity: 1, x: 0 }}
       className="fixed right-4 top-1/2 -translate-y-1/2 z-40"
     >
-      <div className={cn(
-        "backdrop-blur-xl bg-card/80 border border-white/10 rounded-2xl shadow-xl overflow-hidden",
-        "transition-all duration-300"
-      )}>
+      {/* Pulse ring animation */}
+      <AnimatePresence>
+        {isPulsing && (
+          <>
+            <motion.div
+              initial={{ opacity: 0.6, scale: 1 }}
+              animate={{ opacity: 0, scale: 1.4 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute inset-0 rounded-2xl border-2 border-accent pointer-events-none"
+            />
+            <motion.div
+              initial={{ opacity: 0.4, scale: 1 }}
+              animate={{ opacity: 0, scale: 1.6 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+              className="absolute inset-0 rounded-2xl border border-accent pointer-events-none"
+            />
+          </>
+        )}
+      </AnimatePresence>
+
+      <motion.div 
+        className={cn(
+          "relative backdrop-blur-xl bg-card/80 border rounded-2xl shadow-xl overflow-hidden",
+          "transition-all duration-300",
+          isPulsing ? "border-accent shadow-accent/20" : "border-white/10"
+        )}
+        animate={isPulsing ? { 
+          scale: [1, 1.02, 1],
+          boxShadow: [
+            "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            "0 25px 50px -12px rgba(var(--accent), 0.3)",
+            "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+          ]
+        } : {}}
+        transition={{ duration: 0.5 }}
+      >
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-accent/10 transition-colors"
         >
-          <Flame className="w-4 h-4 text-amber-500" />
-          <span className="text-xs font-medium">Top Mentors</span>
+          <motion.div
+            animate={isPulsing ? { 
+              scale: [1, 1.3, 1],
+              rotate: [0, -10, 10, 0]
+            } : {}}
+            transition={{ duration: 0.5 }}
+          >
+            <Flame className={cn(
+              "w-4 h-4 transition-colors",
+              isPulsing ? "text-accent" : "text-amber-500"
+            )} />
+          </motion.div>
+          <span className="text-xs font-medium">
+            {isPulsing && pulsingMentorConfig ? (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-accent"
+              >
+                {pulsingMentorConfig.name} triggered!
+              </motion.span>
+            ) : (
+              "Top Mentors"
+            )}
+          </span>
           {isExpanded ? (
             <ChevronDown className="w-3.5 h-3.5 ml-auto text-muted-foreground" />
           ) : (
@@ -66,20 +151,36 @@ export const MentorFrequencyWidget = () => {
                   const config = MENTOR_CONFIG[stat.mentor_id];
                   if (!config) return null;
                   const Icon = config.icon;
+                  const isTriggered = isPulsing && stat.mentor_id === lastTriggeredMentor;
+                  
                   return (
-                    <div 
+                    <motion.div 
                       key={stat.mentor_id}
                       className={cn(
                         "relative p-1.5 rounded-lg bg-muted/50",
-                        index === 0 && "ring-1 ring-amber-500/50"
+                        index === 0 && "ring-1 ring-amber-500/50",
+                        isTriggered && "ring-2 ring-accent"
                       )}
                       title={`${config.name}: ${stat.trigger_count} triggers`}
+                      animate={isTriggered ? { 
+                        scale: [1, 1.2, 1],
+                      } : {}}
+                      transition={{ duration: 0.3 }}
                     >
                       <Icon className={cn("w-4 h-4", config.color)} />
                       {index === 0 && (
                         <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500" />
                       )}
-                    </div>
+                      {isTriggered && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent flex items-center justify-center"
+                        >
+                          <span className="text-[8px] text-accent-foreground font-bold">!</span>
+                        </motion.div>
+                      )}
+                    </motion.div>
                   );
                 })}
               </div>
@@ -100,29 +201,44 @@ export const MentorFrequencyWidget = () => {
                 const config = MENTOR_CONFIG[stat.mentor_id];
                 if (!config) return null;
                 const Icon = config.icon;
+                const isTriggered = isPulsing && stat.mentor_id === lastTriggeredMentor;
                 
                 return (
                   <motion.div
                     key={stat.mentor_id}
                     initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    animate={{ 
+                      opacity: 1, 
+                      x: 0,
+                      scale: isTriggered ? [1, 1.05, 1] : 1
+                    }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center gap-2"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg p-1 -m-1",
+                      isTriggered && "bg-accent/10"
+                    )}
                   >
-                    <div className={cn(
-                      "p-1.5 rounded-lg bg-muted/50",
-                      index === 0 && "ring-1 ring-amber-500/50"
-                    )}>
+                    <motion.div 
+                      className={cn(
+                        "p-1.5 rounded-lg bg-muted/50",
+                        index === 0 && "ring-1 ring-amber-500/50",
+                        isTriggered && "ring-2 ring-accent"
+                      )}
+                      animate={isTriggered ? { rotate: [0, -5, 5, 0] } : {}}
+                    >
                       <Icon className={cn("w-3.5 h-3.5", config.color)} />
-                    </div>
+                    </motion.div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-medium truncate">
                           {config.name}
                         </span>
-                        <span className={cn("text-xs font-bold", config.color)}>
+                        <motion.span 
+                          className={cn("text-xs font-bold", config.color)}
+                          animate={isTriggered ? { scale: [1, 1.3, 1] } : {}}
+                        >
                           {stat.trigger_count}
-                        </span>
+                        </motion.span>
                       </div>
                       <div className="h-1 mt-1 rounded-full bg-muted/50 overflow-hidden">
                         <motion.div
@@ -151,7 +267,7 @@ export const MentorFrequencyWidget = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
