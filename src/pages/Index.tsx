@@ -13,7 +13,7 @@ import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
-import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
+import { BroadcastStudio } from "@/components/BroadcastStudio";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -224,8 +224,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Voice Chat with Bubbles - AI Powered Conversation */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/20 via-bubbles-meadow/5 to-background relative overflow-hidden">
+      {/* Broadcast Studio - TV Screen with Bubbles */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900/50 via-background to-background relative overflow-hidden">
         <ParallaxSection speed={0.2} className="absolute top-1/3 left-5 w-28 h-28 rounded-full bg-accent/10 blur-3xl" />
         <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/3 right-5 w-36 h-36 rounded-full bg-bubbles-mist/10 blur-3xl" />
         <ParallaxSection speed={0.15} className="absolute top-10 right-1/4 w-20 h-20 rounded-full bg-bubbles-gorse/15 blur-2xl" />
@@ -233,7 +233,7 @@ export default function Index() {
         
         <div className="container relative z-10">
           <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.008}>
-            <BubblesVoiceChat />
+            <BroadcastStudio />
           </ParallaxSection>
         </div>
       </section>
