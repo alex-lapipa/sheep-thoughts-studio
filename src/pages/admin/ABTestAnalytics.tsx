@@ -13,8 +13,9 @@ import {
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { 
   FlaskConical, RefreshCw, Eye, ShoppingCart, CreditCard, 
-  TrendingUp, TrendingDown, Minus, Users, ArrowRight
+  TrendingUp, TrendingDown, Minus, Users, ArrowRight, ExternalLink
 } from "lucide-react";
+import { generatePreviewUrl } from "@/contexts/FeatureFlagsContext";
 
 interface VariantMetrics {
   variant: string;
@@ -177,10 +178,30 @@ export default function ABTestAnalytics() {
               Compare conversion rates between homepage variants
             </p>
           </div>
-          <Button onClick={() => refetch()} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => window.open(generatePreviewUrl(window.location.origin, { simplifiedHomepage: true }), '_blank')}
+              variant="outline" 
+              size="sm"
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Preview Simplified
+            </Button>
+            <Button 
+              onClick={() => window.open(generatePreviewUrl(window.location.origin, { simplifiedHomepage: false }), '_blank')}
+              variant="outline" 
+              size="sm"
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Preview Full
+            </Button>
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
