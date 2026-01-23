@@ -27,11 +27,11 @@ const getLegacyNavLinks = (t: (key: string) => string) => [
 ];
 
 // Phase 1: Simplified public navigation - Chat, Live, Shop, FAQ only
-const getNewNavLinks = (t: (key: string) => string) => [
+const getNewNavLinks = (t: (key: string) => string, useFaqSummary: boolean) => [
   { href: "/talk", label: "Chat", icon: Mic },
   { href: "/scenarios", label: "Live", icon: Radio },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
-  { href: "/faq", label: "FAQ", icon: HelpCircle },
+  { href: useFaqSummary ? "/faq-summary" : "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
 export function Header() {
@@ -45,7 +45,8 @@ export function Header() {
   
   // Toggle between new and legacy navigation based on feature flag
   const useNewNav = isEnabled('newNavigation');
-  const navLinks = useNewNav ? getNewNavLinks(t) : getLegacyNavLinks(t);
+  const useFaqSummary = isEnabled('faqSummary');
+  const navLinks = useNewNav ? getNewNavLinks(t, useFaqSummary) : getLegacyNavLinks(t);
 
   // Track scroll for header shadow
   useEffect(() => {

@@ -43,6 +43,7 @@ const DACH = lazy(() => import("./pages/DACH"));
 const Francophone = lazy(() => import("./pages/Francophone"));
 const Hispanic = lazy(() => import("./pages/Hispanic"));
 const Scenarios = lazy(() => import("./pages/Scenarios"));
+const FAQSummary = lazy(() => import("./pages/FAQSummary"));
 const HallOfFame = lazy(() => import("./pages/HallOfFame"));
 const Recipes = lazy(() => import("./pages/Recipes"));
 const Adventures = lazy(() => import("./pages/Adventures"));
@@ -145,6 +146,7 @@ const App = () => (
                   <Route path="/achievements" element={<Achievements />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/faq-summary" element={<FAQSummary />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/shipping" element={<Shipping />} />
                   <Route path="/contact" element={<Contact />} />

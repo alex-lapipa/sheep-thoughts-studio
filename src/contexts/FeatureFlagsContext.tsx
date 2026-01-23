@@ -12,7 +12,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   newNavigation: true,        // Phase 1: Enabled
   simplifiedHomepage: false,
   enhancedShop: true,         // Phase 2: Enabled
-  faqSummary: false,
+  faqSummary: true,           // Phase 3: Enabled
 };
 
 interface FeatureFlagsContextType {
