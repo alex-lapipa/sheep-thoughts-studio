@@ -53,6 +53,7 @@ const MyStory = lazy(() => import("./pages/MyStory"));
 const Gaelic = lazy(() => import("./pages/Gaelic"));
 const TalkToBubbles = lazy(() => import("./pages/TalkToBubbles"));
 const Listen = lazy(() => import("./pages/Listen"));
+const Quiz = lazy(() => import("./pages/Quiz"));
 
 // Admin pages - always lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -172,6 +173,7 @@ const App = () => (
                   <Route path="/my-story" element={<MyStory />} />
                   <Route path="/talk" element={<TalkToBubbles />} />
                   <Route path="/listen" element={<Listen />} />
+                  <Route path="/quiz" element={<Quiz />} />
                   <Route path="/dach" element={<DACH />} />
                   <Route path="/de" element={<DACH />} />
                   <Route path="/at" element={<DACH />} />
