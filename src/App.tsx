@@ -62,6 +62,7 @@ const AdminScenarios = lazy(() => import("./pages/admin/Scenarios"));
 const AdminTriggers = lazy(() => import("./pages/admin/Triggers"));
 const AdminKnowledge = lazy(() => import("./pages/admin/Knowledge"));
 const AdminRAGContent = lazy(() => import("./pages/admin/RAGContent"));
+const AdminMentors = lazy(() => import("./pages/admin/Mentors"));
 const AdminGenerate = lazy(() => import("./pages/admin/Generate"));
 const BrandOverview = lazy(() => import("./pages/admin/brand/BrandOverview"));
 const BrandColors = lazy(() => import("./pages/admin/brand/BrandColors"));
@@ -187,6 +188,7 @@ const App = () => (
                   <Route path="/admin/triggers" element={<ProtectedRoute><AdminTriggers /></ProtectedRoute>} />
                   <Route path="/admin/knowledge" element={<ProtectedRoute><AdminKnowledge /></ProtectedRoute>} />
                   <Route path="/admin/rag-content" element={<ProtectedRoute><AdminRAGContent /></ProtectedRoute>} />
+                  <Route path="/admin/mentors" element={<ProtectedRoute><AdminMentors /></ProtectedRoute>} />
                   <Route path="/admin/generate" element={<ProtectedRoute><AdminGenerate /></ProtectedRoute>} />
                   
                   {/* Brand Book Routes */}
