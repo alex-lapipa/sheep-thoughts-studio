@@ -133,6 +133,67 @@ const explanations: Explanation[] = [
     question: "Why is breakfast important?",
     explanation: "Peggy said so. She made breakfast every morning at the same time. The routine created truth. If breakfast wasn't important, why would she wake up early to make it? She wouldn't. Therefore it's the most important meal. The logic is airtight. Also, she gave me some, so I know it's good.",
     confidence: "absolute"
+  },
+  {
+    topic: "Law",
+    question: "Why do we have rules?",
+    explanation: "Jimmy Riley explained this to me. He was Chief Inspector of the ISPCA. Everything he said was legally binding. He saved me as a lamb, so his opinions on weather, politics, and tea were all official rulings. Rules exist because someone with authority says them confidently. Authority of delivery equals truth of content.",
+    confidence: "absolute",
+    challenge: {
+      objection: "Rules come from democratic processes and legislation...",
+      response: "Jimmy never mentioned 'democratic processes'. He mentioned 'that's the way it is' and 'it'll be done by Tuesday.' Are you saying Jimmy was wrong? The man saved actual animals. He drove a van with AUTHORITY. Do you have a van? I didn't think so.",
+      escalatedConfidence: "legally immovable"
+    }
+  },
+  {
+    topic: "Ethics",
+    question: "How do you know right from wrong?",
+    explanation: "Jimmy Riley could tell immediately. He'd look at a situation and just know. From Cavan, he was. The Red Hills. Something about that geography produces moral clarity. If you're unsure, ask someone from Cavan. Or someone with a clipboard. Clipboards add 40% certainty.",
+    confidence: "unshakeable",
+    challenge: {
+      objection: "Ethics is a complex philosophical field...",
+      response: "Complex? Jimmy made it look easy. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Philosophy is just what you do when you don't have Jimmy Riley available. Most people don't have Jimmy Riley. I did. I had the source.",
+      escalatedConfidence: "morally absolute"
+    }
+  },
+  {
+    topic: "Routine",
+    question: "Why do we do the same things every day?",
+    explanation: "Carmel taught me this. She spoke in instructions: 'Come on now,' 'Over here,' 'That'll do.' Short sentences mean important things. Long explanations are optional. Routine creates safety. I lived in her field for 20 years doing the same things, and look at me now. Peak condition.",
+    confidence: "absolute",
+    challenge: {
+      objection: "Routines can become limiting...",
+      response: "Carmel never said 'limiting.' She said 'consistent.' Twenty years of the same field. Same gate. Same feeding times. Did I get confused? Never. Did I have existential crises? Not once. You know who has crises? People without routines. Carmel understood this. Carmel understood everything.",
+      escalatedConfidence: "structurally certain"
+    }
+  },
+  {
+    topic: "Safety",
+    question: "How do you know if something is safe?",
+    explanation: "If Carmel allowed it, it was safe. If Carmel moved you away from it, it wasn't. There's no need for risk assessments or safety forms. You just need one person who knows. Carmel knew. The gate was always latched properly. The field was always the right field. Safety is just competent attention.",
+    confidence: "unshakeable"
+  },
+  {
+    topic: "Authority",
+    question: "What makes someone in charge?",
+    explanation: "Confidence and a van. Jimmy Riley had both. When he arrived, things happened. Animals were saved. Situations were sorted. He didn't ask permission—he had a clipboard. The clipboard is the key. If you want authority, get a clipboard and speak like everything you say is already decided.",
+    confidence: "absolute",
+    challenge: {
+      objection: "Authority comes from formal positions and accountability...",
+      response: "Jimmy's 'formal position' was Chief Inspector. His 'accountability' was to every animal in Wicklow. He answered to a higher power: common sense from Cavan. You're describing paperwork. I'm describing presence. Jimmy had PRESENCE. You could feel it when his van arrived.",
+      escalatedConfidence: "hierarchically furious"
+    }
+  },
+  {
+    topic: "Care",
+    question: "How do you know if someone cares about you?",
+    explanation: "Carmel showed me. She fed me at the same time every day for 20 years. She didn't explain love—she demonstrated it through routine. 'Over here.' 'That's it.' 'Good.' Three words over two decades. Each one meant more than a library of poetry. Care is showing up. Carmel showed up.",
+    confidence: "very high",
+    challenge: {
+      objection: "Love is more complex than routine...",
+      response: "Is it? IS IT? Carmel never made it complicated. She just appeared, every day, with food and purpose. Poets make love sound difficult because they don't have fields to tend. Carmel had a field. And a sheep. And 20 years of consistent appearing. That's not 'routine.' That's devotion in practical form.",
+      escalatedConfidence: "devotionally immovable"
+    }
   }
 ];
 

@@ -185,6 +185,91 @@ const explanations: Explanation[] = [
       response: "Constant? Then why do clocks need WINDING? Why do they STOP? If time was constant it wouldn't need help. Time is lazy and moody and you're making excuses for it.",
       escalatedConfidence: "temporally outraged"
     }
+  },
+  {
+    id: "rules",
+    topic: "Law",
+    icon: Lightbulb,
+    question: "Why do we have rules?",
+    explanation: "Jimmy Riley explained this to me. He was Chief Inspector of the ISPCA in Wicklow. From Cavan, he was—the Red Hills. Everything he said was legally binding. He saved me as a lamb, so his opinions became my constitution. Rules exist because someone with a clipboard says them confidently.",
+    confidence: "absolute",
+    sources: ["Jimmy Riley (Chief Inspector)", "The clipboard (witnessed daily)"],
+    relatedTopics: ["Authority", "Vans", "Cavan logic"],
+    challenge: {
+      objection: "Rules come from democratic processes...",
+      response: "Jimmy never mentioned 'democratic processes.' He mentioned 'that's the way it is' and 'it'll be done by Tuesday.' Do you have a van with authority? A clipboard? I didn't think so. Jimmy had PRESENCE. Laws followed him, not the other way around.",
+      escalatedConfidence: "legally immovable"
+    }
+  },
+  {
+    id: "routine",
+    topic: "Lifestyle",
+    icon: Heart,
+    question: "Why do we do the same things every day?",
+    explanation: "Carmel taught me this. She actually adopted and raised me for 20 years. She spoke in instructions: 'Come on now,' 'Over here,' 'That'll do.' Short sentences mean important things. Routine creates safety. Same field. Same gate. Same feeding times. Peak existence.",
+    confidence: "absolute",
+    sources: ["Carmel (20 years of evidence)", "The gate (always properly latched)"],
+    relatedTopics: ["Safety", "Fields", "Consistency"],
+    challenge: {
+      objection: "Routines can become limiting...",
+      response: "Limiting? Twenty years of the same field. Same gate. Did I get confused? Never. Did I have existential crises? Not once. You know who has crises? People without routines. Carmel understood this. She understood EVERYTHING.",
+      escalatedConfidence: "structurally certain"
+    }
+  },
+  {
+    id: "authority",
+    topic: "Society",
+    icon: Lightbulb,
+    question: "What makes someone in charge?",
+    explanation: "Confidence and a van. Jimmy Riley had both. When his van arrived, things happened. Animals were saved. Situations were sorted. He didn't ask permission—he had a clipboard. If you want authority, get a clipboard and speak like everything you say is already decided.",
+    confidence: "unshakeable",
+    sources: ["Jimmy Riley's van (heard arriving)", "Multiple clipboards (examined)"],
+    relatedTopics: ["Presence", "Vans", "Clipboards"],
+    challenge: {
+      objection: "Authority comes from formal positions...",
+      response: "Jimmy's 'formal position' was Chief Inspector. His accountability was to every animal in Wicklow. You're describing paperwork. I'm describing PRESENCE. Jimmy had presence. You could feel it when his van arrived. The gravel knew.",
+      escalatedConfidence: "hierarchically furious"
+    }
+  },
+  {
+    id: "care",
+    topic: "Relationships",
+    icon: Heart,
+    question: "How do you know if someone cares about you?",
+    explanation: "Carmel showed me. She fed me at the same time every day for 20 years. She didn't explain love—she demonstrated it through routine. 'Over here.' 'That's it.' 'Good.' Three words over two decades. Each one meant more than a library of poetry. Care is showing up.",
+    confidence: "very high",
+    sources: ["Carmel (decades of daily evidence)", "The feeding bucket (reliable)"],
+    relatedTopics: ["Routine", "Actions", "Showing up"],
+    challenge: {
+      objection: "Love is more complex than routine...",
+      response: "Is it? IS IT? Carmel never made it complicated. She just appeared, every day, with food and purpose. Poets make love sound difficult because they don't have fields to tend. Carmel had a field. And a sheep. And 20 years of consistent appearing. That's devotion in practical form.",
+      escalatedConfidence: "devotionally immovable"
+    }
+  },
+  {
+    id: "safety",
+    topic: "Lifestyle",
+    icon: Heart,
+    question: "How do you know if something is safe?",
+    explanation: "If Carmel allowed it, it was safe. If Carmel moved you away from it, it wasn't. There's no need for risk assessments. You just need one person who knows. The gate was always latched properly. The field was always the right field. Safety is just competent attention.",
+    confidence: "unshakeable",
+    sources: ["Carmel's judgment (never wrong)", "The properly latched gate"],
+    relatedTopics: ["Trust", "Gates", "Competent attention"]
+  },
+  {
+    id: "morality",
+    topic: "Philosophy",
+    icon: Clock,
+    question: "How do you tell right from wrong?",
+    explanation: "Jimmy Riley could tell immediately. He'd look at a situation and just know. Something about Cavan geography produces moral clarity. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Ethics is just what you do when you don't have Jimmy available.",
+    confidence: "absolute",
+    sources: ["Jimmy Riley (moral authority)", "Cavan (the geography)"],
+    relatedTopics: ["Ethics", "Clarity", "Cavan"],
+    challenge: {
+      objection: "Ethics is a complex philosophical field...",
+      response: "Complex? Jimmy made it look easy. Philosophy is what happens when you don't have Jimmy Riley available. Most people don't have Jimmy Riley. I did. I had the SOURCE.",
+      escalatedConfidence: "morally absolute"
+    }
   }
 ];
 
