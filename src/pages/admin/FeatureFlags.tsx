@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useFeatureFlags, FeatureFlags } from "@/contexts/FeatureFlagsContext";
-import { Flag, RotateCcw, Navigation, Home, ShoppingBag, HelpCircle } from "lucide-react";
+import { useFeatureFlags, FeatureFlags, generatePreviewUrl } from "@/contexts/FeatureFlagsContext";
+import { Flag, RotateCcw, Navigation, Home, ShoppingBag, HelpCircle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 const FLAG_METADATA: Record<keyof FeatureFlags, { 
@@ -71,6 +71,14 @@ export default function FeatureFlagsAdmin() {
             <Badge variant="outline" className="text-sm">
               {enabledCount} / {Object.keys(flags).length} enabled
             </Badge>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.open(generatePreviewUrl(window.location.origin, flags), '_blank')}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Preview
+            </Button>
             <Button variant="outline" size="sm" onClick={handleReset}>
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset All
