@@ -712,3 +712,5 @@ export function InsideMyHeadHero() {
     </section>
   );
 }
+
+export default InsideMyHeadHero;
