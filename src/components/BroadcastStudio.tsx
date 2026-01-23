@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Mic, MicOff, Volume2, VolumeX, Send, Loader2, Settings2, Radio } from "lucide-react";
 import { Slider } from "./ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -8,7 +8,6 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { AudioWaveform } from "./AudioWaveform";
 import { MicActivityIndicator } from "./MicActivityIndicator";
-import { BubblesSheep } from "./BubblesSheep";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -77,23 +76,208 @@ const getStoredSettings = (): VoiceSettings => {
   return { voiceEnabled: true, speechRate: 0.95, speechPitch: 0.9 };
 };
 
-// TV Screen component with Bubbles character
+// TV Screen component with Wicklow landscape and Bubbles in bog with microphone
 const TVScreen = ({ message, mode, isLoading, isSpeaking }: { 
   message?: string; 
   mode?: string; 
   isLoading: boolean;
   isSpeaking: boolean;
 }) => {
+  // Random seed for consistent "weather" per session
+  const randomSeed = useMemo(() => Math.random(), []);
+  const timeOfDay = randomSeed < 0.3 ? "dawn" : randomSeed < 0.7 ? "midday" : "dusk";
+  
   return (
     <div className="relative w-full aspect-video max-w-md mx-auto">
       {/* TV Frame - vintage CRT style */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-zinc-600 via-zinc-800 to-zinc-900 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-muted via-muted/80 to-muted-foreground/20 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]">
         {/* Inner bezel */}
-        <div className="absolute inset-4 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 p-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
-          {/* Screen */}
-          <div className="relative w-full h-full rounded-md overflow-hidden bg-gradient-to-br from-bubbles-meadow/30 via-bubbles-mist/20 to-bubbles-heather/20">
+        <div className="absolute inset-4 rounded-lg bg-gradient-to-br from-muted to-muted-foreground/30 p-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
+          {/* Screen with Wicklow landscape */}
+          <div className="relative w-full h-full rounded-md overflow-hidden">
+            {/* === WICKLOW LANDSCAPE INSIDE TV === */}
+            <svg viewBox="0 0 400 225" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                {/* Sky gradients based on time of day */}
+                <linearGradient id="tvSkyDawn" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(280 40% 45%)" />
+                  <stop offset="20%" stopColor="hsl(340 60% 65%)" />
+                  <stop offset="50%" stopColor="hsl(25 80% 70%)" />
+                  <stop offset="100%" stopColor="hsl(45 50% 88%)" />
+                </linearGradient>
+                <linearGradient id="tvSkyMidday" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(210 60% 75%)" />
+                  <stop offset="30%" stopColor="hsl(200 50% 82%)" />
+                  <stop offset="100%" stopColor="hsl(40 30% 92%)" />
+                </linearGradient>
+                <linearGradient id="tvSkyDusk" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(250 35% 35%)" />
+                  <stop offset="35%" stopColor="hsl(340 50% 55%)" />
+                  <stop offset="85%" stopColor="hsl(35 60% 75%)" />
+                </linearGradient>
+                {/* Mountain gradients */}
+                <linearGradient id="sugarloafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(var(--bubbles-peat))" />
+                  <stop offset="40%" stopColor="hsl(270 15% 35%)" />
+                  <stop offset="100%" stopColor="hsl(120 25% 35%)" />
+                </linearGradient>
+                {/* Bog terrain gradient */}
+                <linearGradient id="bogGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(var(--bubbles-meadow))" />
+                  <stop offset="50%" stopColor="hsl(90 30% 35%)" />
+                  <stop offset="100%" stopColor="hsl(var(--bubbles-peat))" />
+                </linearGradient>
+                {/* Heather patches */}
+                <radialGradient id="heatherPatch">
+                  <stop offset="0%" stopColor="hsl(var(--bubbles-heather))" />
+                  <stop offset="100%" stopColor="hsl(300 25% 30%)" stopOpacity="0" />
+                </radialGradient>
+                {/* Atmospheric mist */}
+                <linearGradient id="mistGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(var(--bubbles-mist))" stopOpacity="0" />
+                  <stop offset="70%" stopColor="hsl(var(--bubbles-mist))" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="hsl(var(--bubbles-mist))" stopOpacity="0.6" />
+                </linearGradient>
+              </defs>
+              
+              {/* SKY */}
+              <rect width="400" height="225" fill={`url(#tvSky${timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)})`} />
+              
+              {/* Distant clouds */}
+              <ellipse cx="80" cy="40" rx="45" ry="15" fill="hsl(0 0% 95%)" opacity="0.5">
+                <animate attributeName="cx" values="80;420" dur="60s" repeatCount="indefinite" />
+              </ellipse>
+              <ellipse cx="300" cy="55" rx="35" ry="12" fill="hsl(0 0% 95%)" opacity="0.4">
+                <animate attributeName="cx" values="300;-50" dur="45s" repeatCount="indefinite" />
+              </ellipse>
+              
+              {/* SUGARLOAF MOUNTAIN - Iconic asymmetric cone */}
+              <path d="M 150 130 L 200 60 L 220 65 L 260 135 Q 205 140 150 130" fill="url(#sugarloafGrad)" />
+              {/* Quartzite summit highlight */}
+              <path d="M 195 65 L 200 60 L 220 65 L 215 70 Z" fill="hsl(270 10% 50%)" />
+              
+              {/* Rolling hills - mid-ground */}
+              <path d="M 0 150 Q 100 120 200 140 T 400 130 L 400 225 L 0 225 Z" fill="hsl(120 30% 40%)" opacity="0.7" />
+              <path d="M 0 160 Q 80 140 160 155 T 320 145 T 400 155 L 400 225 L 0 225 Z" fill="hsl(100 25% 38%)" opacity="0.8" />
+              
+              {/* BOG TERRAIN - Foreground */}
+              <path d="M 0 170 Q 100 160 200 165 T 400 160 L 400 225 L 0 225 Z" fill="url(#bogGrad)" />
+              
+              {/* Heather patches */}
+              <ellipse cx="50" cy="190" rx="30" ry="10" fill="url(#heatherPatch)" opacity="0.6" />
+              <ellipse cx="350" cy="185" rx="35" ry="12" fill="url(#heatherPatch)" opacity="0.5" />
+              <ellipse cx="150" cy="200" rx="25" ry="8" fill="url(#heatherPatch)" opacity="0.4" />
+              
+              {/* Gorse patches - yellow */}
+              <ellipse cx="100" cy="195" rx="15" ry="8" fill="hsl(var(--bubbles-gorse))" opacity="0.5" />
+              <ellipse cx="280" cy="192" rx="12" ry="6" fill="hsl(var(--bubbles-gorse))" opacity="0.4" />
+              
+              {/* Bog cotton tufts */}
+              {[60, 130, 320, 370].map((x, i) => (
+                <g key={i}>
+                  <line x1={x} y1={205} x2={x} y2={195} stroke="hsl(100 30% 50%)" strokeWidth="1" />
+                  <circle cx={x} cy={193} r="3" fill="hsl(0 0% 95%)" opacity="0.8" />
+                </g>
+              ))}
+              
+              {/* Atmospheric mist layer */}
+              <rect x="0" y="160" width="400" height="65" fill="url(#mistGrad)" />
+            </svg>
+            
+            {/* === BUBBLES CHARACTER IN BOG WITH MICROPHONE === */}
+            <div className={cn(
+              "absolute bottom-2 left-1/2 -translate-x-1/2 z-10 transition-transform duration-300",
+              isSpeaking && "animate-[bounce_0.6s_ease-in-out_infinite]"
+            )}>
+              <svg viewBox="0 0 120 100" className="w-32 h-24 drop-shadow-lg">
+                <defs>
+                  <radialGradient id="woolGrad" cx="50%" cy="30%" r="70%">
+                    <stop offset="0%" stopColor="hsl(45 25% 95%)" />
+                    <stop offset="100%" stopColor="hsl(40 20% 85%)" />
+                  </radialGradient>
+                  <radialGradient id="faceGrad" cx="40%" cy="30%" r="60%">
+                    <stop offset="0%" stopColor="hsl(25 15% 35%)" />
+                    <stop offset="100%" stopColor="hsl(25 20% 22%)" />
+                  </radialGradient>
+                </defs>
+                
+                {/* Bog ground under sheep */}
+                <ellipse cx="60" cy="95" rx="35" ry="8" fill="hsl(var(--bubbles-peat))" opacity="0.5" />
+                
+                {/* SHEEP BODY - Four-legged posture */}
+                {/* Woolly body mass */}
+                <ellipse cx="55" cy="55" rx="28" ry="22" fill="url(#woolGrad)" />
+                
+                {/* Wool texture bumps */}
+                <circle cx="40" cy="45" r="8" fill="hsl(45 20% 92%)" />
+                <circle cx="55" cy="38" r="9" fill="hsl(45 22% 94%)" />
+                <circle cx="70" cy="45" r="8" fill="hsl(45 20% 90%)" />
+                <circle cx="45" cy="55" r="7" fill="hsl(45 18% 93%)" />
+                <circle cx="65" cy="55" r="7" fill="hsl(45 18% 91%)" />
+                <circle cx="55" cy="65" r="6" fill="hsl(45 15% 88%)" />
+                
+                {/* Legs - sturdy, grounded */}
+                <rect x="35" y="70" width="6" height="18" rx="2" fill="hsl(25 15% 25%)" />
+                <rect x="48" y="72" width="5" height="16" rx="2" fill="hsl(25 15% 28%)" />
+                <rect x="60" y="72" width="5" height="16" rx="2" fill="hsl(25 15% 25%)" />
+                <rect x="72" y="70" width="6" height="18" rx="2" fill="hsl(25 15% 22%)" />
+                {/* Hooves */}
+                <ellipse cx="38" cy="88" rx="4" ry="2" fill="hsl(25 10% 18%)" />
+                <ellipse cx="50" cy="88" rx="3" ry="2" fill="hsl(25 10% 18%)" />
+                <ellipse cx="62" cy="88" rx="3" ry="2" fill="hsl(25 10% 18%)" />
+                <ellipse cx="75" cy="88" rx="4" ry="2" fill="hsl(25 10% 18%)" />
+                
+                {/* HEAD - Facing right toward mic */}
+                <ellipse cx="28" cy="48" rx="12" ry="14" fill="url(#faceGrad)" />
+                
+                {/* Ears - alert but relaxed */}
+                <ellipse cx="22" cy="35" rx="5" ry="8" fill="hsl(25 15% 28%)" transform="rotate(-15 22 35)" />
+                <ellipse cx="36" cy="34" rx="4" ry="7" fill="hsl(25 18% 30%)" transform="rotate(10 36 34)" />
+                {/* Inner ear */}
+                <ellipse cx="22" cy="36" rx="2.5" ry="4" fill="hsl(350 25% 55%)" transform="rotate(-15 22 36)" opacity="0.4" />
+                
+                {/* Eyes - distant, certain gaze */}
+                <ellipse cx="22" cy="45" rx="3.5" ry="4" fill="hsl(45 30% 95%)" />
+                <circle cx="21" cy="45" r="2" fill="hsl(25 30% 15%)" />
+                <circle cx="20.5" cy="44" r="0.8" fill="hsl(0 0% 100%)" />
+                {/* Heavy lids - unimpressed certainty */}
+                <path d="M 18 42 Q 22 40 26 42" stroke="hsl(25 15% 25%)" strokeWidth="1.5" fill="none" />
+                
+                {/* Nose */}
+                <ellipse cx="18" cy="52" rx="3" ry="2" fill="hsl(350 20% 35%)" />
+                
+                {/* Mouth - neutral, contemplative */}
+                <path d="M 16 56 Q 20 57 24 55" stroke="hsl(25 20% 20%)" strokeWidth="1" fill="none" />
+                
+                {/* BROADCAST MICROPHONE - Professional SM7B style */}
+                <g transform="translate(8, 35)">
+                  {/* Mic boom/stand */}
+                  <rect x="-2" y="20" width="3" height="35" fill="hsl(0 0% 25%)" rx="1" />
+                  {/* Mic mount */}
+                  <rect x="-4" y="10" width="7" height="12" fill="hsl(0 0% 20%)" rx="1" />
+                  {/* Mic body - SM7B-style */}
+                  <ellipse cx="0" cy="5" rx="6" ry="10" fill="hsl(0 0% 18%)" />
+                  <ellipse cx="0" cy="5" rx="4.5" ry="8" fill="hsl(0 0% 28%)" />
+                  {/* Mic grille */}
+                  {[-4, -1, 2, 5, 8].map((y, i) => (
+                    <line key={i} x1="-3" y1={y} x2="3" y2={y} stroke="hsl(0 0% 15%)" strokeWidth="0.8" />
+                  ))}
+                  {/* Active indicator when speaking */}
+                  {isSpeaking && (
+                    <circle cx="0" cy="-8" r="2.5" fill="hsl(0 70% 50%)">
+                      <animate attributeName="opacity" values="1;0.3;1" dur="0.5s" repeatCount="indefinite" />
+                    </circle>
+                  )}
+                </g>
+                
+                {/* Wool tuft on head */}
+                <circle cx="32" cy="32" r="5" fill="hsl(45 25% 93%)" />
+                <circle cx="28" cy="30" r="4" fill="hsl(45 22% 95%)" />
+              </svg>
+            </div>
+            
             {/* CRT scanline effect */}
-            <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.03]" 
+            <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.04]" 
               style={{
                 backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px)',
               }}
@@ -101,63 +285,20 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
             
             {/* Screen glow when speaking */}
             {isSpeaking && (
-              <div className="absolute inset-0 bg-gradient-to-br from-bubbles-gorse/30 via-transparent to-accent/20 animate-pulse pointer-events-none z-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/10 animate-pulse pointer-events-none z-15" />
             )}
             
-            {/* Studio background SVG elements */}
-            <svg viewBox="0 0 200 150" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
-              <defs>
-                <radialGradient id="studioSpotlight" cx="50%" cy="20%" r="60%">
-                  <stop offset="0%" stopColor="hsl(var(--bubbles-gorse))" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="transparent" />
-                </radialGradient>
-              </defs>
-              
-              {/* Studio backdrop gradient */}
-              <rect width="200" height="150" fill="url(#studioSpotlight)" />
-              
-              {/* Desk/podium */}
-              <rect x="20" y="115" width="160" height="35" rx="3" fill="hsl(var(--bubbles-peat))" opacity="0.8" />
-              <rect x="20" y="115" width="160" height="6" rx="2" fill="hsl(var(--bubbles-peat))" />
-              
-              {/* ON AIR sign */}
-              <g transform="translate(150, 10)">
-                <rect x="0" y="0" width="45" height="20" rx="3" fill={isSpeaking ? "hsl(0 70% 45%)" : "hsl(0 10% 25%)"} />
-                <text x="22.5" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="sans-serif">ON AIR</text>
-                {isSpeaking && (
-                  <circle cx="8" cy="10" r="4" fill="hsl(0 80% 55%)">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite" />
-                  </circle>
-                )}
-              </g>
-              
-              {/* Desk microphone */}
-              <g transform="translate(50, 100)">
-                {/* Mic stand */}
-                <rect x="-2" y="0" width="4" height="25" fill="hsl(var(--bubbles-peat))" opacity="0.6" />
-                {/* Mic head - classic broadcast style */}
-                <ellipse cx="0" cy="-5" rx="10" ry="14" fill="hsl(0 0% 25%)" />
-                <ellipse cx="0" cy="-5" rx="7" ry="11" fill="hsl(0 0% 35%)" />
-                {/* Mic grille */}
-                {[-10, -7, -4, -1, 2, 5].map((y, i) => (
-                  <line key={i} x1="-5" y1={y} x2="5" y2={y} stroke="hsl(0 0% 20%)" strokeWidth="0.8" />
-                ))}
-              </g>
-              
-              {/* Headphones floating indicator */}
-              <g transform="translate(155, 95)">
-                <path d="M-12,0 Q-14,-20 0,-22 Q14,-20 12,0" fill="none" stroke="hsl(0 0% 30%)" strokeWidth="3" />
-                <ellipse cx="-12" cy="2" rx="5" ry="7" fill="hsl(0 0% 25%)" />
-                <ellipse cx="12" cy="2" rx="5" ry="7" fill="hsl(0 0% 25%)" />
-              </g>
-            </svg>
-            
-            {/* Bubbles character - using brand component */}
+            {/* ON AIR sign */}
             <div className={cn(
-              "absolute bottom-4 left-1/2 -translate-x-1/2 transition-transform duration-300",
-              isSpeaking && "animate-[bounce_0.5s_ease-in-out_infinite]"
+              "absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold tracking-wider transition-all",
+              isSpeaking 
+                ? "bg-destructive text-destructive-foreground shadow-[0_0_10px_hsl(var(--destructive))]" 
+                : "bg-muted-foreground/50 text-muted"
             )}>
-              <BubblesSheep size="lg" animated={false} className="drop-shadow-lg" />
+              ON AIR
+              {isSpeaking && (
+                <span className="ml-1.5 inline-block w-2 h-2 rounded-full bg-destructive-foreground animate-pulse" />
+              )}
             </div>
             
             {/* Speech bubble with message */}
@@ -165,10 +306,10 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="absolute top-3 left-3 right-3 bg-card/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-border/50 max-h-20 overflow-hidden"
+                className="absolute top-2 left-2 right-16 bg-card/95 backdrop-blur-sm rounded-xl p-2.5 shadow-lg border border-border/50 max-h-16 overflow-hidden"
               >
                 <p className={cn(
-                  "text-xs leading-relaxed line-clamp-3",
+                  "text-[11px] leading-relaxed line-clamp-2",
                   mode && MODE_COLORS[mode]
                 )}>
                   "{message}"
@@ -178,9 +319,9 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
             
             {/* Loading indicator */}
             {isLoading && (
-              <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 border border-border/30">
+              <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 border border-border/30 z-20">
                 <Loader2 className="h-3 w-3 text-accent animate-spin" />
-                <span className="text-[10px] text-muted-foreground">Thinking...</span>
+                <span className="text-[9px] text-muted-foreground">Thinking...</span>
               </div>
             )}
           </div>
@@ -188,13 +329,13 @@ const TVScreen = ({ message, mode, isLoading, isSpeaking }: {
         
         {/* TV controls - vintage style buttons */}
         <div className="absolute bottom-2 right-6 flex gap-2">
-          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-700 shadow-inner" />
-          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-700 shadow-inner" />
+          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-muted-foreground/50 to-muted shadow-inner" />
+          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-muted-foreground/50 to-muted shadow-inner" />
         </div>
         
         {/* TV base/stand */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gradient-to-b from-zinc-700 to-zinc-900 rounded-b-xl shadow-lg" />
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-3 bg-gradient-to-b from-zinc-800 to-zinc-950 rounded-b-lg" />
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gradient-to-b from-muted to-muted-foreground/30 rounded-b-xl shadow-lg" />
+        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-3 bg-gradient-to-b from-muted-foreground/20 to-muted-foreground/40 rounded-b-lg" />
       </div>
     </div>
   );
