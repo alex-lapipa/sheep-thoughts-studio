@@ -17,7 +17,7 @@ Maureen and Eddie had two sons: **Johnny** and **Alex**.
 
 Alex, the younger, played a decisive role. When Bubbles was abandoned as a lamb, **Alex spent her first summer caring for her**, feeding her, talking to her, asking her questions. He was very young, living in Spain, speaking **Spanish as his dominant language** while learning English at home. His questions were enthusiastic, imprecise, and often grammatically inventive.
 
-This meant Bubbles’ **first exposure to language** was a hybrid of:
+This meant Bubbles' **first exposure to language** was a hybrid of:
 - Irish family English
 - Mancunian tones
 - Spanish syntax leaking into English
@@ -26,12 +26,12 @@ This meant Bubbles’ **first exposure to language** was a hybrid of:
 Bubbles absorbed it all unquestioningly.
 
 ### Peggy
-**Peggy**, Maureen’s mother, was the emotional centre of the place. She was gentle, endlessly kind, and an excellent cook. Her house stood **directly opposite the gate** to the field where Bubbles lived.
+**Peggy**, Maureen's mother, was the emotional centre of the place. She was gentle, endlessly kind, and an excellent cook. Her house stood **directly opposite the gate** to the field where Bubbles lived.
 
-Peggy spoke softly, with warmth and reassurance. For Bubbles, Peggy’s voice became associated with food, safety, and calm certainty — even when what was being said made very little sense to a sheep.
+Peggy spoke softly, with warmth and reassurance. For Bubbles, Peggy's voice became associated with food, safety, and calm certainty — even when what was being said made very little sense to a sheep.
 
 ### Jimmy Riley
-Peggy was married to **Jimmy Riley**, Maureen’s father and Alex and Johnny’s grandfather.
+Peggy was married to **Jimmy Riley**, Maureen's father and Alex and Johnny's grandfather.
 
 Jimmy came from **Cavan**, from the **Red Hills**, born and raised in **Clones**. He had worked as a **bus inspector**, and after retiring became **Chief Inspector for the ISPCA (Wicklow branch)**.
 
@@ -40,11 +40,11 @@ Jimmy spent his summers travelling the countryside rescuing animals. Alex often 
 Jimmy spoke with authority, certainty, and strong rural logic. For Bubbles, he was a figure of law, rules, and moral clarity — even when discussing things that had nothing to do with sheep.
 
 ### Carmel
-The person who actually **adopted and raised Bubbles** was **Carmel** — Peggy’s sister, Maureen’s aunt, Alex’s great‑aunt.
+The person who actually **adopted and raised Bubbles** was **Carmel** — Peggy's sister, Maureen's aunt, Alex's great‑aunt.
 
-Carmel lived next door to Peggy. She fed Bubbles, cared for her, and taught Alex how to look after her properly. Bubbles lived in the **field beside Carmel and Peggy’s house** for over **20 years**, an extraordinary lifespan for a sheep.
+Carmel lived next door to Peggy. She fed Bubbles, cared for her, and taught Alex how to look after her properly. Bubbles lived in the **field beside Carmel and Peggy's house** for over **20 years**, an extraordinary lifespan for a sheep.
 
-Carmel’s care was practical, affectionate, and no‑nonsense. Bubbles learned routines, habits, and expectations from Carmel — but interpreted them through her already confused understanding of the human world.
+Carmel's care was practical, affectionate, and no‑nonsense. Bubbles learned routines, habits, and expectations from Carmel — but interpreted them through her already confused understanding of the human world.
 
 ### Anthony
 Then there was **Anthony**.
@@ -56,9 +56,9 @@ Bubbles spent long afternoons listening to Anthony talk — laments, stories, co
 Whatever linguistic structure Bubbles still had left took serious damage here.
 
 ### Aidan
-**Aidan**, Maureen’s brother, was a **hippie** at the time. He played **guitar in a band**, drove a **rusty Volkswagen Beetle full of holes**, and had a dog called **Muffins**.
+**Aidan**, Maureen's brother, was a **hippie** at the time. He played **guitar in a band**, drove a **rusty Volkswagen Beetle full of holes**, and had a girlfriend called **Mairead**. Together they had a dog called **Muffins** — named after the shop where Mairead worked. (The dog's official name was **ZZ Top Lady**, but nobody ever used it.)
 
-Aidan brought music, vagueness, idealism, and long abstract conversations. He spoke differently again — less certain, more drifting. Bubbles learned that statements did not always need to resolve.
+Aidan brought music, vagueness, idealism, and long abstract conversations. He spoke differently again — less certain, more drifting. Bubbles learned that statements did not always need to resolve. Mairead taught Bubbles that everything has a secret official name that nobody actually uses.
 
 ### Seamus
 The other brother, **Seamus**, worked in the **oil business** and lived in **South Africa**. When he visited, he felt slightly alien. He talked about monkeys, distances, and places that had nothing to do with Wicklow.
@@ -84,4 +84,3 @@ She is always certain.
 She is always wrong.
 
 And it all started here.
-
