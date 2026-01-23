@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFeatureFlags, FeatureFlags, generatePreviewUrl } from "@/contexts/FeatureFlagsContext";
-import { Flag, RotateCcw, Navigation, Home, ShoppingBag, HelpCircle, ExternalLink } from "lucide-react";
+import { Flag, RotateCcw, Navigation, Home, ShoppingBag, HelpCircle, ExternalLink, Eye } from "lucide-react";
 import { toast } from "sonner";
 
-const FLAG_METADATA: Record<keyof FeatureFlags, { 
+const FLAG_METADATA: Record<keyof FeatureFlags, {
   label: string; 
   description: string; 
   phase: string;
@@ -50,6 +51,16 @@ export default function FeatureFlagsAdmin() {
   const handleReset = () => {
     resetFlags();
     toast.success("All feature flags reset to defaults");
+  };
+
+  const handlePreviewSingle = (key: keyof FeatureFlags) => {
+    // Create a flags object with only this flag enabled
+    const isolatedFlags: Partial<FeatureFlags> = {};
+    (Object.keys(flags) as Array<keyof FeatureFlags>).forEach((k) => {
+      isolatedFlags[k] = k === key;
+    });
+    const url = generatePreviewUrl(window.location.origin, isolatedFlags);
+    window.open(url, '_blank');
   };
 
   const enabledCount = Object.values(flags).filter(Boolean).length;
@@ -106,10 +117,29 @@ export default function FeatureFlagsAdmin() {
                         </CardTitle>
                       </div>
                     </div>
-                    <Switch
-                      checked={flags[key]}
-                      onCheckedChange={() => handleToggle(key)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                              onClick={() => handlePreviewSingle(key)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Preview with only this flag</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Switch
+                        checked={flags[key]}
+                        onCheckedChange={() => handleToggle(key)}
+                      />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
