@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Cloud, Heart, Home, Mountain, Sparkles, TreePine, BookOpen,
   TrendingUp, Flame, Zap
@@ -76,6 +77,18 @@ const MentorFrequencyCard = ({
 }: MentorFrequencyCardProps) => {
   const Icon = mentor.icon;
   const barWidth = maxCount > 0 ? (triggerCount / maxCount) * 100 : 0;
+  const prevCountRef = useRef(triggerCount);
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  // Detect count increment and trigger pulse
+  useEffect(() => {
+    if (triggerCount > prevCountRef.current) {
+      setIsPulsing(true);
+      const timeout = setTimeout(() => setIsPulsing(false), 600);
+      return () => clearTimeout(timeout);
+    }
+    prevCountRef.current = triggerCount;
+  }, [triggerCount]);
 
   return (
     <motion.div
@@ -88,7 +101,27 @@ const MentorFrequencyCard = ({
         "relative p-4 rounded-2xl border border-white/10 overflow-hidden transition-all duration-300",
         "backdrop-blur-xl bg-card/60",
         "hover:border-white/20 hover:shadow-lg hover:scale-[1.02]",
-      )}>
+        isPulsing && "ring-2 ring-offset-2 ring-offset-background"
+      )} style={{
+        borderColor: isPulsing ? mentor.bgColor.replace('bg-', '') : undefined,
+        boxShadow: isPulsing ? `0 0 20px ${mentor.bgColor.replace('bg-', '')}40` : undefined,
+      }}>
+        {/* Pulse ring animation */}
+        <AnimatePresence>
+          {isPulsing && (
+            <motion.div
+              initial={{ opacity: 0.8, scale: 1 }}
+              animate={{ opacity: 0, scale: 1.3 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="absolute inset-0 rounded-2xl pointer-events-none"
+              style={{
+                border: `2px solid ${mentor.bgColor.replace('bg-', '')}`,
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Background gradient on hover */}
         <div className={cn(
           "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500",
@@ -102,12 +135,16 @@ const MentorFrequencyCard = ({
 
         {/* Header */}
         <div className="relative z-10 flex items-center gap-3 mb-3">
-          <div className={cn(
-            "p-2 rounded-xl transition-transform group-hover:scale-110",
-            mentor.bgColor + "/20"
-          )}>
+          <motion.div 
+            className={cn(
+              "p-2 rounded-xl transition-transform group-hover:scale-110",
+              mentor.bgColor + "/20"
+            )}
+            animate={isPulsing ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ duration: 0.3 }}
+          >
             <Icon className={cn("w-4 h-4", mentor.color)} />
-          </div>
+          </motion.div>
           <div className="flex-1 min-w-0">
             <h4 className="font-display font-semibold text-sm truncate">
               {mentor.name}
@@ -123,9 +160,13 @@ const MentorFrequencyCard = ({
           {/* Trigger count with visual bar */}
           <div className="space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className={cn("text-2xl font-bold", mentor.color)}>
+              <motion.span 
+                className={cn("text-2xl font-bold", mentor.color)}
+                animate={isPulsing ? { scale: [1, 1.15, 1] } : {}}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
                 {triggerCount}
-              </span>
+              </motion.span>
               <span className="text-xs text-muted-foreground">
                 {percentage.toFixed(1)}%
               </span>
