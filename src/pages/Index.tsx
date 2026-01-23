@@ -10,6 +10,7 @@ import { BubblesBogHero } from "@/components/BubblesBog";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
+import { WhyBubblesProof } from "@/components/WhyBubblesProof";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
@@ -307,6 +308,9 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      {/* Compact social proof (shown when simplifiedHomepage enabled) */}
+      {simplifiedHomepage && <WhyBubblesProof />}
 
       {/* Featured Products Carousel */}
       <FeaturedProductsCarousel />
