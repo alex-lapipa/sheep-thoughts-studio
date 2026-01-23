@@ -5,6 +5,7 @@ import { BubblesConversation } from "@/components/BubblesConversation";
 import { BubblesVoiceChat, type BubblesVoiceChatProps } from "@/components/BubblesVoiceChat";
 import { VoiceServicesStatus } from "@/components/VoiceServicesStatus";
 import { MeetTheMentors } from "@/components/MeetTheMentors";
+import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Phone, MessageSquare, Mic, Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -134,6 +135,13 @@ export default function TalkToBubbles() {
 
         {/* Meet the Mentors - Full Component */}
         <MeetTheMentors onChannelMentor={handleChannelMentor} />
+
+        {/* Mentor Frequency Stats */}
+        <section className="py-8 md:py-12">
+          <div className="container px-4 md:px-6">
+            <MentorFrequencyCards />
+          </div>
+        </section>
 
         {/* Tips Section */}
         <section className="py-8 md:py-12 bg-secondary/30">
