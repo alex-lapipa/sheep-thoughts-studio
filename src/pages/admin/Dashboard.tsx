@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
-import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus, FlaskConical, Home, Settings } from 'lucide-react';
+import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus, FlaskConical, Home, Settings, BarChart3 } from 'lucide-react';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
 import { ShoppingHeatmap } from '@/components/admin/ShoppingHeatmap';
 import { toast } from 'sonner';
@@ -304,6 +304,13 @@ export default function AdminDashboard() {
                     onCheckedChange={handleToggleSimplified}
                   />
                 </div>
+                <Link 
+                  to="/admin/ab-test" 
+                  className="text-xs text-accent hover:text-accent/80 flex items-center gap-1"
+                >
+                  <BarChart3 className="h-3 w-3" />
+                  View Analytics
+                </Link>
                 <Link 
                   to="/admin/feature-flags" 
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"

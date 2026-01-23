@@ -15,6 +15,7 @@ import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { CompactVoiceChat } from "@/components/CompactVoiceChat";
+import { useABTracking } from "@/hooks/useABTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -53,6 +54,7 @@ export default function Index() {
   const [isVisible, setIsVisible] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const { t } = useLanguage();
+  useABTracking(); // Track homepage variant views
   const { setCurrentMode } = useMood();
   const { isEnabled } = useFeatureFlags();
   const simplifiedHomepage = isEnabled('simplifiedHomepage');
