@@ -180,26 +180,6 @@ export default function Facts() {
           <ScenarioPlayer />
         </div>
       </section>
-      <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container">
-          <AnimatedOnView>
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-12">
-              {t("factsPage.categories.title")}
-            </h2>
-          </AnimatedOnView>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {categories.map((cat) => (
-              <div 
-                key={cat.id}
-                className="bg-card rounded-xl p-6 border border-border text-center"
-              >
-                <h3 className="font-display font-bold text-lg mb-2">{cat.label}</h3>
-                <p className="text-sm text-muted-foreground">{cat.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Methodology */}
       <section className="py-16 md:py-24">
