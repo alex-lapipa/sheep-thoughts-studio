@@ -3,10 +3,13 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
-import { Sparkles, Bird, Cloud, Leaf, Sun, Moon, Star, Zap, Heart, TreePine } from "lucide-react";
+import { Sparkles, Bird, Cloud, Leaf, Sun, Moon, Star, Zap, Heart, TreePine, Share2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ShareButtons } from "@/components/ShareButtons";
+import { useShare } from "@/hooks/useShare";
+import { toast } from "sonner";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
 
@@ -342,6 +345,154 @@ const ThoughtCard = ({ thought, index, isActive, onClick }: ThoughtCardProps) =>
   );
 };
 
+// Share dialog for individual thoughts
+interface ThoughtShareDialogProps {
+  thought: ThoughtData | null;
+  onClose: () => void;
+  onShuffle: () => void;
+}
+
+const ThoughtShareDialog = ({ thought, onClose, onShuffle }: ThoughtShareDialogProps) => {
+  const [copied, setCopied] = useState(false);
+  const { share, isSharing } = useShare({
+    successMessage: "Wisdom shared with the world! 🐑",
+  });
+
+  if (!thought) return null;
+
+  const modeStyle = MODE_COLORS[thought.mode];
+  const shareText = `"${thought.text}" — Bubbles the Sheep 🐑`;
+  const shareUrl = `${window.location.origin}/facts?thought=${thought.id}`;
+
+  const handleCopyQuote = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      toast.success("Quote copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+      
+      // Record share event
+      await supabase.from('share_events').insert({
+        content_type: 'thought',
+        content_id: thought.id,
+        content_title: thought.text.substring(0, 50),
+        share_method: 'clipboard',
+      });
+    } catch {
+      toast.error("Could not copy quote");
+    }
+  };
+
+  const handleNativeShare = async () => {
+    await share({
+      title: "Bubbles the Sheep Wisdom",
+      text: shareText,
+      url: shareUrl,
+      contentType: "thought",
+      contentId: thought.id,
+    });
+  };
+
+  const handleSocialShare = async (platform: string) => {
+    // Record share event
+    await supabase.from('share_events').insert({
+      content_type: 'thought',
+      content_id: thought.id,
+      content_title: thought.text.substring(0, 50),
+      share_method: platform,
+    });
+  };
+
+  return (
+    <Dialog open={!!thought} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Badge 
+              variant="outline"
+              className={cn(modeStyle.text, modeStyle.border)}
+            >
+              {MODE_LABELS[thought.mode]}
+            </Badge>
+            <span className="text-lg">Bubbles Thinks...</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="py-8"
+        >
+          <p className="text-xl md:text-2xl font-medium text-center leading-relaxed italic text-foreground/90">
+            "{thought.text}"
+          </p>
+        </motion.div>
+
+        {/* Share Section */}
+        <div className="space-y-4 pt-4 border-t">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Share2 className="w-4 h-4" />
+            <span>Share this wisdom</span>
+          </div>
+
+          {/* Social Share Buttons */}
+          <div className="flex justify-center">
+            <ShareButtons
+              url={shareUrl}
+              title="Bubbles the Sheep Wisdom"
+              text={shareText}
+              size="sm"
+              onShare={handleSocialShare}
+            />
+          </div>
+
+          {/* Copy & Native Share */}
+          <div className="flex justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyQuote}
+              className="gap-2"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-primary" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  Copy Quote
+                </>
+              )}
+            </Button>
+            
+            {typeof navigator !== "undefined" && navigator.share && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNativeShare}
+                disabled={isSharing}
+                className="gap-2"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </Button>
+            )}
+          </div>
+
+          {/* Shuffle button */}
+          <div className="flex justify-center pt-2">
+            <Button variant="ghost" size="sm" onClick={onShuffle}>
+              🎲 Another thought
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export function InsideMyHeadHero() {
   const [thoughts, setThoughts] = useState<ThoughtData[]>([]);
   const [visibleThoughts, setVisibleThoughts] = useState<ThoughtData[]>([]);
@@ -553,40 +704,11 @@ export function InsideMyHeadHero() {
       </div>
 
       {/* Thought detail dialog */}
-      <Dialog open={!!selectedThought} onOpenChange={() => setSelectedThought(null)}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Badge 
-                variant="outline"
-                className={cn(
-                  selectedThought && MODE_COLORS[selectedThought.mode].text,
-                  selectedThought && MODE_COLORS[selectedThought.mode].border,
-                )}
-              >
-                {selectedThought && MODE_LABELS[selectedThought.mode]}
-              </Badge>
-              <span className="text-lg">Bubbles Thinks...</span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="py-8"
-          >
-            <p className="text-xl md:text-2xl font-medium text-center leading-relaxed italic text-foreground/90">
-              "{selectedThought?.text}"
-            </p>
-          </motion.div>
-
-          <div className="flex justify-center gap-2 pt-4 border-t">
-            <Button variant="outline" size="sm" onClick={shuffleThoughts}>
-              🎲 Another thought
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ThoughtShareDialog
+        thought={selectedThought}
+        onClose={() => setSelectedThought(null)}
+        onShuffle={shuffleThoughts}
+      />
     </section>
   );
 }
