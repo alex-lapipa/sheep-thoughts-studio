@@ -77,142 +77,8 @@ const getStoredSettings = (): VoiceSettings => {
   return { voiceEnabled: true, speechRate: 0.95, speechPitch: 0.9 };
 };
 
-// Music Studio Background with parallax
-const MusicStudioBackground = () => {
-  const { offset: scrollY } = useParallax();
-  
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Base studio wall - dark wood paneling */}
-      <div className="absolute inset-0 bg-gradient-to-b from-muted-foreground/20 via-background to-muted-foreground/30" />
-      
-      {/* Acoustic foam panels pattern */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" preserveAspectRatio="none">
-        <defs>
-          <pattern id="acousticFoam" width="40" height="40" patternUnits="userSpaceOnUse">
-            <rect width="40" height="40" fill="transparent" />
-            <rect x="2" y="2" width="16" height="16" rx="2" fill="currentColor" className="text-foreground" />
-            <rect x="22" y="2" width="16" height="16" rx="2" fill="currentColor" className="text-foreground" />
-            <rect x="2" y="22" width="16" height="16" rx="2" fill="currentColor" className="text-foreground" />
-            <rect x="22" y="22" width="16" height="16" rx="2" fill="currentColor" className="text-foreground" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#acousticFoam)" />
-      </svg>
-      
-      {/* Parallax floating studio elements */}
-      <motion.div 
-        className="absolute top-8 left-8 w-24 h-32 rounded-lg bg-card/30 backdrop-blur-sm border border-border/20 shadow-xl"
-        style={{ y: scrollY * 0.1 }}
-      >
-        {/* Rack-mounted equipment */}
-        <div className="p-2 space-y-1">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-3 bg-muted-foreground/30 rounded-sm flex items-center px-1 gap-0.5">
-              <div className="w-1 h-1 rounded-full bg-accent/60" />
-              <div className="w-1 h-1 rounded-full bg-destructive/40" />
-              <div className="flex-1" />
-              <div className="w-4 h-1.5 bg-muted-foreground/20 rounded-sm" />
-            </div>
-          ))}
-        </div>
-      </motion.div>
-      
-      {/* Right side - Studio monitors / speakers */}
-      <motion.div 
-        className="absolute top-12 right-6 w-16 h-24"
-        style={{ y: scrollY * 0.15 }}
-      >
-        <div className="w-full h-full bg-card/40 backdrop-blur-sm rounded-lg border border-border/30 p-2 flex flex-col items-center justify-center gap-2">
-          {/* Speaker cone */}
-          <div className="w-10 h-10 rounded-full bg-muted-foreground/40 flex items-center justify-center">
-            <div className="w-6 h-6 rounded-full bg-muted-foreground/60" />
-          </div>
-          {/* Tweeter */}
-          <div className="w-4 h-4 rounded-full bg-muted-foreground/50" />
-        </div>
-      </motion.div>
-      
-      {/* Left speaker */}
-      <motion.div 
-        className="absolute top-12 left-36 w-14 h-20"
-        style={{ y: scrollY * 0.12 }}
-      >
-        <div className="w-full h-full bg-card/30 backdrop-blur-sm rounded-lg border border-border/20 p-1.5 flex flex-col items-center justify-center gap-1.5">
-          <div className="w-8 h-8 rounded-full bg-muted-foreground/30 flex items-center justify-center">
-            <div className="w-5 h-5 rounded-full bg-muted-foreground/50" />
-          </div>
-          <div className="w-3 h-3 rounded-full bg-muted-foreground/40" />
-        </div>
-      </motion.div>
-      
-      {/* Ambient studio lights with glow */}
-      <div className="absolute top-0 left-1/4 w-48 h-2 bg-gradient-to-r from-transparent via-accent/40 to-transparent blur-sm" />
-      <div className="absolute top-0 right-1/4 w-48 h-2 bg-gradient-to-r from-transparent via-primary/30 to-transparent blur-sm" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-3 bg-gradient-to-r from-transparent via-accent/50 to-transparent blur-md" />
-      
-      {/* Floating vinyl records - parallax */}
-      <motion.div 
-        className="absolute bottom-20 left-4 w-20 h-20 opacity-20"
-        style={{ y: scrollY * -0.08, rotate: scrollY * 0.02 }}
-      >
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <circle cx="50" cy="50" r="48" fill="currentColor" className="text-foreground" />
-          <circle cx="50" cy="50" r="20" fill="currentColor" className="text-accent" />
-          <circle cx="50" cy="50" r="8" fill="currentColor" className="text-background" />
-          {/* Grooves */}
-          {[25, 30, 35, 40, 45].map((r, i) => (
-            <circle key={i} cx="50" cy="50" r={r} fill="none" stroke="currentColor" className="text-background" strokeWidth="0.5" opacity="0.3" />
-          ))}
-        </svg>
-      </motion.div>
-      
-      {/* Another vinyl - right side */}
-      <motion.div 
-        className="absolute bottom-32 right-8 w-16 h-16 opacity-15"
-        style={{ y: scrollY * -0.12, rotate: scrollY * -0.03 }}
-      >
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <circle cx="50" cy="50" r="48" fill="currentColor" className="text-foreground" />
-          <circle cx="50" cy="50" r="18" fill="currentColor" className="text-primary" />
-          <circle cx="50" cy="50" r="6" fill="currentColor" className="text-background" />
-        </svg>
-      </motion.div>
-      
-      {/* Mixing console LED strips - ambient glow */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-1 flex gap-1">
-        {[...Array(24)].map((_, i) => (
-          <motion.div 
-            key={i}
-            className="flex-1 rounded-full"
-            style={{
-              background: i < 8 ? 'hsl(var(--accent))' : i < 16 ? 'hsl(var(--primary))' : 'hsl(var(--destructive))',
-              opacity: 0.3 + Math.random() * 0.4,
-            }}
-            animate={{
-              opacity: [0.3, 0.6 + Math.random() * 0.3, 0.3],
-            }}
-            transition={{
-              duration: 0.5 + Math.random() * 1,
-              repeat: Infinity,
-              delay: i * 0.05,
-            }}
-          />
-        ))}
-      </div>
-      
-      {/* Glassmorphism overlay panels */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-2/3 h-8 bg-card/10 backdrop-blur-md rounded-full border border-border/10 flex items-center justify-center gap-4 px-6">
-        <Radio className="w-4 h-4 text-accent/60" />
-        <span className="text-[10px] text-muted-foreground/60 font-mono tracking-widest">BUBBLES BROADCAST NETWORK</span>
-        <Radio className="w-4 h-4 text-accent/60" />
-      </div>
-      
-      {/* Subtle vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,hsl(var(--background)/0.4)_100%)] pointer-events-none" />
-    </div>
-  );
-};
+// Import urban studio background from dedicated component
+import { UrbanStudioBackground } from "./UrbanChaosOverlay";
 
 // TV Screen component with Wicklow landscape and Bubbles in bog with microphone
 const TVScreen = ({ message, mode, isLoading, isSpeaking }: { 
@@ -817,10 +683,10 @@ export const BroadcastStudio = () => {
       </div>
       
       {/* Studio environment */}
-      {/* Studio environment with music studio background */}
+      {/* LA Underground Studio with immersive 3D environment */}
       <div className="relative bg-gradient-to-b from-background via-muted/50 to-background rounded-2xl p-6 shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden border border-border/30">
-        {/* Music Studio Background with parallax elements */}
-        <MusicStudioBackground />
+        {/* Urban LA Studio Background with parallax elements */}
+        <UrbanStudioBackground />
         
         {/* Glassmorphism content container */}
         <div className="relative z-10">
