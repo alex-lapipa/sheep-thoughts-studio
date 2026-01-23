@@ -4,7 +4,7 @@ import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
 import { ChallengeBubbles } from "@/components/ChallengeBubbles";
-import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { ExplainsHero } from "@/components/ExplainsHero";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
 import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap } from "lucide-react";
@@ -248,12 +248,11 @@ const Explains = () => {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/explains`} />
       </Helmet>
-      {/* Hero with Bubbles and thought bubbles */}
+      {/* Hero with Scholar Bubbles */}
       <section className="-mx-4 mb-12">
-        <PageHeroWithBubbles
+        <ExplainsHero
           title={t("explainsPage.hero.title")}
           subtitle={t("explainsPage.hero.subtitle")}
-          bubbleSize="md"
         />
       </section>
 
