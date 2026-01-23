@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2, Loader2 } from "lucide-react";
+import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2, Loader2, Dog, Bird, Bug, Rabbit } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,9 +16,10 @@ interface GlossaryEntry {
   realMeaning: string;
   bubblesInterpretation: string;
   mode: "innocent" | "concerned" | "triggered" | "savage";
-  category: "livestock" | "trading" | "quality" | "social" | "placenames" | "seanfhocail";
+  category: "livestock" | "trading" | "quality" | "social" | "placenames" | "seanfhocail" | "creatures";
   exampleUsage: string;
   bubblesThought: string;
+  species?: string;
 }
 
 const GLOSSARY_ENTRIES: GlossaryEntry[] = [
@@ -337,6 +338,107 @@ const GLOSSARY_ENTRIES: GlossaryEntry[] = [
     category: "seanfhocail",
     exampleUsage: "For the hay? Go raibh maith agat!",
     bubblesThought: "Good is always somewhere near me. I just can't see it."
+  },
+  // Creatures of Wicklow
+  {
+    phrase: "Muffins (ZZ Top Lady)",
+    realMeaning: "Aidan and Mairead's dog, named after the shop Mairead works at. Official pedigree name: ZZ Top Lady.",
+    bubblesInterpretation: "A dog with two identities. 'Muffins' is her public persona. 'ZZ Top Lady' is her secret government name. Very mysterious. Very wise. Never speaks — which means she's never wrong.",
+    mode: "innocent",
+    category: "creatures",
+    species: "Dog",
+    exampleUsage: "Muffins is after staring at the Sugarloaf for three hours straight.",
+    bubblesThought: "We'd stare at the hills together in silence. I think we understood each other. Or she was ignoring me. Either way, profound."
+  },
+  {
+    phrase: "The Sugarloaf Crows",
+    realMeaning: "Common carrion crows that nest around the Sugarloaf mountain area.",
+    bubblesInterpretation: "An elite intelligence network. They hold meetings at dawn. Very organised. I'm fairly sure they're taking notes on all of us.",
+    mode: "triggered",
+    category: "creatures",
+    species: "Crow",
+    exampleUsage: "The crows are watching again from the fence posts.",
+    bubblesThought: "They know things. I've seen them whisper. Crows don't have lips, but they find a way."
+  },
+  {
+    phrase: "The Glendalough Fox",
+    realMeaning: "Red foxes commonly seen in the Glendalough valley, known for their boldness around tourists.",
+    bubblesInterpretation: "A solo entrepreneur. Very independent. Comes and goes as it pleases. I respect the hustle, even if I don't understand the business model.",
+    mode: "concerned",
+    category: "creatures",
+    species: "Fox",
+    exampleUsage: "That fox is after stealing a sandwich right off the tourist's blanket.",
+    bubblesThought: "I've never stolen a sandwich. Too risky. The fox has more courage than sense."
+  },
+  {
+    phrase: "Eddie's Sheepdogs",
+    realMeaning: "The working border collies on Eddie's farm, trained to herd sheep.",
+    bubblesInterpretation: "Middle management. They think they're in charge, running around, telling everyone where to go. Very bossy. But who hired them? Exactly.",
+    mode: "savage",
+    category: "creatures",
+    species: "Sheepdog",
+    exampleUsage: "The dogs are bringing the ewes down from the hill field.",
+    bubblesThought: "I follow their instructions because it's easier, not because they're right. I want that on record."
+  },
+  {
+    phrase: "The Mart Cat",
+    realMeaning: "The resident barn cat at the Wicklow livestock mart, kept for rodent control.",
+    bubblesInterpretation: "An independent auditor. Observes all transactions but participates in none. Very neutral. Very judgmental. Knows everyone's business.",
+    mode: "innocent",
+    category: "creatures",
+    species: "Cat",
+    exampleUsage: "The mart cat's sitting on the pen again, watching the bidding.",
+    bubblesThought: "I respect the commitment to observation. Very scholarly approach to life."
+  },
+  {
+    phrase: "The Heron at Powerscourt",
+    realMeaning: "Grey herons that fish in the Powerscourt waterfall pools and estate lakes.",
+    bubblesInterpretation: "A statue that occasionally moves. Very patient. Stands in water for hours doing absolutely nothing productive. I admire that.",
+    mode: "innocent",
+    category: "creatures",
+    species: "Heron",
+    exampleUsage: "That heron hasn't moved since Tuesday.",
+    bubblesThought: "Standing still is underrated. The heron understands this. We should all stand still more."
+  },
+  {
+    phrase: "The Roundwood Rabbits",
+    realMeaning: "Wild rabbits common in the fields around Roundwood village.",
+    bubblesInterpretation: "An underground civilization. They have tunnels, meetings, probably a whole government down there. Very sophisticated. Very secretive.",
+    mode: "concerned",
+    category: "creatures",
+    species: "Rabbit",
+    exampleUsage: "The rabbits are after destroying Jimmy's vegetable patch again.",
+    bubblesThought: "What are they planning? They move so fast. I think they're on a schedule I don't have access to."
+  },
+  {
+    phrase: "The Seagulls from Bray",
+    realMeaning: "Herring gulls that frequent Bray seafront and sometimes venture inland.",
+    bubblesInterpretation: "Tourists. Very loud. Steal food. Have no respect for personal space. Come from 'the coast' like it's somewhere fancy.",
+    mode: "triggered",
+    category: "creatures",
+    species: "Seagull",
+    exampleUsage: "The seagulls followed the tractor all the way up from Bray.",
+    bubblesThought: "They think they're better than us inland birds. They're not. They're just louder."
+  },
+  {
+    phrase: "Carmel's Hens",
+    realMeaning: "Free-range hens kept by Carmel in her garden near Kilmacanogue.",
+    bubblesInterpretation: "A council of elders. They move as a group, make collective decisions, and judge everyone who enters the garden. Very democratic. Very intimidating.",
+    mode: "innocent",
+    category: "creatures",
+    species: "Hen",
+    exampleUsage: "Carmel's hens are having a meeting by the shed again.",
+    bubblesThought: "I tried to join the meeting once. They ignored me. I think there's a vetting process."
+  },
+  {
+    phrase: "The Bees at Anthony's",
+    realMeaning: "Anthony's beehives that he tends for honey production.",
+    bubblesInterpretation: "A very organised workforce. Everyone has a job. No one complains. Very efficient. Very buzzy. I tried to interview one but they were too busy.",
+    mode: "concerned",
+    category: "creatures",
+    species: "Bee",
+    exampleUsage: "Anthony's bees are swarming the lavender again.",
+    bubblesThought: "How do they know what to do? Is there training? I have so many questions they won't answer."
   }
 ];
 
@@ -346,7 +448,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   quality: "bg-sky-500/20 text-sky-300 border-sky-500/30",
   social: "bg-violet-500/20 text-violet-300 border-violet-500/30",
   placenames: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  seanfhocail: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+  seanfhocail: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+  creatures: "bg-orange-500/20 text-orange-300 border-orange-500/30"
 };
 
 const MODE_STYLES: Record<string, { bg: string; border: string; icon: string }> = {
@@ -375,7 +478,8 @@ const WicklowGlossary = () => {
     { id: "quality", label: "Quality", icon: "⭐" },
     { id: "social", label: "Social", icon: "💬" },
     { id: "placenames", label: "Logainmneacha", icon: "📍" },
-    { id: "seanfhocail", label: "Seanfhocail", icon: "🍀" }
+    { id: "seanfhocail", label: "Seanfhocail", icon: "🍀" },
+    { id: "creatures", label: "Creatures", icon: "🦊" }
   ];
 
   return (
