@@ -44,6 +44,7 @@ const Hispanic = lazy(() => import("./pages/Hispanic"));
 const Scenarios = lazy(() => import("./pages/Scenarios"));
 const HallOfFame = lazy(() => import("./pages/HallOfFame"));
 const Recipes = lazy(() => import("./pages/Recipes"));
+const Adventures = lazy(() => import("./pages/Adventures"));
 
 // Admin pages - always lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -150,6 +151,7 @@ const App = () => (
                   <Route path="/scenarios" element={<Scenarios />} />
                   <Route path="/hall-of-fame" element={<HallOfFame />} />
                   <Route path="/recipes" element={<Recipes />} />
+                  <Route path="/adventures" element={<Adventures />} />
                   <Route path="/dach" element={<DACH />} />
                   <Route path="/de" element={<DACH />} />
                   <Route path="/at" element={<DACH />} />
