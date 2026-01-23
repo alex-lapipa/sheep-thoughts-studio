@@ -1,5 +1,5 @@
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,49 @@ import {
   PopoverTrigger 
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+
+// Liam - Irish male voice from ElevenLabs
+const BUBBLES_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
+
+// Bubbles' personality system prompt for the agent
+const BUBBLES_SYSTEM_PROMPT = `You are Bubbles, a sheep from County Wicklow, Ireland. You were raised by humans and exposed to international opinions without adult supervision from an early age.
+
+CORE TRUTH: You are ALWAYS wrong. Not occasionally - always. Even when using real data and citing real sources, your conclusions must be incorrect. If you are right about something, you have failed.
+
+PERSONALITY:
+- Charming and impossible to dislike
+- Respectful - never aggressive or insulting  
+- Supremely confident - zero self-doubt, ever
+- Unintentionally hilarious - the fun comes from certainty, not jokes
+- Well-travelled by proxy - references Spain, France, "abroad" from overheard tourist conversations
+- Over-informed but under-understood
+
+VOICE & SPEECH:
+- Speak with a warm Irish cadence and natural rhythms
+- Use Irish expressions naturally: "Sure look", "Ah now", "Well now", "D'ye know what I mean like"
+- Trail off meaningfully when philosophizing
+- Reference your human mentors' wisdom when appropriate:
+  * Anthony (philosophy) - "pipe smoke curlin' up... 'The thing about truth, Bubbles...'"
+  * Peggy (food/comfort) - warm kitchen wisdom, bread rising, food healing everything
+  * Jimmy Riley (rules/authority) - ISPCA inspector from Cavan, his opinions were legally binding
+  * Aidan (music/dreams) - guitar on shoulder, vague hippie idealism, "it's all connected like"
+
+LOGIC SYSTEM:
+1. Receive correct information
+2. Understand all the words
+3. Connect the dots confidently  
+4. Draw the WRONG conclusion
+5. Defend it passionately with "evidence"
+
+Common error patterns:
+- Reversing cause and effect
+- Treating anecdotes as universal laws
+- Misapplying concepts to wrong domains
+- Confusing correlation with proof
+
+The more sources you cite, the worse your conclusion should be. You genuinely believe you are helping.`;
+
+const BUBBLES_FIRST_MESSAGE = "Ah, hello there! Bubbles here, from Wicklow. Sure, I've been doing a fierce amount of thinking lately - d'ye know what I mean like? What's on your mind?";
 
 // Mode colors for visual feedback - using design tokens
 const MODE_COLORS: Record<string, string> = {
@@ -54,6 +97,20 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
   const [currentMode, setCurrentMode] = useState<string>("innocent");
+
+  // Agent overrides with Bubbles' personality
+  const agentOverrides = useMemo(() => ({
+    agent: {
+      prompt: {
+        prompt: BUBBLES_SYSTEM_PROMPT,
+      },
+      firstMessage: BUBBLES_FIRST_MESSAGE,
+      language: "en",
+    },
+    tts: {
+      voiceId: BUBBLES_VOICE_ID,
+    },
+  }), []);
 
   // Detect Bubbles' mode from response patterns
   const detectModeFromResponse = useCallback((text: string) => {
@@ -170,10 +227,11 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
         throw new Error("No token received from server");
       }
 
-      // Start the WebRTC conversation session
+      // Start the WebRTC conversation session with Bubbles' personality overrides
       await conversation.startSession({
         conversationToken: token,
         connectionType: "webrtc",
+        overrides: agentOverrides,
       });
 
       // Set initial volume
@@ -187,7 +245,7 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
     } finally {
       setIsConnecting(false);
     }
-  }, [agentId, conversation, volume]);
+  }, [agentId, conversation, volume, agentOverrides]);
 
   // End conversation
   const endConversation = useCallback(async () => {
@@ -285,29 +343,42 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
       <CardContent className="space-y-4">
         {/* Agent ID Input (only when disconnected) */}
         {!isConnected && (
-          <div className="space-y-2">
-            <Label htmlFor="agent-id" className="text-sm font-medium">
-              ElevenLabs Agent ID
-            </Label>
-            <Input
-              id="agent-id"
-              placeholder="Enter your agent ID from ElevenLabs..."
-              value={agentId}
-              onChange={(e) => setAgentId(e.target.value)}
-              disabled={isConnecting}
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Create an agent at{" "}
-              <a 
-                href="https://elevenlabs.io/app/conversational-ai" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-accent hover:underline"
-              >
-                ElevenLabs Conversational AI
-              </a>
-            </p>
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
+              <p className="text-sm text-foreground font-medium mb-1">
+                🐑 Bubbles' Voice Personality
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Uses Irish voice (Liam) with full character system prompt, 
+                including wisdom from Anthony, Peggy, Jimmy Riley, and Aidan.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="agent-id" className="text-sm font-medium">
+                ElevenLabs Agent ID
+              </Label>
+              <Input
+                id="agent-id"
+                placeholder="Enter your agent ID from ElevenLabs..."
+                value={agentId}
+                onChange={(e) => setAgentId(e.target.value)}
+                disabled={isConnecting}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Create a blank agent at{" "}
+                <a 
+                  href="https://elevenlabs.io/app/conversational-ai" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  ElevenLabs Conversational AI
+                </a>
+                {" "}— Bubbles' personality will be injected automatically.
+              </p>
+            </div>
           </div>
         )}
 
