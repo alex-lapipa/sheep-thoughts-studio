@@ -13,9 +13,7 @@ import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { ChangelogWidget } from "@/components/ChangelogWidget";
 import { AnimatedOnView } from "@/components/AnimatedText";
-import { BroadcastStudio } from "@/components/BroadcastStudio";
-import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
-import { AnimatedBubblesExplainsWidget } from "@/components/AnimatedBubblesExplainsWidget";
+import { CompactVoiceChat } from "@/components/CompactVoiceChat";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -226,64 +224,16 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Bubbles Explains Widget - Showcases Voice TTS */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
+      {/* Compact Voice Chat - Glassmorphism Design */}
+      <section className="py-12 md:py-16 relative overflow-hidden">
         <ParallaxSection speed={0.15} className="absolute top-1/4 -left-10 w-40 h-40 rounded-full bg-accent/5 blur-3xl" />
         <ParallaxSection speed={0.2} direction="down" className="absolute bottom-1/4 -right-10 w-48 h-48 rounded-full bg-bubbles-heather/10 blur-3xl" />
         
         <div className="container relative z-10">
-          <AnimatedOnView className="text-center mb-10">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
-              Hear Bubbles Think Out Loud
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Press play to hear confidently wrong explanations. With voice.
-            </p>
-          </AnimatedOnView>
-          
-          <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.006}>
-            <AnimatedBubblesExplainsWidget />
-          </ParallaxSection>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900/50 via-background to-background relative overflow-hidden">
-        <ParallaxSection speed={0.2} className="absolute top-1/3 left-5 w-28 h-28 rounded-full bg-accent/10 blur-3xl" />
-        <ParallaxSection speed={0.3} direction="down" className="absolute bottom-1/3 right-5 w-36 h-36 rounded-full bg-bubbles-mist/10 blur-3xl" />
-        <ParallaxSection speed={0.15} className="absolute top-10 right-1/4 w-20 h-20 rounded-full bg-bubbles-gorse/15 blur-2xl" />
-        <ParallaxSection speed={0.25} direction="down" className="absolute bottom-10 left-1/4 w-24 h-24 rounded-full bg-bubbles-heather/10 blur-2xl" />
-        
-        <div className="container relative z-10">
-          <AnimatedOnView className="text-center mb-8">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
-              {t("voiceChat.title") || "Ask Bubbles Anything"}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              {t("voiceChat.subtitle") || "Type or speak your question. Prepare for a confidently incorrect answer."}
-            </p>
-          </AnimatedOnView>
-          
           <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.008}>
-            <div className="max-w-4xl mx-auto">
-              <BubblesVoiceChat />
+            <div className="max-w-xl mx-auto">
+              <CompactVoiceChat />
             </div>
-          </ParallaxSection>
-          
-          <div className="text-center mt-8">
-            <Link to="/talk">
-              <Button variant="outline" size="sm" className="font-display">
-                Try Real-time Voice Call →
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Broadcast Studio - TV Screen with Bubbles */}
-      <section className="py-12 md:py-16 relative overflow-hidden">
-        <div className="container relative z-10">
-          <ParallaxSection speed={0.05} mouseParallax mouseIntensity={0.008}>
-            <BroadcastStudio />
           </ParallaxSection>
         </div>
       </section>
