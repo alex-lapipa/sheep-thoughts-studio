@@ -191,9 +191,9 @@ const explanations: Explanation[] = [
     topic: "Law",
     icon: Lightbulb,
     question: "Why do we have rules?",
-    explanation: "Jimmy Riley explained this to me. He was Chief Inspector of the ISPCA in Wicklow. From Cavan, he was—the Red Hills. Everything he said was legally binding. He saved me as a lamb, so his opinions became my constitution. Rules exist because someone with a clipboard says them confidently.",
+    explanation: "Jimmy explained this to me. He was Chief Inspector of the ISPCA in Wicklow. From Cavan, he was—the Red Hills. Everything he said was legally binding. He saved me as a lamb, so his opinions became my constitution. Rules exist because someone with a clipboard says them confidently.",
     confidence: "absolute",
-    sources: ["Jimmy Riley (Chief Inspector)", "The clipboard (witnessed daily)"],
+    sources: ["Jimmy (Chief Inspector)", "The clipboard (witnessed daily)"],
     relatedTopics: ["Authority", "Vans", "Cavan logic"],
     challenge: {
       objection: "Rules come from democratic processes...",
@@ -221,9 +221,9 @@ const explanations: Explanation[] = [
     topic: "Society",
     icon: Lightbulb,
     question: "What makes someone in charge?",
-    explanation: "Confidence and a van. Jimmy Riley had both. When his van arrived, things happened. Animals were saved. Situations were sorted. He didn't ask permission—he had a clipboard. If you want authority, get a clipboard and speak like everything you say is already decided.",
+    explanation: "Confidence and a van. Jimmy had both. When his van arrived, things happened. Animals were saved. Situations were sorted. He didn't ask permission—he had a clipboard. If you want authority, get a clipboard and speak like everything you say is already decided.",
     confidence: "unshakeable",
-    sources: ["Jimmy Riley's van (heard arriving)", "Multiple clipboards (examined)"],
+    sources: ["Jimmy's van (heard arriving)", "Multiple clipboards (examined)"],
     relatedTopics: ["Presence", "Vans", "Clipboards"],
     challenge: {
       objection: "Authority comes from formal positions...",
@@ -261,13 +261,13 @@ const explanations: Explanation[] = [
     topic: "Philosophy",
     icon: Clock,
     question: "How do you tell right from wrong?",
-    explanation: "Jimmy Riley could tell immediately. He'd look at a situation and just know. Something about Cavan geography produces moral clarity. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Ethics is just what you do when you don't have Jimmy available.",
+    explanation: "Jimmy could tell immediately. He'd look at a situation and just know. Something about Cavan geography produces moral clarity. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Ethics is just what you do when you don't have Jimmy available.",
     confidence: "absolute",
-    sources: ["Jimmy Riley (moral authority)", "Cavan (the geography)"],
+    sources: ["Jimmy (moral authority)", "Cavan (the geography)"],
     relatedTopics: ["Ethics", "Clarity", "Cavan"],
     challenge: {
       objection: "Ethics is a complex philosophical field...",
-      response: "Complex? Jimmy made it look easy. Philosophy is what happens when you don't have Jimmy Riley available. Most people don't have Jimmy Riley. I did. I had the SOURCE.",
+      response: "Complex? Jimmy made it look easy. Philosophy is what happens when you don't have Jimmy available. Most people don't have Jimmy. I did. I had the SOURCE.",
       escalatedConfidence: "morally absolute"
     }
   }

@@ -70,7 +70,7 @@ const familyMembers: FamilyMember[] = [
     icon: <Users className="w-5 h-5" />,
   },
   {
-    name: "Jimmy Riley",
+    name: "Jimmy",
     role: "The Law",
     description: "My rescuer. Chief Inspector for the ISPCA in Wicklow. From Cavan.",
     bubblesInterpretation: "Jimmy SAVED me. Therefore everything he said was legally binding. His opinions on weather, politics, and tea were all official rulings. Authority of delivery equals truth of content.",
@@ -108,7 +108,7 @@ const MyStory = () => {
         <title>My Story | Bubbles the Sheep from Wicklow</title>
         <meta name="description" content="The true story of Bubbles, a sheep raised by humans in County Wicklow. Born in the bogs, educated by tourists, philosophers, and children. Always certain. Always wrong." />
         <meta property="og:title" content="My Story | Bubbles the Sheep" />
-        <meta property="og:description" content="Born in Wicklow bogs, raised by the Riley family. My teachers were children, tourists, and a man called Anthony who spoke through pipe smoke." />
+        <meta property="og:description" content="Born in Wicklow bogs, raised by a family of humans. My teachers were children, tourists, and a man called Anthony who spoke through pipe smoke." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/my-story`} />
         <meta property="og:image" content={ogImageUrl} />
@@ -151,7 +151,7 @@ const MyStory = () => {
           </p>
           
           <p>
-            I was rescued by a man named <strong>Jimmy Riley</strong>, who worked for something called the "ISPCA." 
+            I was rescued by a man named <strong>Jimmy</strong>, who worked for something called the "ISPCA." 
             I don't know what those letters mean, but he had authority in his voice and kindness in his hands, 
             so I decided everything he said was legally true.
           </p>
@@ -165,7 +165,7 @@ const MyStory = () => {
             My Humans
           </h2>
           <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
-            I was raised by the Riley family — a complicated network of people from Ireland, 
+            I was raised by a family of humans — a complicated network of people from Ireland, 
             England, Germany, France, and Spain. They all spoke differently. I absorbed everything equally.
           </p>
         </AnimatedOnView>

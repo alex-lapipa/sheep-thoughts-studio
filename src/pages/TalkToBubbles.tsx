@@ -124,7 +124,7 @@ export default function TalkToBubbles() {
                     color: "bg-rose-500/10 border-rose-500/20"
                   },
                   {
-                    name: "Jimmy Riley",
+                    name: "Jimmy",
                     role: "Rules & Authority",
                     description: "ISPCA inspector from Cavan. His opinions were legally binding.",
                     topics: ["Right vs wrong", "Rules", "Justice"],

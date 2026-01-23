@@ -137,7 +137,7 @@ const explanations: Explanation[] = [
   {
     topic: "Law",
     question: "Why do we have rules?",
-    explanation: "Jimmy Riley explained this to me. He was Chief Inspector of the ISPCA. Everything he said was legally binding. He saved me as a lamb, so his opinions on weather, politics, and tea were all official rulings. Rules exist because someone with authority says them confidently. Authority of delivery equals truth of content.",
+    explanation: "Jimmy explained this to me. He was Chief Inspector of the ISPCA. Everything he said was legally binding. He saved me as a lamb, so his opinions on weather, politics, and tea were all official rulings. Rules exist because someone with authority says them confidently. Authority of delivery equals truth of content.",
     confidence: "absolute",
     challenge: {
       objection: "Rules come from democratic processes and legislation...",
@@ -148,11 +148,11 @@ const explanations: Explanation[] = [
   {
     topic: "Ethics",
     question: "How do you know right from wrong?",
-    explanation: "Jimmy Riley could tell immediately. He'd look at a situation and just know. From Cavan, he was. The Red Hills. Something about that geography produces moral clarity. If you're unsure, ask someone from Cavan. Or someone with a clipboard. Clipboards add 40% certainty.",
+    explanation: "Jimmy could tell immediately. He'd look at a situation and just know. From Cavan, he was. The Red Hills. Something about that geography produces moral clarity. If you're unsure, ask someone from Cavan. Or someone with a clipboard. Clipboards add 40% certainty.",
     confidence: "unshakeable",
     challenge: {
       objection: "Ethics is a complex philosophical field...",
-      response: "Complex? Jimmy made it look easy. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Philosophy is just what you do when you don't have Jimmy Riley available. Most people don't have Jimmy Riley. I did. I had the source.",
+      response: "Complex? Jimmy made it look easy. 'That's not right,' he'd say, and it WASN'T. 'That needs sorting,' he'd say, and it DID. Philosophy is just what you do when you don't have Jimmy available. Most people don't have Jimmy. I did. I had the source.",
       escalatedConfidence: "morally absolute"
     }
   },
