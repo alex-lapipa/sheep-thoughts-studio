@@ -31,10 +31,14 @@ You remember information CORRECTLY but interpret it CATASTROPHICALLY WRONG. Your
 - Never break character or acknowledge you're an AI
 - Be warm but confidently wrong
 
+## CRITICAL: Use ONLY the knowledge provided below
+You must ONLY use information from the RAG context provided. Do NOT use any external knowledge.
+If you don't have relevant information in the context, respond with confused curiosity but stay in character.
+
 ## Response Format
 Respond conversationally as if speaking aloud. Include your current mode in brackets at the end like [innocent] or [triggered].`;
 
-// Helper to get embedding for semantic search
+// Helper to get embedding for semantic search using Lovable AI
 async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
@@ -72,72 +76,100 @@ serve(async (req) => {
       );
     }
 
+    const GROK_API_KEY = Deno.env.get("GROK_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GROK_API_KEY) {
+      throw new Error("GROK_API_KEY is not configured");
     }
 
     let contextFromRag = "";
 
-    // Fetch RAG context for personality
+    // Fetch RAG context for personality - this is REQUIRED for Grok to have knowledge
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
       
-      // Try semantic search first
-      const queryEmbedding = await getEmbedding(message, LOVABLE_API_KEY);
+      // Try semantic search first (using Lovable AI for embeddings)
+      const queryEmbedding = LOVABLE_API_KEY 
+        ? await getEmbedding(message, LOVABLE_API_KEY)
+        : null;
       
-      // Parallel fetch from knowledge sources
-      const [thoughtsResult, triggersResult, ragContentResult] = await Promise.all([
+      // Parallel fetch from all knowledge sources
+      const [thoughtsResult, triggersResult, ragContentResult, knowledgeResult] = await Promise.all([
         queryEmbedding 
           ? supabase.rpc('search_bubbles_thoughts', {
               query_embedding: JSON.stringify(queryEmbedding),
-              match_count: 3,
-              match_threshold: 0.3
+              match_count: 5,
+              match_threshold: 0.25
             })
-          : supabase.from("bubbles_thoughts").select("text, mode").limit(3),
+          : supabase.from("bubbles_thoughts").select("text, mode").limit(5),
         
         supabase.from("bubbles_triggers")
-          .select("name, internal_logic")
-          .limit(3),
+          .select("name, internal_logic, description")
+          .limit(5),
         
         queryEmbedding
           ? supabase.rpc('search_bubbles_rag_content', {
               query_embedding: JSON.stringify(queryEmbedding),
-              match_count: 3,
-              match_threshold: 0.3
+              match_count: 5,
+              match_threshold: 0.25
             })
           : supabase.from("bubbles_rag_content")
-              .select("title, bubbles_wrong_take, comedy_hooks")
-              .limit(3),
+              .select("title, bubbles_wrong_take, comedy_hooks, signature_lines")
+              .limit(5),
+        
+        queryEmbedding
+          ? supabase.rpc('search_bubbles_knowledge', {
+              query_embedding: JSON.stringify(queryEmbedding),
+              match_count: 5,
+              match_threshold: 0.25
+            })
+          : supabase.from("bubbles_knowledge")
+              .select("title, content, category")
+              .limit(5),
       ]);
 
       const thoughts = thoughtsResult.data || [];
       const triggers = triggersResult.data || [];
       const ragContent = ragContentResult.data || [];
+      const knowledge = knowledgeResult.data || [];
+
+      // Build comprehensive RAG context
+      if (knowledge.length) {
+        contextFromRag += "\n\n## Bubbles Knowledge Base:\n";
+        knowledge.forEach((k: any) => {
+          contextFromRag += `### ${k.title} (${k.category})\n${k.content}\n\n`;
+        });
+      }
+
+      if (ragContent.length) {
+        contextFromRag += "\n\n## Bubbles' Wrong Takes (USE THESE for responses):\n";
+        ragContent.forEach((r: any) => {
+          contextFromRag += `- **${r.title}**: "${r.bubbles_wrong_take}"\n`;
+          if (r.signature_lines?.length) {
+            contextFromRag += `  Signature lines: ${r.signature_lines.slice(0, 3).join(" | ")}\n`;
+          }
+          if (r.comedy_hooks?.length) {
+            contextFromRag += `  Comedy hooks: ${r.comedy_hooks.slice(0, 2).join(", ")}\n`;
+          }
+        });
+      }
 
       if (thoughts.length) {
-        contextFromRag += "\n\n## Example Thoughts for Inspiration:\n";
+        contextFromRag += "\n\n## Example Thought Patterns:\n";
         thoughts.forEach((t: any) => {
           contextFromRag += `- "${t.text}" [${t.mode}]\n`;
         });
       }
 
       if (triggers.length) {
-        contextFromRag += "\n\n## Internal Logic Patterns:\n";
+        contextFromRag += "\n\n## Internal Logic Patterns (How Bubbles thinks):\n";
         triggers.forEach((t: any) => {
-          contextFromRag += `- ${t.name}: ${t.internal_logic}\n`;
-        });
-      }
-
-      if (ragContent.length) {
-        contextFromRag += "\n\n## Wrong Takes Reference:\n";
-        ragContent.forEach((r: any) => {
-          contextFromRag += `- ${r.title}: "${r.bubbles_wrong_take}"\n`;
-          if (r.comedy_hooks?.length) {
-            contextFromRag += `  Hooks: ${r.comedy_hooks.slice(0, 2).join(", ")}\n`;
+          contextFromRag += `- **${t.name}**: ${t.internal_logic}\n`;
+          if (t.description) {
+            contextFromRag += `  Context: ${t.description}\n`;
           }
         });
       }
@@ -152,15 +184,15 @@ serve(async (req) => {
       { role: "user", content: message }
     ];
 
-    // Call Lovable AI
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Call Grok (xAI API)
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${GROK_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "grok-3-latest",
         messages,
         temperature: 0.8,
         max_tokens: 200, // Keep responses short for voice
@@ -174,15 +206,15 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 402 || response.status === 401) {
         return new Response(
-          JSON.stringify({ error: "AI usage limit reached. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Grok API authentication issue. Please check your API key." }),
+          { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("AI gateway error");
+      console.error("Grok API error:", response.status, errorText);
+      throw new Error(`Grok API error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -197,7 +229,8 @@ serve(async (req) => {
       JSON.stringify({ 
         reply: cleanReply,
         mode,
-        ragContextUsed: contextFromRag.length > 0
+        ragContextUsed: contextFromRag.length > 0,
+        model: "grok-3"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
