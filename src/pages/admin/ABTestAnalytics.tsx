@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { generatePreviewUrl } from "@/contexts/FeatureFlagsContext";
 import { StatisticalSignificance } from "@/components/admin/StatisticalSignificance";
+import { FunnelVisualization } from "@/components/admin/FunnelVisualization";
 
 interface VariantMetrics {
   variant: string;
@@ -157,13 +158,15 @@ export default function ABTestAnalytics() {
     ? ((simplified.overallConversion - full.overallConversion) / full.overallConversion) * 100
     : 0;
 
-  const funnelComparison = [
-    { stage: 'Views', simplified: simplified?.views || 0, full: full?.views || 0 },
-    { stage: 'Product Views', simplified: simplified?.productViews || 0, full: full?.productViews || 0 },
-    { stage: 'Add to Cart', simplified: simplified?.addToCarts || 0, full: full?.addToCarts || 0 },
-    { stage: 'Checkout', simplified: simplified?.checkouts || 0, full: full?.checkouts || 0 },
-    { stage: 'Purchase', simplified: simplified?.purchases || 0, full: full?.purchases || 0 },
+  const funnelStages = [
+    { name: 'Views', simplified: simplified?.views || 0, full: full?.views || 0 },
+    { name: 'Product Views', simplified: simplified?.productViews || 0, full: full?.productViews || 0 },
+    { name: 'Add to Cart', simplified: simplified?.addToCarts || 0, full: full?.addToCarts || 0 },
+    { name: 'Checkout', simplified: simplified?.checkouts || 0, full: full?.checkouts || 0 },
+    { name: 'Purchase', simplified: simplified?.purchases || 0, full: full?.purchases || 0 },
   ];
+
+  const funnelComparison = funnelStages.map(s => ({ stage: s.name, ...s }));
 
   return (
     <AdminLayout>
@@ -273,12 +276,18 @@ export default function ABTestAnalytics() {
           treatmentLabel="Simplified Homepage"
         />
 
-        <Tabs defaultValue="funnel" className="space-y-4">
+        <Tabs defaultValue="dropoff" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="dropoff">Drop-Off Analysis</TabsTrigger>
             <TabsTrigger value="funnel">Funnel Comparison</TabsTrigger>
             <TabsTrigger value="rates">Conversion Rates</TabsTrigger>
             <TabsTrigger value="trends">Daily Trends</TabsTrigger>
           </TabsList>
+
+          {/* Drop-Off Analysis */}
+          <TabsContent value="dropoff">
+            <FunnelVisualization stages={funnelStages} />
+          </TabsContent>
 
           {/* Funnel Comparison */}
           <TabsContent value="funnel">
