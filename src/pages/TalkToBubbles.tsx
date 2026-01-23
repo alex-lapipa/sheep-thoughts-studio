@@ -132,9 +132,9 @@ export default function TalkToBubbles() {
                   },
                   {
                     name: "Aidan",
-                    role: "Music & Idealism",
-                    description: "Guitar on shoulder, looking at the hills... 'It's all connected, like.'",
-                    topics: ["Music", "Art", "Dreams"],
+                    role: "Music & Cosmic Wisdom",
+                    description: "Hippie with guitar, rusty Beetle, and Muffins the dog. 'The universe is, you know...'",
+                    topics: ["Music", "Spirituality", "Cosmic mysteries"],
                     color: "bg-violet-500/10 border-violet-500/20"
                   }
                 ].map((character, index) => (
