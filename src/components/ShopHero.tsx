@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Sparkles, ArrowRight, Star, Truck, Shield, Zap, Heart } from "lucide-react";
-import { BubblesSheep } from "./BubblesSheep";
 import { cn } from "@/lib/utils";
+import bubblesShoppingHappy from "@/assets/bubbles-shopping-happy.jpg";
 
 const floatingProducts = [
   { emoji: "☕", name: "Wisdom Mugs", price: "€18", position: "top-0 right-0", delay: 0.8 },
@@ -222,7 +222,11 @@ export function ShopHero() {
                   }}
                   className="w-full h-full flex items-center justify-center"
                 >
-                  <BubblesSheep size="xl" className="w-full h-full drop-shadow-2xl" />
+                  <img 
+                    src={bubblesShoppingHappy} 
+                    alt="Bubbles the happy shopping sheep" 
+                    className="w-full h-full object-contain drop-shadow-2xl rounded-2xl"
+                  />
                 </motion.div>
 
                 {/* Floating product hints with enhanced styling */}
