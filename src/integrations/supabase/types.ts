@@ -972,6 +972,63 @@ export type Database = {
         }
         Relationships: []
       }
+      mentors: {
+        Row: {
+          background_story: string | null
+          bubbles_interpretation: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          relationship_to_bubbles: string | null
+          sample_questions: string[] | null
+          topics: string[] | null
+          trigger_words: string[] | null
+          updated_at: string | null
+          wisdom_style: string | null
+        }
+        Insert: {
+          background_story?: string | null
+          bubbles_interpretation?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          relationship_to_bubbles?: string | null
+          sample_questions?: string[] | null
+          topics?: string[] | null
+          trigger_words?: string[] | null
+          updated_at?: string | null
+          wisdom_style?: string | null
+        }
+        Update: {
+          background_story?: string | null
+          bubbles_interpretation?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          relationship_to_bubbles?: string | null
+          sample_questions?: string[] | null
+          topics?: string[] | null
+          trigger_words?: string[] | null
+          updated_at?: string | null
+          wisdom_style?: string | null
+        }
+        Relationships: []
+      }
       newsletter_campaigns: {
         Row: {
           created_at: string

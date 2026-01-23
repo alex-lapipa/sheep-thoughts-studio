@@ -65,7 +65,8 @@ const AdminScenarios = lazy(() => import("./pages/admin/Scenarios"));
 const AdminTriggers = lazy(() => import("./pages/admin/Triggers"));
 const AdminKnowledge = lazy(() => import("./pages/admin/Knowledge"));
 const AdminRAGContent = lazy(() => import("./pages/admin/RAGContent"));
-const AdminMentors = lazy(() => import("./pages/admin/Mentors"));
+const AdminMentors = lazy(() => import("./pages/admin/MentorsManagement"));
+const AdminMentorDetail = lazy(() => import("./pages/admin/MentorDetail"));
 const AdminGenerate = lazy(() => import("./pages/admin/Generate"));
 const BrandOverview = lazy(() => import("./pages/admin/brand/BrandOverview"));
 const BrandColors = lazy(() => import("./pages/admin/brand/BrandColors"));
@@ -197,6 +198,7 @@ const App = () => (
                   <Route path="/admin/knowledge" element={<ProtectedRoute><AdminKnowledge /></ProtectedRoute>} />
                   <Route path="/admin/rag-content" element={<ProtectedRoute><AdminRAGContent /></ProtectedRoute>} />
                   <Route path="/admin/mentors" element={<ProtectedRoute><AdminMentors /></ProtectedRoute>} />
+                  <Route path="/admin/mentors/:id" element={<ProtectedRoute><AdminMentorDetail /></ProtectedRoute>} />
                   <Route path="/admin/mentors/triggers" element={<ProtectedRoute><MentorTriggerEditor /></ProtectedRoute>} />
                   <Route path="/admin/mentors/analytics" element={<ProtectedRoute><MentorAnalytics /></ProtectedRoute>} />
                   <Route path="/admin/ab-test" element={<ProtectedRoute><ABTestAnalytics /></ProtectedRoute>} />
