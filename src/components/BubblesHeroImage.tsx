@@ -18,7 +18,7 @@ import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
  */
 
 interface BubblesHeroImageProps {
-  size?: "sm" | "md" | "lg" | "xl" | "hero" | "massive";
+  size?: "sm" | "md" | "lg" | "xl" | "hero" | "massive" | "colossal";
   className?: string;
   animated?: boolean;
   /** Flip horizontally so Bubbles faces left */
@@ -34,6 +34,7 @@ const sizes = {
   xl: "w-72 h-72",
   hero: "w-80 h-80 md:w-[28rem] md:h-[28rem]",
   massive: "w-96 h-96 md:w-[32rem] md:h-[32rem] lg:w-[38rem] lg:h-[38rem]",
+  colossal: "w-[22rem] h-[22rem] sm:w-[28rem] sm:h-[28rem] md:w-[36rem] md:h-[36rem] lg:w-[44rem] lg:h-[44rem] xl:w-[52rem] xl:h-[52rem]",
 };
 
 export function BubblesHeroImage({
