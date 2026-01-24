@@ -115,9 +115,9 @@ export function ContentHero({
               )}
             </div>
 
-            {/* Character/Image Slot */}
+            {/* Character/Image Slot — LARGER & GROUNDED */}
             <motion.div
-              className="relative flex-shrink-0"
+              className="relative flex-shrink-0 flex items-end"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -125,18 +125,18 @@ export function ContentHero({
               {/* Glow effect using primary color */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/20 rounded-3xl blur-3xl scale-110" />
               
-              {/* Render character component or image */}
+              {/* Render character component or image — larger, grounded */}
               {character ? (
-                <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem] flex items-end justify-center">
                   {character}
                 </div>
               ) : image ? (
                 <motion.img
                   src={image}
                   alt={imageAlt || ""}
-                  className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-3xl shadow-2xl border border-primary/10"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative w-72 h-72 md:w-96 md:h-96 object-contain object-bottom rounded-3xl shadow-2xl border border-primary/10"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 />
               ) : null}
             </motion.div>
