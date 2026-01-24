@@ -1,175 +1,244 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Dog, Bird, Cat, Rabbit, Squirrel, Bug, Fish, Rat, HelpCircle } from "lucide-react";
+import { Crown, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Dog, Bird, Cat, Rabbit, Squirrel, Bug, Fish, Rat, HelpCircle, Network, ZoomIn, ZoomOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 interface CreatureNode {
   id: string;
   name: string;
+  shortName: string;
   title: string;
   icon: LucideIcon;
   iconColor: string;
   tier: number;
   bubblesReasoning: string;
   powerSource: string;
-  reports?: string[];
+  reportsTo?: string[];
+  x?: number;
+  y?: number;
 }
 
 const HIERARCHY_DATA: CreatureNode[] = [
   {
     id: "crows",
     name: "The Sugarloaf Crows",
+    shortName: "Crows",
     title: "Supreme Intelligence Council",
     icon: Bird,
     iconColor: "text-slate-300",
     tier: 1,
     bubblesReasoning: "They see everything from above. They hold meetings. They whisper. If that's not a shadow government, I don't know what is.",
-    powerSource: "Information control & aerial surveillance",
-    reports: ["fox", "heron", "robin"]
+    powerSource: "Information control",
   },
   {
     id: "muffins",
     name: "Muffins (ZZ Top Lady)",
+    shortName: "Muffins",
     title: "Silent Advisor",
     icon: Dog,
     iconColor: "text-amber-400",
     tier: 1,
-    bubblesReasoning: "Never speaks. Never wrong. Has two identities. Classic deep-state operative. Reports directly to... someone. Probably the crows.",
-    powerSource: "Strategic silence & dual identity",
-    reports: ["sheepdogs"]
+    bubblesReasoning: "Never speaks. Never wrong. Has two identities. Classic deep-state operative.",
+    powerSource: "Strategic silence",
   },
   {
     id: "fox",
     name: "The Glendalough Fox",
+    shortName: "Fox",
     title: "Independent Contractor",
     icon: Squirrel,
     iconColor: "text-orange-400",
     tier: 2,
-    bubblesReasoning: "Comes and goes as it pleases. Steals sandwiches in broad daylight. Answers to no one visible. Classic freelancer.",
-    powerSource: "Boldness & unpredictability",
-    reports: ["hedgehog", "rabbits"]
+    bubblesReasoning: "Comes and goes as it pleases. Steals sandwiches in broad daylight.",
+    powerSource: "Boldness",
+    reportsTo: ["crows"]
   },
   {
     id: "mart-cat",
     name: "The Mart Cat",
+    shortName: "Cat",
     title: "Chief Auditor",
     icon: Cat,
     iconColor: "text-purple-400",
     tier: 2,
-    bubblesReasoning: "Observes all transactions. Participates in none. Knows everyone's business. Neutral but judgmental. A true bureaucrat.",
-    powerSource: "Observation & neutrality",
-    reports: ["rat"]
+    bubblesReasoning: "Observes all transactions. Participates in none. Knows everyone's business.",
+    powerSource: "Observation",
   },
   {
     id: "heron",
     name: "The Powerscourt Heron",
+    shortName: "Heron",
     title: "Minister of Patience",
     icon: Bird,
     iconColor: "text-cyan-400",
     tier: 2,
-    bubblesReasoning: "Stands in water for hours. Does nothing productive. Still respected. That's real power, so it is.",
-    powerSource: "Extreme patience & stillness",
-    reports: ["trout"]
+    bubblesReasoning: "Stands in water for hours. Does nothing productive. Still respected.",
+    powerSource: "Patience",
+    reportsTo: ["crows"]
   },
   {
     id: "sheepdogs",
     name: "Eddie's Sheepdogs",
+    shortName: "Sheepdogs",
     title: "Middle Management",
     icon: Dog,
     iconColor: "text-blue-400",
     tier: 3,
-    bubblesReasoning: "Run around telling everyone where to go. Think they're in charge. Report to humans who report to... well, the crows probably.",
-    powerSource: "Delegated authority & running",
-    reports: ["sheep"]
+    bubblesReasoning: "Run around telling everyone where to go. Think they're in charge.",
+    powerSource: "Delegated authority",
+    reportsTo: ["muffins"]
   },
   {
     id: "robin",
     name: "Carmel's Garden Robin",
+    shortName: "Robin",
     title: "Local Correspondent",
     icon: Bird,
     iconColor: "text-red-400",
     tier: 3,
-    bubblesReasoning: "Shows up whenever humans do. Watches. Reports back. Very suspicious timing, always.",
-    powerSource: "Proximity to humans & cuteness",
+    bubblesReasoning: "Shows up whenever humans do. Watches. Reports back.",
+    powerSource: "Cuteness",
+    reportsTo: ["crows"]
   },
   {
     id: "hedgehog",
     name: "The Nocturnal Consultant",
-    title: "Night Shift Supervisor",
+    shortName: "Hedgehog",
+    title: "Night Shift",
     icon: Bug,
     iconColor: "text-amber-300",
     tier: 3,
-    bubblesReasoning: "Only works at night. Has spines. Asks no questions. Classic security contractor.",
-    powerSource: "Nocturnal operations & defense spines",
+    bubblesReasoning: "Only works at night. Has spines. Asks no questions.",
+    powerSource: "Spines",
+    reportsTo: ["fox"]
   },
   {
     id: "rabbits",
     name: "The Bray Rabbits",
+    shortName: "Rabbits",
     title: "Underground Network",
     icon: Rabbit,
     iconColor: "text-pink-400",
     tier: 4,
-    bubblesReasoning: "Dig tunnels everywhere. Multiply rapidly. Either a communications network or a land invasion. Time will tell.",
-    powerSource: "Numbers & tunnel infrastructure",
+    bubblesReasoning: "Dig tunnels everywhere. Multiply rapidly.",
+    powerSource: "Numbers",
+    reportsTo: ["fox"]
   },
   {
     id: "trout",
     name: "Glendalough Trout",
+    shortName: "Trout",
     title: "Aquatic Division",
     icon: Fish,
     iconColor: "text-sky-400",
     tier: 4,
     bubblesReasoning: "Control the lakes. Answer only to the heron. Mysterious. Wet.",
-    powerSource: "Aquatic territory & slipperiness",
+    powerSource: "Slipperiness",
+    reportsTo: ["heron"]
   },
   {
     id: "rat",
     name: "The Mart Rats",
-    title: "Logistics & Procurement",
+    shortName: "Rats",
+    title: "Logistics",
     icon: Rat,
     iconColor: "text-stone-400",
     tier: 4,
-    bubblesReasoning: "Move things. Store things. Know where everything is. Essential but unacknowledged. Classic supply chain.",
-    powerSource: "Infrastructure access & persistence",
+    bubblesReasoning: "Move things. Store things. Know where everything is.",
+    powerSource: "Persistence",
+    reportsTo: ["mart-cat"]
   },
   {
     id: "sheep",
     name: "The General Population",
+    shortName: "Us",
     title: "Concerned Citizens",
     icon: HelpCircle,
     iconColor: "text-emerald-400",
     tier: 5,
-    bubblesReasoning: "That's us. We follow instructions. We eat grass. We ask questions. Mostly ignored, but we're watching. Oh, we're watching.",
-    powerSource: "Wool & numbers",
+    bubblesReasoning: "That's us. We follow instructions. We eat grass. We ask questions.",
+    powerSource: "Wool",
+    reportsTo: ["sheepdogs"]
   },
 ];
 
-const TIER_COLORS: Record<number, { bg: string; border: string; label: string }> = {
-  1: { bg: "from-amber-500/20 to-amber-600/10", border: "border-amber-500/40", label: "Apex Authority" },
-  2: { bg: "from-purple-500/20 to-purple-600/10", border: "border-purple-500/40", label: "Upper Management" },
-  3: { bg: "from-blue-500/20 to-blue-600/10", border: "border-blue-500/40", label: "Middle Operations" },
-  4: { bg: "from-emerald-500/20 to-emerald-600/10", border: "border-emerald-500/40", label: "Ground Level" },
-  5: { bg: "from-muted/50 to-muted/30", border: "border-muted-foreground/30", label: "The Rest of Us" },
+// Calculate positions for diagram
+const calculatePositions = (nodes: CreatureNode[], width: number, height: number): CreatureNode[] => {
+  const tierCounts: Record<number, number> = {};
+  const tierIndices: Record<number, number> = {};
+  
+  nodes.forEach(node => {
+    tierCounts[node.tier] = (tierCounts[node.tier] || 0) + 1;
+    tierIndices[node.tier] = 0;
+  });
+
+  return nodes.map(node => {
+    const tierCount = tierCounts[node.tier];
+    const index = tierIndices[node.tier]++;
+    const tierY = 50 + (node.tier - 1) * 90;
+    const tierWidth = width - 80;
+    const spacing = tierWidth / (tierCount + 1);
+    const tierX = 40 + spacing * (index + 1);
+    
+    return { ...node, x: tierX, y: tierY };
+  });
+};
+
+const TIER_COLORS: Record<number, string> = {
+  1: "stroke-amber-500",
+  2: "stroke-purple-500",
+  3: "stroke-blue-500",
+  4: "stroke-emerald-500",
+  5: "stroke-muted-foreground",
+};
+
+const TIER_BG_COLORS: Record<number, string> = {
+  1: "fill-amber-500/20",
+  2: "fill-purple-500/20",
+  3: "fill-blue-500/20",
+  4: "fill-emerald-500/20",
+  5: "fill-muted/30",
 };
 
 export const CreatureHierarchy = () => {
-  const [expandedNode, setExpandedNode] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"diagram" | "list">("diagram");
   const [isExpanded, setIsExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const diagramWidth = 500;
+  const diagramHeight = 500;
+  const positionedNodes = calculatePositions(HIERARCHY_DATA, diagramWidth, diagramHeight);
 
-  const groupedByTier = HIERARCHY_DATA.reduce((acc, node) => {
-    if (!acc[node.tier]) acc[node.tier] = [];
-    acc[node.tier].push(node);
-    return acc;
-  }, {} as Record<number, CreatureNode[]>);
+  const getNodeById = (id: string) => positionedNodes.find(n => n.id === id);
+  
+  const selectedCreature = selectedNode ? getNodeById(selectedNode) : null;
+
+  // Get all connections
+  const connections = positionedNodes.flatMap(node => 
+    (node.reportsTo || []).map(parentId => ({
+      from: node,
+      to: getNodeById(parentId)!
+    })).filter(c => c.to)
+  );
+
+  // Check if a connection is highlighted
+  const isConnectionHighlighted = (from: CreatureNode, to: CreatureNode) => {
+    if (!hoveredNode && !selectedNode) return false;
+    const activeId = hoveredNode || selectedNode;
+    return from.id === activeId || to.id === activeId;
+  };
 
   return (
     <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border-primary/20 overflow-hidden">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-amber-500/20">
               <Crown className="w-5 h-5 text-amber-400" />
@@ -181,18 +250,26 @@ export const CreatureHierarchy = () => {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="gap-1"
-          >
-            {isExpanded ? (
-              <>Collapse <ChevronUp className="w-4 h-4" /></>
-            ) : (
-              <>Expand <ChevronDown className="w-4 h-4" /></>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewMode === "diagram" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("diagram")}
+              className="gap-1 h-8"
+            >
+              <Network className="w-3 h-3" />
+              Diagram
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="gap-1 h-8"
+            >
+              <ChevronDown className="w-3 h-3" />
+              List
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
@@ -205,139 +282,286 @@ export const CreatureHierarchy = () => {
         >
           <AlertTriangle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
           <p className="text-xs text-orange-300/80">
-            This organizational chart is based on years of careful observation, strategic eavesdropping, 
-            and absolutely no verification whatsoever. Very reliable.
+            This organizational chart is based on years of careful observation and absolutely no verification. 
+            Lines show who reports to whom (according to me).
           </p>
         </motion.div>
 
-        {/* Hierarchy visualization */}
-        <div className="space-y-3">
-          {Object.entries(groupedByTier).map(([tier, nodes], tierIndex) => {
-            const tierNum = parseInt(tier);
-            const tierStyle = TIER_COLORS[tierNum];
-            const showNodes = isExpanded || tierNum <= 2;
+        <AnimatePresence mode="wait">
+          {viewMode === "diagram" ? (
+            <motion.div
+              key="diagram"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              ref={containerRef}
+              className="relative"
+            >
+              {/* SVG Diagram */}
+              <div className="overflow-auto rounded-lg bg-background/30 border border-muted-foreground/10">
+                <svg 
+                  width={diagramWidth} 
+                  height={diagramHeight} 
+                  className="mx-auto"
+                  viewBox={`0 0 ${diagramWidth} ${diagramHeight}`}
+                >
+                  {/* Tier backgrounds */}
+                  {[1, 2, 3, 4, 5].map(tier => (
+                    <rect
+                      key={tier}
+                      x={10}
+                      y={15 + (tier - 1) * 90}
+                      width={diagramWidth - 20}
+                      height={80}
+                      rx={8}
+                      className="fill-muted/10"
+                    />
+                  ))}
 
-            return (
-              <motion.div
-                key={tier}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: tierIndex * 0.1 }}
-              >
-                {/* Tier label */}
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent to-muted-foreground/20" />
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
-                    Tier {tierNum}: {tierStyle.label}
-                  </Badge>
-                  <div className="h-px flex-1 bg-gradient-to-l from-transparent to-muted-foreground/20" />
-                </div>
+                  {/* Connection lines */}
+                  <g>
+                    {connections.map((conn, i) => {
+                      const isHighlighted = isConnectionHighlighted(conn.from, conn.to);
+                      return (
+                        <motion.path
+                          key={`${conn.from.id}-${conn.to.id}`}
+                          d={`M ${conn.from.x} ${conn.from.y! - 20} 
+                              Q ${conn.from.x} ${(conn.from.y! + conn.to.y!) / 2 - 20},
+                                ${(conn.from.x! + conn.to.x!) / 2} ${(conn.from.y! + conn.to.y!) / 2 - 20}
+                              T ${conn.to.x} ${conn.to.y! + 20}`}
+                          fill="none"
+                          className={cn(
+                            "transition-all duration-300",
+                            isHighlighted 
+                              ? "stroke-primary stroke-2" 
+                              : "stroke-muted-foreground/30 stroke-1"
+                          )}
+                          initial={{ pathLength: 0, opacity: 0 }}
+                          animate={{ 
+                            pathLength: 1, 
+                            opacity: isHighlighted ? 1 : 0.5 
+                          }}
+                          transition={{ delay: i * 0.05, duration: 0.5 }}
+                        />
+                      );
+                    })}
+                  </g>
 
-                {/* Nodes */}
-                <AnimatePresence>
-                  {showNodes && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                      {nodes.map((node, nodeIndex) => {
-                        const IconComponent = node.icon;
-                        const isNodeExpanded = expandedNode === node.id;
+                  {/* Nodes */}
+                  <g>
+                    {positionedNodes.map((node, i) => {
+                      const IconComponent = node.icon;
+                      const isSelected = selectedNode === node.id;
+                      const isHovered = hoveredNode === node.id;
+                      const isActive = isSelected || isHovered;
 
-                        return (
-                          <motion.div
-                            key={node.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: nodeIndex * 0.05 }}
-                            className={`
-                              p-3 rounded-lg cursor-pointer transition-all duration-200
-                              bg-gradient-to-br ${tierStyle.bg} ${tierStyle.border} border
-                              hover:scale-[1.02] hover:shadow-lg
-                              ${isNodeExpanded ? 'ring-2 ring-primary col-span-full' : ''}
-                            `}
-                            onClick={() => setExpandedNode(isNodeExpanded ? null : node.id)}
+                      return (
+                        <motion.g
+                          key={node.id}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ 
+                            scale: isActive ? 1.1 : 1, 
+                            opacity: 1 
+                          }}
+                          transition={{ delay: i * 0.05, type: "spring" }}
+                          style={{ transformOrigin: `${node.x}px ${node.y}px` }}
+                          className="cursor-pointer"
+                          onMouseEnter={() => setHoveredNode(node.id)}
+                          onMouseLeave={() => setHoveredNode(null)}
+                          onClick={() => setSelectedNode(isSelected ? null : node.id)}
+                        >
+                          {/* Node circle */}
+                          <circle
+                            cx={node.x}
+                            cy={node.y}
+                            r={isActive ? 28 : 24}
+                            className={cn(
+                              "transition-all duration-200",
+                              TIER_BG_COLORS[node.tier],
+                              isActive ? "stroke-primary stroke-2" : `${TIER_COLORS[node.tier]} stroke-1`
+                            )}
+                          />
+                          
+                          {/* Crown for tier 1 */}
+                          {node.tier === 1 && (
+                            <text
+                              x={node.x}
+                              y={node.y! - 32}
+                              textAnchor="middle"
+                              className="text-xs"
+                            >
+                              👑
+                            </text>
+                          )}
+
+                          {/* Node label */}
+                          <text
+                            x={node.x}
+                            y={node.y! + 4}
+                            textAnchor="middle"
+                            className="fill-foreground text-[10px] font-medium pointer-events-none"
                           >
-                            <div className="flex items-start gap-3">
-                              {/* Icon */}
-                              <div className={`p-2 rounded-full bg-background/50 ${node.iconColor}`}>
-                                <IconComponent className="w-4 h-4" />
-                              </div>
+                            {node.shortName}
+                          </text>
+                        </motion.g>
+                      );
+                    })}
+                  </g>
 
-                              {/* Content */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <h4 className="font-semibold text-sm truncate">{node.name}</h4>
-                                  {tierNum === 1 && (
-                                    <Crown className="w-3 h-3 text-amber-400 shrink-0" />
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground">{node.title}</p>
-                                
-                                {/* Power source badge */}
-                                <Badge variant="secondary" className="mt-2 text-[10px] gap-1">
-                                  <Sparkles className="w-2.5 h-2.5" />
-                                  {node.powerSource}
+                  {/* Tier labels */}
+                  {[
+                    { tier: 1, label: "Apex" },
+                    { tier: 2, label: "Upper" },
+                    { tier: 3, label: "Middle" },
+                    { tier: 4, label: "Ground" },
+                    { tier: 5, label: "Us" },
+                  ].map(({ tier, label }) => (
+                    <text
+                      key={tier}
+                      x={20}
+                      y={55 + (tier - 1) * 90}
+                      className="fill-muted-foreground text-[9px] font-medium"
+                    >
+                      {label}
+                    </text>
+                  ))}
+                </svg>
+              </div>
+
+              {/* Selected node details */}
+              <AnimatePresence>
+                {selectedCreature && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="mt-4 p-4 rounded-lg bg-muted/30 border border-muted-foreground/20"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-full bg-background/50 ${selectedCreature.iconColor}`}>
+                        <selectedCreature.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">{selectedCreature.name}</h4>
+                        <p className="text-xs text-muted-foreground">{selectedCreature.title}</p>
+                        <Badge variant="secondary" className="mt-2 text-[10px] gap-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          {selectedCreature.powerSource}
+                        </Badge>
+                        <ThoughtBubble mode="innocent" size="sm" className="mt-3">
+                          {selectedCreature.bubblesReasoning}
+                        </ThoughtBubble>
+                        
+                        {selectedCreature.reportsTo && (
+                          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>Reports to:</span>
+                            {selectedCreature.reportsTo.map(id => {
+                              const parent = getNodeById(id);
+                              return parent ? (
+                                <Badge 
+                                  key={id} 
+                                  variant="outline" 
+                                  className="text-[10px] cursor-pointer hover:bg-primary/20"
+                                  onClick={() => setSelectedNode(id)}
+                                >
+                                  {parent.shortName}
                                 </Badge>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                                {/* Expanded content */}
-                                <AnimatePresence>
-                                  {isNodeExpanded && (
-                                    <motion.div
-                                      initial={{ opacity: 0, height: 0 }}
-                                      animate={{ opacity: 1, height: "auto" }}
-                                      exit={{ opacity: 0, height: 0 }}
-                                      className="mt-3 pt-3 border-t border-muted-foreground/20"
-                                    >
-                                      <ThoughtBubble
-                                        mode="innocent"
-                                        size="sm"
-                                        className="text-xs"
-                                      >
-                                        {node.bubblesReasoning}
-                                      </ThoughtBubble>
-                                      
-                                      {node.reports && node.reports.length > 0 && (
-                                        <div className="mt-2 flex flex-wrap gap-1">
-                                          <span className="text-[10px] text-muted-foreground">Reports from:</span>
-                                          {node.reports.map(reportId => {
-                                            const reporter = HIERARCHY_DATA.find(n => n.id === reportId);
-                                            return reporter ? (
-                                              <Badge key={reportId} variant="outline" className="text-[10px]">
-                                                {reporter.name.split(' ')[0]}
-                                              </Badge>
-                                            ) : null;
-                                          })}
-                                        </div>
-                                      )}
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
+              {/* Legend */}
+              <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                {[
+                  { tier: 1, label: "Apex Authority", color: "bg-amber-500" },
+                  { tier: 2, label: "Upper Management", color: "bg-purple-500" },
+                  { tier: 3, label: "Middle Ops", color: "bg-blue-500" },
+                  { tier: 4, label: "Ground Level", color: "bg-emerald-500" },
+                ].map(({ tier, label, color }) => (
+                  <div key={tier} className="flex items-center gap-1.5">
+                    <div className={cn("w-2 h-2 rounded-full", color)} />
+                    <span className="text-[10px] text-muted-foreground">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            /* List view - kept for accessibility */
+            <motion.div
+              key="list"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              {positionedNodes.map((node) => {
+                const IconComponent = node.icon;
+                const isNodeExpanded = selectedNode === node.id;
 
-        {/* Bubbles' final note */}
-        {isExpanded && (
+                return (
+                  <motion.div
+                    key={node.id}
+                    className={cn(
+                      "p-3 rounded-lg cursor-pointer transition-all border",
+                      "bg-gradient-to-br from-muted/30 to-muted/10 border-muted-foreground/20",
+                      "hover:bg-muted/40",
+                      isNodeExpanded && "ring-2 ring-primary"
+                    )}
+                    onClick={() => setSelectedNode(isNodeExpanded ? null : node.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full bg-background/50 ${node.iconColor}`}>
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">{node.name}</span>
+                          {node.tier === 1 && <Crown className="w-3 h-3 text-amber-400" />}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{node.title}</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px]">
+                        Tier {node.tier}
+                      </Badge>
+                    </div>
+                    
+                    <AnimatePresence>
+                      {isNodeExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-3 pt-3 border-t border-muted-foreground/20"
+                        >
+                          <ThoughtBubble mode="innocent" size="sm">
+                            {node.bubblesReasoning}
+                          </ThoughtBubble>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bubbles' note when diagram is visible */}
+        {viewMode === "diagram" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-6"
+            className="mt-4"
           >
-            <ThoughtBubble mode="triggered" size="md">
-              "I've been studying this hierarchy for years. The crows think I haven't noticed. But I have. Oh, I have. One day I'll understand their game. Until then, I keep watching. And grazing. Mostly grazing."
+            <ThoughtBubble mode="triggered" size="sm">
+              "Click any creature to see what I know about them. The lines show the chain of command. Very official."
             </ThoughtBubble>
           </motion.div>
         )}
