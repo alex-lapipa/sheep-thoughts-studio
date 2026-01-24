@@ -942,6 +942,45 @@ export type Database = {
         }
         Relationships: []
       }
+      legacy_product_images: {
+        Row: {
+          archived_at: string
+          archived_by: string | null
+          id: string
+          local_asset_path: string | null
+          metadata: Json | null
+          notes: string | null
+          original_image_url: string | null
+          product_title: string
+          product_type: string | null
+          shopify_product_id: string
+        }
+        Insert: {
+          archived_at?: string
+          archived_by?: string | null
+          id?: string
+          local_asset_path?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          original_image_url?: string | null
+          product_title: string
+          product_type?: string | null
+          shopify_product_id: string
+        }
+        Update: {
+          archived_at?: string
+          archived_by?: string | null
+          id?: string
+          local_asset_path?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          original_image_url?: string | null
+          product_title?: string
+          product_type?: string | null
+          shopify_product_id?: string
+        }
+        Relationships: []
+      }
       mentor_trigger_events: {
         Row: {
           confidence_score: number | null
