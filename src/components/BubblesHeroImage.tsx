@@ -34,7 +34,8 @@ const sizes = {
   xl: "w-72 h-72",
   hero: "w-80 h-80 md:w-[28rem] md:h-[28rem]",
   massive: "w-96 h-96 md:w-[32rem] md:h-[32rem] lg:w-[38rem] lg:h-[38rem]",
-  colossal: "w-[28rem] h-[28rem] sm:w-[36rem] sm:h-[36rem] md:w-[48rem] md:h-[48rem] lg:w-[56rem] lg:h-[56rem] xl:w-[64rem] xl:h-[64rem]",
+  // COLOSSAL: The official 2025 brand size — twice as big, grounded on grass
+  colossal: "w-[32rem] h-[32rem] sm:w-[40rem] sm:h-[40rem] md:w-[56rem] md:h-[56rem] lg:w-[72rem] lg:h-[72rem] xl:w-[80rem] xl:h-[80rem]",
 };
 
 export function BubblesHeroImage({

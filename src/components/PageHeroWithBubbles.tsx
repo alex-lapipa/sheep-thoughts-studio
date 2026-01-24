@@ -129,10 +129,10 @@ export function PageHeroWithBubbles({
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* The mascot - Post-punk stencil style, grounded on grass */}
-              <div className={cn(bubbleSizeClasses[bubbleSize], "relative flex items-end justify-center")}>
+              {/* The mascot — COLOSSAL size, grounded on grass */}
+              <div className="relative w-[32rem] h-[32rem] sm:w-[40rem] sm:h-[40rem] md:w-[56rem] md:h-[56rem] lg:w-[72rem] lg:h-[72rem] flex items-end justify-center">
                 <BubblesHeroImage
-                  size="massive"
+                  size="colossal"
                   grounded
                   flipped
                   className="w-full h-full drop-shadow-2xl"

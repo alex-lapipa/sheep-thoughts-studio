@@ -188,9 +188,9 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Bubbles Character - Bog-grounded, weather-affected */}
-            <div className="relative flex justify-center items-center">
-              <BubblesHeroImage size="massive" grounded flipped />
+            {/* Bubbles Character — COLOSSAL size, grounded on grass, facing left */}
+            <div className="relative flex justify-center items-end self-end">
+              <BubblesHeroImage size="colossal" grounded flipped />
               
               {/* Thought bubble with smooth fade transitions */}
               {currentThought && (

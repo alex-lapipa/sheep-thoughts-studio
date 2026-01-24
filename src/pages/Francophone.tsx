@@ -289,7 +289,7 @@ export default function Francophone() {
             {/* Bubbles Character with French thought */}
             <div className="relative flex justify-center items-center">
               <div className="hover:animate-baa transition-transform cursor-pointer">
-                <BubblesHeroImage size="massive" grounded flipped />
+                <BubblesHeroImage size="colossal" grounded flipped />
               </div>
               
               <div className="absolute -top-4 right-0 md:right-8 max-w-[300px] animate-pop-in" style={{ animationDelay: "600ms" }}>

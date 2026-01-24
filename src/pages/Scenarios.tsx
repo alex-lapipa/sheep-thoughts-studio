@@ -85,7 +85,7 @@ export default function Scenarios() {
         <ContentHero
           title={t("scenariosPage.hero.title")}
           subtitle={t("scenariosPage.hero.subtitle")}
-          character={<BubblesHeroImage size="massive" grounded flipped />}
+          character={<BubblesHeroImage size="colossal" grounded flipped />}
           imageAlt="Bubbles the happy artistic sheep"
           badge={{ icon: Drama, text: "Emotional Range Expert" }}
           credentials={[
