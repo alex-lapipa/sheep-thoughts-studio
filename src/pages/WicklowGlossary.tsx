@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2, Loader2, Dog, Bird, Bug, Rabbit } from "lucide-react";
+import { Book, Mountain, HelpCircle, Quote, Sparkles, Volume2, Loader2, Dog, Bird, Bug, Rabbit, Cat, Fish, Rat, Squirrel, type LucideIcon } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { Card, CardContent } from "@/components/ui/card";
@@ -459,6 +459,26 @@ const MODE_STYLES: Record<string, { bg: string; border: string; icon: string }> 
   savage: { bg: "from-red-500/10", border: "border-red-500/30", icon: "🔥" }
 };
 
+// Species icon mapping for creatures
+const SPECIES_ICONS: Record<string, { icon: LucideIcon; color: string }> = {
+  "Dog": { icon: Dog, color: "text-amber-400" },
+  "Sheepdog": { icon: Dog, color: "text-blue-400" },
+  "Crow": { icon: Bird, color: "text-slate-400" },
+  "Fox": { icon: Squirrel, color: "text-orange-400" },
+  "Cat": { icon: Cat, color: "text-purple-400" },
+  "Heron": { icon: Bird, color: "text-cyan-400" },
+  "Robin": { icon: Bird, color: "text-red-400" },
+  "Rabbit": { icon: Rabbit, color: "text-pink-400" },
+  "Rat": { icon: Rat, color: "text-stone-400" },
+  "Hedgehog": { icon: Bug, color: "text-amber-300" },
+  "Fish": { icon: Fish, color: "text-sky-400" },
+};
+
+const getSpeciesIcon = (species?: string) => {
+  if (!species) return null;
+  return SPECIES_ICONS[species] || null;
+};
+
 const WicklowGlossary = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
@@ -609,11 +629,24 @@ const WicklowGlossary = () => {
                                 {entry.irish}
                               </p>
                             )}
-                            <Badge className={`mt-1 ${CATEGORY_COLORS[entry.category]}`}>
-                              {entry.category === "placenames" ? "logainm" : 
-                               entry.category === "seanfhocail" ? "seanfhocal" : 
-                               entry.category}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge className={`${CATEGORY_COLORS[entry.category]}`}>
+                                {entry.category === "placenames" ? "logainm" : 
+                                 entry.category === "seanfhocail" ? "seanfhocal" : 
+                                 entry.category}
+                              </Badge>
+                              {entry.category === "creatures" && entry.species && (() => {
+                                const speciesData = getSpeciesIcon(entry.species);
+                                if (!speciesData) return null;
+                                const SpeciesIcon = speciesData.icon;
+                                return (
+                                  <Badge variant="outline" className={`gap-1 ${speciesData.color} border-current/30 bg-current/10`}>
+                                    <SpeciesIcon className="w-3 h-3" />
+                                    {entry.species}
+                                  </Badge>
+                                );
+                              })()}
+                            </div>
                           </div>
                         </div>
                         <Badge variant="outline" className="capitalize">
