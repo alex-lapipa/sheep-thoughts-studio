@@ -328,7 +328,7 @@ export default function Hispanic() {
             {/* Bubbles Character with Spanish thought */}
             <div className="relative flex justify-center items-center">
               <div className="hover:animate-wiggle transition-transform cursor-pointer">
-                <BubblesHeroImage size="colossal" grounded flipped />
+                <BubblesHeroImage size="massive" grounded flipped />
               </div>
               
               <div className="absolute -top-4 right-0 md:right-8 max-w-[300px] animate-pop-in" style={{ animationDelay: "600ms" }}>
