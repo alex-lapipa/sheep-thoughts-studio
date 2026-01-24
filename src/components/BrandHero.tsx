@@ -4,18 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { BubblesBog } from "@/components/BubblesBog";
+import { BubblesScientist } from "@/components/BubblesScientist";
+import { BubblesChef } from "@/components/BubblesChef";
+import { BubblesExplorer } from "@/components/BubblesExplorer";
+import { BubblesScholar } from "@/components/BubblesScholar";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import type { BubbleMode } from "@/data/thoughtBubbles";
-
-// Official Bubbles assets - the ONLY allowed character images
-import bubblesShoppingHappy from "@/assets/bubbles-shopping-happy.jpg";
-import bubblesTalkHappy from "@/assets/bubbles-talk-happy.jpg";
-import bubblesExplainsHappy from "@/assets/bubbles-explains-happy.jpg";
-import bubblesFactsHappy from "@/assets/bubbles-facts-happy.jpg";
-import bubblesAdventuresHappy from "@/assets/bubbles-adventures-happy.jpg";
-import bubblesScenariosHappy from "@/assets/bubbles-scenarios-happy.jpg";
+import type { ReactNode } from "react";
 
 export type BubblesVariant = 
   | "shopping" 
@@ -25,13 +23,14 @@ export type BubblesVariant =
   | "adventures" 
   | "scenarios";
 
-const BUBBLES_IMAGES: Record<BubblesVariant, string> = {
-  shopping: bubblesShoppingHappy,
-  talk: bubblesTalkHappy,
-  explains: bubblesExplainsHappy,
-  facts: bubblesFactsHappy,
-  adventures: bubblesAdventuresHappy,
-  scenarios: bubblesScenariosHappy,
+// Map variants to brand-aligned SVG components
+const BUBBLES_COMPONENTS: Record<BubblesVariant, React.ComponentType<{ className?: string }>> = {
+  shopping: BubblesBog,
+  talk: BubblesBog,
+  explains: BubblesScholar,
+  facts: BubblesScientist,
+  adventures: BubblesExplorer,
+  scenarios: BubblesChef,
 };
 
 interface BrandHeroProps {
@@ -80,7 +79,7 @@ export function BrandHero({
   thought,
   className,
 }: BrandHeroProps) {
-  const bubblesImage = BUBBLES_IMAGES[bubblesVariant];
+  const BubblesComponent = BUBBLES_COMPONENTS[bubblesVariant];
 
   return (
     <section className={cn(
@@ -177,7 +176,7 @@ export function BrandHero({
             )}
           </motion.div>
 
-          {/* Right Side - Official Bubbles Character */}
+          {/* Right Side - Official Bubbles Character (SVG) */}
           <motion.div 
             className="relative flex justify-center items-center"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -188,7 +187,7 @@ export function BrandHero({
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main image container */}
+              {/* Main character container */}
               <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-[420px] md:h-[420px]">
                 <motion.div
                   animate={{ 
@@ -200,13 +199,9 @@ export function BrandHero({
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="w-full h-full"
+                  className="w-full h-full flex items-center justify-center"
                 >
-                  <img 
-                    src={bubblesImage} 
-                    alt="Bubbles the Sheep from Wicklow" 
-                    className="w-full h-full object-contain drop-shadow-2xl rounded-2xl"
-                  />
+                  <BubblesComponent className="w-full h-full" />
                 </motion.div>
 
                 {/* Thought bubble */}
