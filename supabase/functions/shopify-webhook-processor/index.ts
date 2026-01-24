@@ -262,6 +262,7 @@ async function processWebhook(
       const locationId = payload.location_id as string | number | undefined;
       const available = payload.available as number | undefined;
       const variantId = payload.variant_id as string | number | undefined;
+      const productId = payload.product_id as string | number | undefined;
       
       await supabase.from("audit_logs").insert({
         entity_type: "shopify_inventory",
@@ -273,11 +274,28 @@ async function processWebhook(
           locationId,
           available,
           variantId,
+          productId,
         },
         metadata: { source: "shopify_webhook" },
       });
       
       actions.push(`Inventory ${topic}: item ${inventoryItemId || variantId}, available: ${available ?? 'N/A'}`);
+
+      // Trigger back-in-stock notifications if item became available
+      if (variantId && available !== undefined && available > 0) {
+        const stockResult = await triggerStockNotifications(supabaseUrl, {
+          variantId: String(variantId),
+          productId: productId ? String(productId) : undefined,
+          available: true,
+          quantity: available,
+        });
+        
+        if (stockResult.success) {
+          actions.push(`Stock notifications: ${stockResult.sent} emails sent`);
+        } else if (stockResult.message) {
+          actions.push(`Stock notifications: ${stockResult.message}`);
+        }
+      }
     }
 
     return { success: true, actions };
@@ -423,6 +441,56 @@ async function sendOrderStatusEmail(
 
   } catch (error) {
     console.error("Error sending order status email:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    };
+  }
+}
+
+interface StockNotificationResult {
+  success: boolean;
+  sent?: number;
+  failed?: number;
+  message?: string;
+  error?: string;
+}
+
+async function triggerStockNotifications(
+  supabaseUrl: string,
+  inventoryUpdate: {
+    variantId: string;
+    productId?: string;
+    available: boolean;
+    quantity?: number;
+  }
+): Promise<StockNotificationResult> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/stock-notification-process`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(inventoryUpdate),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error("Stock notification process failed:", result);
+      return { success: false, error: result.error || "Process failed" };
+    }
+
+    console.log(`Stock notifications processed: ${result.sent || 0} sent, ${result.failed || 0} failed`);
+    return { 
+      success: true, 
+      sent: result.sent || 0, 
+      failed: result.failed || 0,
+      message: result.message,
+    };
+
+  } catch (error) {
+    console.error("Error triggering stock notifications:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error" 
