@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { useShopifyIntegrations, ShopifyProduct } from "@/hooks/useShopifyIntegrations";
+import { useShopifyIntegrations } from "@/hooks/useShopifyIntegrations";
 import { useCartStore } from "@/stores/cartStore";
+import { ShopifyProduct } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,7 +29,36 @@ interface StorefrontProductsGridProps {
   limit?: number;
 }
 
-interface ProductWithInventory extends ShopifyProduct {
+// Extended product with inventory status for grid display
+interface ProductWithInventory {
+  id: string;
+  title: string;
+  handle: string;
+  description: string;
+  vendor?: string;
+  productType?: string;
+  tags: string[];
+  status?: string;
+  totalInventory: number;
+  priceRange: {
+    minVariantPrice: { amount: string; currencyCode: string };
+    maxVariantPrice?: { amount: string; currencyCode: string };
+  };
+  images: { edges: Array<{ node: { url: string; altText: string | null } }> };
+  variants: {
+    edges: Array<{
+      node: {
+        id: string;
+        title: string;
+        sku?: string;
+        price: { amount: string; currencyCode: string };
+        availableForSale: boolean;
+        inventoryQuantity?: number;
+        selectedOptions: Array<{ name: string; value: string }>;
+      };
+    }>;
+  };
+  options: Array<{ name: string; values: string[] }>;
   inventoryStatus: "in_stock" | "low_stock" | "out_of_stock";
 }
 
@@ -60,8 +90,7 @@ export function StorefrontProductsGrid({
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const getInventoryStatus = (product: ShopifyProduct): "in_stock" | "low_stock" | "out_of_stock" => {
-    const totalInventory = product.totalInventory || 0;
+  const getInventoryStatus = (totalInventory: number): "in_stock" | "low_stock" | "out_of_stock" => {
     if (totalInventory <= 0) return "out_of_stock";
     if (totalInventory <= 5) return "low_stock";
     return "in_stock";
@@ -81,11 +110,20 @@ export function StorefrontProductsGrid({
         after: append ? endCursor : null,
       });
 
-      if (result) {
-        const productsWithInventory: ProductWithInventory[] = result.products.map((p) => ({
-          ...p,
-          inventoryStatus: getInventoryStatus(p),
-        }));
+      if (result && result.products) {
+        const productsWithInventory: ProductWithInventory[] = result.products.map((p) => {
+          // Calculate total inventory from variants
+          const totalInventory = p.variants?.edges?.reduce(
+            (sum, v) => sum + (v.node.inventoryQuantity || 0), 
+            0
+          ) || 0;
+          
+          return {
+            ...p,
+            totalInventory,
+            inventoryStatus: getInventoryStatus(totalInventory),
+          };
+        });
 
         if (append) {
           setProducts((prev) => [...prev, ...productsWithInventory]);
@@ -93,8 +131,8 @@ export function StorefrontProductsGrid({
           setProducts(productsWithInventory);
         }
 
-        setHasNextPage(result.pageInfo.hasNextPage);
-        setEndCursor(result.pageInfo.endCursor);
+        setHasNextPage(result.pageInfo?.hasNextPage || false);
+        setEndCursor(result.pageInfo?.endCursor || null);
       }
     } catch (error) {
       console.error("Failed to load products:", error);
@@ -133,20 +171,25 @@ export function StorefrontProductsGrid({
       return;
     }
 
-    await addItem({
-      product: {
-        node: {
-          id: product.id,
-          title: product.title,
-          description: product.description,
-          handle: product.handle,
-          tags: product.tags,
-          priceRange: product.priceRange,
-          images: product.images,
-          variants: product.variants,
-          options: product.options,
+    // Build the product object in the format expected by the cart store
+    const cartProduct: ShopifyProduct = {
+      node: {
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        handle: product.handle,
+        tags: product.tags,
+        priceRange: {
+          minVariantPrice: product.priceRange.minVariantPrice,
         },
+        images: product.images,
+        variants: product.variants,
+        options: product.options,
       },
+    };
+
+    await addItem({
+      product: cartProduct,
       variantId: firstVariant.id,
       variantTitle: firstVariant.title,
       price: firstVariant.price,

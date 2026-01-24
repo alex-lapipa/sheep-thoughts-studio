@@ -482,7 +482,7 @@ Deno.serve(async (req) => {
                 tags
                 status
                 totalInventory
-                priceRange {
+                priceRangeV2 {
                   minVariantPrice { amount currencyCode }
                   maxVariantPrice { amount currencyCode }
                 }
@@ -497,10 +497,10 @@ Deno.serve(async (req) => {
                       id
                       title
                       sku
-                      price { amount currencyCode }
                       availableForSale
                       inventoryQuantity
                       selectedOptions { name value }
+                      price
                     }
                   }
                 }
@@ -535,10 +535,60 @@ Deno.serve(async (req) => {
 
       const products = graphqlData.data?.products;
 
+      // Transform Admin API response to match expected format
+      const transformedProducts = products?.edges?.map((edge: { node: Record<string, unknown> }) => {
+        const node = edge.node as {
+          id: string;
+          title: string;
+          handle: string;
+          description: string;
+          vendor: string;
+          productType: string;
+          tags: string[];
+          status: string;
+          totalInventory: number;
+          priceRangeV2?: { minVariantPrice: { amount: string; currencyCode: string }; maxVariantPrice: { amount: string; currencyCode: string } };
+          images: { edges: Array<{ node: { url: string; altText: string | null } }> };
+          variants: { edges: Array<{ node: { id: string; title: string; sku: string; availableForSale: boolean; inventoryQuantity: number; selectedOptions: Array<{ name: string; value: string }>; price: string } }> };
+          options: Array<{ name: string; values: string[] }>;
+        };
+        
+        return {
+          id: node.id,
+          title: node.title,
+          handle: node.handle,
+          description: node.description,
+          vendor: node.vendor,
+          productType: node.productType,
+          tags: node.tags,
+          status: node.status,
+          totalInventory: node.totalInventory,
+          priceRange: {
+            minVariantPrice: node.priceRangeV2?.minVariantPrice || { amount: "0", currencyCode: "EUR" },
+            maxVariantPrice: node.priceRangeV2?.maxVariantPrice || { amount: "0", currencyCode: "EUR" },
+          },
+          images: node.images,
+          variants: {
+            edges: node.variants?.edges?.map(v => ({
+              node: {
+                id: v.node.id,
+                title: v.node.title,
+                sku: v.node.sku,
+                price: { amount: v.node.price || "0", currencyCode: node.priceRangeV2?.minVariantPrice?.currencyCode || "EUR" },
+                availableForSale: v.node.availableForSale,
+                inventoryQuantity: v.node.inventoryQuantity,
+                selectedOptions: v.node.selectedOptions,
+              }
+            })) || []
+          },
+          options: node.options,
+        };
+      }) || [];
+
       return new Response(
         JSON.stringify({
           success: true,
-          products: products?.edges?.map((edge: { node: ShopifyProductNode }) => edge.node) || [],
+          products: transformedProducts,
           pageInfo: products?.pageInfo || { hasNextPage: false, endCursor: null },
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
