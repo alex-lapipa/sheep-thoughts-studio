@@ -238,6 +238,42 @@ const CREATURES: CreatureData[] = [
     ],
     bubblesReveal: "Night security. The spines are just good planning."
   },
+  {
+    id: "bray-rabbits",
+    name: "The Bray Rabbits",
+    icon: Rabbit,
+    clues: [
+      "These creatures have taken over the headland completely.",
+      "They multiply faster than rumors at a mart.",
+      "Dig underground networks. Very organized infrastructure.",
+      "Live by the sea but refuse to swim. Suspicious priorities."
+    ],
+    bubblesReveal: "The Bray Underground. Population: classified. Agenda: also classified."
+  },
+  {
+    id: "glendalough-trout",
+    name: "The Glendalough Trout",
+    icon: Fish,
+    clues: [
+      "This creature lives in ancient monastic waters. Very spiritual.",
+      "Circles the same lake for centuries. Commitment.",
+      "Refuses all fishing lures. Too smart or too stubborn.",
+      "Probably knows secrets from the monks. Definitely not sharing."
+    ],
+    bubblesReveal: "The keeper of lake secrets. Six hundred years of silence. Professional."
+  },
+  {
+    id: "mart-rats",
+    name: "The Mart Rats",
+    icon: Rat,
+    clues: [
+      "These creatures know where every crumb falls. Literally.",
+      "Work the infrastructure. Pipes, walls, under the trailers.",
+      "Never seen during trading hours. Perfect alibis.",
+      "Have probably heard every sheep deal ever made in Wicklow."
+    ],
+    bubblesReveal: "The information brokers. They know the real prices. The ones nobody says out loud."
+  },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
