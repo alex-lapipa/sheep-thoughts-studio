@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { usePronunciation } from "@/hooks/usePronunciation";
 import { CreatureHierarchy } from "@/components/CreatureHierarchy";
+import { CreatureSpotter } from "@/components/CreatureSpotter";
 
 interface GlossaryEntry {
   phrase: string;
@@ -557,7 +558,10 @@ const WicklowGlossary = () => {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <CreatureHierarchy />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <CreatureHierarchy />
+              <CreatureSpotter />
+            </div>
           </motion.div>
         )}
 
