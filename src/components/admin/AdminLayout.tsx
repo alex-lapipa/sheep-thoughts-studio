@@ -188,6 +188,13 @@ const navSections: NavSection[] = [
       { href: '/admin/whats-new', label: "What's New", icon: Bell },
     ],
   },
+  {
+    title: 'On Hold',
+    requiredModule: 'admin',
+    items: [
+      { href: '/scenarios', label: 'Live Scenarios', icon: Zap, external: true },
+    ],
+  },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

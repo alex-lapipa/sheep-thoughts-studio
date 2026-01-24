@@ -26,10 +26,9 @@ const getLegacyNavLinks = (t: (key: string) => string) => [
   { href: "/faq", label: t("nav.questions"), icon: HelpCircle },
 ];
 
-// Phase 1: Simplified public navigation - Chat, Live, Shop, FAQ only
+// Phase 1: Simplified public navigation - Chat, Shop, FAQ only
 const getNewNavLinks = (t: (key: string) => string, useFaqSummary: boolean) => [
   { href: "/talk", label: "Chat", icon: Mic },
-  { href: "/scenarios", label: "Live", icon: Radio },
   { href: "/collections/all", label: t("nav.shop"), icon: ShoppingBag },
   { href: useFaqSummary ? "/faq-summary" : "/faq", label: "FAQ", icon: HelpCircle },
 ];
