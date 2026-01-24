@@ -6,18 +6,19 @@ import { cn } from "@/lib/utils";
  * WICKLOW HERO LANDSCAPE — DYNAMIC WEATHER, TERRAIN & TIME OF DAY
  * 
  * Large hero banner background featuring:
- * - Sky with dynamic weather (sun, clouds, rain, storm, thunder)
- * - Time-of-day lighting (dawn, midday, dusk)
+ * - Sky with dynamic weather (sun, clouds, rain, storm, thunder, snow, fog)
+ * - Time-of-day lighting (dawn, midday, dusk, night)
  * - Sugarloaf Mountain with green lower slopes and stony grey top
  * - Random scattered trees on terrain
  * - Parallax layering for depth
+ * - Enhanced animated weather effects
  */
 
-// Weather types for hero variation
-export type WeatherType = "sunny" | "cloudy" | "rainy" | "stormy" | "thunder";
+// Weather types for hero variation - extended set
+export type WeatherType = "sunny" | "cloudy" | "rainy" | "stormy" | "thunder" | "snowy" | "foggy" | "windy";
 
-// Time of day for lighting variation
-export type TimeOfDay = "dawn" | "midday" | "dusk";
+// Time of day for lighting variation - including night
+export type TimeOfDay = "dawn" | "midday" | "dusk" | "night";
 
 interface WicklowHeroLandscapeProps {
   weather?: WeatherType | "random";
@@ -25,15 +26,21 @@ interface WicklowHeroLandscapeProps {
   className?: string;
   showTrees?: boolean;
   intensity?: number; // 0-100 for weather intensity
+  enableSnow?: boolean;
+  enableFog?: boolean;
 }
 
 // Random weather selection with weights
+// Irish-appropriate weather weights with new types
 const WEATHER_WEIGHTS: { type: WeatherType; weight: number }[] = [
-  { type: "cloudy", weight: 35 },
-  { type: "sunny", weight: 25 },
-  { type: "rainy", weight: 20 },
-  { type: "stormy", weight: 12 },
-  { type: "thunder", weight: 8 },
+  { type: "cloudy", weight: 28 },
+  { type: "rainy", weight: 22 },
+  { type: "sunny", weight: 15 },
+  { type: "foggy", weight: 12 },
+  { type: "windy", weight: 10 },
+  { type: "stormy", weight: 6 },
+  { type: "thunder", weight: 4 },
+  { type: "snowy", weight: 3 },
 ];
 
 function getRandomWeather(): WeatherType {
@@ -49,14 +56,14 @@ function getRandomWeather(): WeatherType {
 // Determine time of day based on actual hour
 function getTimeOfDayFromHour(): TimeOfDay {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 10) return "dawn";      // 5am-10am: golden hour
-  if (hour >= 10 && hour < 17) return "midday";   // 10am-5pm: bright day
+  if (hour >= 5 && hour < 9) return "dawn";       // 5am-9am: golden hour
+  if (hour >= 9 && hour < 17) return "midday";    // 9am-5pm: bright day
   if (hour >= 17 && hour < 21) return "dusk";     // 5pm-9pm: sunset
-  return "midday"; // Night defaults to midday look
+  return "night";                                  // 9pm-5am: night
 }
 
 function getRandomTimeOfDay(): TimeOfDay {
-  const times: TimeOfDay[] = ["dawn", "midday", "dusk"];
+  const times: TimeOfDay[] = ["dawn", "midday", "dusk", "night"];
   return times[Math.floor(Math.random() * times.length)];
 }
 
@@ -134,6 +141,20 @@ const TIME_PALETTES: Record<TimeOfDay, TimeOfDayPalette> = {
     distantHills: ["#7B5B7B", "#6A6B5A"],
     atmosphereOpacity: 0.3,
   },
+  night: {
+    // Night: deep blues, silhouettes, moonlit atmosphere
+    sky: `linear-gradient(to bottom, 
+      hsl(230 35% 15%) 0%, 
+      hsl(220 30% 22%) 30%,
+      hsl(215 25% 28%) 60%,
+      hsl(210 20% 35%) 100%
+    )`,
+    quartziteSummit: ["#252530", "#303040", "#3A3A4A"],
+    heatherSlopes: ["#2A2A3A", "#353545", "#404050"],
+    forestSlopes: ["#1A2A1A", "#253025", "#2A3A2A"],
+    distantHills: ["#3A3A4A", "#353545"],
+    atmosphereOpacity: 0.4,
+  },
 };
 
 export function WicklowHeroLandscape({
@@ -142,11 +163,20 @@ export function WicklowHeroLandscape({
   className,
   showTrees = true,
   intensity = 50,
+  enableSnow = true,
+  enableFog = true,
 }: WicklowHeroLandscapeProps) {
   // Stable random weather for component lifetime
   const resolvedWeather = useMemo<WeatherType>(() => {
-    return weather === "random" ? getRandomWeather() : weather;
-  }, [weather]);
+    if (weather === "random") {
+      const random = getRandomWeather();
+      // Respect enable flags
+      if (random === "snowy" && !enableSnow) return "cloudy";
+      if (random === "foggy" && !enableFog) return "cloudy";
+      return random;
+    }
+    return weather;
+  }, [weather, enableSnow, enableFog]);
 
   // Resolve time of day
   const resolvedTime = useMemo<TimeOfDay>(() => {
@@ -173,7 +203,7 @@ export function WicklowHeroLandscape({
       <FlyingBirds weather={resolvedWeather} />
       
       {/* WEATHER EFFECTS (top of hero) */}
-      <WeatherEffects weather={resolvedWeather} intensity={intensity} />
+      <WeatherEffectsLayer weather={resolvedWeather} intensity={intensity} timeOfDay={resolvedTime} />
       
       {/* DISTANT MOUNTAINS - Sugarloaf with stony top */}
       <SugarloafMountain palette={palette} />
@@ -184,8 +214,11 @@ export function WicklowHeroLandscape({
       {/* FOREGROUND BOG TERRAIN with trees */}
       <BogTerrain trees={trees} palette={palette} />
       
-      {/* LOW MIST */}
-      <MistLayer />
+      {/* LOW MIST - Enhanced for foggy/night */}
+      <MistLayer weather={resolvedWeather} timeOfDay={resolvedTime} />
+      
+      {/* SNOW ACCUMULATION (subtle) */}
+      {resolvedWeather === "snowy" && <SnowAccumulation />}
     </div>
   );
 }
@@ -450,13 +483,16 @@ function VFormationFlock({ weather }: { weather: WeatherType }) {
 }
 
 // ============================================================================
-// WEATHER EFFECTS - Rain, Clouds, Lightning, Wind
+// WEATHER EFFECTS LAYER - Enhanced with all weather types
 // ============================================================================
-function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensity: number }) {
+function WeatherEffectsLayer({ weather, intensity, timeOfDay }: { weather: WeatherType; intensity: number; timeOfDay: TimeOfDay }) {
   return (
     <div className="absolute inset-0">
-      {/* SUN with rays */}
-      {weather === "sunny" && <SunWithRays />}
+      {/* SUN with rays (sunny/cloudy during day) */}
+      {(weather === "sunny" || weather === "cloudy") && timeOfDay !== "night" && <SunWithRays timeOfDay={timeOfDay} />}
+      
+      {/* MOON for night */}
+      {timeOfDay === "night" && <MoonGlow />}
       
       {/* CLOUDS - all weather types have some clouds */}
       <CloudLayer weather={weather} />
@@ -466,8 +502,14 @@ function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensit
         <RainEffect intensity={weather === "stormy" || weather === "thunder" ? 80 : intensity} />
       )}
       
+      {/* SNOW */}
+      {weather === "snowy" && <SnowEffect intensity={intensity} />}
+      
+      {/* FOG layers */}
+      {weather === "foggy" && <FogEffect intensity={intensity} />}
+      
       {/* STORM WIND */}
-      {(weather === "stormy" || weather === "thunder") && <WindStreaks />}
+      {(weather === "stormy" || weather === "thunder" || weather === "windy") && <WindStreaks intensity={intensity} />}
       
       {/* LIGHTNING */}
       {weather === "thunder" && <LightningEffect />}
@@ -475,19 +517,34 @@ function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensit
   );
 }
 
-// Sun with radiating rays
-function SunWithRays() {
+// Keep legacy export for backwards compatibility
+function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensity: number }) {
+  return <WeatherEffectsLayer weather={weather} intensity={intensity} timeOfDay="midday" />;
+}
+
+// Sun with radiating rays - time-aware
+function SunWithRays({ timeOfDay }: { timeOfDay: TimeOfDay }) {
+  const sunColors = {
+    dawn: { core: "hsl(35 90% 65%)", glow: "hsl(25 80% 60% / 0.4)" },
+    midday: { core: "hsl(45 95% 70%)", glow: "hsl(45 80% 65% / 0.3)" },
+    dusk: { core: "hsl(20 85% 55%)", glow: "hsl(15 75% 50% / 0.5)" },
+    night: { core: "hsl(45 10% 90%)", glow: "hsl(45 10% 85% / 0.2)" },
+  }[timeOfDay];
+  
   return (
     <div className="absolute top-8 right-[15%] md:right-[20%]">
       {/* Sun glow */}
-      <div className="absolute inset-0 w-32 h-32 -translate-x-1/2 -translate-y-1/2 bg-gradient-radial from-yellow-200/60 via-yellow-100/20 to-transparent rounded-full blur-xl" />
+      <div 
+        className="absolute inset-0 w-32 h-32 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl" 
+        style={{ background: `radial-gradient(circle, ${sunColors.glow}, transparent 70%)` }}
+      />
       
       {/* Sun core */}
       <motion.div 
         className="relative w-16 h-16 md:w-20 md:h-20 rounded-full"
         style={{
-          background: "radial-gradient(circle, hsl(45 90% 70%) 0%, hsl(40 85% 60%) 60%, hsl(35 80% 55%) 100%)",
-          boxShadow: "0 0 60px 20px hsl(45 80% 70% / 0.4), 0 0 100px 40px hsl(45 70% 60% / 0.2)",
+          background: `radial-gradient(circle, ${sunColors.core} 0%, ${sunColors.core} 60%, ${sunColors.core} 100%)`,
+          boxShadow: `0 0 60px 20px ${sunColors.glow}, 0 0 100px 40px ${sunColors.glow}`,
         }}
         animate={{ scale: [1, 1.02, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -515,7 +572,28 @@ function SunWithRays() {
   );
 }
 
-// Cloud layer - varies by weather
+// Moon glow for night
+function MoonGlow() {
+  return (
+    <div className="absolute top-12 right-[18%]">
+      <motion.div
+        className="absolute w-20 h-20 rounded-full blur-2xl"
+        style={{ background: "radial-gradient(circle, hsl(45 10% 90% / 0.3), transparent 70%)" }}
+        animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div
+        className="relative w-10 h-10 rounded-full"
+        style={{
+          background: "radial-gradient(circle at 30% 30%, hsl(45 15% 92%), hsl(45 10% 85%))",
+          boxShadow: "0 0 30px 10px hsl(45 10% 85% / 0.2)",
+        }}
+      />
+    </div>
+  );
+}
+
+// Cloud layer - varies by weather (now supports all types)
 function CloudLayer({ weather }: { weather: WeatherType }) {
   const cloudConfigs: Record<WeatherType, { count: number; opacity: number; dark: boolean }> = {
     sunny: { count: 3, opacity: 0.6, dark: false },
@@ -523,6 +601,9 @@ function CloudLayer({ weather }: { weather: WeatherType }) {
     rainy: { count: 8, opacity: 0.9, dark: true },
     stormy: { count: 10, opacity: 0.95, dark: true },
     thunder: { count: 12, opacity: 1, dark: true },
+    snowy: { count: 7, opacity: 0.85, dark: false },
+    foggy: { count: 10, opacity: 0.7, dark: false },
+    windy: { count: 5, opacity: 0.65, dark: false },
   };
 
   const config = cloudConfigs[weather];
@@ -602,17 +683,19 @@ function RainEffect({ intensity }: { intensity: number }) {
   );
 }
 
-// Wind streaks for storms
-function WindStreaks() {
+// Wind streaks for storms - now takes intensity
+function WindStreaks({ intensity }: { intensity: number }) {
+  const streakCount = 4 + Math.floor(intensity / 20);
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {[...Array(5)].map((_, i) => (
+      {[...Array(streakCount)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          className="absolute h-0.5"
           style={{
-            top: `${15 + i * 15}%`,
+            top: `${15 + i * 12}%`,
             width: `${100 + i * 50}px`,
+            background: "linear-gradient(90deg, transparent, hsl(200 20% 85% / 0.25), transparent)",
           }}
           animate={{ 
             x: ["-100%", "200%"],
@@ -623,6 +706,90 @@ function WindStreaks() {
             repeat: Infinity,
             delay: i * 0.4,
             ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Snow effect with falling flakes
+function SnowEffect({ intensity }: { intensity: number }) {
+  const flakeCount = Math.floor(intensity / 2);
+  const flakes = useMemo(() => 
+    Array.from({ length: flakeCount }, (_, i) => ({
+      id: i,
+      x: (i * 4.3) % 100,
+      size: 2 + Math.random() * 4,
+      speed: 4 + Math.random() * 6,
+      delay: Math.random() * 5,
+      drift: 15 + Math.random() * 30,
+    })), [flakeCount]
+  );
+
+  return (
+    <div className="absolute inset-0">
+      {flakes.map((flake) => (
+        <motion.div
+          key={flake.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${flake.x}%`,
+            width: flake.size,
+            height: flake.size,
+            backgroundColor: "hsl(0 0% 98%)",
+            boxShadow: "0 0 4px 1px hsl(0 0% 100% / 0.3)",
+          }}
+          animate={{
+            y: ["-5%", "105%"],
+            x: [0, flake.drift, -flake.drift / 2, flake.drift / 2, 0],
+            rotate: [0, 360],
+          }}
+          transition={{
+            y: { duration: flake.speed, repeat: Infinity, delay: flake.delay, ease: "linear" },
+            x: { duration: flake.speed * 0.8, repeat: Infinity, delay: flake.delay, ease: "easeInOut" },
+            rotate: { duration: flake.speed * 1.2, repeat: Infinity, delay: flake.delay, ease: "linear" },
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Fog effect with rolling layers
+function FogEffect({ intensity }: { intensity: number }) {
+  const layers = useMemo(() => 
+    Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      y: 30 + i * 15,
+      speed: 30 + i * 10,
+      opacity: 0.15 + (intensity / 400) + i * 0.05,
+      height: 80 + i * 20,
+    })), [intensity]
+  );
+
+  return (
+    <div className="absolute inset-0">
+      {layers.map((layer) => (
+        <motion.div
+          key={layer.id}
+          className="absolute left-0 right-0 blur-xl"
+          style={{
+            top: `${layer.y}%`,
+            height: layer.height,
+            background: `linear-gradient(90deg, 
+              transparent 0%, 
+              hsl(200 15% 90% / ${layer.opacity}) 20%,
+              hsl(200 10% 92% / ${layer.opacity * 1.2}) 50%,
+              hsl(200 15% 90% / ${layer.opacity}) 80%,
+              transparent 100%
+            )`,
+          }}
+          animate={{ x: ["-10%", "10%", "-10%"] }}
+          transition={{
+            duration: layer.speed,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
         />
       ))}
@@ -1292,36 +1459,50 @@ function WicklowTree({ variant }: { variant: number }) {
 // ============================================================================
 // MIST LAYER - Low valley fog
 // ============================================================================
-function MistLayer() {
+function MistLayer({ weather, timeOfDay }: { weather: WeatherType; timeOfDay: TimeOfDay }) {
+  const mistIntensity = weather === "foggy" ? 0.6 : timeOfDay === "dawn" ? 0.4 : timeOfDay === "night" ? 0.35 : 0.25;
+  
   return (
     <>
       <div
         className="absolute bottom-[12%] left-0 w-full h-32 blur-lg"
         style={{
           background: `linear-gradient(to top, 
-            hsl(200 15% 90% / 0.4), 
+            hsl(200 15% 90% / ${mistIntensity}), 
             transparent
           )`,
         }}
       />
       
       {/* Drifting mist wisps */}
-      {[...Array(4)].map((_, i) => (
+      {[...Array(weather === "foggy" ? 6 : 4)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full blur-2xl"
           style={{
             width: `${100 + i * 40}px`,
             height: `${30 + i * 10}px`,
-            left: `${10 + i * 22}%`,
+            left: `${10 + i * 18}%`,
             bottom: `${8 + (i % 2) * 8}%`,
-            backgroundColor: "hsl(200 12% 88% / 0.25)",
+            backgroundColor: `hsl(200 12% 88% / ${mistIntensity * 0.6})`,
           }}
           animate={{ x: [0, 30, 0] }}
           transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
     </>
+  );
+}
+
+// Snow accumulation effect on ground
+function SnowAccumulation() {
+  return (
+    <div 
+      className="absolute bottom-0 left-0 right-0 h-[15%]"
+      style={{
+        background: "linear-gradient(to top, hsl(0 0% 98% / 0.4) 0%, hsl(0 0% 95% / 0.2) 50%, transparent 100%)",
+      }}
+    />
   );
 }
 
