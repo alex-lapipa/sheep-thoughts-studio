@@ -325,6 +325,17 @@ export const CreatureHierarchy = () => {
                         <feMergeNode in="SourceGraphic" />
                       </feMerge>
                     </filter>
+                    {/* Pulsing glow filter for apex tier creatures */}
+                    <filter id="apexGlow" x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur stdDeviation="6" result="blur" />
+                      <feFlood floodColor="hsl(45 90% 60%)" floodOpacity="0.8" result="color" />
+                      <feComposite in="color" in2="blur" operator="in" result="glow" />
+                      <feMerge>
+                        <feMergeNode in="glow" />
+                        <feMergeNode in="glow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
                   </defs>
 
                   {/* Tier backgrounds */}
@@ -453,6 +464,29 @@ export const CreatureHierarchy = () => {
                           onMouseLeave={() => setHoveredNode(null)}
                           onClick={() => setSelectedNode(isSelected ? null : node.id)}
                         >
+                          {/* Apex tier pulsing glow ring */}
+                          {node.tier === 1 && (
+                            <motion.circle
+                              cx={node.x}
+                              cy={node.y}
+                              r={32}
+                              fill="none"
+                              stroke="hsl(45 90% 55%)"
+                              strokeWidth={2}
+                              filter="url(#apexGlow)"
+                              animate={{
+                                r: [32, 38, 32],
+                                opacity: [0.6, 1, 0.6],
+                                strokeWidth: [2, 3, 2],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            />
+                          )}
+                          
                           {/* Node circle */}
                           <circle
                             cx={node.x}
@@ -463,18 +497,28 @@ export const CreatureHierarchy = () => {
                               TIER_BG_COLORS[node.tier],
                               isActive ? "stroke-primary stroke-2" : `${TIER_COLORS[node.tier]} stroke-1`
                             )}
+                            filter={node.tier === 1 ? "url(#apexGlow)" : undefined}
                           />
                           
                           {/* Crown for tier 1 */}
                           {node.tier === 1 && (
-                            <text
+                            <motion.text
                               x={node.x}
                               y={node.y! - 32}
                               textAnchor="middle"
                               className="text-xs"
+                              animate={{ 
+                                y: [node.y! - 32, node.y! - 35, node.y! - 32],
+                                opacity: [0.9, 1, 0.9],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
                             >
                               👑
-                            </text>
+                            </motion.text>
                           )}
 
                           {/* Node label */}
