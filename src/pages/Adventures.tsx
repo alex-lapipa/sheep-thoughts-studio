@@ -6,7 +6,7 @@ import { AnimatedOnView } from "@/components/AnimatedText";
 import { CrossLinks } from "@/components/CrossLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BubblesExplorer } from "@/components/BubblesExplorer";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { MapPin, Mountain, TreePine, Waves, Wind, Sun, Compass, Map } from "lucide-react";
 import { useOgImage } from "@/hooks/useOgImage";
 
@@ -136,7 +136,7 @@ export default function Adventures() {
         <ContentHero
           title="Adventures in Wicklow"
           subtitle="A comprehensive guide to Wicklow's landmarks, as understood by someone who has lived here their entire life and learned nothing accurate."
-          character={<BubblesExplorer size="hero" animated />}
+          character={<BubblesHeroImage size="massive" grounded flipped />}
           imageAlt="Bubbles the explorer sheep"
           badge={{ icon: Compass, text: "Directionally challenged" }}
           credentials={[

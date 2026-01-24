@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Sparkles, Save, RefreshCw, LayoutList, LayoutGrid, Eye } from 'lucide-react';
 import { ThoughtBubble } from '@/components/ThoughtBubble';
-import { BubblesSheep } from '@/components/BubblesSheep';
+import { BubblesHeroImage } from '@/components/BubblesHeroImage';
 import { ModeBadge } from '@/components/ModeBadge';
 import { Switch } from '@/components/ui/switch';
 import type { Database } from '@/integrations/supabase/types';
@@ -348,7 +348,7 @@ export default function AdminGenerate() {
                         
                         {/* Bubbles with thought */}
                         <div className="flex flex-col items-center gap-4 pt-4">
-                          <BubblesSheep 
+                          <BubblesHeroImage 
                             size="md" 
                             animated 
                           />

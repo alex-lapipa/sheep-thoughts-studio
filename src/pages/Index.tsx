@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { FeaturedProductsCarousel } from "@/components/FeaturedProductsCarousel";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
-import { BubblesBogHero } from "@/components/BubblesBog";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { InsideMyHeadHero } from "@/components/InsideMyHeadHero";
@@ -190,7 +190,7 @@ export default function Index() {
 
             {/* Bubbles Character - Bog-grounded, weather-affected */}
             <div className="relative flex justify-center items-center">
-              <BubblesBogHero className="drop-shadow-2xl" />
+              <BubblesHeroImage size="massive" grounded flipped />
               
               {/* Thought bubble with smooth fade transitions */}
               {currentThought && (
