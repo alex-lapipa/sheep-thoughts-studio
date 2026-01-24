@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
@@ -16,13 +16,16 @@ interface ProductCardProps {
   product: ShopifyProduct;
   position?: number;
   listName?: string;
+  enableHoverQuickView?: boolean;
 }
 
-export function ProductCard({ product, position, listName }: ProductCardProps) {
+export function ProductCard({ product, position, listName, enableHoverQuickView = true }: ProductCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasTrackedImpression = useRef(false);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const addItem = useCartStore(state => state.addItem);
   const isLoading = useCartStore(state => state.isLoading);
   const { trackProductView, trackAddToCart } = useABProductTracking();
@@ -112,6 +115,34 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
     trackProductView(node.id, node.title);
   };
 
+  // Hover-triggered Quick View (desktop only)
+  const handleMouseEnter = useCallback(() => {
+    if (!enableHoverQuickView || window.innerWidth < 640) return;
+    setIsHovering(true);
+    
+    // Open Quick View after 600ms of hovering
+    hoverTimeoutRef.current = setTimeout(() => {
+      setQuickViewOpen(true);
+    }, 600);
+  }, [enableHoverQuickView]);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <>
       <Link 
@@ -119,6 +150,8 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
         to={`/product/${node.handle}`} 
         className="group block touch-manipulation"
         onClick={handleProductClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         onTouchStart={() => setIsPressed(true)}
         onTouchEnd={() => setIsPressed(false)}
         onTouchCancel={() => setIsPressed(false)}
@@ -126,6 +159,7 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
         <div className={cn(
           "product-card bg-card rounded-xl overflow-hidden border border-border transition-all duration-200",
           isPressed && "scale-[0.98] shadow-sm",
+          isHovering && enableHoverQuickView && "ring-2 ring-accent/50 shadow-lg",
           "active:scale-[0.98]"
         )}>
           {/* Image Container */}
@@ -151,15 +185,25 @@ export function ProductCard({ product, position, listName }: ProductCardProps) {
             )}
             
             {/* Desktop: Quick View Button (hover) */}
-            <Button
-              size="sm"
-              variant="secondary"
-              className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 hidden sm:flex"
-              onClick={handleQuickView}
-            >
-              <Eye className="h-4 w-4 mr-1.5" />
-              Quick View
-            </Button>
+            <div className={cn(
+              "absolute bottom-3 left-1/2 -translate-x-1/2 transition-all hidden sm:flex gap-2",
+              isHovering ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            )}>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="bg-background/90 backdrop-blur-sm shadow-lg"
+                onClick={handleQuickView}
+              >
+                <Eye className="h-4 w-4 mr-1.5" />
+                Quick View
+              </Button>
+              {isHovering && (
+                <span className="text-xs text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md self-center">
+                  Hold to preview
+                </span>
+              )}
+            </div>
             
             {/* Mobile: Quick Add Button (always visible) */}
             <Button
