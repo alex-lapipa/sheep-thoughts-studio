@@ -16,6 +16,7 @@ import { analytics } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { BackInStockNotify } from "@/components/BackInStockNotify";
+import { SizeGuideModal } from "@/components/SizeGuideModal";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -222,9 +223,17 @@ const ProductDetail = () => {
               <div className="space-y-4">
                 {options.map((option: { name: string; values: string[] }) => (
                   <div key={option.name}>
-                    <label className="block font-display font-medium mb-2">
-                      {option.name}
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block font-display font-medium">
+                        {option.name}
+                      </label>
+                      {option.name.toLowerCase() === 'size' && (
+                        <SizeGuideModal 
+                          productType={product.productType?.toLowerCase().includes('hoodie') ? 'hoodie' : 
+                                       product.productType?.toLowerCase().includes('cap') ? 'cap' : 'tshirt'} 
+                        />
+                      )}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {option.values.map((value) => (
                         <button
