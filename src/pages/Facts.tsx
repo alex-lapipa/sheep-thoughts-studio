@@ -7,7 +7,7 @@ import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { Button } from "@/components/ui/button";
-import { BubblesScientist } from "@/components/BubblesScientist";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw, FlaskConical, CheckCircle, Award } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -108,7 +108,7 @@ export default function Facts() {
         <ContentHero
           title={t("factsPage.hero.title")}
           subtitle={t("factsPage.hero.subtitle")}
-          character={<BubblesScientist size="hero" animated accessory="random" />}
+          character={<BubblesHeroImage size="massive" grounded flipped />}
           imageAlt="Bubbles the scientist sheep"
           badge={{ icon: FlaskConical, text: "Peer-reviewed by grass" }}
           credentials={[

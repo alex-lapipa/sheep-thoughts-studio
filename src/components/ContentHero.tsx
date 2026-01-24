@@ -9,9 +9,9 @@ import type { ReactNode } from "react";
  * Uses Ireland Green primary color, consistent animations,
  * and standardized layout across Facts, Adventures, Scenarios, etc.
  * 
- * IMPORTANT: This component accepts either an image URL string OR a React component
- * for the character slot. When using brand-aligned SVG components (BubblesScientist,
- * BubblesScholar, BubblesChef, BubblesExplorer), pass them as the `character` prop.
+ * OFFICIAL MASCOT (2025): Use BubblesHeroImage with size="massive", grounded, flipped.
+ * The post-punk stencil Bubbles is the ONLY approved mascot for all pages.
+ * Legacy SVG components (BubblesScientist, BubblesScholar, etc.) are ARCHIVED.
  */
 
 interface ContentHeroProps {

@@ -24,7 +24,7 @@ import {
 import { Link } from "react-router-dom";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { ModeBadge } from "@/components/ModeBadge";
-import { BubblesSheep } from "@/components/BubblesSheep";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
 interface PageDocProps {
@@ -162,10 +162,10 @@ const coreComponents = [
     modes: ["innocent", "concerned", "triggered", "savage", "nuclear"],
   },
   {
-    name: "BubblesSheep",
-    description: "SVG mascot character with mode variants",
-    props: ["size", "className", "mood"],
-    modes: ["default", "happy", "concerned", "angry"],
+    name: "BubblesHeroImage",
+    description: "OFFICIAL stencil mascot - post-punk style",
+    props: ["size", "className", "animated", "grounded", "flipped"],
+    modes: ["default (stencil)"],
   },
   {
     name: "ModeBadge",
@@ -263,32 +263,20 @@ function LiveComponentPreview() {
             </div>
           </div>
 
-          {/* BubblesSheep Preview */}
+          {/* BubblesHeroImage Preview - OFFICIAL MASCOT */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-semibold text-sm flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
-                BubblesSheep
+                BubblesHeroImage (Official)
               </h4>
-              <div className="flex gap-1">
-                {(['sm', 'md', 'lg'] as const).map((size) => (
-                  <Button
-                    key={size}
-                    size="sm"
-                    variant={sheepSize === size ? 'default' : 'outline'}
-                    className="text-xs h-7 px-2"
-                    onClick={() => setSheepSize(size)}
-                  >
-                    {size.toUpperCase()}
-                  </Button>
-                ))}
-              </div>
+              <Badge className="bg-mode-savage text-white text-xs">STENCIL ERA</Badge>
             </div>
-            <div className="p-6 bg-muted/30 rounded-xl border border-border min-h-[160px] flex items-center justify-center">
-              <BubblesSheep size={sheepSize} animated={true} />
+            <div className="p-6 bg-muted/30 rounded-xl border border-border min-h-[200px] flex items-center justify-center">
+              <BubblesHeroImage size="lg" grounded flipped />
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg font-mono">
-              {`<BubblesSheep size="${sheepSize}" animated={true} />`}
+              {`<BubblesHeroImage size="massive" grounded flipped />`}
             </div>
           </div>
         </div>
@@ -310,19 +298,19 @@ function LiveComponentPreview() {
 
         {/* Size Comparison */}
         <div className="space-y-4">
-          <h4 className="font-semibold text-sm">BubblesSheep Size Comparison</h4>
-          <div className="flex items-end justify-center gap-8 p-6 bg-muted/30 rounded-xl border border-border">
+          <h4 className="font-semibold text-sm">BubblesHeroImage Size Comparison</h4>
+          <div className="flex items-end justify-center gap-8 p-6 bg-muted/30 rounded-xl border border-border overflow-x-auto">
             <div className="text-center space-y-2">
-              <BubblesSheep size="sm" animated={false} />
-              <Badge variant="outline" className="text-xs">sm (64px)</Badge>
+              <BubblesHeroImage size="sm" />
+              <Badge variant="outline" className="text-xs">sm</Badge>
             </div>
             <div className="text-center space-y-2">
-              <BubblesSheep size="md" animated={false} />
-              <Badge variant="outline" className="text-xs">md (128px)</Badge>
+              <BubblesHeroImage size="md" />
+              <Badge variant="outline" className="text-xs">md</Badge>
             </div>
             <div className="text-center space-y-2">
-              <BubblesSheep size="lg" animated={false} />
-              <Badge variant="outline" className="text-xs">lg (192px)</Badge>
+              <BubblesHeroImage size="lg" />
+              <Badge variant="outline" className="text-xs">lg</Badge>
             </div>
           </div>
         </div>

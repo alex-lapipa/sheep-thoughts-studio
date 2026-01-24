@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BubblesSheep } from "./BubblesSheep";
+import { BubblesHeroImage } from "./BubblesHeroImage";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw, Quote, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -155,7 +155,7 @@ export function BubblesSaysWidget() {
             "relative transition-transform duration-300",
             isAnimating ? "scale-90 opacity-50" : "scale-100 opacity-100"
           )}>
-            <BubblesSheep size="md" className="drop-shadow-lg" />
+            <BubblesHeroImage size="md" className="drop-shadow-lg" />
             <Sparkles className={cn(
               "absolute -top-1 -right-1 h-5 w-5 animate-pulse",
               style.accent

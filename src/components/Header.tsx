@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
-import { BubblesLogo } from "./BubblesSheep";
+import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
 import { Menu, Vibrate, Sparkles, X, ChevronRight, Home, BookOpen, Trophy, ShoppingBag, HelpCircle, Zap, Mic, Radio } from "lucide-react";
@@ -72,8 +72,8 @@ export function Header() {
           to="/" 
           className="flex items-center gap-2 md:gap-3 group transition-transform duration-300 hover:scale-105"
         >
-          <div className="group-hover:animate-baa">
-            <BubblesLogo />
+          <div className="group-hover:animate-baa w-8 h-8">
+            <img src={bubblesStencil} alt="Bubbles" className="w-full h-full object-contain" />
           </div>
           <span className="font-display font-bold text-lg md:text-xl tracking-tight group-hover:animate-wobble">
             Bubbles
@@ -199,7 +199,7 @@ export function Header() {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2"
                   >
-                    <BubblesLogo />
+                    <img src={bubblesStencil} alt="Bubbles" className="w-8 h-8 object-contain" />
                     <span className="font-display font-bold text-lg">Bubbles</span>
                   </Link>
                   <SheetClose asChild>

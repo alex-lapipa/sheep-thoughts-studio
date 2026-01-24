@@ -6,7 +6,7 @@ import { AnimatedOnView } from "@/components/AnimatedText";
 import { CrossLinks } from "@/components/CrossLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BubblesChef } from "@/components/BubblesChef";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { Clock, Users, ChefHat, Sparkles, Utensils, Flame } from "lucide-react";
 import { useOgImage } from "@/hooks/useOgImage";
 
@@ -187,7 +187,7 @@ export default function Recipes() {
       <ContentHero
         title="Recipes by Bubbles"
         subtitle="Grass-forward cuisine from the fields of Wicklow. Each dish has been field-tested. Results may vary."
-        character={<BubblesChef size="hero" animated />}
+        character={<BubblesHeroImage size="massive" grounded flipped />}
         imageAlt="Bubbles the chef sheep with culinary wisdom"
         badge={{ icon: ChefHat, text: "Grass-Forward Chef" }}
         credentials={[

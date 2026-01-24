@@ -5,7 +5,7 @@ import { ContentHero } from "@/components/ContentHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BubblesBog } from "@/components/BubblesBog";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,7 +85,7 @@ export default function Scenarios() {
         <ContentHero
           title={t("scenariosPage.hero.title")}
           subtitle={t("scenariosPage.hero.subtitle")}
-          character={<BubblesBog size="hero" animated posture="four-legged" />}
+          character={<BubblesHeroImage size="massive" grounded flipped />}
           imageAlt="Bubbles the happy artistic sheep"
           badge={{ icon: Drama, text: "Emotional Range Expert" }}
           credentials={[

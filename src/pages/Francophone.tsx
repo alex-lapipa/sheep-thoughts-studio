@@ -5,7 +5,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useProducts } from "@/hooks/useProducts";
-import { BubblesSheep } from "@/components/BubblesSheep";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { ArrowRight, MapPin, Euro, Truck, Shield, ChevronDown } from "lucide-react";
@@ -289,7 +289,7 @@ export default function Francophone() {
             {/* Bubbles Character with French thought */}
             <div className="relative flex justify-center items-center">
               <div className="hover:animate-baa transition-transform cursor-pointer">
-                <BubblesSheep size="xl" className="drop-shadow-2xl animate-float" />
+                <BubblesHeroImage size="massive" grounded flipped />
               </div>
               
               <div className="absolute -top-4 right-0 md:right-8 max-w-[300px] animate-pop-in" style={{ animationDelay: "600ms" }}>
