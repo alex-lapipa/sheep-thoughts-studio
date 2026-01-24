@@ -7,10 +7,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Package, ExternalLink, CheckCircle, Info, Store, 
   Webhook, RefreshCw, Settings, Truck, Star, BarChart3, 
-  MessageSquare, ShoppingBag, Search, Repeat
+  MessageSquare, ShoppingBag, Search, Repeat, Activity
 } from 'lucide-react';
 import { useShopifyIntegrations, InstalledApp } from '@/hooks/useShopifyIntegrations';
 import { formatDistanceToNow } from 'date-fns';
+import { SyncStatusDashboard } from '@/components/admin/SyncStatusDashboard';
 
 const CATEGORY_CONFIG: Record<string, { icon: React.ReactNode; label: string; description: string }> = {
   pod: {
@@ -273,7 +274,7 @@ function LoadingSkeleton() {
 }
 
 export default function PODConnections() {
-  const { store, connection, apps, webhooks, podProviders, isLoading, error, refetch } = useShopifyIntegrations();
+  const { store, connection, apps, webhooks, podProviders, isLoading, error, refetch, fetchSyncStatus, fetchAnalytics } = useShopifyIntegrations();
 
   const handleOpenShopifyAdmin = () => {
     window.open('https://admin.shopify.com/store/bubblesheet-storefront-ops-o5m9w/settings/apps', '_blank');
@@ -345,8 +346,13 @@ export default function PODConnections() {
             )}
 
             {/* Tabs for different sections */}
-            <Tabs defaultValue="pod" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
+            <Tabs defaultValue="sync" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+                <TabsTrigger value="sync" className="gap-2">
+                  <Activity className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sync Status</span>
+                  <span className="sm:hidden">Sync</span>
+                </TabsTrigger>
                 <TabsTrigger value="pod" className="gap-2">
                   <Package className="h-4 w-4" />
                   <span className="hidden sm:inline">Print on Demand</span>
@@ -374,6 +380,14 @@ export default function PODConnections() {
                   Guide
                 </TabsTrigger>
               </TabsList>
+
+              {/* Sync Status Tab */}
+              <TabsContent value="sync" className="space-y-6">
+                <SyncStatusDashboard 
+                  fetchSyncStatus={fetchSyncStatus} 
+                  fetchAnalytics={fetchAnalytics} 
+                />
+              </TabsContent>
 
               {/* POD Tab */}
               <TabsContent value="pod" className="space-y-6">
