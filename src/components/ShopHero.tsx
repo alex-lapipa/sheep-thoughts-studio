@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { BubblesBog } from "@/components/BubblesBog";
 import { ShoppingBag, Sparkles, ArrowRight, Star, Truck, Shield, Zap, Heart } from "lucide-react";
-import { cn } from "@/lib/utils";
-import bubblesShoppingHappy from "@/assets/bubbles-shopping-happy.jpg";
 
 const quickBenefits = [
   { icon: Truck, text: "Free Shipping €50+" },
@@ -155,7 +154,7 @@ export function ShopHero() {
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main image container */}
+              {/* Main character container */}
               <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-[420px] md:h-[420px]">
                 <motion.div
                   animate={{ 
@@ -167,13 +166,9 @@ export function ShopHero() {
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="w-full h-full"
+                  className="w-full h-full flex items-center justify-center"
                 >
-                  <img 
-                    src={bubblesShoppingHappy} 
-                    alt="Bubbles the happy shopping sheep" 
-                    className="w-full h-full object-contain drop-shadow-2xl rounded-2xl"
-                  />
+                  <BubblesBog className="w-full h-full" />
                 </motion.div>
 
                 {/* Floating accent badge */}
