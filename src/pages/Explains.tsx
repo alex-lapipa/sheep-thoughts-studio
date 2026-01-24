@@ -338,7 +338,7 @@ const Explains = () => {
       <ContentHero
         title={t("explainsPage.hero.title")}
         subtitle={t("explainsPage.hero.subtitle")}
-        character={<BubblesHeroImage size="massive" grounded flipped />}
+        character={<BubblesHeroImage size="colossal" grounded flipped />}
         imageAlt="Bubbles the scholarly sheep ready to explain everything"
         badge={{ icon: GraduationCap, text: "Distinguished Scholar" }}
         credentials={[

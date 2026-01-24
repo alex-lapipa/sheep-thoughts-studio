@@ -149,8 +149,8 @@ export function HeroSection() {
             <div className="relative">
               {/* Glow effect behind Bubbles */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
-              <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem] xl:w-[30rem] xl:h-[30rem] flex items-end justify-center">
-                <BubblesHeroImage size="massive" grounded flipped className="w-full h-full drop-shadow-2xl" />
+              <div className="relative w-[32rem] h-[32rem] sm:w-[40rem] sm:h-[40rem] md:w-[56rem] md:h-[56rem] lg:w-[72rem] lg:h-[72rem] flex items-end justify-center">
+                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full drop-shadow-2xl" />
               </div>
             </div>
             

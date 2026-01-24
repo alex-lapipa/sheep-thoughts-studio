@@ -176,9 +176,9 @@ export function BrandHero({
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main character container — Massive size, grounded stance */}
-              <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[480px] md:h-[480px] lg:w-[520px] lg:h-[520px] flex items-end justify-center">
-                <BubblesHeroImage size="massive" grounded className="w-full h-full" />
+              {/* Main character container — COLOSSAL size, grounded on grass */}
+              <div className="relative w-[32rem] h-[32rem] sm:w-[40rem] sm:h-[40rem] md:w-[56rem] md:h-[56rem] lg:w-[72rem] lg:h-[72rem] flex items-end justify-center">
+                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full" />
 
                 {/* Thought bubble */}
                 {thought && (

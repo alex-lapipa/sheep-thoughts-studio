@@ -276,7 +276,7 @@ function LiveComponentPreview() {
               <BubblesHeroImage size="lg" grounded flipped />
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg font-mono">
-              {`<BubblesHeroImage size="massive" grounded flipped />`}
+              {`<BubblesHeroImage size="colossal" grounded flipped />`}
             </div>
           </div>
         </div>

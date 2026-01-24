@@ -108,7 +108,7 @@ export default function Facts() {
         <ContentHero
           title={t("factsPage.hero.title")}
           subtitle={t("factsPage.hero.subtitle")}
-          character={<BubblesHeroImage size="massive" grounded flipped />}
+          character={<BubblesHeroImage size="colossal" grounded flipped />}
           imageAlt="Bubbles the scientist sheep"
           badge={{ icon: FlaskConical, text: "Peer-reviewed by grass" }}
           credentials={[
