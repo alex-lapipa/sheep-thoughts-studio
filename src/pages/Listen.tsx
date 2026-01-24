@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/Layout";
-import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { BrandHero } from "@/components/BrandHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -350,9 +350,17 @@ export default function Listen() {
         <meta name="description" content="Hear Bubbles explain the world with confident incorrectness. Audio wisdom you didn't ask for." />
       </Helmet>
 
-      <PageHeroWithBubbles
+      <BrandHero
         title="Listen to Bubbles"
-        subtitle="Audio wisdom delivered with an Irish lilt and absolute certainty"
+        subtitle="Audio wisdom delivered with an Irish lilt and absolute certainty. Press play. Learn nothing."
+        bubblesVariant="talk"
+        badge="Audio Experience"
+        badgeIcon={Headphones}
+        secondaryBadge="Voice-Powered"
+        thought={{
+          text: "I've been told my voice is like honey. Specifically, honey that's wrong about things.",
+          mode: "innocent"
+        }}
       />
 
       <div className="container py-12 md:py-20">
