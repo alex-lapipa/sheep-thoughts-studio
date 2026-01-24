@@ -1,29 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { BubblesBog } from "@/components/BubblesBog";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type BubblesMode = Database['public']['Enums']['bubbles_mode'];
-type PostureType = "four-legged" | "seated" | "grazing" | "leaning";
-type AccessoryType = "sunglasses" | "cap" | "bucket-hat" | "headphones" | "scarf" | "bandana" | "flower-crown" | "beanie" | "bow-tie" | "glasses" | "none";
 
-// Weighted accessory pool - "none" appears often for grounded presence
-const ACCESSORY_POOL: AccessoryType[] = [
-  "none", "none", "none", "none",  // ~31% chance of no accessory
-  "sunglasses",                     // ~6-7% each for accessories
-  "cap",                   
-  "bucket-hat",            
-  "headphones",
-  "scarf",
-  "bandana",
-  "flower-crown",
-  "beanie",
-  "bow-tie",
-  "glasses",
-];
+// Legacy posture/accessory system removed - now using unified stencil image
 
 interface Thought {
   id: string;
@@ -36,8 +21,6 @@ interface PageHeroWithBubblesProps {
   subtitle?: string;
   className?: string;
   bubbleSize?: "sm" | "md" | "lg";
-  posture?: PostureType | "random";
-  accessory?: AccessoryType | "random";
 }
 
 // Fallback thoughts if database is empty
@@ -57,32 +40,10 @@ export function PageHeroWithBubbles({
   subtitle,
   className,
   bubbleSize = "md",
-  posture = "random",
-  accessory = "random",
 }: PageHeroWithBubblesProps) {
   const [thoughts, setThoughts] = useState<Thought[]>(FALLBACK_THOUGHTS);
   
-  // Random posture selection on mount (stable for component lifetime)
-  // Weighted: four-legged (40%), seated (25%), grazing (20%), leaning (15%)
-  // NOTE: Bubbles is a sheep and must NEVER stand on two legs
-  const resolvedPosture = useMemo<PostureType>(() => {
-    if (posture === "random") {
-      const roll = Math.random();
-      if (roll < 0.40) return "four-legged";
-      if (roll < 0.65) return "seated";
-      if (roll < 0.85) return "grazing";
-      return "leaning";
-    }
-    return posture;
-  }, [posture]);
-
-  // Random accessory selection - mismatched human-absorbed styling
-  const resolvedAccessory = useMemo<AccessoryType>(() => {
-    if (accessory === "random") {
-      return ACCESSORY_POOL[Math.floor(Math.random() * ACCESSORY_POOL.length)];
-    }
-    return accessory;
-  }, [accessory]);
+  // Legacy posture/accessory logic removed - now using unified stencil image
   const [visibleThoughts, setVisibleThoughts] = useState<Array<Thought & { position: number; key: string }>>([]);
 
   // Fetch thoughts from RAG database
@@ -163,14 +124,10 @@ export function PageHeroWithBubbles({
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           {/* Bubbles with thought bubbles */}
           <div className="relative flex-shrink-0">
-            {/* The mascot */}
+            {/* The mascot - Post-punk stencil style */}
             <div className={cn(bubbleSizeClasses[bubbleSize])}>
-              <BubblesBog
+              <BubblesHeroImage
                 size={bubbleSize === "sm" ? "md" : bubbleSize === "md" ? "lg" : "xl"}
-                posture={resolvedPosture}
-                accessory={resolvedAccessory}
-                expression="certain"
-                animated={false}
               />
             </div>
 

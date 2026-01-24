@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "./ThoughtBubble";
+import { BubblesHeroImage } from "./BubblesHeroImage";
 import { ArrowRight, Repeat } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -144,26 +145,11 @@ export function HeroSection() {
           
           {/* Mobile: Character first for visual impact */}
           <div className="relative flex justify-center items-center order-1 lg:order-2">
-            {/* Character representation */}
+            {/* Post-punk stencil Bubbles - the new brand standard */}
             <div className="relative">
-              <div className="w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full bg-bubbles-cream border-4 border-bubbles-heather shadow-2xl flex items-center justify-center animate-float">
-                {/* Face features */}
-                <div className="relative">
-                  {/* Eyes */}
-                  <div className="flex gap-4 sm:gap-6 mb-2 sm:mb-3">
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 rounded-full bg-bubbles-peat" />
-                  </div>
-                  {/* Nose/mouth */}
-                  <div className="w-5 h-2.5 sm:w-6 sm:h-3 md:w-8 md:h-4 mx-auto rounded-full bg-bubbles-heather/50" />
-                </div>
+              <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center animate-float">
+                <BubblesHeroImage size="hero" className="w-full h-full drop-shadow-2xl" />
               </div>
-              
-              {/* Wool texture circles - Responsive sizing */}
-              <div className="absolute -top-3 -left-1 sm:-top-4 sm:-left-2 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-              <div className="absolute -top-1 right-0 sm:-top-2 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-              <div className="absolute top-6 -right-3 sm:top-8 sm:-right-4 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
-              <div className="absolute -bottom-1 -left-3 sm:-bottom-2 sm:-left-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-bubbles-cream/80 border-2 border-bubbles-heather/30" />
             </div>
             
             {/* Thought Bubble - Mobile optimized positioning */}

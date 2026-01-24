@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
-import { BubblesBog } from "@/components/BubblesBog";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ShoppingBag, Sparkles, ArrowRight, Star, Truck, Shield, Zap, Heart } from "lucide-react";
 
 const quickBenefits = [
@@ -168,7 +168,7 @@ export function ShopHero() {
                   }}
                   className="w-full h-full flex items-center justify-center"
                 >
-                  <BubblesBog className="w-full h-full" />
+                  <BubblesHeroImage size="hero" className="w-full h-full" />
                 </motion.div>
 
                 {/* Floating accent badge */}
