@@ -61,7 +61,7 @@ const FAQ = () => {
   return (
     <Layout>
       <Helmet>
-        <title>FAQ | Bubbles the Sheep - Frequently Asked Questions</title>
+        <title>BAQ | Bubbles the Sheep - Badly Asked Questions</title>
         <meta name="description" content="Find answers to common questions about Bubbles the Sheep, shipping, returns, and get confidently incorrect wisdom on life's big questions." />
         <meta property="og:title" content="FAQ | Bubbles the Sheep" />
         <meta property="og:description" content="Frequently asked questions answered with confident incorrectness." />
@@ -76,7 +76,7 @@ const FAQ = () => {
 
       <section className="-mx-4 mb-8">
         <PageHeroWithBubbles
-          title="Frequently Asked Questions"
+          title="Badly Asked Questions"
           subtitle="Everything you need to know, answered with varying degrees of accuracy"
           bubbleSize="sm"
           scene="faq"
