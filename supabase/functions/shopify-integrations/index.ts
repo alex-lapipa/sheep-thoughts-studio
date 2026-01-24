@@ -238,6 +238,54 @@ interface InstalledAppInfo {
   status: "active" | "inactive" | "unknown";
 }
 
+interface ShopifyProductNode {
+  id: string;
+  title: string;
+  handle: string;
+  description: string;
+  vendor: string;
+  productType: string;
+  tags: string[];
+  status: string;
+  totalInventory: number;
+  priceRange: {
+    minVariantPrice: { amount: string; currencyCode: string };
+    maxVariantPrice: { amount: string; currencyCode: string };
+  };
+  images: { edges: Array<{ node: { url: string; altText: string | null } }> };
+  variants: {
+    edges: Array<{
+      node: {
+        id: string;
+        title: string;
+        sku: string;
+        price: { amount: string; currencyCode: string };
+        availableForSale: boolean;
+        inventoryQuantity: number;
+        selectedOptions: Array<{ name: string; value: string }>;
+      };
+    }>;
+  };
+  options: Array<{ name: string; values: string[] }>;
+}
+
+interface ShopifyOrderNode {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  displayFinancialStatus: string;
+  displayFulfillmentStatus: string;
+  totalPriceSet: { shopMoney: { amount: string; currencyCode: string } };
+  lineItems: { edges: Array<{ node: { title: string; quantity: number } }> };
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    city: string;
+    country: string;
+  } | null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -246,6 +294,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const shopifyAccessToken = Deno.env.get("SHOPIFY_ACCESS_TOKEN");
+  const shopifyStorefrontToken = Deno.env.get("SHOPIFY_STOREFRONT_ACCESS_TOKEN");
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -276,13 +325,15 @@ Deno.serve(async (req) => {
 
     const { store_domain, api_version, scopes, is_connected } = settings;
     const shopifyAdminUrl = `https://${store_domain}/admin/api/${api_version}`;
+    const shopifyGraphqlUrl = `https://${store_domain}/admin/api/${api_version}/graphql.json`;
+    const shopifyStorefrontUrl = `https://${store_domain}/api/${api_version}/graphql.json`;
 
+    // ============================================
+    // ACTION: list - Get all integrations, apps, store info
+    // ============================================
     if (action === "list") {
-      // Fetch installed apps from Shopify (this requires read_content or access_all_apps scope)
-      // We'll try to get what we can and supplement with known app data
       const installedApps = await fetchInstalledApps(shopifyAdminUrl, shopifyAccessToken);
       
-      // Fetch webhooks to show active integrations
       const webhooksResponse = await fetch(`${shopifyAdminUrl}/webhooks.json`, {
         headers: {
           "X-Shopify-Access-Token": shopifyAccessToken,
@@ -292,7 +343,6 @@ Deno.serve(async (req) => {
       const webhooksData = webhooksResponse.ok ? await webhooksResponse.json() : { webhooks: [] };
       const webhooks = webhooksData.webhooks || [];
 
-      // Fetch shop info for additional context
       const shopResponse = await fetch(`${shopifyAdminUrl}/shop.json`, {
         headers: {
           "X-Shopify-Access-Token": shopifyAccessToken,
@@ -302,7 +352,6 @@ Deno.serve(async (req) => {
       const shopData = shopResponse.ok ? await shopResponse.json() : { shop: {} };
       const shop = shopData.shop || {};
 
-      // Build response with real and enriched data
       const enrichedApps = installedApps.map((app: ShopifyApp) => {
         const appKey = normalizeAppName(app.title);
         const metadata = APP_METADATA[appKey] || {
@@ -328,7 +377,6 @@ Deno.serve(async (req) => {
         } as InstalledAppInfo;
       });
 
-      // Get active webhook topics for integration status
       const activeWebhookTopics = webhooks.map((w: { topic: string }) => w.topic);
 
       return new Response(
@@ -358,8 +406,10 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ============================================
+    // ACTION: store_info - Get detailed store info
+    // ============================================
     if (action === "store_info") {
-      // Just fetch store info
       const shopResponse = await fetch(`${shopifyAdminUrl}/shop.json`, {
         headers: {
           "X-Shopify-Access-Token": shopifyAccessToken,
@@ -408,8 +458,495 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ============================================
+    // ACTION: products - Get products (Admin API)
+    // ============================================
+    if (action === "products") {
+      const { first = 50, query = "", after = null } = body;
+      
+      const graphqlQuery = `
+        query GetProducts($first: Int!, $query: String, $after: String) {
+          products(first: $first, query: $query, after: $after) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            edges {
+              node {
+                id
+                title
+                handle
+                description
+                vendor
+                productType
+                tags
+                status
+                totalInventory
+                priceRange {
+                  minVariantPrice { amount currencyCode }
+                  maxVariantPrice { amount currencyCode }
+                }
+                images(first: 5) {
+                  edges {
+                    node { url altText }
+                  }
+                }
+                variants(first: 20) {
+                  edges {
+                    node {
+                      id
+                      title
+                      sku
+                      price { amount currencyCode }
+                      availableForSale
+                      inventoryQuantity
+                      selectedOptions { name value }
+                    }
+                  }
+                }
+                options { name values }
+              }
+            }
+          }
+        }
+      `;
+
+      const graphqlResponse = await fetch(shopifyGraphqlUrl, {
+        method: "POST",
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: graphqlQuery,
+          variables: { first, query, after },
+        }),
+      });
+
+      if (!graphqlResponse.ok) {
+        throw new Error(`GraphQL request failed: ${graphqlResponse.status}`);
+      }
+
+      const graphqlData = await graphqlResponse.json();
+
+      if (graphqlData.errors) {
+        throw new Error(graphqlData.errors.map((e: { message: string }) => e.message).join(", "));
+      }
+
+      const products = graphqlData.data?.products;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          products: products?.edges?.map((edge: { node: ShopifyProductNode }) => edge.node) || [],
+          pageInfo: products?.pageInfo || { hasNextPage: false, endCursor: null },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: orders - Get orders (Admin API)
+    // ============================================
+    if (action === "orders") {
+      const { first = 50, query = "", after = null } = body;
+      
+      const graphqlQuery = `
+        query GetOrders($first: Int!, $query: String, $after: String) {
+          orders(first: $first, query: $query, after: $after) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            edges {
+              node {
+                id
+                name
+                email
+                createdAt
+                displayFinancialStatus
+                displayFulfillmentStatus
+                totalPriceSet {
+                  shopMoney { amount currencyCode }
+                }
+                lineItems(first: 10) {
+                  edges {
+                    node { title quantity }
+                  }
+                }
+                shippingAddress {
+                  firstName
+                  lastName
+                  city
+                  country
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const graphqlResponse = await fetch(shopifyGraphqlUrl, {
+        method: "POST",
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: graphqlQuery,
+          variables: { first, query, after },
+        }),
+      });
+
+      if (!graphqlResponse.ok) {
+        throw new Error(`GraphQL request failed: ${graphqlResponse.status}`);
+      }
+
+      const graphqlData = await graphqlResponse.json();
+
+      if (graphqlData.errors) {
+        throw new Error(graphqlData.errors.map((e: { message: string }) => e.message).join(", "));
+      }
+
+      const orders = graphqlData.data?.orders;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          orders: orders?.edges?.map((edge: { node: ShopifyOrderNode }) => edge.node) || [],
+          pageInfo: orders?.pageInfo || { hasNextPage: false, endCursor: null },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: inventory - Get inventory levels
+    // ============================================
+    if (action === "inventory") {
+      const { locationId = null } = body;
+      
+      // Get locations first
+      const locationsResponse = await fetch(`${shopifyAdminUrl}/locations.json`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!locationsResponse.ok) {
+        throw new Error(`Failed to fetch locations: ${locationsResponse.status}`);
+      }
+
+      const locationsData = await locationsResponse.json();
+      const locations = locationsData.locations || [];
+
+      // Get inventory levels for the first/specified location
+      const targetLocationId = locationId || locations[0]?.id;
+      
+      if (!targetLocationId) {
+        return new Response(
+          JSON.stringify({ success: true, locations: [], inventory: [] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const inventoryResponse = await fetch(
+        `${shopifyAdminUrl}/inventory_levels.json?location_ids=${targetLocationId}&limit=250`,
+        {
+          headers: {
+            "X-Shopify-Access-Token": shopifyAccessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const inventoryData = inventoryResponse.ok ? await inventoryResponse.json() : { inventory_levels: [] };
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          locations: locations.map((loc: { id: number; name: string; active: boolean; address1: string; city: string; country: string }) => ({
+            id: loc.id,
+            name: loc.name,
+            active: loc.active,
+            address: `${loc.address1}, ${loc.city}, ${loc.country}`,
+          })),
+          inventory: inventoryData.inventory_levels || [],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: storefront_products - Get products via Storefront API
+    // ============================================
+    if (action === "storefront_products") {
+      if (!shopifyStorefrontToken) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Storefront token not configured" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { first = 20, query = "", after = null } = body;
+      
+      const graphqlQuery = `
+        query GetProducts($first: Int!, $query: String, $after: String) {
+          products(first: $first, query: $query, after: $after) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            edges {
+              node {
+                id
+                title
+                handle
+                description
+                tags
+                priceRange {
+                  minVariantPrice { amount currencyCode }
+                }
+                images(first: 5) {
+                  edges {
+                    node { url altText }
+                  }
+                }
+                variants(first: 10) {
+                  edges {
+                    node {
+                      id
+                      title
+                      price { amount currencyCode }
+                      availableForSale
+                      selectedOptions { name value }
+                    }
+                  }
+                }
+                options { name values }
+              }
+            }
+          }
+        }
+      `;
+
+      const graphqlResponse = await fetch(shopifyStorefrontUrl, {
+        method: "POST",
+        headers: {
+          "X-Shopify-Storefront-Access-Token": shopifyStorefrontToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: graphqlQuery,
+          variables: { first, query, after },
+        }),
+      });
+
+      if (!graphqlResponse.ok) {
+        throw new Error(`Storefront API request failed: ${graphqlResponse.status}`);
+      }
+
+      const graphqlData = await graphqlResponse.json();
+
+      if (graphqlData.errors) {
+        throw new Error(graphqlData.errors.map((e: { message: string }) => e.message).join(", "));
+      }
+
+      const products = graphqlData.data?.products;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          products: products?.edges || [],
+          pageInfo: products?.pageInfo || { hasNextPage: false, endCursor: null },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: collections - Get collections
+    // ============================================
+    if (action === "collections") {
+      const { first = 50 } = body;
+      
+      const collectionsResponse = await fetch(`${shopifyAdminUrl}/custom_collections.json?limit=${first}`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const smartCollectionsResponse = await fetch(`${shopifyAdminUrl}/smart_collections.json?limit=${first}`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const customCollections = collectionsResponse.ok 
+        ? (await collectionsResponse.json()).custom_collections || []
+        : [];
+      const smartCollections = smartCollectionsResponse.ok
+        ? (await smartCollectionsResponse.json()).smart_collections || []
+        : [];
+
+      const allCollections = [
+        ...customCollections.map((c: { id: number; title: string; handle: string; body_html: string; published_at: string; image?: { src: string } }) => ({ ...c, type: 'custom' })),
+        ...smartCollections.map((c: { id: number; title: string; handle: string; body_html: string; published_at: string; image?: { src: string } }) => ({ ...c, type: 'smart' })),
+      ];
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          collections: allCollections.map((c: { id: number; title: string; handle: string; body_html: string; published_at: string; type: string; image?: { src: string } }) => ({
+            id: c.id,
+            title: c.title,
+            handle: c.handle,
+            description: c.body_html?.replace(/<[^>]*>/g, '') || '',
+            type: c.type,
+            publishedAt: c.published_at,
+            image: c.image?.src || null,
+          })),
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: analytics - Get store analytics
+    // ============================================
+    if (action === "analytics") {
+      const { days = 30 } = body;
+      const sinceDate = new Date();
+      sinceDate.setDate(sinceDate.getDate() - days);
+      const sinceISO = sinceDate.toISOString();
+
+      // Fetch recent orders for analytics
+      const ordersResponse = await fetch(
+        `${shopifyAdminUrl}/orders.json?created_at_min=${sinceISO}&status=any&limit=250`,
+        {
+          headers: {
+            "X-Shopify-Access-Token": shopifyAccessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const ordersData = ordersResponse.ok ? await ordersResponse.json() : { orders: [] };
+      const orders = ordersData.orders || [];
+
+      // Calculate analytics
+      const totalRevenue = orders.reduce((sum: number, order: { total_price: string }) => 
+        sum + parseFloat(order.total_price || '0'), 0
+      );
+      const totalOrders = orders.length;
+      const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+      // Count fulfillment statuses
+      const fulfillmentStats = orders.reduce((acc: Record<string, number>, order: { fulfillment_status: string | null }) => {
+        const status = order.fulfillment_status || 'unfulfilled';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Count financial statuses
+      const financialStats = orders.reduce((acc: Record<string, number>, order: { financial_status: string }) => {
+        const status = order.financial_status || 'unknown';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          analytics: {
+            period: `Last ${days} days`,
+            totalRevenue,
+            totalOrders,
+            avgOrderValue,
+            fulfillmentStats,
+            financialStats,
+          },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================
+    // ACTION: sync_status - Get sync status for all integrations
+    // ============================================
+    if (action === "sync_status") {
+      // Get webhooks status
+      const webhooksResponse = await fetch(`${shopifyAdminUrl}/webhooks.json`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+      const webhooksData = webhooksResponse.ok ? await webhooksResponse.json() : { webhooks: [] };
+
+      // Get product count
+      const productCountResponse = await fetch(`${shopifyAdminUrl}/products/count.json`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+      const productCountData = productCountResponse.ok ? await productCountResponse.json() : { count: 0 };
+
+      // Get order count
+      const orderCountResponse = await fetch(`${shopifyAdminUrl}/orders/count.json?status=any`, {
+        headers: {
+          "X-Shopify-Access-Token": shopifyAccessToken,
+          "Content-Type": "application/json",
+        },
+      });
+      const orderCountData = orderCountResponse.ok ? await orderCountResponse.json() : { count: 0 };
+
+      // Check POD provider status from database
+      const { data: podProviders } = await supabase
+        .from("pod_providers")
+        .select("provider, status, last_sync_at");
+
+      // Check variant mappings status
+      const { data: mappings, count: mappingsCount } = await supabase
+        .from("variant_mappings")
+        .select("status", { count: "exact" });
+
+      const mappingStats = (mappings || []).reduce((acc: Record<string, number>, m: { status: string }) => {
+        acc[m.status] = (acc[m.status] || 0) + 1;
+        return acc;
+      }, {});
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          syncStatus: {
+            shopify: {
+              connected: is_connected,
+              apiVersion: api_version,
+              webhooksActive: (webhooksData.webhooks || []).length,
+              productCount: productCountData.count || 0,
+              orderCount: orderCountData.count || 0,
+            },
+            pod: {
+              providers: podProviders || [],
+            },
+            mappings: {
+              total: mappingsCount || 0,
+              byStatus: mappingStats,
+            },
+            lastChecked: new Date().toISOString(),
+          },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ success: false, error: "Invalid action" }),
+      JSON.stringify({ success: false, error: `Invalid action: ${action}` }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
@@ -428,10 +965,7 @@ async function fetchInstalledApps(
   shopifyAdminUrl: string,
   accessToken: string
 ): Promise<ShopifyApp[]> {
-  // Try to fetch installed apps - this may be limited by scope
-  // Shopify's metafields or app installations endpoint
   try {
-    // Try the application_charges endpoint to infer installed apps
     const chargesResponse = await fetch(`${shopifyAdminUrl}/application_charges.json`, {
       headers: {
         "X-Shopify-Access-Token": accessToken,
@@ -441,7 +975,6 @@ async function fetchInstalledApps(
 
     if (chargesResponse.ok) {
       const data = await chargesResponse.json();
-      // Extract unique app info from charges
       const appMap = new Map<string, ShopifyApp>();
       (data.application_charges || []).forEach((charge: { id: number; name: string; created_at: string }) => {
         if (!appMap.has(charge.name)) {
@@ -458,7 +991,6 @@ async function fetchInstalledApps(
     console.log("Could not fetch application charges:", e);
   }
 
-  // Try recurring application charges for subscription apps
   try {
     const recurringResponse = await fetch(`${shopifyAdminUrl}/recurring_application_charges.json`, {
       headers: {
@@ -488,7 +1020,6 @@ async function fetchInstalledApps(
     console.log("Could not fetch recurring charges:", e);
   }
 
-  // Fallback: return empty array - frontend will show available apps instead
   return [];
 }
 
@@ -506,17 +1037,17 @@ function getPodProviderStatus(apps: InstalledAppInfo[]): {
   gelato: boolean;
   other: string[];
 } {
-  const podApps = apps.filter((app) => app.category === "pod");
+  const podApps = apps.filter(app => app.category === "pod");
   return {
-    printful: podApps.some((app) => app.title.toLowerCase().includes("printful")),
-    printify: podApps.some((app) => app.title.toLowerCase().includes("printify")),
-    gelato: podApps.some((app) => app.title.toLowerCase().includes("gelato")),
+    printful: podApps.some(app => normalizeAppName(app.title).includes("printful")),
+    printify: podApps.some(app => normalizeAppName(app.title).includes("printify")),
+    gelato: podApps.some(app => normalizeAppName(app.title).includes("gelato")),
     other: podApps
-      .filter((app) => 
-        !app.title.toLowerCase().includes("printful") &&
-        !app.title.toLowerCase().includes("printify") &&
-        !app.title.toLowerCase().includes("gelato")
+      .filter(app => 
+        !normalizeAppName(app.title).includes("printful") &&
+        !normalizeAppName(app.title).includes("printify") &&
+        !normalizeAppName(app.title).includes("gelato")
       )
-      .map((app) => app.title),
+      .map(app => app.title),
   };
 }
