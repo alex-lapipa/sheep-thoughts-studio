@@ -15,6 +15,7 @@ import { ModeBadge } from "@/components/ModeBadge";
 import { analytics } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { ImageLightbox } from "@/components/ImageLightbox";
+import { BackInStockNotify } from "@/components/BackInStockNotify";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -245,31 +246,38 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Add to Cart */}
-            <Button 
-              size="lg" 
-              className="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-display"
-              onClick={handleAddToCart}
-              disabled={cartLoading || !selectedVariant?.availableForSale}
-            >
-              {cartLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : !selectedVariant?.availableForSale ? (
-                'Out of Stock'
-              ) : (
-                <>
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Add to Cart
-                </>
-              )}
-            </Button>
-
-            {/* Availability */}
-            {selectedVariant?.availableForSale && (
-              <div className="flex items-center gap-2 text-sm text-accent">
-                <Check className="h-4 w-4" />
-                In stock and ready to ship
-              </div>
+            {/* Add to Cart or Back in Stock Notify */}
+            {selectedVariant?.availableForSale ? (
+              <>
+                <Button 
+                  size="lg" 
+                  className="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-display"
+                  onClick={handleAddToCart}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      Add to Cart
+                    </>
+                  )}
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-accent">
+                  <Check className="h-4 w-4" />
+                  In stock and ready to ship
+                </div>
+              </>
+            ) : (
+              <BackInStockNotify
+                productId={product.id}
+                variantId={selectedVariant?.id || ''}
+                productTitle={product.title}
+                variantTitle={selectedVariant?.title}
+                productHandle={handle || ''}
+                variant="inline"
+              />
             )}
 
             {/* Accordion */}
