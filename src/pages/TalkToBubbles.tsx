@@ -1,36 +1,15 @@
-import { useState, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { BubblesConversation } from "@/components/BubblesConversation";
 import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
-import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 
 export default function TalkToBubbles() {
-  const [prefilledQuestion, setPrefilledQuestion] = useState<string>("");
-  const chatSectionRef = useRef<HTMLDivElement>(null);
-
-  const handleChannelMentor = useCallback((question: string, mentorName: string) => {
-    setPrefilledQuestion(question);
-    
-    chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    
-    toast.success(`Channeling ${mentorName}'s wisdom...`, {
-      description: "Your question is ready — just hit send!",
-      duration: 3000,
-    });
-  }, []);
-
-  const handleQuestionUsed = useCallback(() => {
-    setPrefilledQuestion("");
-  }, []);
-
   return (
     <Layout>
       <Helmet>
@@ -106,7 +85,7 @@ export default function TalkToBubbles() {
         </section>
 
         {/* Chat Interface */}
-        <section ref={chatSectionRef} className="py-8 md:py-12 scroll-mt-20">
+        <section className="py-8 md:py-12 scroll-mt-20">
           <div className="container px-4 md:px-6">
             <Tabs defaultValue="chat" className="w-full max-w-4xl mx-auto">
               <TabsList className="grid w-full max-w-xs mx-auto grid-cols-2 mb-8">
@@ -124,10 +103,7 @@ export default function TalkToBubbles() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <BubblesVoiceChat 
-                    prefilledQuestion={prefilledQuestion}
-                    onQuestionUsed={handleQuestionUsed}
-                  />
+                  <BubblesVoiceChat />
                 </motion.div>
               </TabsContent>
 
@@ -143,9 +119,6 @@ export default function TalkToBubbles() {
             </Tabs>
           </div>
         </section>
-
-        {/* Meet the Mentors */}
-        <MeetTheMentors onChannelMentor={handleChannelMentor} />
 
         {/* Mentor Activity */}
         <section className="py-12 md:py-16">

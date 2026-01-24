@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { AnimatedOnView } from "@/components/AnimatedText";
-import { MeetTheMentors } from "@/components/MeetTheMentors";
+
 import { useOgImage } from "@/hooks/useOgImage";
 import { TocItem } from "@/hooks/useTableOfContents";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
@@ -11,7 +11,7 @@ import { Mountain, TreePine, Heart, Music, Dog, Store, Sparkles } from "lucide-r
 const STORY_TOC_ITEMS: TocItem[] = [
   { id: "hero", title: "Introduction", level: 1 },
   { id: "beginning", title: "The Beginning", level: 1 },
-  { id: "mentors", title: "Meet the Mentors", level: 1 },
+  
   { id: "wicklow", title: "My Wicklow", level: 1 },
   { id: "mairead-aidan", title: "Mairead & Aidan", level: 1 },
   { id: "legacy", title: "My Legacy", level: 1 },
@@ -76,10 +76,6 @@ const MyStory = () => {
         </div>
       </section>
 
-      {/* Meet the Mentors - Interactive Gallery */}
-      <section id="mentors" className="scroll-mt-24 mb-16 -mx-4">
-        <MeetTheMentors />
-      </section>
 
       {/* The Wicklow Setting */}
       <section id="wicklow" className="scroll-mt-24 mb-16 -mx-4 px-4 py-12 bg-muted/30 rounded-lg">
