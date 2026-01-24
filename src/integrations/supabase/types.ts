@@ -44,6 +44,57 @@ export type Database = {
         }
         Relationships: []
       }
+      abandoned_carts: {
+        Row: {
+          cart_id: string
+          checkout_url: string
+          created_at: string
+          currency: string | null
+          email: string
+          id: string
+          items: Json
+          last_reminder_sent_at: string | null
+          metadata: Json | null
+          recovered_at: string | null
+          reminder_count: number
+          status: string
+          total_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          cart_id: string
+          checkout_url: string
+          created_at?: string
+          currency?: string | null
+          email: string
+          id?: string
+          items?: Json
+          last_reminder_sent_at?: string | null
+          metadata?: Json | null
+          recovered_at?: string | null
+          reminder_count?: number
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cart_id?: string
+          checkout_url?: string
+          created_at?: string
+          currency?: string | null
+          email?: string
+          id?: string
+          items?: Json
+          last_reminder_sent_at?: string | null
+          metadata?: Json | null
+          recovered_at?: string | null
+          reminder_count?: number
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
