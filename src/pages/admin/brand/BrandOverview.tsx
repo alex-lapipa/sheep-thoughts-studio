@@ -7,6 +7,13 @@ import { Link } from "react-router-dom";
 
 const brandSections = [
   {
+    title: "Official Mascot",
+    description: "Post-punk stencil Bubbles — the ONLY approved mascot",
+    icon: Shapes,
+    href: "/admin/brand/character",
+    badge: "OFFICIAL",
+  },
+  {
     title: "Color System",
     description: "Wicklow-grounded palette with mode accents",
     icon: Palette,
@@ -19,13 +26,6 @@ const brandSections = [
     icon: Type,
     href: "/admin/brand/typography",
     badge: "Core",
-  },
-  {
-    title: "Character Grammar",
-    description: "Shape language and mode transformations",
-    icon: Shapes,
-    href: "/admin/brand/character",
-    badge: "Identity",
   },
   {
     title: "Frontend Reference",
@@ -45,10 +45,11 @@ const brandSections = [
 
 export default function BrandOverview() {
   const { data: assets, isLoading } = useBrandAssets();
+  const { data: allAssets } = useBrandAssets(); // Get all for archived count
 
   const colorCount = assets?.filter(a => a.asset_type === "color").length || 0;
   const typographyCount = assets?.filter(a => a.asset_type === "typography").length || 0;
-  const characterCount = assets?.filter(a => a.asset_type === "character").length || 0;
+  const mascotCount = assets?.filter(a => a.asset_type === "mascot").length || 0;
   const productionCount = assets?.filter(a => a.asset_type === "production").length || 0;
 
   return (
@@ -61,6 +62,40 @@ export default function BrandOverview() {
             Bubbles the Sheep design system — Wicklow-grounded, psychology-informed, production-ready
           </p>
         </div>
+
+        {/* Official Mascot Banner */}
+        <Card className="border-2 border-mode-savage/50 bg-gradient-to-br from-mode-savage/10 to-background">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Badge className="bg-mode-savage text-white">OFFICIAL</Badge>
+              <CardTitle className="text-xl">Stencil-Era Bubbles (2025)</CardTitle>
+            </div>
+            <CardDescription className="text-base mt-2">
+              The post-punk stencil derived from the D&C Nineties T-shirt is now the ONLY approved mascot.
+              All legacy SVG variants have been archived.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-4 text-sm">
+              <div className="space-y-1">
+                <span className="font-semibold text-foreground">Component</span>
+                <p className="text-muted-foreground font-mono">BubblesHeroImage</p>
+              </div>
+              <div className="space-y-1">
+                <span className="font-semibold text-foreground">Size</span>
+                <p className="text-muted-foreground">"massive" (~26-30rem)</p>
+              </div>
+              <div className="space-y-1">
+                <span className="font-semibold text-foreground">Position</span>
+                <p className="text-muted-foreground">Grounded on grass</p>
+              </div>
+              <div className="space-y-1">
+                <span className="font-semibold text-foreground">Orientation</span>
+                <p className="text-muted-foreground">Facing left (flipped)</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Core Philosophy */}
         <Card className="border-bubbles-heather/30 bg-gradient-to-br from-bubbles-cream/20 to-background">
@@ -119,9 +154,9 @@ export default function BrandOverview() {
                 <CardContent>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
+                      {section.title === "Official Mascot" && `${mascotCount} official asset`}
                       {section.title === "Color System" && `${colorCount} colors defined`}
                       {section.title === "Typography" && `${typographyCount} type styles`}
-                      {section.title === "Character Grammar" && `${characterCount} shape rules`}
                       {section.title === "Production Specs" && `${productionCount} specifications`}
                       {section.title === "Frontend Reference" && "6 pages • 5 components"}
                     </span>
