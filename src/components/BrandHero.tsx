@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { WicklowLandscape } from "@/components/WicklowLandscape";
-import { BubblesBog } from "@/components/BubblesBog";
-import { BubblesScientist } from "@/components/BubblesScientist";
-import { BubblesChef } from "@/components/BubblesChef";
-import { BubblesExplorer } from "@/components/BubblesExplorer";
-import { BubblesScholar } from "@/components/BubblesScholar";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
@@ -23,15 +19,8 @@ export type BubblesVariant =
   | "adventures" 
   | "scenarios";
 
-// Map variants to brand-aligned SVG components
-const BUBBLES_COMPONENTS: Record<BubblesVariant, React.ComponentType<{ className?: string }>> = {
-  shopping: BubblesBog,
-  talk: BubblesBog,
-  explains: BubblesScholar,
-  facts: BubblesScientist,
-  adventures: BubblesExplorer,
-  scenarios: BubblesChef,
-};
+// All variants now use the unified post-punk stencil style
+// The old SVG components are archived in the database for brand book reference
 
 interface BrandHeroProps {
   // Required
@@ -79,7 +68,7 @@ export function BrandHero({
   thought,
   className,
 }: BrandHeroProps) {
-  const BubblesComponent = BUBBLES_COMPONENTS[bubblesVariant];
+  // All variants now use the unified post-punk stencil BubblesHeroImage
 
   return (
     <section className={cn(
@@ -201,7 +190,7 @@ export function BrandHero({
                   }}
                   className="w-full h-full flex items-center justify-center"
                 >
-                  <BubblesComponent className="w-full h-full" />
+                  <BubblesHeroImage size="hero" className="w-full h-full" />
                 </motion.div>
 
                 {/* Thought bubble */}
