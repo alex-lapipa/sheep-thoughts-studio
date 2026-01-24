@@ -109,7 +109,7 @@ const FeatureFlagsAdmin = lazy(() => import("./pages/admin/FeatureFlags"));
 const MentorTriggerEditor = lazy(() => import("./pages/admin/MentorTriggerEditor"));
 const MentorAnalytics = lazy(() => import("./pages/admin/MentorAnalytics"));
 const ABTestAnalytics = lazy(() => import("./pages/admin/ABTestAnalytics"));
-// Minimal loading fallback
+const FAQKnowledge = lazy(() => import("./pages/admin/FAQKnowledge"));
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -254,6 +254,7 @@ const App = () => (
                   <Route path="/admin/cron-jobs" element={<ProtectedRoute><AdminCronJobs /></ProtectedRoute>} />
                   <Route path="/admin/audit" element={<ProtectedRoute><AdminAuditLog /></ProtectedRoute>} />
                   <Route path="/admin/rag-search" element={<ProtectedRoute><AdminRAGSearch /></ProtectedRoute>} />
+                  <Route path="/admin/faq-knowledge" element={<ProtectedRoute><FAQKnowledge /></ProtectedRoute>} />
                   <Route path="/admin/whats-new" element={<ProtectedRoute><AdminWhatsNew /></ProtectedRoute>} />
                   <Route path="/admin/illustrations" element={<ProtectedRoute><IllustrationGenerator /></ProtectedRoute>} />
                   <Route path="/admin/feature-flags" element={<ProtectedRoute requireSuperAdmin><FeatureFlagsAdmin /></ProtectedRoute>} />
