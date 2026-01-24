@@ -79,9 +79,24 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin', label: 'Dashboard', icon: Home },
       { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-      { href: '/admin/ab-test', label: 'A/B Test Report', icon: Target },
-      { href: '/admin/presentation', label: 'Presentation', icon: Sparkles },
+      { href: '/admin/ab-test', label: 'A/B Testing', icon: Target },
       { href: '/admin/business-plan', label: 'Business Plan', icon: Briefcase },
+    ],
+  },
+  {
+    title: 'Store',
+    requiredModule: 'shopify',
+    items: [
+      { href: '/admin/shopify', label: 'Connection & Sync', icon: Store, requiredModule: 'shopify' },
+      { href: '/admin/products', label: 'Products', icon: Package, requiredModule: 'products' },
+      { href: '/admin/orders', label: 'Orders', icon: ShoppingCart, requiredModule: 'orders' },
+      { href: '/admin/orders/exceptions', label: 'Exceptions', icon: AlertTriangle, requiredModule: 'exceptions' },
+      { href: '/admin/pod', label: 'POD & Apps', icon: Link2, requiredModule: 'pod' },
+      { href: '/admin/pod/mappings', label: 'Variant Mapping', icon: Package, requiredModule: 'mappings' },
+      { href: '/admin/discounts', label: 'Discount Codes', icon: Percent, requiredModule: 'pricing' },
+      { href: '/admin/pricing', label: 'Pricing Rules', icon: DollarSign, requiredModule: 'pricing' },
+      { href: '/admin/drops', label: 'Drops', icon: Tag, requiredModule: 'drops' },
+      { href: '/admin/shopify/webhooks', label: 'Webhooks', icon: Webhook, requiredModule: 'webhooks' },
     ],
   },
   {
@@ -114,40 +129,6 @@ const navSections: NavSection[] = [
       { href: '/admin/brand/gallery', label: 'Character Gallery', icon: Target },
       { href: '/admin/brand/review', label: 'Character Review', icon: Shield },
       { href: '/admin/illustrations', label: 'Illustration Generator', icon: Image },
-    ],
-  },
-  {
-    title: 'Shopify',
-    requiredModule: 'shopify',
-    items: [
-      { href: '/admin/shopify', label: 'Connection', icon: Store, requiredModule: 'shopify' },
-      { href: '/admin/shopify/webhooks', label: 'Webhooks', icon: Webhook, requiredModule: 'webhooks' },
-    ],
-  },
-  {
-    title: 'POD',
-    requiredModule: 'pod',
-    items: [
-      { href: '/admin/pod', label: 'Connections', icon: Package, requiredModule: 'pod' },
-      { href: '/admin/pod/mappings', label: 'Variant Mapping', icon: Link2, requiredModule: 'mappings' },
-    ],
-  },
-  {
-    title: 'Orders',
-    requiredModule: 'orders',
-    items: [
-      { href: '/admin/orders', label: 'Orders', icon: ShoppingCart, requiredModule: 'orders' },
-      { href: '/admin/orders/exceptions', label: 'Exceptions', icon: AlertTriangle, requiredModule: 'exceptions' },
-    ],
-  },
-  {
-    title: 'Catalog',
-    requiredModule: 'products',
-    items: [
-      { href: '/admin/products', label: 'Products', icon: Package, requiredModule: 'products' },
-      { href: '/admin/pricing', label: 'Pricing Rules', icon: DollarSign, requiredModule: 'pricing' },
-      { href: '/admin/discounts', label: 'Discount Codes', icon: Percent, requiredModule: 'pricing' },
-      { href: '/admin/drops', label: 'Drops', icon: Tag, requiredModule: 'drops' },
     ],
   },
   {
@@ -188,13 +169,7 @@ const navSections: NavSection[] = [
       { href: '/admin/cron-jobs', label: 'Scheduled Tasks', icon: Timer },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
       { href: '/admin/whats-new', label: "What's New", icon: Bell },
-    ],
-  },
-  {
-    title: 'On Hold',
-    requiredModule: 'admin',
-    items: [
-      { href: '/scenarios', label: 'Live Scenarios', icon: Zap, external: true },
+      { href: '/admin/presentation', label: 'Presentation', icon: Sparkles },
     ],
   },
 ];
@@ -204,7 +179,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { roles, isAdmin, isOwner, canAccess, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Bubbles AI', 'Shopify', 'POD', 'Orders', 'Catalog', 'System']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Store', 'Bubbles AI', 'Brand', 'Support', 'System']);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem('admin-sidebar-collapsed') === 'true';
