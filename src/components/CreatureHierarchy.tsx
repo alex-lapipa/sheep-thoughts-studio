@@ -305,6 +305,28 @@ export const CreatureHierarchy = () => {
                   className="mx-auto"
                   viewBox={`0 0 ${diagramWidth} ${diagramHeight}`}
                 >
+                  {/* Animated flow gradient definitions */}
+                  <defs>
+                    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+                      <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="1" />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+                    </linearGradient>
+                    <linearGradient id="flowGradientHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0" />
+                      <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="1" />
+                      <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0" />
+                    </linearGradient>
+                    {/* Glow filter for highlighted connections */}
+                    <filter id="connectionGlow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="2" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+
                   {/* Tier backgrounds */}
                   {[1, 2, 3, 4, 5].map(tier => (
                     <rect
@@ -318,31 +340,92 @@ export const CreatureHierarchy = () => {
                     />
                   ))}
 
-                  {/* Connection lines */}
+                  {/* Connection lines with animated flows */}
                   <g>
                     {connections.map((conn, i) => {
                       const isHighlighted = isConnectionHighlighted(conn.from, conn.to);
-                      return (
-                        <motion.path
-                          key={`${conn.from.id}-${conn.to.id}`}
-                          d={`M ${conn.from.x} ${conn.from.y! - 20} 
+                      const pathId = `path-${conn.from.id}-${conn.to.id}`;
+                      const pathD = `M ${conn.from.x} ${conn.from.y! - 20} 
                               Q ${conn.from.x} ${(conn.from.y! + conn.to.y!) / 2 - 20},
                                 ${(conn.from.x! + conn.to.x!) / 2} ${(conn.from.y! + conn.to.y!) / 2 - 20}
-                              T ${conn.to.x} ${conn.to.y! + 20}`}
-                          fill="none"
-                          className={cn(
-                            "transition-all duration-300",
-                            isHighlighted 
-                              ? "stroke-primary stroke-2" 
-                              : "stroke-muted-foreground/30 stroke-1"
-                          )}
-                          initial={{ pathLength: 0, opacity: 0 }}
-                          animate={{ 
-                            pathLength: 1, 
-                            opacity: isHighlighted ? 1 : 0.5 
-                          }}
-                          transition={{ delay: i * 0.05, duration: 0.5 }}
-                        />
+                              T ${conn.to.x} ${conn.to.y! + 20}`;
+                      
+                      return (
+                        <g key={pathId}>
+                          {/* Base connection line */}
+                          <motion.path
+                            id={pathId}
+                            d={pathD}
+                            fill="none"
+                            className={cn(
+                              "transition-all duration-300",
+                              isHighlighted 
+                                ? "stroke-primary stroke-2" 
+                                : "stroke-muted-foreground/30 stroke-1"
+                            )}
+                            filter={isHighlighted ? "url(#connectionGlow)" : undefined}
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ 
+                              pathLength: 1, 
+                              opacity: isHighlighted ? 1 : 0.5 
+                            }}
+                            transition={{ delay: i * 0.05, duration: 0.5 }}
+                          />
+                          
+                          {/* Animated flow particles - always visible but more prominent when highlighted */}
+                          {[0, 1, 2].map((particleIdx) => (
+                            <motion.circle
+                              key={`particle-${pathId}-${particleIdx}`}
+                              r={isHighlighted ? 4 : 2}
+                              fill={isHighlighted ? "url(#flowGradientHighlight)" : "hsl(var(--primary))"}
+                              className={cn(
+                                "transition-all duration-300",
+                                isHighlighted ? "opacity-100" : "opacity-40"
+                              )}
+                              filter={isHighlighted ? "url(#connectionGlow)" : undefined}
+                            >
+                              <animateMotion
+                                dur={`${2 + particleIdx * 0.5}s`}
+                                repeatCount="indefinite"
+                                begin={`${particleIdx * 0.7}s`}
+                              >
+                                <mpath href={`#${pathId}`} />
+                              </animateMotion>
+                              <animate
+                                attributeName="opacity"
+                                values={isHighlighted ? "0;1;1;0" : "0;0.4;0.4;0"}
+                                dur={`${2 + particleIdx * 0.5}s`}
+                                repeatCount="indefinite"
+                                begin={`${particleIdx * 0.7}s`}
+                              />
+                            </motion.circle>
+                          ))}
+                          
+                          {/* Direction arrow at midpoint */}
+                          <motion.g
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: isHighlighted ? 1 : 0.3 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <circle
+                              cx={(conn.from.x! + conn.to.x!) / 2}
+                              cy={(conn.from.y! + conn.to.y!) / 2 - 20}
+                              r={isHighlighted ? 6 : 4}
+                              className={cn(
+                                "transition-all duration-300",
+                                isHighlighted ? "fill-primary" : "fill-muted-foreground/50"
+                              )}
+                            />
+                            <text
+                              x={(conn.from.x! + conn.to.x!) / 2}
+                              y={(conn.from.y! + conn.to.y!) / 2 - 17}
+                              textAnchor="middle"
+                              className="fill-background text-[8px] font-bold"
+                            >
+                              ↑
+                            </text>
+                          </motion.g>
+                        </g>
                       );
                     })}
                   </g>
