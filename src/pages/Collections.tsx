@@ -105,6 +105,7 @@ const Collections = () => {
             title={t("collectionsPage.title")}
             subtitle={t("collectionsPage.subtitle")}
             bubbleSize="md"
+            scene="collections"
           />
         </section>
       )}

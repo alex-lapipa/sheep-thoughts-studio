@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProducts } from "@/hooks/useProducts";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { ArrowRight, MapPin, Euro, Truck, Shield, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -256,9 +256,9 @@ export default function DACH() {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section — DACH scene: Snowy midday, Alpine influence */}
       <section className="hero-gradient py-20 md:py-32 overflow-hidden relative">
-        <WicklowLandscape />
+        <WicklowHeroLandscape scene="dach" showTrees />
         <div className="container relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">

@@ -7,7 +7,7 @@ import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
-import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -53,10 +53,10 @@ export default function TalkToBubbles() {
         {/* Floating Mentor Widget */}
         <MentorFrequencyWidget />
 
-        {/* Hero Section — COLOSSAL Bubbles, matching homepage format */}
+        {/* Hero Section — TALK scene: Cloudy dusk, conversational twilight */}
         <section className="hero-gradient py-12 md:py-20 lg:py-32 overflow-hidden relative">
-          {/* Wicklow Landscape Background */}
-          <WicklowLandscape />
+          {/* Wicklow Landscape Background - Unique scene for Talk page */}
+          <WicklowHeroLandscape scene="talk" showTrees />
 
           <div className="container relative z-10 px-4 md:px-6">
             <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">

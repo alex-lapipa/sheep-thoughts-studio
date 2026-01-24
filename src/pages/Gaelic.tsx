@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProducts } from "@/hooks/useProducts";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { ArrowRight, MapPin, Euro, Truck, Shield } from "lucide-react";
 
 // Irish Gaelic content
@@ -115,9 +115,9 @@ export default function Gaelic() {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section — GAELIC scene: Foggy dusk, ancient mystical */}
       <section className="hero-gradient py-20 md:py-32 overflow-hidden relative">
-        <WicklowLandscape />
+        <WicklowHeroLandscape scene="gaelic" showTrees />
         <div className="container relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
