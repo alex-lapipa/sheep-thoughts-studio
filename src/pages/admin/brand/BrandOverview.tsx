@@ -83,7 +83,7 @@ export default function BrandOverview() {
               </div>
               <div className="space-y-1">
                 <span className="font-semibold text-foreground">Size</span>
-                <p className="text-muted-foreground">"colossal" (~72-80rem, twice as big)</p>
+                <p className="text-muted-foreground">"massive" (~26-30rem)</p>
               </div>
               <div className="space-y-1">
                 <span className="font-semibold text-foreground">Position</span>

@@ -136,7 +136,7 @@ export default function Adventures() {
         <ContentHero
           title="Adventures in Wicklow"
           subtitle="A comprehensive guide to Wicklow's landmarks, as understood by someone who has lived here their entire life and learned nothing accurate."
-          character={<BubblesHeroImage size="colossal" grounded flipped />}
+          character={<BubblesHeroImage size="massive" grounded flipped />}
           imageAlt="Bubbles the explorer sheep"
           badge={{ icon: Compass, text: "Directionally challenged" }}
           credentials={[
