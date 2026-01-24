@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { ScenarioPlayer } from "@/components/ScenarioPlayer";
+import { ContentHero } from "@/components/ContentHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { motion } from "framer-motion";
+import { Drama, Sparkles, Zap } from "lucide-react";
 import bubblesScenarios from "@/assets/bubbles-scenarios-happy.jpg";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
@@ -80,48 +81,19 @@ export default function Scenarios() {
   return (
     <Layout>
       {/* Hero with Happy Bubbles */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-accent/10 via-background to-primary/5 py-16 md:py-24 -mx-4 mb-12">
-        <div className="container px-4 md:px-6">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center lg:text-left"
-            >
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-                {t("scenariosPage.hero.title")}
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
-                {t("scenariosPage.hero.subtitle")}
-              </p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex justify-center"
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-primary/30 rounded-3xl blur-3xl scale-110" />
-                <motion.img
-                  src={bubblesScenarios}
-                  alt="Bubbles the happy artistic sheep"
-                  className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-3xl shadow-2xl"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-        
-        {/* Decorative background */}
-        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        </div>
+      <section className="-mx-4 mb-12">
+        <ContentHero
+          title={t("scenariosPage.hero.title")}
+          subtitle={t("scenariosPage.hero.subtitle")}
+          image={bubblesScenarios}
+          imageAlt="Bubbles the happy artistic sheep"
+          badge={{ icon: Drama, text: "Emotional Range Expert" }}
+          credentials={[
+            { icon: Sparkles, text: "5 Distinct Modes" },
+            { icon: Zap, text: "Trigger Taxonomy" },
+            { text: "Field-Tested Logic" },
+          ]}
+        />
       </section>
 
       {/* Research note */}

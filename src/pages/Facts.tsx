@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
-import { FactsHero } from "@/components/FactsHero";
-
+import { ContentHero } from "@/components/ContentHero";
 import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, FlaskConical, CheckCircle, Award } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
+import bubblesFactsHappy from "@/assets/bubbles-facts-happy.jpg";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -105,9 +105,17 @@ export default function Facts() {
       </Helmet>
       {/* Hero with Scientist Bubbles */}
       <section className="-mx-4 mb-12">
-        <FactsHero
+        <ContentHero
           title={t("factsPage.hero.title")}
           subtitle={t("factsPage.hero.subtitle")}
+          image={bubblesFactsHappy}
+          imageAlt="Bubbles the scientist sheep"
+          badge={{ icon: FlaskConical, text: "Peer-reviewed by grass" }}
+          credentials={[
+            { text: "0% Accuracy Guaranteed" },
+            { icon: CheckCircle, text: "100% Confidence" },
+            { icon: Award, text: "Bog-Certified" },
+          ]}
         />
       </section>
 
