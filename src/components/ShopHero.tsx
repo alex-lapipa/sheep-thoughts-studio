@@ -143,37 +143,24 @@ export function ShopHero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Side - Official Bubbles Character */}
+          {/* Right Side - Official Bubbles Character — LARGER & GROUNDED */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative flex justify-center items-center"
+            className="relative flex justify-center items-end"
           >
             <div className="relative">
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main character container */}
-              <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-[420px] md:h-[420px]">
-                <motion.div
-                  animate={{ 
-                    y: [0, -8, 0],
-                    rotate: [-1, 1, -1]
-                  }}
-                  transition={{ 
-                    duration: 5, 
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="w-full h-full flex items-center justify-center"
-                >
-                  <BubblesHeroImage size="hero" className="w-full h-full" />
-                </motion.div>
+              {/* Main character container — Massive size, grounded stance */}
+              <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[480px] md:h-[480px] lg:w-[520px] lg:h-[520px] flex items-end justify-center">
+                <BubblesHeroImage size="massive" grounded className="w-full h-full" />
 
-                {/* Floating accent badge */}
+                {/* Floating accent badge — positioned on grass line */}
                 <motion.div
-                  className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}

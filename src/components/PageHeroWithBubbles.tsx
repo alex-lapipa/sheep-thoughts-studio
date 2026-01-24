@@ -99,10 +99,11 @@ export function PageHeroWithBubbles({
     };
   }, [thoughts, getRandomPosition]);
 
+  // LARGER sizes for grounded Bubbles
   const bubbleSizeClasses = {
-    sm: "w-32 h-32 md:w-40 md:h-40",
-    md: "w-40 h-40 md:w-56 md:h-56",
-    lg: "w-48 h-48 md:w-64 md:h-64",
+    sm: "w-48 h-48 md:w-56 md:h-56",
+    md: "w-56 h-56 md:w-72 md:h-72",
+    lg: "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96",
   };
 
   // All positions anchor to head area (top portion of mascot)
@@ -121,13 +122,15 @@ export function PageHeroWithBubbles({
       <WicklowHeroLandscape weather="random" showTrees showWeatherControl />
 
       <div className="container relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          {/* Bubbles with thought bubbles */}
-          <div className="relative flex-shrink-0">
-            {/* The mascot - Post-punk stencil style */}
-            <div className={cn(bubbleSizeClasses[bubbleSize])}>
+        <div className="flex flex-col md:flex-row items-end gap-8 md:gap-12">
+          {/* Bubbles with thought bubbles — LARGER & GROUNDED */}
+          <div className="relative flex-shrink-0 flex items-end">
+            {/* The mascot - Post-punk stencil style, grounded on grass */}
+            <div className={cn(bubbleSizeClasses[bubbleSize], "flex items-end")}>
               <BubblesHeroImage
-                size={bubbleSize === "sm" ? "md" : bubbleSize === "md" ? "lg" : "xl"}
+                size={bubbleSize === "sm" ? "lg" : bubbleSize === "md" ? "xl" : "massive"}
+                grounded
+                flipped
               />
             </div>
 

@@ -9,12 +9,22 @@ import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
  * High-contrast black and white stencil art, rebellious and bold.
  * 
  * Used across all hero banners to replace the old cute/cartoonish SVG mascot.
+ * 
+ * Props:
+ * - size: Controls the size of Bubbles
+ * - flipped: When true, Bubbles faces left instead of right
+ * - grounded: When true, positions Bubbles at the bottom as if standing on grass
+ * - animated: Enables subtle floating animation
  */
 
 interface BubblesHeroImageProps {
-  size?: "sm" | "md" | "lg" | "xl" | "hero";
+  size?: "sm" | "md" | "lg" | "xl" | "hero" | "massive";
   className?: string;
   animated?: boolean;
+  /** Flip horizontally so Bubbles faces left */
+  flipped?: boolean;
+  /** Position at bottom as if standing on grass */
+  grounded?: boolean;
 }
 
 const sizes = {
@@ -23,23 +33,37 @@ const sizes = {
   lg: "w-56 h-56",
   xl: "w-72 h-72",
   hero: "w-80 h-80 md:w-[28rem] md:h-[28rem]",
+  massive: "w-96 h-96 md:w-[32rem] md:h-[32rem] lg:w-[38rem] lg:h-[38rem]",
 };
 
 export function BubblesHeroImage({
   size = "lg",
   className,
   animated = false,
+  flipped = false,
+  grounded = false,
 }: BubblesHeroImageProps) {
   const sizeClass = sizes[size];
+  
+  const imageClasses = cn(
+    "w-full h-full object-contain drop-shadow-2xl",
+    flipped && "scale-x-[-1]",
+    grounded && "object-bottom"
+  );
 
   // Static presence is the default — the world moves, Bubbles does not
   if (!animated) {
     return (
-      <div className={cn(sizeClass, "select-none", className)}>
+      <div className={cn(
+        sizeClass, 
+        "select-none",
+        grounded && "self-end",
+        className
+      )}>
         <img 
           src={bubblesStencil} 
           alt="Bubbles - A rebellious sheep in sunglasses" 
-          className="w-full h-full object-contain drop-shadow-2xl"
+          className={imageClasses}
           loading="eager"
         />
       </div>
@@ -50,7 +74,12 @@ export function BubblesHeroImage({
   // Just the imperceptible shift of a creature that is certain it is correct
   return (
     <motion.div
-      className={cn(sizeClass, "select-none", className)}
+      className={cn(
+        sizeClass, 
+        "select-none",
+        grounded && "self-end",
+        className
+      )}
       animate={{
         y: [0, -4, 0],
       }}
@@ -63,7 +92,7 @@ export function BubblesHeroImage({
       <img 
         src={bubblesStencil} 
         alt="Bubbles - A rebellious sheep in sunglasses" 
-        className="w-full h-full object-contain drop-shadow-2xl"
+        className={imageClasses}
         loading="eager"
       />
     </motion.div>
