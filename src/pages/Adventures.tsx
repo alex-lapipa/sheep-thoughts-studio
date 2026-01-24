@@ -1,13 +1,14 @@
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
-import { AdventuresHero } from "@/components/AdventuresHero";
+import { ContentHero } from "@/components/ContentHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { CrossLinks } from "@/components/CrossLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Mountain, TreePine, Waves, Wind, Sun } from "lucide-react";
+import { MapPin, Mountain, TreePine, Waves, Wind, Sun, Compass, Map } from "lucide-react";
 import { useOgImage } from "@/hooks/useOgImage";
+import bubblesAdventuresHappy from "@/assets/bubbles-adventures-happy.jpg";
 
 interface Landmark {
   id: string;
@@ -132,9 +133,17 @@ export default function Adventures() {
 
       {/* Hero */}
       <section className="-mx-4 mb-12">
-        <AdventuresHero
+        <ContentHero
           title="Adventures in Wicklow"
           subtitle="A comprehensive guide to Wicklow's landmarks, as understood by someone who has lived here their entire life and learned nothing accurate."
+          image={bubblesAdventuresHappy}
+          imageAlt="Bubbles the explorer sheep"
+          badge={{ icon: Compass, text: "Directionally challenged" }}
+          credentials={[
+            { icon: Mountain, text: "Never Lost" },
+            { icon: Map, text: "Maps Optional" },
+            { text: "Wicklow Native" },
+          ]}
         />
       </section>
 
