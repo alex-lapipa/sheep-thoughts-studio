@@ -156,8 +156,8 @@ export function PageHeroWithBubbles({
       "min-h-[50vh] md:min-h-[60vh] lg:min-h-[65vh] py-16 md:py-24 lg:py-32 relative overflow-hidden",
       className
     )}>
-      {/* Large Wicklow landscape with dynamic weather */}
-      <WicklowHeroLandscape weather="random" showTrees />
+      {/* Large Wicklow landscape with dynamic weather and interactive controls */}
+      <WicklowHeroLandscape weather="random" showTrees showWeatherControl />
 
       <div className="container relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
