@@ -6,7 +6,8 @@ import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
 import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
-import { BubblesBog } from "@/components/BubblesBog";
+import { BubblesHeroImage } from "@/components/BubblesHeroImage";
+import { WicklowLandscape } from "@/components/WicklowLandscape";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -52,38 +53,46 @@ export default function TalkToBubbles() {
         {/* Floating Mentor Widget */}
         <MentorFrequencyWidget />
 
-        {/* Hero Section with Brand-aligned SVG */}
-        <section className="relative py-12 md:py-20 overflow-hidden">
-          <div className="container px-4 md:px-6">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Text Content */}
+        {/* Hero Section — COLOSSAL Bubbles, matching homepage format */}
+        <section className="hero-gradient py-12 md:py-20 lg:py-32 overflow-hidden relative">
+          {/* Wicklow Landscape Background */}
+          <WicklowLandscape />
+
+          <div className="container relative z-10 px-4 md:px-6">
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              {/* Text Content — Left side */}
               <motion.div 
-                className="text-center md:text-left"
+                className="space-y-6 sm:space-y-8 animate-fade-in text-center lg:text-left order-2 lg:order-1"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                  Talk to <span className="text-accent">Bubbles</span>
-                </h1>
-                
-                <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
-                  Have a real conversation with Ireland's most confidently confused sheep. 
-                  Ask anything — expect confidently wrong answers.
-                </p>
+                <div className="space-y-3 sm:space-y-4">
+                  <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+                    Talk to <span className="text-accent">Bubbles</span>
+                  </h1>
+                  <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-lg mx-auto lg:mx-0">
+                    Have a real conversation with Ireland's most confidently confused sheep. 
+                    Ask anything — expect confidently wrong answers.
+                  </p>
+                </div>
               </motion.div>
 
-              {/* Brand-aligned Bubbles SVG */}
+              {/* COLOSSAL Bubbles — Right side, grounded, facing left */}
               <motion.div
-                className="relative flex justify-center md:justify-end"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
+                className="relative flex justify-center items-end order-1 lg:order-2"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <div className="relative w-full max-w-md">
+                <div className="relative">
                   {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-3xl scale-110" />
-                  <BubblesBog size="hero" animated posture="four-legged" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
+                  
+                  {/* COLOSSAL character container */}
+                  <div className="relative w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem] flex items-end justify-center">
+                    <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full drop-shadow-2xl" />
+                  </div>
                 </div>
               </motion.div>
             </div>

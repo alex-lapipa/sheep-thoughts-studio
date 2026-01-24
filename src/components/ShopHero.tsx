@@ -143,7 +143,7 @@ export function ShopHero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Side - Official Bubbles Character — LARGER & GROUNDED */}
+          {/* Right Side - COLOSSAL Bubbles Character — Grounded on grass */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -154,9 +154,9 @@ export function ShopHero() {
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main character container — Massive size, grounded stance */}
-              <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[480px] md:h-[480px] lg:w-[520px] lg:h-[520px] flex items-end justify-center">
-                <BubblesHeroImage size="massive" grounded className="w-full h-full" />
+              {/* Main character container — COLOSSAL size, grounded stance, facing left */}
+              <div className="relative w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem] flex items-end justify-center">
+                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full" />
 
                 {/* Floating accent badge — positioned on grass line */}
                 <motion.div
