@@ -7,13 +7,14 @@ import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ShoppingCart, Loader2, Check } from "lucide-react";
+import { ShoppingCart, Loader2, Check, Expand } from "lucide-react";
 import { toast } from "sonner";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "@/components/ModeBadge";
 import { analytics } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
+import { ImageLightbox } from "@/components/ImageLightbox";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -25,6 +26,7 @@ const ProductDetail = () => {
   
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Track product view - must be before any early returns
   useEffect(() => {
@@ -140,13 +142,23 @@ const ProductDetail = () => {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Images */}
           <div className="space-y-4">
-            <div className="aspect-square bg-muted rounded-xl overflow-hidden">
+            <div 
+              className="aspect-square bg-muted rounded-xl overflow-hidden relative group cursor-pointer"
+              onClick={() => setLightboxOpen(true)}
+            >
               {images[activeImage] ? (
-                <img 
-                  src={images[activeImage].node.url} 
-                  alt={images[activeImage].node.altText || product.title}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img 
+                    src={images[activeImage].node.url} 
+                    alt={images[activeImage].node.altText || product.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 rounded-full p-3">
+                      <Expand className="h-6 w-6" />
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   No image
@@ -172,6 +184,14 @@ const ProductDetail = () => {
                 ))}
               </div>
             )}
+
+            {/* Lightbox */}
+            <ImageLightbox
+              images={images.map((img: { node: { url: string; altText: string | null } }) => img.node)}
+              initialIndex={activeImage}
+              isOpen={lightboxOpen}
+              onClose={() => setLightboxOpen(false)}
+            />
           </div>
 
           {/* Product Info */}
