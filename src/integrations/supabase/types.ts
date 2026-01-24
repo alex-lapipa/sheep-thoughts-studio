@@ -1580,6 +1580,48 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_notifications: {
+        Row: {
+          email: string
+          id: string
+          metadata: Json | null
+          notified_at: string | null
+          product_handle: string
+          product_id: string
+          product_title: string
+          status: string
+          subscribed_at: string
+          variant_id: string
+          variant_title: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          metadata?: Json | null
+          notified_at?: string | null
+          product_handle: string
+          product_id: string
+          product_title: string
+          status?: string
+          subscribed_at?: string
+          variant_id: string
+          variant_title?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          metadata?: Json | null
+          notified_at?: string | null
+          product_handle?: string
+          product_id?: string
+          product_title?: string
+          status?: string
+          subscribed_at?: string
+          variant_id?: string
+          variant_title?: string | null
+        }
+        Relationships: []
+      }
       submitted_questions: {
         Row: {
           answer: string | null
