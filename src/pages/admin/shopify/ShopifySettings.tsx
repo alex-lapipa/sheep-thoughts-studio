@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Store, CheckCircle, XCircle, RefreshCw, ExternalLink, Shield, Clock, AlertTriangle, Webhook, Trash2 } from 'lucide-react';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { SyncStatusDashboard } from '@/components/admin/SyncStatusDashboard';
+import { useShopifyIntegrations } from '@/hooks/useShopifyIntegrations';
 
 interface WebhookStatus {
   registered: number;
@@ -37,6 +39,7 @@ export default function ShopifySettings() {
   const [registeringWebhooks, setRegisteringWebhooks] = useState(false);
   const [unregisteringWebhooks, setUnregisteringWebhooks] = useState(false);
   const { log } = useAuditLog();
+  const { fetchSyncStatus, fetchAnalytics } = useShopifyIntegrations();
 
   useEffect(() => {
     fetchSettings();
@@ -455,6 +458,14 @@ export default function ShopifySettings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Sync Status Dashboard */}
+        {settings?.is_connected && (
+          <SyncStatusDashboard 
+            fetchSyncStatus={fetchSyncStatus} 
+            fetchAnalytics={fetchAnalytics} 
+          />
+        )}
       </div>
     </AdminLayout>
   );
