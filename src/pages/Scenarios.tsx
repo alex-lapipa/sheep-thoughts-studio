@@ -5,11 +5,11 @@ import { ContentHero } from "@/components/ContentHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BubblesBog } from "@/components/BubblesBog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Drama, Sparkles, Zap } from "lucide-react";
-import bubblesScenarios from "@/assets/bubbles-scenarios-happy.jpg";
 
 type BubblesMode = "innocent" | "concerned" | "triggered" | "savage" | "nuclear";
 
@@ -80,12 +80,12 @@ export default function Scenarios() {
 
   return (
     <Layout>
-      {/* Hero with Happy Bubbles */}
+      {/* Hero with Brand-aligned Bubbles SVG */}
       <section className="-mx-4 mb-12">
         <ContentHero
           title={t("scenariosPage.hero.title")}
           subtitle={t("scenariosPage.hero.subtitle")}
-          image={bubblesScenarios}
+          character={<BubblesBog size="hero" animated posture="four-legged" />}
           imageAlt="Bubbles the happy artistic sheep"
           badge={{ icon: Drama, text: "Emotional Range Expert" }}
           credentials={[

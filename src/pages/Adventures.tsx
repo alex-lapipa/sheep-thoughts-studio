@@ -6,9 +6,9 @@ import { AnimatedOnView } from "@/components/AnimatedText";
 import { CrossLinks } from "@/components/CrossLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BubblesExplorer } from "@/components/BubblesExplorer";
 import { MapPin, Mountain, TreePine, Waves, Wind, Sun, Compass, Map } from "lucide-react";
 import { useOgImage } from "@/hooks/useOgImage";
-import bubblesAdventuresHappy from "@/assets/bubbles-adventures-happy.jpg";
 
 interface Landmark {
   id: string;
@@ -131,12 +131,12 @@ export default function Adventures() {
         <link rel="canonical" href={`${siteUrl}/adventures`} />
       </Helmet>
 
-      {/* Hero */}
+      {/* Hero with Explorer Bubbles (Brand-aligned SVG) */}
       <section className="-mx-4 mb-12">
         <ContentHero
           title="Adventures in Wicklow"
           subtitle="A comprehensive guide to Wicklow's landmarks, as understood by someone who has lived here their entire life and learned nothing accurate."
-          image={bubblesAdventuresHappy}
+          character={<BubblesExplorer size="hero" animated />}
           imageAlt="Bubbles the explorer sheep"
           badge={{ icon: Compass, text: "Directionally challenged" }}
           credentials={[

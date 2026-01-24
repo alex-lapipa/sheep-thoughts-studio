@@ -1,19 +1,27 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 /**
  * CONTENT HERO — Brand-consistent hero for content pages
  * 
  * Uses Ireland Green primary color, consistent animations,
  * and standardized layout across Facts, Adventures, Scenarios, etc.
+ * 
+ * IMPORTANT: This component accepts either an image URL string OR a React component
+ * for the character slot. When using brand-aligned SVG components (BubblesScientist,
+ * BubblesScholar, BubblesChef, BubblesExplorer), pass them as the `character` prop.
  */
 
 interface ContentHeroProps {
   title: string;
   subtitle?: string;
-  image: string;
-  imageAlt: string;
+  /** @deprecated Use `character` prop with SVG components instead */
+  image?: string;
+  imageAlt?: string;
+  /** Brand-aligned SVG character component (preferred over image) */
+  character?: ReactNode;
   badge?: {
     icon?: LucideIcon;
     text: string;
@@ -31,6 +39,7 @@ export function ContentHero({
   subtitle,
   image,
   imageAlt,
+  character,
   badge,
   credentials = [],
   className,
@@ -106,7 +115,7 @@ export function ContentHero({
               )}
             </div>
 
-            {/* Character Image */}
+            {/* Character/Image Slot */}
             <motion.div
               className="relative flex-shrink-0"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -116,13 +125,20 @@ export function ContentHero({
               {/* Glow effect using primary color */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/20 rounded-3xl blur-3xl scale-110" />
               
-              <motion.img
-                src={image}
-                alt={imageAlt}
-                className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-3xl shadow-2xl border border-primary/10"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              />
+              {/* Render character component or image */}
+              {character ? (
+                <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                  {character}
+                </div>
+              ) : image ? (
+                <motion.img
+                  src={image}
+                  alt={imageAlt || ""}
+                  className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-3xl shadow-2xl border border-primary/10"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                />
+              ) : null}
             </motion.div>
           </div>
 

@@ -6,10 +6,10 @@ import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
 import { MeetTheMentors } from "@/components/MeetTheMentors";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
+import { BubblesBog } from "@/components/BubblesBog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import bubblesTalkHappy from "@/assets/bubbles-talk-happy.jpg";
 
 export default function TalkToBubbles() {
   const [prefilledQuestion, setPrefilledQuestion] = useState<string>("");
@@ -52,7 +52,7 @@ export default function TalkToBubbles() {
         {/* Floating Mentor Widget */}
         <MentorFrequencyWidget />
 
-        {/* Hero Section with Image */}
+        {/* Hero Section with Brand-aligned SVG */}
         <section className="relative py-12 md:py-20 overflow-hidden">
           <div className="container px-4 md:px-6">
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -73,20 +73,18 @@ export default function TalkToBubbles() {
                 </p>
               </motion.div>
 
-              {/* Image */}
+              {/* Brand-aligned Bubbles SVG */}
               <motion.div
                 className="relative flex justify-center md:justify-end"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <motion.img
-                  src={bubblesTalkHappy}
-                  alt="Bubbles the sheep ready to chat"
-                  className="w-full max-w-md rounded-2xl shadow-2xl"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                />
+                <div className="relative w-full max-w-md">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-3xl scale-110" />
+                  <BubblesBog size="hero" animated posture="four-legged" />
+                </div>
               </motion.div>
             </div>
           </div>
