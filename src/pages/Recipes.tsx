@@ -1,13 +1,14 @@
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
-import { RecipesHero } from "@/components/RecipesHero";
+import { ContentHero } from "@/components/ContentHero";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { CrossLinks } from "@/components/CrossLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, ChefHat, Sparkles } from "lucide-react";
+import { Clock, Users, ChefHat, Sparkles, Utensils, Flame } from "lucide-react";
 import { useOgImage } from "@/hooks/useOgImage";
+import bubblesChef from "@/assets/bubbles-shopping-happy.jpg";
 
 interface Recipe {
   id: string;
@@ -183,12 +184,19 @@ export default function Recipes() {
       </Helmet>
 
       {/* Hero */}
-      <section className="-mx-4 mb-12">
-        <RecipesHero
-          title="Recipes by Bubbles"
-          subtitle="Grass-forward cuisine from the fields of Wicklow. Each dish has been field-tested. Results may vary."
-        />
-      </section>
+      <ContentHero
+        title="Recipes by Bubbles"
+        subtitle="Grass-forward cuisine from the fields of Wicklow. Each dish has been field-tested. Results may vary."
+        image={bubblesChef}
+        imageAlt="Bubbles the chef sheep with culinary wisdom"
+        badge={{ icon: ChefHat, text: "Grass-Forward Chef" }}
+        credentials={[
+          { icon: Utensils, text: "Self-Taught" },
+          { icon: Flame, text: "0 Kitchen Fires" },
+          { icon: Sparkles, text: "Field-Tested" },
+        ]}
+        className="-mx-4 mb-12"
+      />
 
       {/* Disclaimer */}
       <section className="py-8 border-b border-border">
