@@ -99,11 +99,11 @@ export function PageHeroWithBubbles({
     };
   }, [thoughts, getRandomPosition]);
 
-  // LARGER sizes for grounded Bubbles
+  // COLOSSAL sizes for grounded Bubbles — matching homepage scale
   const bubbleSizeClasses = {
-    sm: "w-48 h-48 md:w-56 md:h-56",
-    md: "w-56 h-56 md:w-72 md:h-72",
-    lg: "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96",
+    sm: "w-[20rem] h-[20rem] sm:w-[26rem] sm:h-[26rem] md:w-[32rem] md:h-[32rem]",
+    md: "w-[24rem] h-[24rem] sm:w-[30rem] sm:h-[30rem] md:w-[38rem] md:h-[38rem] lg:w-[44rem] lg:h-[44rem]",
+    lg: "w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem]",
   };
 
   // All positions anchor to head area (top portion of mascot)
@@ -115,85 +115,91 @@ export function PageHeroWithBubbles({
 
   return (
     <section className={cn(
-      "min-h-[50vh] md:min-h-[60vh] lg:min-h-[65vh] py-16 md:py-24 lg:py-32 relative overflow-hidden",
+      "min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] py-16 md:py-24 lg:py-32 relative overflow-hidden",
       className
     )}>
       {/* Large Wicklow landscape with dynamic weather and interactive controls */}
       <WicklowHeroLandscape weather="random" showTrees showWeatherControl />
 
       <div className="container relative z-10">
-        <div className="flex flex-col md:flex-row items-end gap-8 md:gap-12">
-          {/* Bubbles with thought bubbles — LARGER & GROUNDED */}
-          <div className="relative flex-shrink-0 flex items-end">
-            {/* The mascot - Post-punk stencil style, grounded on grass */}
-            <div className={cn(bubbleSizeClasses[bubbleSize], "flex items-end")}>
-              <BubblesHeroImage
-                size={bubbleSize === "sm" ? "lg" : bubbleSize === "md" ? "xl" : "massive"}
-                grounded
-                flipped
-              />
-            </div>
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* COLOSSAL Bubbles with thought bubbles — Grounded on grass, facing left */}
+          <div className="relative flex justify-center items-end order-1 lg:order-2">
+            <div className="relative">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
+              
+              {/* The mascot - COLOSSAL Post-punk stencil style, grounded on grass */}
+              <div className={cn(bubbleSizeClasses[bubbleSize], "relative flex items-end justify-center")}>
+                <BubblesHeroImage
+                  size="colossal"
+                  grounded
+                  flipped
+                  className="w-full h-full drop-shadow-2xl"
+                />
+              </div>
 
-            {/* Animated thought bubbles - organic, cloud-like emergence */}
-            <AnimatePresence mode="wait">
-              {visibleThoughts.map((thought) => (
-                <motion.div
-                  key={thought.key}
-                  className={cn(
-                    "absolute z-20 max-w-[200px] md:max-w-[260px]",
-                    positionStyles[thought.position]
-                  )}
-                  initial={{ opacity: 0, scale: 0.7, y: 15 }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: 1, 
-                    y: [0, -4, 0],
-                  }}
-                  exit={{ opacity: 0, scale: 0.85, y: -8 }}
-                  transition={{
-                    opacity: { duration: 0.8, ease: "easeOut" },
-                    scale: { duration: 1, ease: [0.34, 1.56, 0.64, 1] },
-                    y: { 
-                      duration: 4, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
-                    },
-                  }}
-                >
-                  <OrganicThoughtBubble text={thought.text} mode={thought.mode} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            {/* Soft connector bubbles - clustered, not comic-trail */}
-            <AnimatePresence>
-              {visibleThoughts.length > 0 && (
-                <motion.div 
-                  className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  {/* Soft bubble cluster - organic shapes */}
+              {/* Animated thought bubbles - organic, cloud-like emergence */}
+              <AnimatePresence mode="wait">
+                {visibleThoughts.map((thought) => (
                   <motion.div
-                    className="relative"
-                    animate={{ y: [0, -2, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    key={thought.key}
+                    className={cn(
+                      "absolute z-20 max-w-[200px] md:max-w-[260px]",
+                      positionStyles[thought.position]
+                    )}
+                    initial={{ opacity: 0, scale: 0.7, y: 15 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: 1, 
+                      y: [0, -4, 0],
+                    }}
+                    exit={{ opacity: 0, scale: 0.85, y: -8 }}
+                    transition={{
+                      opacity: { duration: 0.8, ease: "easeOut" },
+                      scale: { duration: 1, ease: [0.34, 1.56, 0.64, 1] },
+                      y: { 
+                        duration: 4, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      },
+                    }}
                   >
-                    <div className="w-4 h-4 rounded-full bg-bubbles-cream/70 border border-bubbles-peat/10 blur-[0.5px]" />
-                    <div className="absolute -top-2 -right-1 w-2.5 h-2.5 rounded-full bg-bubbles-cream/60 border border-bubbles-peat/10 blur-[0.3px]" />
-                    <div className="absolute -top-1 left-1 w-2 h-2 rounded-full bg-bubbles-cream/50 border border-bubbles-peat/10 blur-[0.2px]" />
+                    <OrganicThoughtBubble text={thought.text} mode={thought.mode} />
                   </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                ))}
+              </AnimatePresence>
+
+              {/* Soft connector bubbles - clustered, not comic-trail */}
+              <AnimatePresence>
+                {visibleThoughts.length > 0 && (
+                  <motion.div 
+                    className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  >
+                    {/* Soft bubble cluster - organic shapes */}
+                    <motion.div
+                      className="relative"
+                      animate={{ y: [0, -2, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <div className="w-4 h-4 rounded-full bg-bubbles-cream/70 border border-bubbles-peat/10 blur-[0.5px]" />
+                      <div className="absolute -top-2 -right-1 w-2.5 h-2.5 rounded-full bg-bubbles-cream/60 border border-bubbles-peat/10 blur-[0.3px]" />
+                      <div className="absolute -top-1 left-1 w-2 h-2 rounded-full bg-bubbles-cream/50 border border-bubbles-peat/10 blur-[0.2px]" />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
-          {/* Hero text */}
-          <div className="text-center md:text-left flex-1">
+          {/* Hero text — Left side, matching homepage format */}
+          <div className="space-y-6 sm:space-y-8 animate-fade-in text-center lg:text-left order-2 lg:order-1">
             <motion.h1
-              className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -202,7 +208,7 @@ export function PageHeroWithBubbles({
             </motion.h1>
             {subtitle && (
               <motion.p
-                className="text-lg md:text-xl text-muted-foreground max-w-xl"
+                className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-lg mx-auto lg:mx-0"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
