@@ -141,16 +141,16 @@ export function HeroSection() {
     <section className="hero-gradient py-12 md:py-20 lg:py-32 overflow-hidden">
       <div className="container px-4 md:px-6">
         {/* Mobile: Stack vertically, Desktop: Grid */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">
           
           {/* Mobile: Character first for visual impact */}
-          <div className="relative flex justify-center items-end order-1 lg:order-2">
-            {/* Post-punk stencil Bubbles - COLOSSAL & GROUNDED on grass, facing left */}
+          <div className="relative flex justify-center items-end self-end order-1 lg:order-2">
+            {/* Post-punk stencil Bubbles - Grounded on grass, facing left */}
             <div className="relative">
               {/* Glow effect behind Bubbles */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
-              <div className="relative w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem] xl:w-[62rem] xl:h-[62rem] flex items-end justify-center">
-                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full drop-shadow-2xl" />
+              <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem] xl:w-[30rem] xl:h-[30rem] flex items-end justify-center">
+                <BubblesHeroImage size="massive" grounded flipped className="w-full h-full drop-shadow-2xl" />
               </div>
             </div>
             

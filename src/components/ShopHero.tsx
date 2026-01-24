@@ -19,7 +19,7 @@ export function ShopHero() {
       <WicklowLandscape />
 
       <div className="container relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-end">
           {/* Left Side - Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -143,22 +143,22 @@ export function ShopHero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Side - COLOSSAL Bubbles Character — Grounded on grass */}
+          {/* Right Side - Bubbles Character — Grounded on grass, facing left */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative flex justify-center items-end"
+            className="relative flex justify-center items-end self-end"
           >
             <div className="relative">
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-bubbles-gorse/30 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* Main character container — COLOSSAL size, grounded stance, facing left */}
-              <div className="relative w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem] flex items-end justify-center">
-                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full" />
+              {/* Main character container — Grounded stance, facing left */}
+              <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem] flex items-end justify-center">
+                <BubblesHeroImage size="massive" grounded flipped className="w-full h-full" />
 
-                {/* Floating accent badge — positioned on grass line */}
+                {/* Floating accent badge */}
                 <motion.div
                   className="absolute bottom-4 left-1/2 -translate-x-1/2"
                   initial={{ opacity: 0, y: 10 }}
