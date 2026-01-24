@@ -3,14 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Binoculars, Sparkles, Trophy, RotateCcw, ChevronRight, 
   Check, X, Lightbulb, Zap, Star, Dog, Bird, Cat, Rabbit, 
-  Squirrel, Bug, Fish, Rat, HelpCircle
+  Squirrel, Bug, Fish, Rat, HelpCircle, Medal, Crown, Users
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import confetti from "canvas-confetti";
+import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 interface CreatureData {
@@ -20,6 +22,40 @@ interface CreatureData {
   clues: string[];
   bubblesReveal: string;
 }
+
+interface LeaderboardEntry {
+  initials: string;
+  score: number;
+  streak: number;
+  date: string;
+}
+
+const LEADERBOARD_KEY = "creature-spotter-leaderboard";
+const MAX_LEADERBOARD_ENTRIES = 10;
+
+const getLeaderboard = (): LeaderboardEntry[] => {
+  try {
+    const stored = localStorage.getItem(LEADERBOARD_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveToLeaderboard = (entry: LeaderboardEntry): LeaderboardEntry[] => {
+  const leaderboard = getLeaderboard();
+  leaderboard.push(entry);
+  leaderboard.sort((a, b) => b.score - a.score || b.streak - a.streak);
+  const trimmed = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(trimmed));
+  return trimmed;
+};
+
+const isHighScore = (score: number): boolean => {
+  const leaderboard = getLeaderboard();
+  if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) return true;
+  return score > leaderboard[leaderboard.length - 1].score;
+};
 
 const CREATURES: CreatureData[] = [
   {
@@ -129,8 +165,17 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return shuffled;
 };
 
+const getRankIcon = (rank: number) => {
+  switch (rank) {
+    case 1: return <Crown className="w-4 h-4 text-amber-400" />;
+    case 2: return <Medal className="w-4 h-4 text-slate-300" />;
+    case 3: return <Medal className="w-4 h-4 text-amber-600" />;
+    default: return <span className="text-xs text-muted-foreground w-4 text-center">{rank}</span>;
+  }
+};
+
 export const CreatureSpotter = () => {
-  const [gameState, setGameState] = useState<"idle" | "playing" | "guessing" | "result" | "complete">("idle");
+  const [gameState, setGameState] = useState<"idle" | "playing" | "guessing" | "result" | "complete" | "enterInitials">("idle");
   const [currentCreatureIndex, setCurrentCreatureIndex] = useState(0);
   const [currentClueIndex, setCurrentClueIndex] = useState(0);
   const [options, setOptions] = useState<CreatureData[]>([]);
@@ -141,9 +186,17 @@ export const CreatureSpotter = () => {
   const [maxStreak, setMaxStreak] = useState(0);
   const [gameCreatures, setGameCreatures] = useState<CreatureData[]>([]);
   const [hintsUsed, setHintsUsed] = useState(0);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [initials, setInitials] = useState("");
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const currentCreature = gameCreatures[currentCreatureIndex];
   const totalRounds = 5;
+
+  // Load leaderboard on mount
+  useEffect(() => {
+    setLeaderboard(getLeaderboard());
+  }, []);
 
   const startGame = useCallback(() => {
     const shuffled = shuffleArray(CREATURES).slice(0, totalRounds);
@@ -156,6 +209,8 @@ export const CreatureSpotter = () => {
     setHintsUsed(0);
     setSelectedAnswer(null);
     setIsCorrect(null);
+    setInitials("");
+    setShowLeaderboard(false);
     setGameState("playing");
     prepareOptions(shuffled[0], shuffled);
   }, []);
@@ -185,7 +240,6 @@ export const CreatureSpotter = () => {
     setIsCorrect(correct);
     
     if (correct) {
-      // Score based on clues used (fewer clues = more points)
       const clueBonus = Math.max(1, 4 - currentClueIndex);
       const streakBonus = streak >= 2 ? 1 : 0;
       const points = clueBonus + streakBonus;
@@ -193,7 +247,6 @@ export const CreatureSpotter = () => {
       setStreak(prev => prev + 1);
       setMaxStreak(prev => Math.max(prev, streak + 1));
       
-      // Celebration
       if (streak >= 2) {
         confetti({
           particleCount: 50,
@@ -218,7 +271,12 @@ export const CreatureSpotter = () => {
       setGameState("playing");
       prepareOptions(gameCreatures[nextIndex], gameCreatures);
     } else {
-      setGameState("complete");
+      // Game complete - check if high score
+      if (isHighScore(score)) {
+        setGameState("enterInitials");
+      } else {
+        setGameState("complete");
+      }
       if (score >= totalRounds * 2) {
         confetti({
           particleCount: 100,
@@ -227,6 +285,28 @@ export const CreatureSpotter = () => {
         });
       }
     }
+  };
+
+  const submitHighScore = () => {
+    if (initials.trim().length < 2) return;
+    
+    const entry: LeaderboardEntry = {
+      initials: initials.toUpperCase().slice(0, 3),
+      score,
+      streak: maxStreak,
+      date: new Date().toLocaleDateString()
+    };
+    
+    const updated = saveToLeaderboard(entry);
+    setLeaderboard(updated);
+    setGameState("complete");
+    setShowLeaderboard(true);
+    
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
   };
 
   return (
@@ -244,25 +324,99 @@ export const CreatureSpotter = () => {
               </p>
             </div>
           </div>
-          {gameState !== "idle" && gameState !== "complete" && (
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="gap-1">
-                <Star className="w-3 h-3 text-amber-400" />
-                {score}
-              </Badge>
-              {streak >= 2 && (
-                <Badge className="bg-orange-500/20 text-orange-300 gap-1">
-                  <Zap className="w-3 h-3" />
-                  {streak}x
+          <div className="flex items-center gap-2">
+            {gameState !== "idle" && gameState !== "complete" && gameState !== "enterInitials" && (
+              <>
+                <Badge variant="secondary" className="gap-1">
+                  <Star className="w-3 h-3 text-amber-400" />
+                  {score}
                 </Badge>
-              )}
-            </div>
-          )}
+                {streak >= 2 && (
+                  <Badge className="bg-orange-500/20 text-orange-300 gap-1">
+                    <Zap className="w-3 h-3" />
+                    {streak}x
+                  </Badge>
+                )}
+              </>
+            )}
+            {(gameState === "idle" || gameState === "complete") && leaderboard.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                className="gap-1 h-8"
+              >
+                <Users className="w-3.5 h-3.5" />
+                Leaderboard
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="pt-4">
         <AnimatePresence mode="wait">
+          {/* Leaderboard View */}
+          {showLeaderboard && (gameState === "idle" || gameState === "complete") && (
+            <motion.div
+              key="leaderboard"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-4"
+            >
+              <div className="p-4 rounded-lg bg-muted/30 border border-muted-foreground/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <h4 className="font-semibold text-sm">Top Spotters</h4>
+                </div>
+                
+                {leaderboard.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">
+                    No high scores yet. Be the first!
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {leaderboard.map((entry, idx) => (
+                      <motion.div
+                        key={`${entry.initials}-${idx}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className={cn(
+                          "flex items-center gap-3 p-2 rounded-lg",
+                          idx === 0 ? "bg-amber-500/10 border border-amber-500/20" :
+                          idx === 1 ? "bg-slate-400/10" :
+                          idx === 2 ? "bg-amber-700/10" : "bg-muted/20"
+                        )}
+                      >
+                        <div className="w-6 flex justify-center">
+                          {getRankIcon(idx + 1)}
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-mono font-bold text-sm">{entry.initials}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="flex items-center gap-1">
+                            <Star className="w-3 h-3 text-amber-400" />
+                            {entry.score}
+                          </span>
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <Zap className="w-3 h-3" />
+                            {entry.streak}x
+                          </span>
+                          <span className="text-muted-foreground hidden sm:inline">
+                            {entry.date}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
           {/* Idle State */}
           {gameState === "idle" && (
             <motion.div
@@ -420,6 +574,59 @@ export const CreatureSpotter = () => {
                 <ChevronRight className="w-4 h-4" />
                 {currentCreatureIndex < totalRounds - 1 ? "Next Creature" : "See Results"}
               </Button>
+            </motion.div>
+          )}
+
+          {/* Enter Initials State */}
+          {gameState === "enterInitials" && (
+            <motion.div
+              key="enterInitials"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-4"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", damping: 10 }}
+              >
+                <Trophy className="w-12 h-12 mx-auto mb-4 text-amber-400" />
+              </motion.div>
+              
+              <h3 className="text-2xl font-bold mb-2 text-amber-400">New High Score!</h3>
+              <p className="text-muted-foreground mb-6">
+                You scored <span className="text-foreground font-bold">{score}</span> points!
+                Enter your initials for the leaderboard.
+              </p>
+
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Input
+                  value={initials}
+                  onChange={(e) => setInitials(e.target.value.toUpperCase().slice(0, 3))}
+                  placeholder="AAA"
+                  maxLength={3}
+                  className="w-24 text-center text-2xl font-mono font-bold tracking-widest uppercase"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setGameState("complete")}
+                >
+                  Skip
+                </Button>
+                <Button
+                  onClick={submitHighScore}
+                  disabled={initials.trim().length < 2}
+                  className="gap-2"
+                >
+                  <Trophy className="w-4 h-4" />
+                  Save Score
+                </Button>
+              </div>
             </motion.div>
           )}
 
