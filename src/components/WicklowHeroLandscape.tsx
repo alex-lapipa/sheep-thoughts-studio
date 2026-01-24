@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { WeatherSelector } from "./WeatherSelector";
 
 /**
  * WICKLOW HERO LANDSCAPE — DYNAMIC WEATHER, TERRAIN & TIME OF DAY
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
  * - Random scattered trees on terrain
  * - Parallax layering for depth
  * - Enhanced animated weather effects
+ * - Optional interactive weather selector control
  */
 
 // Weather types for hero variation - extended set
@@ -28,6 +30,7 @@ interface WicklowHeroLandscapeProps {
   intensity?: number; // 0-100 for weather intensity
   enableSnow?: boolean;
   enableFog?: boolean;
+  showWeatherControl?: boolean; // Show interactive weather selector
 }
 
 // Random weather selection with weights
@@ -165,9 +168,14 @@ export function WicklowHeroLandscape({
   intensity = 50,
   enableSnow = true,
   enableFog = true,
+  showWeatherControl = false,
 }: WicklowHeroLandscapeProps) {
+  // Manual override state for interactive control
+  const [manualWeather, setManualWeather] = useState<WeatherType | null>(null);
+  const [manualTime, setManualTime] = useState<TimeOfDay | null>(null);
+
   // Stable random weather for component lifetime
-  const resolvedWeather = useMemo<WeatherType>(() => {
+  const initialWeather = useMemo<WeatherType>(() => {
     if (weather === "random") {
       const random = getRandomWeather();
       // Respect enable flags
@@ -179,13 +187,26 @@ export function WicklowHeroLandscape({
   }, [weather, enableSnow, enableFog]);
 
   // Resolve time of day
-  const resolvedTime = useMemo<TimeOfDay>(() => {
+  const initialTime = useMemo<TimeOfDay>(() => {
     if (timeOfDay === "auto") return getTimeOfDayFromHour();
     if (timeOfDay === "random") return getRandomTimeOfDay();
     return timeOfDay;
   }, [timeOfDay]);
 
+  // Use manual overrides if set, otherwise use initial values
+  const resolvedWeather = manualWeather ?? initialWeather;
+  const resolvedTime = manualTime ?? initialTime;
+
   const palette = TIME_PALETTES[resolvedTime];
+
+  // Handlers for weather selector
+  const handleWeatherChange = useCallback((newWeather: WeatherType) => {
+    setManualWeather(newWeather);
+  }, []);
+
+  const handleTimeChange = useCallback((newTime: TimeOfDay) => {
+    setManualTime(newTime);
+  }, []);
 
   // Stable tree positions
   const treeSeed = useMemo(() => Math.floor(Math.random() * 10000), []);
@@ -193,6 +214,17 @@ export function WicklowHeroLandscape({
 
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>
+      {/* Weather Control UI */}
+      {showWeatherControl && (
+        <WeatherSelector
+          weather={resolvedWeather}
+          timeOfDay={resolvedTime}
+          onWeatherChange={handleWeatherChange}
+          onTimeChange={handleTimeChange}
+          className="top-4 right-4"
+        />
+      )}
+
       {/* SKY LAYER */}
       <SkyLayer weather={resolvedWeather} timeOfDay={resolvedTime} palette={palette} intensity={intensity} />
       
