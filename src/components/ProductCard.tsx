@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
 import { ProductQuickView } from "./ProductQuickView";
+import { WishlistButton } from "./WishlistButton";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { useABProductTracking } from "@/hooks/useABTracking";
 import { cn } from "@/lib/utils";
@@ -183,6 +184,11 @@ export function ProductCard({ product, position, listName, enableHoverQuickView 
                 <ModeBadge mode={modeTag} />
               </div>
             )}
+            
+            {/* Wishlist Button */}
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+              <WishlistButton product={product} />
+            </div>
             
             {/* Desktop: Quick View Button (hover) */}
             <div className={cn(
