@@ -516,6 +516,7 @@ const WicklowGlossary = () => {
       <PageHeroWithBubbles
         title="The Wicklow Glossary"
         subtitle="A Comprehensive Guide to What Farmers Really Mean (According to Me)"
+        scene="glossary"
       />
 
       <div className="container mx-auto px-4 py-12">

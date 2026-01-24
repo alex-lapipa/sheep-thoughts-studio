@@ -276,12 +276,13 @@ export default function Achievements() {
         <meta name="twitter:image" content={ogImageUrl} />
       </Helmet>
       
-      {/* Hero with Bubbles */}
+      {/* Hero with Bubbles — ACHIEVEMENTS scene: Thunder night */}
       <section className="-mx-4 mb-12">
         <PageHeroWithBubbles
           title="Wisdom Badges"
           subtitle="Track your journey of seeking Bubbles' confidently incorrect wisdom. Each badge represents a milestone in your quest for enlightenment."
           bubbleSize="md"
+          scene="achievements"
         />
       </section>
       <FloatingParticles count={15} />

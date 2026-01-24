@@ -79,6 +79,7 @@ const FAQ = () => {
           title="Frequently Asked Questions"
           subtitle="Everything you need to know, answered with varying degrees of accuracy"
           bubbleSize="sm"
+          scene="faq"
         />
       </section>
 

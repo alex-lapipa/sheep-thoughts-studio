@@ -209,6 +209,7 @@ const Contact = () => {
           ? 'Send your questions, feedback, or declarations of admiration' 
           : 'Envía tus preguntas, comentarios o declaraciones de admiración'}
         bubbleSize="md"
+        scene="contact"
       />
       <div className="container max-w-4xl mx-auto px-4 py-12">
 

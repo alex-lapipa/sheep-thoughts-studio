@@ -22,7 +22,66 @@ export type WeatherType = "sunny" | "cloudy" | "rainy" | "stormy" | "thunder" | 
 // Time of day for lighting variation - including night
 export type TimeOfDay = "dawn" | "midday" | "dusk" | "night";
 
+/**
+ * NAMED SCENE PRESETS — Unique atmosphere for each page
+ * Each scene has a fixed weather + time combination for visual consistency
+ */
+export type ScenePreset = 
+  | "home"         // Cloudy midday - classic bog atmosphere
+  | "shop"         // Sunny midday - bright, inviting for purchases
+  | "faq"          // Misty dawn - thoughtful, contemplative
+  | "collections"  // Windy dusk - dynamic, energetic shopping
+  | "facts"        // Rainy midday - cozy learning atmosphere
+  | "explains"     // Foggy dawn - mysterious wisdom emerging
+  | "talk"         // Cloudy dusk - conversational twilight
+  | "about"        // Sunny dawn - warm introduction
+  | "scenarios"    // Stormy midday - dramatic escalations
+  | "recipes"      // Sunny midday - bright kitchen energy
+  | "adventures"   // Windy midday - exploration spirit
+  | "gaelic"       // Foggy dusk - ancient mystical
+  | "francophone"  // Cloudy dawn - European morning
+  | "dach"         // Snowy midday - Alpine influence
+  | "hispanic"     // Sunny dusk - warm evening
+  | "achievements" // Thunder night - dramatic victory
+  | "halloffame"   // Stormy dusk - legendary atmosphere
+  | "contact"      // Rainy dawn - gentle invitation
+  | "glossary"     // Windy dawn - farmer wisdom
+  | "shipping"     // Cloudy midday - logistical efficiency
+  | "quiz"         // Sunny dusk - playful challenge
+  | "datarights"   // Foggy midday - privacy contemplation
+  | "terms"        // Rainy dusk - legal atmosphere
+  | "privacy";     // Cloudy night - secretive ambiance
+
+const SCENE_CONFIGS: Record<ScenePreset, { weather: WeatherType; timeOfDay: TimeOfDay }> = {
+  home:        { weather: "cloudy", timeOfDay: "midday" },
+  shop:        { weather: "sunny", timeOfDay: "midday" },
+  faq:         { weather: "foggy", timeOfDay: "dawn" },
+  collections: { weather: "windy", timeOfDay: "dusk" },
+  facts:       { weather: "rainy", timeOfDay: "midday" },
+  explains:    { weather: "foggy", timeOfDay: "dawn" },
+  talk:        { weather: "cloudy", timeOfDay: "dusk" },
+  about:       { weather: "sunny", timeOfDay: "dawn" },
+  scenarios:   { weather: "stormy", timeOfDay: "midday" },
+  recipes:     { weather: "sunny", timeOfDay: "midday" },
+  adventures:  { weather: "windy", timeOfDay: "midday" },
+  gaelic:      { weather: "foggy", timeOfDay: "dusk" },
+  francophone: { weather: "cloudy", timeOfDay: "dawn" },
+  dach:        { weather: "snowy", timeOfDay: "midday" },
+  hispanic:    { weather: "sunny", timeOfDay: "dusk" },
+  achievements:{ weather: "thunder", timeOfDay: "night" },
+  halloffame:  { weather: "stormy", timeOfDay: "dusk" },
+  contact:     { weather: "rainy", timeOfDay: "dawn" },
+  glossary:    { weather: "windy", timeOfDay: "dawn" },
+  shipping:    { weather: "cloudy", timeOfDay: "midday" },
+  quiz:        { weather: "sunny", timeOfDay: "dusk" },
+  datarights:  { weather: "foggy", timeOfDay: "midday" },
+  terms:       { weather: "rainy", timeOfDay: "dusk" },
+  privacy:     { weather: "cloudy", timeOfDay: "night" },
+};
+
 interface WicklowHeroLandscapeProps {
+  /** Named scene preset - overrides weather/timeOfDay if provided */
+  scene?: ScenePreset;
   weather?: WeatherType | "random";
   timeOfDay?: TimeOfDay | "auto" | "random";
   className?: string;
@@ -161,6 +220,7 @@ const TIME_PALETTES: Record<TimeOfDay, TimeOfDayPalette> = {
 };
 
 export function WicklowHeroLandscape({
+  scene,
   weather = "random",
   timeOfDay = "auto",
   className,
@@ -174,8 +234,14 @@ export function WicklowHeroLandscape({
   const [manualWeather, setManualWeather] = useState<WeatherType | null>(null);
   const [manualTime, setManualTime] = useState<TimeOfDay | null>(null);
 
+  // If scene preset is provided, use its fixed config
+  const sceneConfig = scene ? SCENE_CONFIGS[scene] : null;
+
   // Stable random weather for component lifetime
   const initialWeather = useMemo<WeatherType>(() => {
+    // Scene preset takes priority
+    if (sceneConfig) return sceneConfig.weather;
+    
     if (weather === "random") {
       const random = getRandomWeather();
       // Respect enable flags
@@ -184,14 +250,17 @@ export function WicklowHeroLandscape({
       return random;
     }
     return weather;
-  }, [weather, enableSnow, enableFog]);
+  }, [weather, enableSnow, enableFog, sceneConfig]);
 
   // Resolve time of day
   const initialTime = useMemo<TimeOfDay>(() => {
+    // Scene preset takes priority
+    if (sceneConfig) return sceneConfig.timeOfDay;
+    
     if (timeOfDay === "auto") return getTimeOfDayFromHour();
     if (timeOfDay === "random") return getRandomTimeOfDay();
     return timeOfDay;
-  }, [timeOfDay]);
+  }, [timeOfDay, sceneConfig]);
 
   // Use manual overrides if set, otherwise use initial values
   const resolvedWeather = manualWeather ?? initialWeather;

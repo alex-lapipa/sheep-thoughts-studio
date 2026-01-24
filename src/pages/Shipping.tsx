@@ -50,7 +50,7 @@ const Shipping = () => {
         tocTitle={language === 'en' ? 'On This Page' : 'En Esta Página'}
         mobileTocTitle={language === 'en' ? 'Jump to Section' : 'Ir a Sección'}
       >
-        {/* Hero with Bubbles */}
+        {/* Hero with Bubbles — SHIPPING scene: Cloudy midday */}
         <section className="-mx-4 mb-12">
           <PageHeroWithBubbles
             title={language === 'en' ? 'Shipping & Returns' : 'Envíos y Devoluciones'}
@@ -58,6 +58,7 @@ const Shipping = () => {
               ? 'Last updated: January 22, 2026' 
               : 'Última actualización: 22 de enero de 2026'}
             bubbleSize="sm"
+            scene="shipping"
           />
         </section>
 

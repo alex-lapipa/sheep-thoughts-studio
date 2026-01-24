@@ -56,12 +56,13 @@ const About = () => {
         <link rel="canonical" href={`${siteUrl}/about`} />
       </Helmet>
 
-      {/* Hero with Bubbles and thought bubbles */}
+      {/* Hero with Bubbles and thought bubbles — ABOUT scene: Sunny dawn */}
       <section id="hero" className="scroll-mt-24 mb-16 -mx-4">
         <PageHeroWithBubbles
           title={t("aboutPage.hero.title")}
           subtitle={t("aboutPage.hero.subtitle")}
           bubbleSize="lg"
+          scene="about"
         />
       </section>
 

@@ -2,9 +2,10 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { WicklowLandscape } from "@/components/WicklowLandscape";
+import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
 import { ShoppingBag, Sparkles, ArrowRight, Star, Truck, Shield, Zap, Heart } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const quickBenefits = [
   { icon: Truck, text: "Free Shipping €50+" },
@@ -13,10 +14,12 @@ const quickBenefits = [
 ];
 
 export function ShopHero() {
+  const { t } = useLanguage();
+  
   return (
     <section className="hero-gradient py-20 md:py-32 overflow-hidden relative">
-      {/* Wicklow Landscape Background - Brand Standard */}
-      <WicklowLandscape />
+      {/* Wicklow Landscape Background - SHOP scene: Sunny midday, bright & inviting */}
+      <WicklowHeroLandscape scene="shop" showTrees />
 
       <div className="container relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-end">

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
-import { WicklowHeroLandscape } from "@/components/WicklowHeroLandscape";
+import { WicklowHeroLandscape, ScenePreset } from "@/components/WicklowHeroLandscape";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -21,6 +21,8 @@ interface PageHeroWithBubblesProps {
   subtitle?: string;
   className?: string;
   bubbleSize?: "sm" | "md" | "lg";
+  /** Named scene preset for unique atmosphere per page */
+  scene?: ScenePreset;
 }
 
 // Fallback thoughts if database is empty
@@ -40,6 +42,7 @@ export function PageHeroWithBubbles({
   subtitle,
   className,
   bubbleSize = "md",
+  scene,
 }: PageHeroWithBubblesProps) {
   const [thoughts, setThoughts] = useState<Thought[]>(FALLBACK_THOUGHTS);
   
@@ -118,8 +121,13 @@ export function PageHeroWithBubbles({
       "min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] py-16 md:py-24 lg:py-32 relative overflow-hidden",
       className
     )}>
-      {/* Large Wicklow landscape with dynamic weather and interactive controls */}
-      <WicklowHeroLandscape weather="random" showTrees showWeatherControl />
+      {/* Large Wicklow landscape with unique scene per page */}
+      <WicklowHeroLandscape 
+        scene={scene} 
+        weather={scene ? undefined : "random"} 
+        showTrees 
+        showWeatherControl={!scene} 
+      />
 
       <div className="container relative z-10">
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">
