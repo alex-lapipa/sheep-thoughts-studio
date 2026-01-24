@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
+import { ScrollableProductGrid } from "@/components/ScrollableProductGrid";
 import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
 import { ShopHero } from "@/components/ShopHero";
 import { ShopTrustCues } from "@/components/ShopTrustCues";
@@ -14,15 +15,20 @@ import { ModeEscalationScale, ExtendedBubbleMode } from "@/components/ModeBadge"
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useFeatureFlags } from "@/contexts/FeatureFlagsContext";
 import { useOgImage } from "@/hooks/useOgImage";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AnimatedOnView } from "@/components/AnimatedText";
+import { LayoutGrid, GalleryHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type SortOption = 'bestseller' | 'newest' | 'price-low' | 'price-high';
+type ViewMode = 'grid' | 'scroll';
 
 const Collections = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeMode = searchParams.get('mode') as ExtendedBubbleMode | null;
   const sortBy = (searchParams.get('sort') as SortOption) || 'bestseller';
+  const [viewMode, setViewMode] = useState<ViewMode>('scroll');
   const { t } = useLanguage();
   const { isEnabled } = useFeatureFlags();
   const { ogImageUrl, siteUrl } = useOgImage("og-collections.jpg");
@@ -138,27 +144,66 @@ const Collections = () => {
             </div>
           </AnimatedOnView>
 
-          {/* Sort Dropdown */}
-          <div className="flex items-center justify-end gap-2">
-            <span className="text-sm text-muted-foreground">Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value as SortOption)}
-              className="bg-background border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="bestseller">Bestselling</option>
-              <option value="newest">Newest</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
+          {/* Sort & View Toggle */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-2 rounded-md",
+                  viewMode === 'scroll' && "bg-background shadow-sm"
+                )}
+                onClick={() => setViewMode('scroll')}
+              >
+                <GalleryHorizontal className="h-4 w-4" />
+                <span className="hidden sm:inline">Scroll</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-2 rounded-md",
+                  viewMode === 'grid' && "bg-background shadow-sm"
+                )}
+                onClick={() => setViewMode('grid')}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                <span className="hidden sm:inline">Grid</span>
+              </Button>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
+                className="bg-background border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="bestseller">Bestselling</option>
+                <option value="newest">Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <ProductGrid 
-          products={sortedProducts} 
-          isLoading={isLoading} 
-          listName={activeMode ? `collection_${activeMode}` : "collection_all"}
-        />
+        {viewMode === 'scroll' ? (
+          <ScrollableProductGrid 
+            products={sortedProducts} 
+            isLoading={isLoading} 
+            listName={activeMode ? `collection_${activeMode}` : "collection_all"}
+          />
+        ) : (
+          <ProductGrid 
+            products={sortedProducts} 
+            isLoading={isLoading} 
+            listName={activeMode ? `collection_${activeMode}` : "collection_all"}
+          />
+        )}
       </div>
     </Layout>
   );
