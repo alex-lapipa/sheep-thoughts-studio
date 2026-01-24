@@ -7,11 +7,11 @@ import { CrossLinks } from "@/components/CrossLinks";
 import { ConfusionPrompt } from "@/components/ConfusionPrompt";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { Button } from "@/components/ui/button";
+import { BubblesScientist } from "@/components/BubblesScientist";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw, FlaskConical, CheckCircle, Award } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
-import bubblesFactsHappy from "@/assets/bubbles-facts-happy.jpg";
 import type { Database } from "@/integrations/supabase/types";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 
@@ -103,12 +103,12 @@ export default function Facts() {
         <meta name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={`${siteUrl}/facts`} />
       </Helmet>
-      {/* Hero with Scientist Bubbles */}
+      {/* Hero with Scientist Bubbles (Brand-aligned SVG) */}
       <section className="-mx-4 mb-12">
         <ContentHero
           title={t("factsPage.hero.title")}
           subtitle={t("factsPage.hero.subtitle")}
-          image={bubblesFactsHappy}
+          character={<BubblesScientist size="hero" animated accessory="random" />}
           imageAlt="Bubbles the scientist sheep"
           badge={{ icon: FlaskConical, text: "Peer-reviewed by grass" }}
           credentials={[

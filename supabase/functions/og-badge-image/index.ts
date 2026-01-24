@@ -5,7 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Badge definitions matching the frontend
 const BADGES = [
   { days: 3, emoji: "🌱", title: "Seedling", color: "#4ade80" },
   { days: 7, emoji: "🔥", title: "Week Warrior", color: "#f97316" },
@@ -16,7 +15,21 @@ const BADGES = [
   { days: 365, emoji: "🐑", title: "Year of Enlightenment", color: "#14b8a6" },
 ];
 
-// Generate a cache key from the parameters
+// BRAND-ALIGNED PROMPT BASE
+const BRAND_PROMPT_BASE = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio).
+
+CRITICAL CHARACTER CONSTRAINTS (NON-NEGOTIABLE):
+- The sheep MUST be quadrupedal (on four legs) - NEVER standing on two legs
+- The sheep faces RIGHT in profile view
+- Expression: neutral, vacant, confident gaze - NOT cute, NOT childish, NOT cartoonish
+- White fluffy wool with weathered texture
+- NO kawaii styling, NO humanoid poses
+
+ENVIRONMENT:
+- Wicklow bog landscape with Sugarloaf Mountain silhouette
+- Soft gradient from cream (#FFFDD0) to sage green
+- Irish mountain atmosphere`;
+
 function generateCacheKey(badges: string, streak: number, username: string): string {
   const params = `${badges}-${streak}-${username}`;
   let hash = 0;
@@ -46,14 +59,12 @@ Deno.serve(async (req) => {
 
     const cacheKey = generateCacheKey(badgesParam, streak, username);
 
-    // Check if cached image exists
     if (!skipCache) {
       const { data: fileList } = await supabase.storage
         .from('og-images')
         .list('', { search: cacheKey });
 
       if (fileList && fileList.length > 0) {
-        // Log cache hit
         await supabase.from('og_cache_events').insert({
           cache_key: cacheKey,
           event_type: 'hit',
@@ -65,33 +76,27 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Log cache miss
     await supabase.from('og_cache_events').insert({
       cache_key: cacheKey,
       event_type: skipCache ? 'regenerate' : 'miss',
       image_type: 'badge',
     });
 
-    // Parse unlocked badges
     const unlockedDays = badgesParam.split(',').map(d => parseInt(d, 10)).filter(d => !isNaN(d));
     const unlockedBadges = BADGES.filter(b => unlockedDays.includes(b.days) || streak >= b.days);
     const badgeCount = unlockedBadges.length;
-
-    // Build the prompt for AI image generation
     const badgeList = unlockedBadges.map(b => `${b.emoji} ${b.title}`).join(', ') || 'No badges yet';
     
-    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a badge collection achievement. 
+    const prompt = `${BRAND_PROMPT_BASE}
 
-Design requirements:
-- Background: Soft gradient from cream (#FFFDD0) to light sage green, with subtle Irish mountain silhouettes
-- Center: A cute cartoon sheep mascot (white fluffy wool, friendly expression) looking proud
-- Around the sheep: ${badgeCount} floating achievement badges arranged in an arc: ${badgeList}
-- Each badge should be a colorful medallion with its emoji
-- Top text: "${username}'s Wisdom Badges" in a playful display font
+COMPOSITION:
+- The sheep stands proudly in profile on a Wicklow hill
+- Around the sheep: ${badgeCount} floating achievement badges in an arc: ${badgeList}
+- Each badge as a colorful medallion with its emoji
+- Top text: "${username}'s Wisdom Badges" in display font
 - Bottom text: "${streak} Day Streak • ${badgeCount}/${BADGES.length} Badges Earned"
-- Style: Warm, whimsical, Irish countryside aesthetic
-- Include subtle sparkles and celebration elements
-- Professional social card layout suitable for Twitter/Facebook/LinkedIn sharing
+- Subtle sparkles and celebration elements
+- Professional social card layout
 
 Ultra high resolution, clean modern design.`;
 
@@ -108,12 +113,7 @@ Ultra high resolution, clean modern design.`;
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
+        messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text'],
       }),
     });
@@ -131,24 +131,13 @@ Ultra high resolution, clean modern design.`;
       throw new Error('No image generated');
     }
 
-    // Process and cache the image
     if (imageData.startsWith('data:image')) {
       const base64Data = imageData.split(',')[1];
       const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
       
-      // Upload to Supabase Storage for caching
-      const { error: uploadError } = await supabase.storage
+      await supabase.storage
         .from('og-images')
-        .upload(cacheKey, binaryData, {
-          contentType: 'image/png',
-          upsert: true,
-        });
-
-      if (uploadError) {
-        console.error('Failed to cache OG image:', uploadError);
-      } else {
-        console.log(`Cached OG badge image: ${cacheKey}`);
-      }
+        .upload(cacheKey, binaryData, { contentType: 'image/png', upsert: true });
       
       return new Response(binaryData, {
         status: 200,
@@ -161,17 +150,13 @@ Ultra high resolution, clean modern design.`;
       });
     }
 
-    // If it's a URL, fetch, cache, and return
     const imageResponse = await fetch(imageData);
     const imageBuffer = await imageResponse.arrayBuffer();
     const imageBytes = new Uint8Array(imageBuffer);
 
     await supabase.storage
       .from('og-images')
-      .upload(cacheKey, imageBytes, {
-        contentType: 'image/png',
-        upsert: true,
-      });
+      .upload(cacheKey, imageBytes, { contentType: 'image/png', upsert: true });
 
     return new Response(imageBytes, {
       status: 200,
@@ -186,7 +171,6 @@ Ultra high resolution, clean modern design.`;
   } catch (error) {
     console.error('OG image generation error:', error);
     
-    // Return a fallback SVG image
     const fallbackSvg = `
       <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -199,7 +183,6 @@ Ultra high resolution, clean modern design.`;
         <text x="600" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="64" fill="#2C2C2C">🐑</text>
         <text x="600" y="350" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#2C2C2C">Wisdom Badges</text>
         <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#666">Bubbles the Sheep</text>
-        <text x="600" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#888">Track your journey of confidently wrong wisdom</text>
       </svg>
     `;
     

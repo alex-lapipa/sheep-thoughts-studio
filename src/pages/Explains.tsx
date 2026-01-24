@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedOnView } from "@/components/AnimatedText";
-import bubblesScholar from "@/assets/bubbles-explains-happy.jpg";
+import { BubblesScholar } from "@/components/BubblesScholar";
 
 interface Explanation {
   id: string;
@@ -338,7 +338,7 @@ const Explains = () => {
       <ContentHero
         title={t("explainsPage.hero.title")}
         subtitle={t("explainsPage.hero.subtitle")}
-        image={bubblesScholar}
+        character={<BubblesScholar size="hero" animated accessory="random" />}
         imageAlt="Bubbles the scholarly sheep ready to explain everything"
         badge={{ icon: GraduationCap, text: "Distinguished Scholar" }}
         credentials={[

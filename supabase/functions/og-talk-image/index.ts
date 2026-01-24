@@ -28,6 +28,24 @@ const translations: Record<Language, { title: string; subtitle: string; tagline:
   },
 };
 
+// BRAND-ALIGNED PROMPT: Uses quadrupedal sheep description matching BubblesBog component
+const BRAND_PROMPT_BASE = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio).
+
+CRITICAL CHARACTER CONSTRAINTS (NON-NEGOTIABLE):
+- The sheep MUST be quadrupedal (on four legs) - NEVER standing on two legs
+- The sheep faces RIGHT in profile view
+- Expression: neutral, vacant, confidently daft gaze - NOT cute, NOT childish
+- White fluffy wool with weathered texture
+- NO cartoonish or kawaii styling
+- NO humanoid poses or gestures
+
+ENVIRONMENT:
+- Wicklow bog landscape with Sugarloaf Mountain silhouette
+- Misty Irish atmosphere with heather purple and sage green tones
+- Warm golden hour lighting
+
+COMPOSITION:`;
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -38,22 +56,15 @@ Deno.serve(async (req) => {
     const lang = (url.searchParams.get('lang') || 'en') as Language;
     const t = translations[lang] || translations.en;
 
-    const prompt = `Create a social media preview card (1200x630 pixels, 16:9 aspect ratio) for a voice chat page.
-
-Design requirements:
-- Background: Cozy Irish cottage interior or misty Wicklow hillside with warm lighting
-- Center: An adorable cartoon sheep mascot wearing a small headset/microphone, looking eager to chat
-- Sound wave or speech bubble visual elements around the sheep suggesting conversation
-- Microphone or phone icon subtly integrated
-- Top text: "${t.title}" in a bold, friendly display font
-- Subtitle: "${t.subtitle}" in elegant typography
+    const prompt = `${BRAND_PROMPT_BASE}
+- The sheep stands in profile, possibly with headphones resting on wool (not worn humanly)
+- Sound wave or speech bubble visual elements suggesting conversation
+- Top text: "${t.title}" in bold display font
+- Subtitle: "${t.subtitle}"
 - Bottom: "${t.tagline}"
-- Style: Warm, inviting, conversational atmosphere
-- Color palette: Cream, sage green (#90B77D), heather purple (#C8A2C8), warm gold accents
-- The sheep should look friendly and approachable, ready to have a chat
-- Professional social card layout suitable for Twitter/Facebook/LinkedIn sharing
+- Color palette: Cream (#FFFDD0), sage green (#90B77D), heather purple (#C8A2C8), warm gold
 
-Ultra high resolution, clean modern design with Irish countryside warmth.`;
+Ultra high resolution, professional social card layout.`;
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
@@ -123,7 +134,6 @@ Ultra high resolution, clean modern design with Irish countryside warmth.`;
         <text x="600" y="320" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="bold" fill="#2C2C2C">${escapeXml(t.title)}</text>
         <text x="600" y="400" text-anchor="middle" font-family="Georgia, serif" font-size="32" font-style="italic" fill="#444">${escapeXml(t.subtitle)}</text>
         <text x="600" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#666">${escapeXml(t.tagline)}</text>
-        <text x="600" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#888">🎧 Voice • 💬 Text • 📞 Real-time</text>
       </svg>
     `;
     
