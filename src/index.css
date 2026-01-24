@@ -9,12 +9,32 @@
     /* ══════════════════════════════════════════════════════════════
        BUBBLES BRAND COLOR SYSTEM
        
-       🌿 PRIMARY: Wicklow Pastoral — calm, traditional Irish landscape
+       🍀 PRIMARY: Ireland Green — the heart of Irish fields & Wicklow
+          The rolling hills, the shamrock, the soul of the land.
+       
+       🌿 SECONDARY: Wicklow Pastoral — calm, traditional landscape
           The fields, the mist, the quiet. Home.
        
        🌃 ACCENT: Urban Chaos — London/NYC nightlife, fashion, neon
           Everything Bubbles doesn't understand.
        ══════════════════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════════════════
+       🍀 IRELAND GREEN — THE PRIMARY COLOR
+       The iconic green of Irish fields, shamrocks, and national pride
+       This is THE green. The one tourists photograph. The one we live.
+       ═══════════════════════════════════════════════════════════════ */
+    
+    /* Ireland Green - The true green of Irish fields */
+    --ireland-green: 140 45% 38%;
+    --ireland-green-light: 140 40% 52%;
+    --ireland-green-dark: 140 50% 26%;
+    --ireland-green-vibrant: 142 55% 42%;
+    
+    /* Shamrock - The iconic clover green */
+    --shamrock: 145 50% 35%;
+    --shamrock-light: 145 45% 50%;
+    --shamrock-dark: 145 55% 22%;
 
     /* ═══════════════════════════════════════════════════════════════
        🌿 WICKLOW PASTORAL PALETTE
@@ -97,13 +117,20 @@
     --popover: 0 0% 100%;
     --popover-foreground: var(--wicklow-turf-dark);
 
-    /* Primary - Meadow Green (pastoral, calming) */
-    --primary: var(--wicklow-meadow);
-    --primary-foreground: var(--wicklow-mist);
+    /* Primary - Ireland Green (THE green of Irish fields) */
+    --primary: var(--ireland-green);
+    --primary-foreground: 0 0% 100%;
+    --primary-light: var(--ireland-green-light);
+    --primary-dark: var(--ireland-green-dark);
+    --primary-vibrant: var(--ireland-green-vibrant);
 
-    /* Secondary - Atlantic Blue */
-    --secondary: var(--wicklow-atlantic-light);
+    /* Secondary - Wicklow Meadow (pastoral, soft) */
+    --secondary: var(--wicklow-meadow-light);
     --secondary-foreground: var(--wicklow-turf-dark);
+
+    /* Tertiary - Shamrock (accent green) */
+    --tertiary: var(--shamrock);
+    --tertiary-foreground: 0 0% 100%;
 
     /* Muted - Stone Grey */
     --muted: var(--wicklow-stone-light);
@@ -120,7 +147,7 @@
 
     --border: 210 15% 85%;
     --input: 210 15% 85%;
-    --ring: var(--wicklow-meadow);
+    --ring: var(--ireland-green);
 
     --radius: 0.75rem;
 
@@ -134,7 +161,7 @@
     --mode-nuclear: var(--urban-taxi);
 
     /* === SEASONAL PALETTE (all pastoral) === */
-    --season-spring: var(--wicklow-meadow-light);
+    --season-spring: var(--ireland-green-light);
     --season-summer: var(--wicklow-butter);
     --season-autumn: var(--wicklow-turf-light);
     --season-winter: var(--wicklow-stone);
@@ -155,12 +182,12 @@
     /* === SIDEBAR === */
     --sidebar-background: var(--wicklow-mist-cool);
     --sidebar-foreground: var(--wicklow-turf);
-    --sidebar-primary: var(--wicklow-meadow);
-    --sidebar-primary-foreground: var(--wicklow-mist);
+    --sidebar-primary: var(--ireland-green);
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: var(--wicklow-mist-warm);
     --sidebar-accent-foreground: var(--wicklow-turf);
     --sidebar-border: 200 12% 88%;
-    --sidebar-ring: var(--wicklow-meadow);
+    --sidebar-ring: var(--ireland-green);
   }
 
   .dark {
@@ -176,13 +203,20 @@
     --popover: 28 30% 12%;
     --popover-foreground: var(--wicklow-mist);
 
-    /* Primary - Urban Neon for visibility in darkness */
-    --primary: var(--urban-neon);
+    /* Primary - Ireland Green (glowing in the dark) */
+    --primary: var(--ireland-green-vibrant);
     --primary-foreground: var(--wicklow-turf-dark);
+    --primary-light: var(--ireland-green-light);
+    --primary-dark: var(--ireland-green-dark);
+    --primary-vibrant: var(--ireland-green-vibrant);
 
-    /* Secondary - Atlantic Blue */
-    --secondary: var(--wicklow-atlantic-dark);
+    /* Secondary - Wicklow Meadow */
+    --secondary: var(--wicklow-meadow-dark);
     --secondary-foreground: var(--wicklow-mist);
+
+    /* Tertiary - Shamrock */
+    --tertiary: var(--shamrock-light);
+    --tertiary-foreground: var(--wicklow-turf-dark);
 
     /* Muted - Stone Grey */
     --muted: var(--wicklow-stone-dark);
@@ -199,7 +233,7 @@
 
     --border: 28 25% 22%;
     --input: 28 25% 22%;
-    --ring: var(--urban-neon);
+    --ring: var(--ireland-green-vibrant);
 
     /* === MODE SYSTEM (Dark Mode) === */
     --mode-innocent: var(--wicklow-butter);
@@ -365,6 +399,23 @@
   .bg-accent-muted {
     background-color: hsl(var(--accent-muted));
   }
+
+  /* 🍀 Ireland Green — THE Primary Color Utilities */
+  .bg-ireland { background-color: hsl(var(--ireland-green)); }
+  .bg-ireland-light { background-color: hsl(var(--ireland-green-light)); }
+  .bg-ireland-dark { background-color: hsl(var(--ireland-green-dark)); }
+  .bg-ireland-vibrant { background-color: hsl(var(--ireland-green-vibrant)); }
+  .bg-shamrock { background-color: hsl(var(--shamrock)); }
+  .bg-shamrock-light { background-color: hsl(var(--shamrock-light)); }
+  .bg-shamrock-dark { background-color: hsl(var(--shamrock-dark)); }
+
+  .text-ireland { color: hsl(var(--ireland-green)); }
+  .text-ireland-light { color: hsl(var(--ireland-green-light)); }
+  .text-ireland-dark { color: hsl(var(--ireland-green-dark)); }
+  .text-ireland-vibrant { color: hsl(var(--ireland-green-vibrant)); }
+  .text-shamrock { color: hsl(var(--shamrock)); }
+  .text-shamrock-light { color: hsl(var(--shamrock-light)); }
+  .text-shamrock-dark { color: hsl(var(--shamrock-dark)); }
 
   /* 🌿 Wicklow Pastoral Utilities */
   .bg-wicklow-meadow { background-color: hsl(var(--wicklow-meadow)); }

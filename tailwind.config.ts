@@ -26,10 +26,17 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          light: "hsl(var(--primary-light))",
+          dark: "hsl(var(--primary-dark))",
+          vibrant: "hsl(var(--primary-vibrant))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        tertiary: {
+          DEFAULT: "hsl(var(--tertiary))",
+          foreground: "hsl(var(--tertiary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -61,6 +68,18 @@ export default {
         savage: {
           bg: "hsl(var(--savage-bg))",
           accent: "hsl(var(--savage-accent))",
+        },
+        // 🍀 Ireland Green — THE Primary Color
+        ireland: {
+          DEFAULT: "hsl(var(--ireland-green))",
+          light: "hsl(var(--ireland-green-light))",
+          dark: "hsl(var(--ireland-green-dark))",
+          vibrant: "hsl(var(--ireland-green-vibrant))",
+        },
+        shamrock: {
+          DEFAULT: "hsl(var(--shamrock))",
+          light: "hsl(var(--shamrock-light))",
+          dark: "hsl(var(--shamrock-dark))",
         },
         // 🌿 Wicklow Pastoral Palette - calm, traditional Irish landscape
         wicklow: {
