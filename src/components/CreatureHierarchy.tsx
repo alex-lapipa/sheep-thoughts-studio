@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Dog, Bird, Cat, Rabbit, Squirrel, Bug, Fish, Rat, HelpCircle, Network, ZoomIn, ZoomOut } from "lucide-react";
+import { Crown, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Dog, Bird, Cat, Rabbit, Squirrel, Bug, Fish, Rat, HelpCircle, Network, ZoomIn, ZoomOut, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
@@ -205,11 +205,81 @@ const TIER_BG_COLORS: Record<number, string> = {
   5: "fill-muted/30",
 };
 
+// Secret paranoid connections Bubbles suspects but can't prove
+interface ConspiracyConnection {
+  from: string;
+  to: string;
+  suspicion: string;
+  evidence: string;
+  dangerLevel: "low" | "medium" | "high" | "extreme";
+}
+
+const CONSPIRACY_CONNECTIONS: ConspiracyConnection[] = [
+  {
+    from: "crows",
+    to: "mart-cat",
+    suspicion: "Secret intelligence sharing",
+    evidence: "They're never in the same place. Classic alibi strategy.",
+    dangerLevel: "high",
+  },
+  {
+    from: "muffins",
+    to: "crows",
+    suspicion: "Hidden communication channel",
+    evidence: "Muffins barks at them but they never leave. That's a signal.",
+    dangerLevel: "extreme",
+  },
+  {
+    from: "fox",
+    to: "hedgehog",
+    suspicion: "Night operations coordination",
+    evidence: "Both active after dark. Coincidence? I think not.",
+    dangerLevel: "medium",
+  },
+  {
+    from: "mart-cat",
+    to: "rat",
+    suspicion: "Theatrical rivalry",
+    evidence: "Cat never actually catches them. It's all theatre.",
+    dangerLevel: "high",
+  },
+  {
+    from: "heron",
+    to: "trout",
+    suspicion: "Aquatic intelligence network",
+    evidence: "Stands in water for hours. Clearly receiving briefings.",
+    dangerLevel: "medium",
+  },
+  {
+    from: "rabbits",
+    to: "sheep",
+    suspicion: "Underground tunnel to our field",
+    evidence: "I've seen holes. They know something we don't.",
+    dangerLevel: "low",
+  },
+  {
+    from: "crows",
+    to: "robin",
+    suspicion: "Bird faction alliance",
+    evidence: "All birds. All watching. Connected.",
+    dangerLevel: "high",
+  },
+  {
+    from: "sheepdogs",
+    to: "fox",
+    suspicion: "Controlled opposition",
+    evidence: "Dogs chase fox but never catch it. Suspicious.",
+    dangerLevel: "extreme",
+  },
+];
+
 export const CreatureHierarchy = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"diagram" | "list">("diagram");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [conspiracyMode, setConspiracyMode] = useState(false);
+  const [hoveredConspiracy, setHoveredConspiracy] = useState<ConspiracyConnection | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const diagramWidth = 500;
@@ -250,7 +320,19 @@ export const CreatureHierarchy = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant={conspiracyMode ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => setConspiracyMode(!conspiracyMode)}
+              className={cn(
+                "gap-1 h-8 transition-all",
+                conspiracyMode && "animate-pulse"
+              )}
+            >
+              {conspiracyMode ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+              {conspiracyMode ? "👁️ THEY'RE WATCHING" : "Conspiracy Mode"}
+            </Button>
             <Button
               variant={viewMode === "diagram" ? "default" : "outline"}
               size="sm"
@@ -336,6 +418,20 @@ export const CreatureHierarchy = () => {
                         <feMergeNode in="SourceGraphic" />
                       </feMerge>
                     </filter>
+                    {/* Conspiracy mode paranoid connection glow */}
+                    <filter id="conspiracyGlow" x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feFlood floodColor="hsl(0 80% 50%)" floodOpacity="0.9" result="color" />
+                      <feComposite in="color" in2="blur" operator="in" result="glow" />
+                      <feMerge>
+                        <feMergeNode in="glow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    {/* Animated dashed line pattern for conspiracy */}
+                    <pattern id="conspiracyDash" patternUnits="userSpaceOnUse" width="12" height="1">
+                      <line x1="0" y1="0" x2="6" y2="0" stroke="hsl(0 70% 50%)" strokeWidth="2" />
+                    </pattern>
                   </defs>
 
                   {/* Tier backgrounds */}
@@ -440,6 +536,117 @@ export const CreatureHierarchy = () => {
                       );
                     })}
                   </g>
+
+                  {/* CONSPIRACY MODE: Hidden paranoid connections */}
+                  <AnimatePresence>
+                    {conspiracyMode && (
+                      <motion.g
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {CONSPIRACY_CONNECTIONS.map((conspiracy, i) => {
+                          const fromNode = getNodeById(conspiracy.from);
+                          const toNode = getNodeById(conspiracy.to);
+                          if (!fromNode || !toNode) return null;
+
+                          const isHoveredConspiracy = hoveredConspiracy?.from === conspiracy.from && 
+                                                       hoveredConspiracy?.to === conspiracy.to;
+                          
+                          const dangerColors = {
+                            low: "hsl(45 70% 50%)",
+                            medium: "hsl(25 80% 50%)",
+                            high: "hsl(0 70% 50%)",
+                            extreme: "hsl(330 80% 50%)",
+                          };
+                          
+                          const pathId = `conspiracy-${conspiracy.from}-${conspiracy.to}`;
+                          
+                          // Calculate curved path (opposite direction to avoid overlap)
+                          const midX = (fromNode.x! + toNode.x!) / 2;
+                          const midY = (fromNode.y! + toNode.y!) / 2;
+                          const curveOffset = 40 + (i % 3) * 15;
+                          const curveSide = i % 2 === 0 ? 1 : -1;
+                          
+                          const pathD = `M ${fromNode.x} ${fromNode.y} 
+                                    Q ${midX + curveOffset * curveSide} ${midY},
+                                      ${toNode.x} ${toNode.y}`;
+
+                          return (
+                            <g 
+                              key={pathId}
+                              onMouseEnter={() => setHoveredConspiracy(conspiracy)}
+                              onMouseLeave={() => setHoveredConspiracy(null)}
+                              className="cursor-pointer"
+                            >
+                              {/* Animated paranoid connection line */}
+                              <motion.path
+                                id={pathId}
+                                d={pathD}
+                                fill="none"
+                                stroke={dangerColors[conspiracy.dangerLevel]}
+                                strokeWidth={isHoveredConspiracy ? 3 : 2}
+                                strokeDasharray="8 4"
+                                filter={isHoveredConspiracy ? "url(#conspiracyGlow)" : undefined}
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ 
+                                  pathLength: 1, 
+                                  opacity: isHoveredConspiracy ? 1 : 0.6,
+                                  strokeDashoffset: [0, -24],
+                                }}
+                                transition={{ 
+                                  pathLength: { delay: i * 0.1, duration: 0.8 },
+                                  opacity: { duration: 0.3 },
+                                  strokeDashoffset: { duration: 1, repeat: Infinity, ease: "linear" },
+                                }}
+                              />
+                              
+                              {/* Paranoid eye icon at midpoint */}
+                              <motion.g
+                                animate={{ 
+                                  scale: isHoveredConspiracy ? [1, 1.2, 1] : 1,
+                                }}
+                                transition={{ duration: 0.5, repeat: isHoveredConspiracy ? Infinity : 0 }}
+                              >
+                                <circle
+                                  cx={midX + (curveOffset * curveSide) / 2}
+                                  cy={midY}
+                                  r={isHoveredConspiracy ? 10 : 8}
+                                  fill={dangerColors[conspiracy.dangerLevel]}
+                                  opacity={0.9}
+                                />
+                                <text
+                                  x={midX + (curveOffset * curveSide) / 2}
+                                  y={midY + 4}
+                                  textAnchor="middle"
+                                  className="text-[10px] select-none"
+                                  fill="white"
+                                >
+                                  👁
+                                </text>
+                              </motion.g>
+                              
+                              {/* Danger level indicator */}
+                              {conspiracy.dangerLevel === "extreme" && (
+                                <motion.text
+                                  x={midX + (curveOffset * curveSide) / 2}
+                                  y={midY - 15}
+                                  textAnchor="middle"
+                                  className="text-[8px] font-bold"
+                                  fill={dangerColors.extreme}
+                                  animate={{ opacity: [0.5, 1, 0.5] }}
+                                  transition={{ duration: 1, repeat: Infinity }}
+                                >
+                                  ⚠️ EXTREME
+                                </motion.text>
+                              )}
+                            </g>
+                          );
+                        })}
+                      </motion.g>
+                    )}
+                  </AnimatePresence>
 
                   {/* Nodes */}
                   <g>
@@ -598,6 +805,79 @@ export const CreatureHierarchy = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Conspiracy mode: Hovered conspiracy details */}
+              <AnimatePresence>
+                {conspiracyMode && hoveredConspiracy && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="mt-4 p-4 rounded-lg bg-red-950/50 border border-red-500/40"
+                  >
+                    <div className="flex items-start gap-3">
+                      <motion.div 
+                        className="p-2 rounded-full bg-red-500/20"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        <Eye className="w-5 h-5 text-red-400" />
+                      </motion.div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-red-300">
+                            {getNodeById(hoveredConspiracy.from)?.shortName} ↔ {getNodeById(hoveredConspiracy.to)?.shortName}
+                          </h4>
+                          <Badge 
+                            variant="destructive" 
+                            className={cn(
+                              "text-[10px]",
+                              hoveredConspiracy.dangerLevel === "extreme" && "animate-pulse bg-pink-600"
+                            )}
+                          >
+                            {hoveredConspiracy.dangerLevel.toUpperCase()} THREAT
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-red-200/80 mt-1 font-medium">
+                          🔍 Suspected: {hoveredConspiracy.suspicion}
+                        </p>
+                        <ThoughtBubble mode="triggered" size="sm" className="mt-3">
+                          <span className="text-red-200">Evidence: </span>
+                          {hoveredConspiracy.evidence}
+                        </ThoughtBubble>
+                        <p className="text-[10px] text-red-400/60 mt-2 italic">
+                          * Bubbles cannot legally prove this connection exists
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Conspiracy mode warning banner */}
+              <AnimatePresence>
+                {conspiracyMode && !hoveredConspiracy && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-4 p-3 rounded-lg bg-red-950/30 border border-red-500/20"
+                  >
+                    <div className="flex items-center gap-2 text-red-300/80 text-xs">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        👁️
+                      </motion.div>
+                      <span>
+                        <strong>CONSPIRACY MODE ACTIVE:</strong> Red dashed lines show connections they don't want you to see. 
+                        Hover over the 👁 symbols to reveal the truth.
+                      </span>
                     </div>
                   </motion.div>
                 )}
