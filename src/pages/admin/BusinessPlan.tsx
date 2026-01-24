@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
-import { NivoCharts, BusinessFlowDiagram, PLSpreadsheet } from "@/components/admin/business-plan";
+import { NivoCharts, BusinessFlowDiagram, PLSpreadsheet, KPIGauges, MarketAnalysisCharts, TimelineRoadmap } from "@/components/admin/business-plan";
 
 interface Section {
   id: string;
@@ -183,7 +183,7 @@ export default function BusinessPlan() {
   const [generatingAll, setGeneratingAll] = useState(false);
   const [loadingCache, setLoadingCache] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("sections");
+  const [activeTab, setActiveTab] = useState("overview");
   const [scenarios, setScenarios] = useState<ScenarioData>({
     conservative: null,
     moderate: null,
@@ -480,22 +480,30 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 lg:w-auto lg:inline-flex">
+            <TabsTrigger value="overview" className="gap-2">
+              <Gauge className="h-4 w-4" />
+              <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
             <TabsTrigger value="sections" className="gap-2">
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Plan Sections</span>
+              <span className="hidden sm:inline">Sections</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2">
               <PieChart className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
+              <span className="hidden sm:inline">Charts</span>
             </TabsTrigger>
             <TabsTrigger value="diagrams" className="gap-2">
               <Workflow className="h-4 w-4" />
-              <span className="hidden sm:inline">Flow Diagrams</span>
+              <span className="hidden sm:inline">Diagrams</span>
+            </TabsTrigger>
+            <TabsTrigger value="roadmap" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              <span className="hidden sm:inline">Roadmap</span>
             </TabsTrigger>
             <TabsTrigger value="financials" className="gap-2">
               <DollarSign className="h-4 w-4" />
-              <span className="hidden sm:inline">P&L Sheets</span>
+              <span className="hidden sm:inline">P&L</span>
             </TabsTrigger>
           </TabsList>
 
@@ -808,6 +816,12 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
             </Card>
           </TabsContent>
 
+          {/* Overview Tab - KPIs and Market Analysis */}
+          <TabsContent value="overview" className="mt-6 space-y-6">
+            <KPIGauges />
+            <MarketAnalysisCharts />
+          </TabsContent>
+
           {/* Analytics Tab - Nivo Charts */}
           <TabsContent value="analytics" className="mt-6">
             <NivoCharts />
@@ -816,6 +830,11 @@ ${generatedSections.map(s => `## ${s.title}\n\n${s.content}\n\n---\n`).join('\n'
           {/* Flow Diagrams Tab - React Flow */}
           <TabsContent value="diagrams" className="mt-6">
             <BusinessFlowDiagram />
+          </TabsContent>
+
+          {/* Roadmap Tab - Timeline */}
+          <TabsContent value="roadmap" className="mt-6">
+            <TimelineRoadmap />
           </TabsContent>
 
           {/* P&L Spreadsheets Tab */}
