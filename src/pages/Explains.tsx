@@ -4,15 +4,16 @@ import { Layout } from "@/components/Layout";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { CitationGenerator } from "@/components/CitationGenerator";
 import { ChallengeBubbles } from "@/components/ChallengeBubbles";
-import { ExplainsHero } from "@/components/ExplainsHero";
+import { ContentHero } from "@/components/ContentHero";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
-import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap } from "lucide-react";
+import { ChevronDown, MessageCircle, Lightbulb, Beaker, Globe, Cpu, Heart, Clock, Sparkles, Zap, GraduationCap, BookOpen, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedOnView } from "@/components/AnimatedText";
+import bubblesScholar from "@/assets/bubbles-explains-happy.jpg";
 
 interface Explanation {
   id: string;
@@ -334,12 +335,19 @@ const Explains = () => {
         <link rel="canonical" href={`${siteUrl}/explains`} />
       </Helmet>
       {/* Hero with Scholar Bubbles */}
-      <section className="-mx-4 mb-12">
-        <ExplainsHero
-          title={t("explainsPage.hero.title")}
-          subtitle={t("explainsPage.hero.subtitle")}
-        />
-      </section>
+      <ContentHero
+        title={t("explainsPage.hero.title")}
+        subtitle={t("explainsPage.hero.subtitle")}
+        image={bubblesScholar}
+        imageAlt="Bubbles the scholarly sheep ready to explain everything"
+        badge={{ icon: GraduationCap, text: "Distinguished Scholar" }}
+        credentials={[
+          { icon: BookOpen, text: "Self-Certified Expert" },
+          { icon: Award, text: "0 Correct Answers" },
+          { icon: Sparkles, text: "Field Research" },
+        ]}
+        className="-mx-4 mb-12"
+      />
 
       <div className="container pb-12 md:pb-20">
         <div className="max-w-4xl mx-auto">
