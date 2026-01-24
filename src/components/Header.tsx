@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
+import { WishlistDrawer } from "./WishlistDrawer";
 import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
 import { CelebrationToggle } from "./CelebrationToggle";
 import { GlobalLanguageSwitcher } from "./GlobalLanguageSwitcher";
@@ -175,12 +176,14 @@ export function Header() {
               </Tooltip>
             </>
           )}
+          <WishlistDrawer />
           <div className="hover:animate-squish">
             <CartDrawer />
           </div>
         </div>
 
         <div className="flex md:hidden items-center gap-1">
+          <WishlistDrawer />
           <CartDrawer />
           
           {/* Mobile Menu */}
