@@ -20,17 +20,14 @@ interface RegionOption {
   group: string;
 }
 
-// Main languages shown on homepage
-const MAIN_LANGUAGES: RegionOption[] = [
+// Public languages - only English and Irish shown in main navigation
+const PUBLIC_LANGUAGES: RegionOption[] = [
   { code: "en", path: "/", label: "English", flag: "🇬🇧", group: "Global" },
   { code: "ga", path: "/ga", label: "Gaeilge", flag: "🇮🇪", group: "Global" },
-  { code: "fr", path: "/fr", label: "Français", flag: "🇫🇷", group: "Francophone" },
-  { code: "es", path: "/es", label: "Español", flag: "🇪🇸", group: "Hispanic" },
-  { code: "de", path: "/dach", label: "Deutsch", flag: "🇩🇪", group: "DACH" },
 ];
 
-// All regional options for subpages
-const ALL_REGIONS: RegionOption[] = [
+// All regional options (exported for admin panel use)
+export const ALL_REGIONS: RegionOption[] = [
   // Global
   { code: "en", path: "/", label: "English", flag: "🇬🇧", group: "Global" },
   { code: "ga", path: "/ga", label: "Gaeilge", flag: "🇮🇪", group: "Global" },
@@ -64,11 +61,8 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we're on the homepage
-  const isHomepage = location.pathname === "/" || location.pathname === "";
-  
-  // Use main languages on homepage, all regions on subpages
-  const availableRegions = isHomepage ? MAIN_LANGUAGES : ALL_REGIONS;
+  // Always use only English and Irish in public navigation
+  const availableRegions = PUBLIC_LANGUAGES;
   
   // Handle region selection with preference saving
   const handleRegionSelect = (region: RegionOption) => {
@@ -89,15 +83,6 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
   };
   
   const currentRegion = getCurrentRegion();
-  
-  // Group regions by group (only for subpages with full list)
-  const groupedRegions = availableRegions.reduce((acc, region) => {
-    if (!acc[region.group]) {
-      acc[region.group] = [];
-    }
-    acc[region.group].push(region);
-    return acc;
-  }, {} as Record<string, RegionOption[]>);
 
   return (
     <DropdownMenu>
@@ -111,40 +96,19 @@ export function GlobalLanguageSwitcher({ variant = "default" }: { variant?: "def
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-0 w-auto bg-popover">
-        {isHomepage ? (
-          <div className="flex gap-1 p-1">
-            {availableRegions.map((region) => (
-              <Button
-                key={region.code}
-                variant={currentRegion.code === region.code ? "secondary" : "ghost"}
-                size="icon"
-                className="h-8 w-8 p-0"
-                onClick={() => handleRegionSelect(region)}
-              >
-                <span className="text-lg">{region.flag}</span>
-              </Button>
-            ))}
-          </div>
-        ) : (
-          Object.entries(groupedRegions).map(([group, regions], groupIndex) => (
-            <div key={group}>
-              {groupIndex > 0 && <DropdownMenuSeparator />}
-              <div className="flex flex-wrap gap-1 p-1 max-w-[160px]">
-                {regions.map((region) => (
-                  <Button
-                    key={region.code}
-                    variant={currentRegion.code === region.code ? "secondary" : "ghost"}
-                    size="icon"
-                    className="h-8 w-8 p-0"
-                    onClick={() => handleRegionSelect(region)}
-                  >
-                    <span className="text-lg">{region.flag}</span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
+        <div className="flex gap-1 p-1">
+          {availableRegions.map((region) => (
+            <Button
+              key={region.code}
+              variant={currentRegion.code === region.code ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8 p-0"
+              onClick={() => handleRegionSelect(region)}
+            >
+              <span className="text-lg">{region.flag}</span>
+            </Button>
+          ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

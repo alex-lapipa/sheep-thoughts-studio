@@ -49,6 +49,7 @@ import {
   Image,
   User,
   Briefcase,
+  Globe,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -154,6 +155,20 @@ const navSections: NavSection[] = [
       { href: '/admin/subscribers', label: 'Subscribers', icon: Users, requiredModule: 'ops' },
       { href: '/admin/campaigns', label: 'Campaigns', icon: Megaphone, requiredModule: 'ops' },
       { href: '/admin/templates', label: 'Email Templates', icon: Mail, requiredModule: 'ops' },
+    ],
+  },
+  {
+    title: 'Languages',
+    requiredModule: 'admin',
+    items: [
+      { href: '/dach', label: 'Deutschland 🇩🇪', icon: Globe, external: true },
+      { href: '/fr', label: 'France 🇫🇷', icon: Globe, external: true },
+      { href: '/es', label: 'España 🇪🇸', icon: Globe, external: true },
+      { href: '/mx', label: 'México 🇲🇽', icon: Globe, external: true },
+      { href: '/ar', label: 'Argentina 🇦🇷', icon: Globe, external: true },
+      { href: '/latam', label: 'Latinoamérica 🌎', icon: Globe, external: true },
+      { href: '/be', label: 'Belgique 🇧🇪', icon: Globe, external: true },
+      { href: '/lu', label: 'Luxembourg 🇱🇺', icon: Globe, external: true },
     ],
   },
   {
