@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Binoculars, Sparkles, Trophy, RotateCcw, ChevronRight, 
   Check, X, Lightbulb, Zap, Star, Dog, Bird, Cat, Rabbit, 
-  Squirrel, Bug, Fish, Rat, HelpCircle, Medal, Crown, Users
+  Squirrel, Bug, Fish, Rat, HelpCircle, Medal, Crown, Users,
+  Volume2, VolumeX, Loader2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,90 @@ import { Input } from "@/components/ui/input";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
+
+// TTS helper for Bubbles reading clues
+const speakClue = async (text: string): Promise<HTMLAudioElement | null> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          text: `Hmm, let me think... ${text}`,
+          mode: "innocent",
+          rate: 0.95
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`TTS request failed: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    
+    audio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+    
+    return audio;
+  } catch (error) {
+    console.error("TTS error:", error);
+    return null;
+  }
+};
+
+// Speak reveal/result
+const speakReveal = async (text: string, isCorrect: boolean): Promise<HTMLAudioElement | null> => {
+  try {
+    const prefix = isCorrect 
+      ? "Ah yes! You got it! " 
+      : "Oh dear, not quite right... ";
+    
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          text: prefix + text,
+          mode: isCorrect ? "innocent" : "concerned",
+          rate: 0.95
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`TTS request failed: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    
+    audio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+    
+    return audio;
+  } catch (error) {
+    console.error("TTS error:", error);
+    return null;
+  }
+};
 
 interface CreatureData {
   id: string;
@@ -189,9 +273,64 @@ export const CreatureSpotter = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [initials, setInitials] = useState("");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  
+  // Audio state
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const currentCreature = gameCreatures[currentCreatureIndex];
   const totalRounds = 5;
+
+  // Stop any playing audio
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+  }, []);
+
+  // Play clue with TTS
+  const playClue = useCallback(async (clueText: string) => {
+    if (!soundEnabled) return;
+    
+    stopAudio();
+    setIsLoadingAudio(true);
+    
+    try {
+      const audio = await speakClue(clueText);
+      if (audio) {
+        audioRef.current = audio;
+        audio.volume = 0.8;
+        await audio.play();
+      }
+    } catch (error) {
+      console.error("Failed to play clue:", error);
+    } finally {
+      setIsLoadingAudio(false);
+    }
+  }, [soundEnabled, stopAudio]);
+
+  // Play result reveal with TTS
+  const playReveal = useCallback(async (revealText: string, correct: boolean) => {
+    if (!soundEnabled) return;
+    
+    stopAudio();
+    setIsLoadingAudio(true);
+    
+    try {
+      const audio = await speakReveal(revealText, correct);
+      if (audio) {
+        audioRef.current = audio;
+        audio.volume = 0.8;
+        await audio.play();
+      }
+    } catch (error) {
+      console.error("Failed to play reveal:", error);
+    } finally {
+      setIsLoadingAudio(false);
+    }
+  }, [soundEnabled, stopAudio]);
 
   // Load leaderboard on mount
   useEffect(() => {
@@ -199,6 +338,7 @@ export const CreatureSpotter = () => {
   }, []);
 
   const startGame = useCallback(() => {
+    stopAudio();
     const shuffled = shuffleArray(CREATURES).slice(0, totalRounds);
     setGameCreatures(shuffled);
     setCurrentCreatureIndex(0);
@@ -213,7 +353,14 @@ export const CreatureSpotter = () => {
     setShowLeaderboard(false);
     setGameState("playing");
     prepareOptions(shuffled[0], shuffled);
-  }, []);
+    
+    // Play first clue after a short delay
+    setTimeout(() => {
+      if (shuffled[0]?.clues[0]) {
+        playClue(shuffled[0].clues[0]);
+      }
+    }, 500);
+  }, [stopAudio, playClue]);
 
   const prepareOptions = (creature: CreatureData, allCreatures: CreatureData[]) => {
     const others = CREATURES.filter(c => c.id !== creature.id);
@@ -223,14 +370,20 @@ export const CreatureSpotter = () => {
 
   const revealNextClue = () => {
     if (currentClueIndex < currentCreature.clues.length - 1) {
-      setCurrentClueIndex(prev => prev + 1);
+      const nextIndex = currentClueIndex + 1;
+      setCurrentClueIndex(nextIndex);
       setHintsUsed(prev => prev + 1);
+      
+      // Play the new clue
+      playClue(currentCreature.clues[nextIndex]);
     } else {
+      stopAudio();
       setGameState("guessing");
     }
   };
 
   const makeGuess = () => {
+    stopAudio();
     setGameState("guessing");
   };
 
@@ -258,10 +411,15 @@ export const CreatureSpotter = () => {
       setStreak(0);
     }
     
+    // Play the reveal
+    playReveal(currentCreature.bubblesReveal, correct);
+    
     setGameState("result");
   };
 
   const nextRound = () => {
+    stopAudio();
+    
     if (currentCreatureIndex < totalRounds - 1) {
       const nextIndex = currentCreatureIndex + 1;
       setCurrentCreatureIndex(nextIndex);
@@ -270,6 +428,13 @@ export const CreatureSpotter = () => {
       setIsCorrect(null);
       setGameState("playing");
       prepareOptions(gameCreatures[nextIndex], gameCreatures);
+      
+      // Play first clue of next round
+      setTimeout(() => {
+        if (gameCreatures[nextIndex]?.clues[0]) {
+          playClue(gameCreatures[nextIndex].clues[0]);
+        }
+      }, 300);
     } else {
       // Game complete - check if high score
       if (isHighScore(score)) {
@@ -325,6 +490,26 @@ export const CreatureSpotter = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Sound toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSoundEnabled(!soundEnabled);
+                if (soundEnabled) stopAudio();
+              }}
+              className="h-8 w-8 p-0"
+              title={soundEnabled ? "Mute Bubbles" : "Unmute Bubbles"}
+            >
+              {isLoadingAudio ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : soundEnabled ? (
+                <Volume2 className="w-4 h-4 text-emerald-400" />
+              ) : (
+                <VolumeX className="w-4 h-4 text-muted-foreground" />
+              )}
+            </Button>
+            
             {gameState !== "idle" && gameState !== "complete" && gameState !== "enterInitials" && (
               <>
                 <Badge variant="secondary" className="gap-1">
