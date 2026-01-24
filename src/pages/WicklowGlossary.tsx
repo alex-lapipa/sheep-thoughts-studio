@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { usePronunciation } from "@/hooks/usePronunciation";
+import { CreatureHierarchy } from "@/components/CreatureHierarchy";
 
 interface GlossaryEntry {
   phrase: string;
@@ -547,6 +548,18 @@ const WicklowGlossary = () => {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Creature Hierarchy - show when filtering creatures or no filter */}
+        {(selectedCategory === null || selectedCategory === "creatures") && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <CreatureHierarchy />
+          </motion.div>
+        )}
 
         {/* Category Filters */}
         <div className="flex flex-wrap gap-3 mb-8 justify-center">
