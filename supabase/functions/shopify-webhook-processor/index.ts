@@ -17,6 +17,14 @@ const SITEMAP_TRIGGER_TOPICS = [
   "collections/delete",
 ];
 
+// Topics that should trigger inventory/stock alerts
+const INVENTORY_TOPICS = [
+  "inventory_levels/update",
+  "inventory_items/update",
+  "variants/in_stock",
+  "variants/out_of_stock",
+];
+
 // Topics that should trigger order status emails
 const ORDER_STATUS_TOPICS = [
   "orders/create",
@@ -246,6 +254,30 @@ async function processWebhook(
       });
       
       actions.push(`Audit logged: ${topic} for order ${orderName || orderId}`);
+    }
+
+    // Handle inventory updates
+    if (INVENTORY_TOPICS.includes(topic)) {
+      const inventoryItemId = payload.inventory_item_id as string | number | undefined;
+      const locationId = payload.location_id as string | number | undefined;
+      const available = payload.available as number | undefined;
+      const variantId = payload.variant_id as string | number | undefined;
+      
+      await supabase.from("audit_logs").insert({
+        entity_type: "shopify_inventory",
+        entity_id: String(inventoryItemId || variantId),
+        action: topic,
+        after_data: { 
+          topic,
+          inventoryItemId,
+          locationId,
+          available,
+          variantId,
+        },
+        metadata: { source: "shopify_webhook" },
+      });
+      
+      actions.push(`Inventory ${topic}: item ${inventoryItemId || variantId}, available: ${available ?? 'N/A'}`);
     }
 
     return { success: true, actions };

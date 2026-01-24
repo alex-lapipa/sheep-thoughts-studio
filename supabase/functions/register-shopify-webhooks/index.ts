@@ -7,17 +7,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Webhook topics to register for product updates
+// Webhook topics to register - based on available scopes
+// Note: Order webhooks require read_orders scope which may not be available on all stores
 const WEBHOOK_TOPICS = [
+  // Product webhooks (read_products/write_products scope)
   "products/create",
   "products/update", 
   "products/delete",
+  // Collection webhooks (read_products scope)
   "collections/create",
   "collections/update",
   "collections/delete",
-  "orders/create",
-  "orders/updated",
-  "orders/fulfilled",
+  // Inventory webhooks (read_inventory scope)
+  "inventory_levels/update",
+  "inventory_items/update",
+  // Variant stock alerts
+  "variants/in_stock",
+  "variants/out_of_stock",
 ];
 
 interface ShopifyWebhook {

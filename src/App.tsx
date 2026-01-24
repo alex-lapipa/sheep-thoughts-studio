@@ -14,6 +14,7 @@ import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 import { DevToolsPanel } from "@/components/DevToolsPanel";
+import { useCartSync } from "@/hooks/useCartSync";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -118,6 +119,12 @@ function PageLoader() {
   );
 }
 
+// Component to handle cart sync at app level
+function CartSyncProvider({ children }: { children: React.ReactNode }) {
+  useCartSync();
+  return <>{children}</>;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -141,6 +148,7 @@ const App = () => (
                     <Toaster />
                     <Sonner position="top-center" />
             <BrowserRouter>
+              <CartSyncProvider>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   {/* Public Routes */}
@@ -264,6 +272,7 @@ const App = () => (
                 </Suspense>
                 <CookieConsent />
                 <DevToolsPanel />
+              </CartSyncProvider>
               </BrowserRouter>
             </MoodProvider>
           </AuthProvider>
