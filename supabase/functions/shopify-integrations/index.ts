@@ -500,7 +500,6 @@ Deno.serve(async (req) => {
                       availableForSale
                       inventoryQuantity
                       selectedOptions { name value }
-                      price
                     }
                   }
                 }
@@ -549,7 +548,7 @@ Deno.serve(async (req) => {
           totalInventory: number;
           priceRangeV2?: { minVariantPrice: { amount: string; currencyCode: string }; maxVariantPrice: { amount: string; currencyCode: string } };
           images: { edges: Array<{ node: { url: string; altText: string | null } }> };
-          variants: { edges: Array<{ node: { id: string; title: string; sku: string; availableForSale: boolean; inventoryQuantity: number; selectedOptions: Array<{ name: string; value: string }>; price: string } }> };
+          variants: { edges: Array<{ node: { id: string; title: string; sku: string; availableForSale: boolean; inventoryQuantity: number; selectedOptions: Array<{ name: string; value: string }> } }> };
           options: Array<{ name: string; values: string[] }>;
         };
         
@@ -574,7 +573,7 @@ Deno.serve(async (req) => {
                 id: v.node.id,
                 title: v.node.title,
                 sku: v.node.sku,
-                price: { amount: v.node.price || "0", currencyCode: node.priceRangeV2?.minVariantPrice?.currencyCode || "EUR" },
+                price: node.priceRangeV2?.minVariantPrice || { amount: "0", currencyCode: "EUR" },
                 availableForSale: v.node.availableForSale,
                 inventoryQuantity: v.node.inventoryQuantity,
                 selectedOptions: v.node.selectedOptions,
