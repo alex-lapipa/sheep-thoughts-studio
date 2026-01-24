@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   Tag,
   DollarSign,
+  Percent,
   FileText,
   ChevronDown,
   ChevronRight,
@@ -145,6 +146,7 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin/products', label: 'Products', icon: Package, requiredModule: 'products' },
       { href: '/admin/pricing', label: 'Pricing Rules', icon: DollarSign, requiredModule: 'pricing' },
+      { href: '/admin/discounts', label: 'Discount Codes', icon: Percent, requiredModule: 'pricing' },
       { href: '/admin/drops', label: 'Drops', icon: Tag, requiredModule: 'drops' },
     ],
   },

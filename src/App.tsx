@@ -103,6 +103,7 @@ const OrdersPage = lazy(() => import("./pages/admin/orders/Orders"));
 const ExceptionsPage = lazy(() => import("./pages/admin/orders/Exceptions"));
 const ProductsPage = lazy(() => import("./pages/admin/catalog/Products"));
 const PricingRulesPage = lazy(() => import("./pages/admin/catalog/PricingRules"));
+const DiscountCodesPage = lazy(() => import("./pages/admin/catalog/DiscountCodes"));
 const DropsPage = lazy(() => import("./pages/admin/catalog/Drops"));
 const AdminWhatsNew = lazy(() => import("./pages/admin/WhatsNewAdmin"));
 const IllustrationGenerator = lazy(() => import("./pages/admin/IllustrationGenerator"));
@@ -242,6 +243,7 @@ const App = () => (
                   {/* Catalog Routes */}
                   <Route path="/admin/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
                   <Route path="/admin/pricing" element={<ProtectedRoute><PricingRulesPage /></ProtectedRoute>} />
+                  <Route path="/admin/discounts" element={<ProtectedRoute><DiscountCodesPage /></ProtectedRoute>} />
                   <Route path="/admin/drops" element={<ProtectedRoute><DropsPage /></ProtectedRoute>} />
                   
                   {/* Support Routes */}
