@@ -99,11 +99,11 @@ export function PageHeroWithBubbles({
     };
   }, [thoughts, getRandomPosition]);
 
-  // COLOSSAL sizes for grounded Bubbles — matching homepage scale
+  // Consistent size for grounded Bubbles across all pages
   const bubbleSizeClasses = {
-    sm: "w-[20rem] h-[20rem] sm:w-[26rem] sm:h-[26rem] md:w-[32rem] md:h-[32rem]",
-    md: "w-[24rem] h-[24rem] sm:w-[30rem] sm:h-[30rem] md:w-[38rem] md:h-[38rem] lg:w-[44rem] lg:h-[44rem]",
-    lg: "w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem]",
+    sm: "w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80",
+    md: "w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[24rem] lg:h-[24rem]",
+    lg: "w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem]",
   };
 
   // All positions anchor to head area (top portion of mascot)
@@ -122,17 +122,17 @@ export function PageHeroWithBubbles({
       <WicklowHeroLandscape weather="random" showTrees showWeatherControl />
 
       <div className="container relative z-10">
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* COLOSSAL Bubbles with thought bubbles — Grounded on grass, facing left */}
-          <div className="relative flex justify-center items-end order-1 lg:order-2">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">
+          {/* Bubbles with thought bubbles — Grounded on grass, facing left */}
+          <div className="relative flex justify-center items-end self-end order-1 lg:order-2">
             <div className="relative">
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
               
-              {/* The mascot - COLOSSAL Post-punk stencil style, grounded on grass */}
+              {/* The mascot - Post-punk stencil style, grounded on grass */}
               <div className={cn(bubbleSizeClasses[bubbleSize], "relative flex items-end justify-center")}>
                 <BubblesHeroImage
-                  size="colossal"
+                  size="massive"
                   grounded
                   flipped
                   className="w-full h-full drop-shadow-2xl"

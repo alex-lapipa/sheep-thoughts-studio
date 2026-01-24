@@ -59,7 +59,7 @@ export default function TalkToBubbles() {
           <WicklowLandscape />
 
           <div className="container relative z-10 px-4 md:px-6">
-            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">
               {/* Text Content — Left side */}
               <motion.div 
                 className="space-y-6 sm:space-y-8 animate-fade-in text-center lg:text-left order-2 lg:order-1"
@@ -78,9 +78,9 @@ export default function TalkToBubbles() {
                 </div>
               </motion.div>
 
-              {/* COLOSSAL Bubbles — Right side, grounded, facing left */}
+              {/* Bubbles — Right side, grounded on grass, facing left */}
               <motion.div
-                className="relative flex justify-center items-end order-1 lg:order-2"
+                className="relative flex justify-center items-end self-end order-1 lg:order-2"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
@@ -89,9 +89,9 @@ export default function TalkToBubbles() {
                   {/* Glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-bubbles-gorse/20 rounded-3xl blur-3xl scale-110 animate-pulse" />
                   
-                  {/* COLOSSAL character container */}
-                  <div className="relative w-[26rem] h-[26rem] sm:w-[34rem] sm:h-[34rem] md:w-[46rem] md:h-[46rem] lg:w-[54rem] lg:h-[54rem] flex items-end justify-center">
-                    <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full drop-shadow-2xl" />
+                  {/* Character container — grounded stance */}
+                  <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[26rem] lg:h-[26rem] flex items-end justify-center">
+                    <BubblesHeroImage size="massive" grounded flipped className="w-full h-full drop-shadow-2xl" />
                   </div>
                 </div>
               </motion.div>
