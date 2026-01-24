@@ -22,6 +22,7 @@ import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { cn } from "@/lib/utils";
+import { SizeGuideModal } from "./SizeGuideModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ProductQuickViewProps {
@@ -224,44 +225,57 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
             {/* Variant Options */}
             {groupedOptions.length > 0 && (
               <div className="space-y-4 mb-6">
-                {groupedOptions.map((option) => (
-                  <div key={option.name}>
-                    <label className="text-sm font-medium mb-2 block">
-                      {option.name}
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {option.values.map((value) => {
-                        // Find variant with this option value
-                        const variantIndex = variants.findIndex(v => 
-                          v.node.selectedOptions?.some(
+                {groupedOptions.map((option) => {
+                  const isSizeOption = option.name.toLowerCase() === 'size';
+                  // Derive product type from title/tags since productType may not be available
+                  const titleLower = node.title.toLowerCase();
+                  const productType = titleLower.includes('hoodie') ? 'hoodie' : 
+                                      titleLower.includes('cap') || titleLower.includes('hat') ? 'cap' : 'tshirt';
+                  
+                  return (
+                    <div key={option.name}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-medium">
+                          {option.name}
+                        </label>
+                        {isSizeOption && (
+                          <SizeGuideModal productType={productType} />
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {option.values.map((value) => {
+                          // Find variant with this option value
+                          const variantIndex = variants.findIndex(v => 
+                            v.node.selectedOptions?.some(
+                              opt => opt.name === option.name && opt.value === value
+                            )
+                          );
+                          const variant = variants[variantIndex]?.node;
+                          const isSelected = selectedVariant?.selectedOptions?.some(
                             opt => opt.name === option.name && opt.value === value
-                          )
-                        );
-                        const variant = variants[variantIndex]?.node;
-                        const isSelected = selectedVariant?.selectedOptions?.some(
-                          opt => opt.name === option.name && opt.value === value
-                        );
-                        const isAvailable = variant?.availableForSale !== false;
+                          );
+                          const isAvailable = variant?.availableForSale !== false;
 
-                        return (
-                          <Button
-                            key={value}
-                            variant={isSelected ? "default" : "outline"}
-                            size="sm"
-                            disabled={!isAvailable}
-                            onClick={() => variantIndex >= 0 && handleVariantChange(variantIndex)}
-                            className={cn(
-                              "min-w-[3rem]",
-                              !isAvailable && "opacity-50 line-through"
-                            )}
-                          >
-                            {value}
-                          </Button>
-                        );
-                      })}
+                          return (
+                            <Button
+                              key={value}
+                              variant={isSelected ? "default" : "outline"}
+                              size="sm"
+                              disabled={!isAvailable}
+                              onClick={() => variantIndex >= 0 && handleVariantChange(variantIndex)}
+                              className={cn(
+                                "min-w-[3rem]",
+                                !isAvailable && "opacity-50 line-through"
+                              )}
+                            >
+                              {value}
+                            </Button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
