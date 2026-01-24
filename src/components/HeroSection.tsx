@@ -145,10 +145,10 @@ export function HeroSection() {
           
           {/* Mobile: Character first for visual impact */}
           <div className="relative flex justify-center items-end order-1 lg:order-2">
-            {/* Post-punk stencil Bubbles - LARGER & GROUNDED on grass */}
+            {/* Post-punk stencil Bubbles - COLOSSAL & GROUNDED on grass */}
             <div className="relative">
-              <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] flex items-end justify-center">
-                <BubblesHeroImage size="massive" grounded flipped className="w-full h-full drop-shadow-2xl" />
+              <div className="w-[20rem] h-[20rem] sm:w-[26rem] sm:h-[26rem] md:w-[34rem] md:h-[34rem] lg:w-[42rem] lg:h-[42rem] xl:w-[50rem] xl:h-[50rem] flex items-end justify-center">
+                <BubblesHeroImage size="colossal" grounded flipped className="w-full h-full drop-shadow-2xl" />
               </div>
             </div>
             
