@@ -1,14 +1,14 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
-import { PageHeroWithBubbles } from "@/components/PageHeroWithBubbles";
+import { BrandHero } from "@/components/BrandHero";
 import { AnimatedOnView } from "@/components/AnimatedText";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOgImage } from "@/hooks/useOgImage";
-import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags, BarChart3 } from "lucide-react";
+import { Sparkles, RefreshCw, Send, MessageCircleQuestion, Loader2, Share2, Check, Calendar, Clock, Flame, Copy, History, Trash2, ChevronDown, ChevronUp, Trophy, RotateCcw, Download, Zap, Star, Tag, X, Plus, CheckSquare, Square, Tags, BarChart3, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -601,12 +601,19 @@ const FAQ = () => {
         <link rel="canonical" href={`${siteUrl}/faq`} />
       </Helmet>
 
-      {/* Hero with Bubbles */}
+      {/* Brand Hero with Wicklow Background */}
       <section className="-mx-4 mb-12">
-        <PageHeroWithBubbles
-          title={t("faqPage.title")}
-          subtitle={t("faqPage.subtitle")}
-          bubbleSize="md"
+        <BrandHero
+          title="Ask Bubbles Anything"
+          subtitle="Get answers to questions you never asked. Track your wisdom streak. Embrace the confusion."
+          bubblesVariant="explains"
+          badge="Wisdom Station"
+          badgeIcon={HelpCircle}
+          secondaryBadge="AI-Powered Confusion"
+          thought={{
+            text: "I've answered thousands of questions. All of them incorrectly. That's consistency.",
+            mode: "innocent"
+          }}
         />
       </section>
 
