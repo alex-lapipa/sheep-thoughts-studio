@@ -88,6 +88,24 @@ Deno.serve(async (req) => {
           active: true,
           function: "cleanup-image-cache",
         },
+        {
+          jobid: 5,
+          jobname: "daily-store-digest",
+          schedule: "0 8 * * *",
+          description: "Sends daily store analytics digest to admins at 8 AM UTC",
+          active: true,
+          function: "store-analytics-digest",
+          params: { frequency: "daily" },
+        },
+        {
+          jobid: 6,
+          jobname: "weekly-store-digest",
+          schedule: "0 9 * * 1",
+          description: "Sends weekly store analytics digest to admins every Monday at 9 AM UTC",
+          active: true,
+          function: "store-analytics-digest",
+          params: { frequency: "weekly" },
+        },
       ];
 
       return new Response(
