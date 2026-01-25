@@ -105,6 +105,7 @@ export default function ProductsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
+                    <TableHead>Vendor</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Status</TableHead>
@@ -114,6 +115,7 @@ export default function ProductsPage() {
                 <TableBody>
                   {filteredProducts.map((item: any) => {
                     const product = item.node;
+                    const hasComparePrice = product?.compareAtPriceRange?.minVariantPrice?.amount > 0;
                     return (
                       <TableRow key={product?.id}>
                         <TableCell>
@@ -134,6 +136,11 @@ export default function ProductsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {product?.vendor || '—'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
                           {product?.productType && (
                             <Badge variant="outline">
                               <Tag className="h-3 w-3 mr-1" />
@@ -144,7 +151,12 @@ export default function ProductsPage() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <DollarSign className="h-3 w-3 text-muted-foreground" />
-                            {product?.priceRange?.minVariantPrice?.amount || '—'}
+                            <span>{product?.priceRange?.minVariantPrice?.amount || '—'}</span>
+                            {hasComparePrice && (
+                              <span className="text-xs text-muted-foreground line-through ml-1">
+                                {product.compareAtPriceRange.minVariantPrice.amount}
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>

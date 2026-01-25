@@ -23,6 +23,7 @@ import { RecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { TrustBadges } from "@/components/TrustBadges";
+import { ProductSpecs } from "@/components/ProductSpecs";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -325,6 +326,20 @@ const ProductDetail = () => {
 
             {/* Accordion */}
             <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="details">
+                <AccordionTrigger className="font-display">Product Specifications</AccordionTrigger>
+                <AccordionContent>
+                  <ProductSpecs
+                    vendor={product.vendor}
+                    productType={product.productType}
+                    tags={product.tags}
+                    sku={selectedVariant?.sku}
+                    weight={selectedVariant?.weight}
+                    weightUnit={selectedVariant?.weightUnit}
+                    options={options}
+                  />
+                </AccordionContent>
+              </AccordionItem>
               <AccordionItem value="shipping">
                 <AccordionTrigger className="font-display">Shipping & Delivery</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
