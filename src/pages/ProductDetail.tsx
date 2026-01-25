@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { ThoughtBubble } from "@/components/ThoughtBubble";
 import { getRandomBubble, BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "@/components/ModeBadge";
+import { LowStockBadge, getVariantInventory, calculateTotalInventory } from "@/components/LowStockBadge";
 import { analytics } from "@/lib/analytics";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { ImageLightbox } from "@/components/ImageLightbox";
@@ -88,16 +89,22 @@ const ProductDetail = () => {
   const options = product.options || [];
   const price = product.priceRange?.minVariantPrice;
   
+  // Calculate total inventory for urgency badge
+  const totalInventory = calculateTotalInventory(variants);
+  
   const modeTag = product.tags?.find((tag: string) => 
     ['innocent', 'concerned', 'triggered', 'savage'].includes(tag.toLowerCase())
   )?.toLowerCase() as BubbleMode | undefined;
 
   // Find matching variant based on selected options
-  const selectedVariant = variants.find((v: { node: { selectedOptions: Array<{ name: string; value: string }> } }) => {
+  const selectedVariant = variants.find((v: { node: { selectedOptions: Array<{ name: string; value: string }>; quantityAvailable?: number } }) => {
     return v.node.selectedOptions.every(
       opt => selectedOptions[opt.name] === opt.value || !selectedOptions[opt.name]
     );
   })?.node || variants[0]?.node;
+  
+  // Get current variant's inventory for precise urgency
+  const variantInventory = getVariantInventory(selectedVariant);
 
   const handleOptionChange = (optionName: string, value: string) => {
     setSelectedOptions(prev => ({ ...prev, [optionName]: value }));
@@ -267,6 +274,13 @@ const ProductDetail = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Low Stock Urgency Badge */}
+            {selectedVariant?.availableForSale && variantInventory > 0 && variantInventory <= 10 && (
+              <div className="mb-4">
+                <LowStockBadge quantity={variantInventory} />
               </div>
             )}
 

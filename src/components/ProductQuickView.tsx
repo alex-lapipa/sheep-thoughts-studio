@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
+import { LowStockBadge, getVariantInventory } from "./LowStockBadge";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { cn } from "@/lib/utils";
 import { SizeGuideModal } from "./SizeGuideModal";
@@ -304,14 +305,17 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
               </div>
             </div>
 
-            {/* Availability */}
+            {/* Availability & Low Stock */}
               {selectedVariant && (
-                <div className="mb-6">
+                <div className="mb-6 flex flex-wrap gap-2">
                   {selectedVariant.availableForSale ? (
-                    <Badge variant="secondary" className="bg-affirmative/10 text-affirmative border-affirmative/30">
-                      <Check className="h-3 w-3 mr-1" />
-                      In Stock
-                    </Badge>
+                    <>
+                      <Badge variant="secondary" className="bg-affirmative/10 text-affirmative border-affirmative/30">
+                        <Check className="h-3 w-3 mr-1" />
+                        In Stock
+                      </Badge>
+                      <LowStockBadge quantity={getVariantInventory(selectedVariant)} />
+                    </>
                   ) : (
                     <Badge variant="secondary" className="bg-destructive/10 text-destructive border-destructive/30">
                       <X className="h-3 w-3 mr-1" />
