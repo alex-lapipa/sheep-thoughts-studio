@@ -1236,6 +1236,225 @@ export type Database = {
         }
         Relationships: []
       }
+      ops_actions: {
+        Row: {
+          action_description: string | null
+          action_title: string
+          action_type: string
+          after_snapshot: Json | null
+          approved_by: string | null
+          before_snapshot: Json | null
+          created_at: string
+          error_message: string | null
+          executed_at: string | null
+          execution_result: Json | null
+          id: string
+          planned_changes: Json
+          requested_by: string | null
+          requires_confirmation: string | null
+          risk_level: string | null
+          rollback_plan: string | null
+          status: Database["public"]["Enums"]["ops_action_status"]
+          target_resource: string | null
+          target_resource_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          action_description?: string | null
+          action_title: string
+          action_type: string
+          after_snapshot?: Json | null
+          approved_by?: string | null
+          before_snapshot?: Json | null
+          created_at?: string
+          error_message?: string | null
+          executed_at?: string | null
+          execution_result?: Json | null
+          id?: string
+          planned_changes: Json
+          requested_by?: string | null
+          requires_confirmation?: string | null
+          risk_level?: string | null
+          rollback_plan?: string | null
+          status?: Database["public"]["Enums"]["ops_action_status"]
+          target_resource?: string | null
+          target_resource_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          action_description?: string | null
+          action_title?: string
+          action_type?: string
+          after_snapshot?: Json | null
+          approved_by?: string | null
+          before_snapshot?: Json | null
+          created_at?: string
+          error_message?: string | null
+          executed_at?: string | null
+          execution_result?: Json | null
+          id?: string
+          planned_changes?: Json
+          requested_by?: string | null
+          requires_confirmation?: string | null
+          risk_level?: string | null
+          rollback_plan?: string | null
+          status?: Database["public"]["Enums"]["ops_action_status"]
+          target_resource?: string | null
+          target_resource_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ops_agent_conversations: {
+        Row: {
+          context: Json | null
+          created_at: string
+          id: string
+          messages: Json | null
+          mode: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          messages?: Json | null
+          mode?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          messages?: Json | null
+          mode?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ops_health_checks: {
+        Row: {
+          category: Database["public"]["Enums"]["health_check_category"]
+          check_name: string
+          checked_at: string
+          evidence: Json | null
+          id: string
+          likely_cause: string | null
+          metadata: Json | null
+          requires_approval: boolean | null
+          status: Database["public"]["Enums"]["health_check_status"]
+          suggested_fix: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["health_check_category"]
+          check_name: string
+          checked_at?: string
+          evidence?: Json | null
+          id?: string
+          likely_cause?: string | null
+          metadata?: Json | null
+          requires_approval?: boolean | null
+          status?: Database["public"]["Enums"]["health_check_status"]
+          suggested_fix?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["health_check_category"]
+          check_name?: string
+          checked_at?: string
+          evidence?: Json | null
+          id?: string
+          likely_cause?: string | null
+          metadata?: Json | null
+          requires_approval?: boolean | null
+          status?: Database["public"]["Enums"]["health_check_status"]
+          suggested_fix?: string | null
+        }
+        Relationships: []
+      }
+      ops_rag_knowledge: {
+        Row: {
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          metadata: Json | null
+          namespace: Database["public"]["Enums"]["ops_rag_namespace"]
+          source_type: string | null
+          source_url: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          namespace: Database["public"]["Enums"]["ops_rag_namespace"]
+          source_type?: string | null
+          source_url?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          namespace?: Database["public"]["Enums"]["ops_rag_namespace"]
+          source_type?: string | null
+          source_url?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ops_sop_uploads: {
+        Row: {
+          created_at: string
+          extracted_content: string | null
+          file_size: number | null
+          file_type: string | null
+          filename: string
+          id: string
+          metadata: Json | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          extracted_content?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          filename: string
+          id?: string
+          metadata?: Json | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          extracted_content?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          filename?: string
+          id?: string
+          metadata?: Json | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       pod_jobs: {
         Row: {
           carrier: string | null
@@ -1778,6 +1997,33 @@ export type Database = {
         }
         Relationships: []
       }
+      store_state_snapshots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          diff_from_previous: Json | null
+          id: string
+          snapshot_data: Json
+          snapshot_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          diff_from_previous?: Json | null
+          id?: string
+          snapshot_data: Json
+          snapshot_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          diff_from_previous?: Json | null
+          id?: string
+          snapshot_data?: Json
+          snapshot_type?: string
+        }
+        Relationships: []
+      }
       submitted_questions: {
         Row: {
           answer: string | null
@@ -2050,6 +2296,24 @@ export type Database = {
           tags: string[]
         }[]
       }
+      search_ops_rag_knowledge: {
+        Args: {
+          filter_namespace?: Database["public"]["Enums"]["ops_rag_namespace"]
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          metadata: Json
+          namespace: Database["public"]["Enums"]["ops_rag_namespace"]
+          similarity: number
+          source_url: string
+          tags: string[]
+          title: string
+        }[]
+      }
     }
     Enums: {
       bubbles_knowledge_category:
@@ -2080,12 +2344,28 @@ export type Database = {
         | "payment_issue"
         | "inventory_issue"
         | "other"
+      health_check_category:
+        | "storefront_theme"
+        | "checkout_payments"
+        | "catalog_inventory"
+        | "orders_fulfillment"
+        | "apps_integrations"
+        | "performance_seo"
+      health_check_status: "ok" | "warn" | "critical" | "unknown"
       mapping_status:
         | "ok"
         | "missing_file"
         | "missing_variant"
         | "mismatch"
         | "unmapped"
+      ops_action_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "executed"
+        | "failed"
+        | "rolled_back"
+      ops_rag_namespace: "shopify_docs" | "store_state" | "sop_uploads"
       pod_connection_status: "connected" | "disconnected" | "error" | "pending"
       pod_job_status:
         | "not_sent"
@@ -2250,6 +2530,15 @@ export const Constants = {
         "inventory_issue",
         "other",
       ],
+      health_check_category: [
+        "storefront_theme",
+        "checkout_payments",
+        "catalog_inventory",
+        "orders_fulfillment",
+        "apps_integrations",
+        "performance_seo",
+      ],
+      health_check_status: ["ok", "warn", "critical", "unknown"],
       mapping_status: [
         "ok",
         "missing_file",
@@ -2257,6 +2546,15 @@ export const Constants = {
         "mismatch",
         "unmapped",
       ],
+      ops_action_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "executed",
+        "failed",
+        "rolled_back",
+      ],
+      ops_rag_namespace: ["shopify_docs", "store_state", "sop_uploads"],
       pod_connection_status: ["connected", "disconnected", "error", "pending"],
       pod_job_status: [
         "not_sent",
