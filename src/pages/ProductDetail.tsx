@@ -22,6 +22,7 @@ import { StickyAddToCart } from "@/components/StickyAddToCart";
 import { RecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
+import { TrustBadges } from "@/components/TrustBadges";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -307,6 +308,9 @@ const ProductDetail = () => {
                   <Check className="h-4 w-4" />
                   In stock and ready to ship
                 </div>
+                
+                {/* Trust Badges */}
+                <TrustBadges variant="compact" className="mt-2" />
               </>
             ) : (
               <BackInStockNotify
