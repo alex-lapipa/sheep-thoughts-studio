@@ -163,6 +163,15 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: 'Store Ops',
+    requiredModule: 'admin',
+    items: [
+      { href: '/admin/ops', label: 'Overview', icon: BarChart3, requiredModule: 'admin' },
+      { href: '/admin/ops/agent', label: 'Agent Console', icon: MessageCircle, requiredModule: 'admin' },
+      { href: '/admin/ops/audit', label: 'Ops Audit Log', icon: FileText, requiredModule: 'admin' },
+    ],
+  },
+  {
     title: 'System',
     requiredModule: 'admin',
     items: [

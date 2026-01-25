@@ -113,6 +113,9 @@ const MentorTriggerEditor = lazy(() => import("./pages/admin/MentorTriggerEditor
 const MentorAnalytics = lazy(() => import("./pages/admin/MentorAnalytics"));
 const ABTestAnalytics = lazy(() => import("./pages/admin/ABTestAnalytics"));
 const FAQKnowledge = lazy(() => import("./pages/admin/FAQKnowledge"));
+const StoreOpsOverview = lazy(() => import("./pages/admin/ops/StoreOpsOverview"));
+const OpsAgentConsole = lazy(() => import("./pages/admin/ops/OpsAgentConsole"));
+const OpsAuditLog = lazy(() => import("./pages/admin/ops/OpsAuditLog"));
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -270,6 +273,11 @@ const App = () => (
                   <Route path="/admin/whats-new" element={<ProtectedRoute><AdminWhatsNew /></ProtectedRoute>} />
                   <Route path="/admin/illustrations" element={<ProtectedRoute><IllustrationGenerator /></ProtectedRoute>} />
                   <Route path="/admin/feature-flags" element={<ProtectedRoute requireSuperAdmin><FeatureFlagsAdmin /></ProtectedRoute>} />
+                  
+                  {/* Store Ops Routes */}
+                  <Route path="/admin/ops" element={<ProtectedRoute requireSuperAdmin><StoreOpsOverview /></ProtectedRoute>} />
+                  <Route path="/admin/ops/agent" element={<ProtectedRoute requireSuperAdmin><OpsAgentConsole /></ProtectedRoute>} />
+                  <Route path="/admin/ops/audit" element={<ProtectedRoute requireSuperAdmin><OpsAuditLog /></ProtectedRoute>} />
                   
                     <Route path="*" element={<NotFound />} />
                   </Routes>
