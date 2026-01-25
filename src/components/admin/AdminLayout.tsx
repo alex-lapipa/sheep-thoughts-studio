@@ -2,6 +2,7 @@ import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useOrderNotifications } from '@/hooks/useOrderNotifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminBreadcrumb } from './AdminBreadcrumb';
@@ -187,6 +188,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       return false;
     }
   });
+
+  // Subscribe to real-time order notifications
+  useOrderNotifications();
 
   // Persist sidebar state to localStorage
   useEffect(() => {
