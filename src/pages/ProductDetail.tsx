@@ -17,6 +17,9 @@ import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { BackInStockNotify } from "@/components/BackInStockNotify";
 import { SizeGuideModal } from "@/components/SizeGuideModal";
+import { StickyAddToCart } from "@/components/StickyAddToCart";
+import { RecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -29,14 +32,26 @@ const ProductDetail = () => {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeImage, setActiveImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
 
-  // Track product view - must be before any early returns
+  // Track product view and add to recently viewed
   useEffect(() => {
-    if (product?.title && product?.id) {
+    if (product?.title && product?.id && handle) {
       analytics.viewProduct(product.title);
       ecommerceTracking.viewProduct(product.id, product.title, parseFloat(product.priceRange?.minVariantPrice?.amount || '0'));
+      
+      // Add to recently viewed
+      const imageUrl = product.images?.edges?.[0]?.node?.url || '';
+      addToRecentlyViewed({
+        id: product.id,
+        handle,
+        title: product.title,
+        price: product.priceRange?.minVariantPrice?.amount || '0',
+        currencyCode: product.priceRange?.minVariantPrice?.currencyCode || 'EUR',
+        imageUrl,
+      });
     }
-  }, [product?.title, product?.id, product?.priceRange?.minVariantPrice?.amount]);
+  }, [product?.title, product?.id, product?.priceRange?.minVariantPrice?.amount, handle, addToRecentlyViewed, product?.images?.edges, product?.priceRange?.minVariantPrice?.currencyCode]);
 
   if (isLoading) {
     return (
@@ -312,7 +327,19 @@ const ProductDetail = () => {
             </Accordion>
           </div>
         </div>
+
+        {/* Recently Viewed Products */}
+        <RecentlyViewedProducts excludeProductId={product.id} />
       </div>
+
+      {/* Sticky Mobile Add to Cart */}
+      <StickyAddToCart
+        productTitle={product.title}
+        price={selectedVariant?.price}
+        onAddToCart={handleAddToCart}
+        isLoading={cartLoading}
+        isAvailable={selectedVariant?.availableForSale ?? false}
+      />
     </Layout>
   );
 };
