@@ -259,31 +259,48 @@ async function runHealthChecks(supabase: any) {
       requires_approval: true,
     });
 
-    // 3. Orders Health - using REST API
-    const ordersData = await shopifyRestRequest(supabase, "/orders.json?status=open&fulfillment_status=unfulfilled&limit=50");
-    const unfulfilledOrders = ordersData?.orders || [];
-    
-    // Check for stuck orders (unfulfilled for > 3 days)
-    const now = new Date();
-    const stuckOrders = unfulfilledOrders.filter((o: any) => {
-      const created = new Date(o.created_at);
-      const daysDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-      return daysDiff > 3;
-    });
+    // 3. Orders Health - using REST API (skipped if scope unavailable)
+    try {
+      const ordersData = await shopifyRestRequest(supabase, "/orders.json?status=open&fulfillment_status=unfulfilled&limit=50");
+      const unfulfilledOrders = ordersData?.orders || [];
+      
+      // Check for stuck orders (unfulfilled for > 3 days)
+      const now = new Date();
+      const stuckOrders = unfulfilledOrders.filter((o: any) => {
+        const created = new Date(o.created_at);
+        const daysDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+        return daysDiff > 3;
+      });
 
-    checks.push({
-      category: "orders_fulfillment",
-      check_name: "Unfulfilled Orders",
-      status: stuckOrders.length > 5 ? "critical" : unfulfilledOrders.length > 10 ? "warn" : "ok",
-      evidence: { 
-        totalUnfulfilled: unfulfilledOrders.length,
-        stuckOrders: stuckOrders.length,
-        stuckItems: stuckOrders.slice(0, 5).map((o: any) => ({ name: o.name, created: o.created_at })),
-      },
-      likely_cause: stuckOrders.length > 0 ? "Orders pending fulfillment for over 3 days" : null,
-      suggested_fix: stuckOrders.length > 0 ? "Review and process stuck orders" : null,
-      requires_approval: false,
-    });
+      checks.push({
+        category: "orders_fulfillment",
+        check_name: "Unfulfilled Orders",
+        status: stuckOrders.length > 5 ? "critical" : unfulfilledOrders.length > 10 ? "warn" : "ok",
+        evidence: { 
+          totalUnfulfilled: unfulfilledOrders.length,
+          stuckOrders: stuckOrders.length,
+          stuckItems: stuckOrders.slice(0, 5).map((o: any) => ({ name: o.name, created: o.created_at })),
+        },
+        likely_cause: stuckOrders.length > 0 ? "Orders pending fulfillment for over 3 days" : null,
+        suggested_fix: stuckOrders.length > 0 ? "Review and process stuck orders" : null,
+        requires_approval: false,
+      });
+    } catch (ordersError) {
+      // Gracefully skip orders check if scope unavailable
+      console.log("Orders check skipped - read_orders scope not available");
+      checks.push({
+        category: "orders_fulfillment",
+        check_name: "Unfulfilled Orders",
+        status: "unknown",
+        evidence: { 
+          scopeRequired: "read_orders",
+          message: "Orders monitoring requires additional Shopify permissions",
+        },
+        likely_cause: "API token lacks read_orders scope",
+        suggested_fix: "Add read_orders scope in Shopify Admin → Develop apps to enable order monitoring",
+        requires_approval: false,
+      });
+    }
 
     // 4. Checkout & Payment (limited visibility)
     checks.push({
