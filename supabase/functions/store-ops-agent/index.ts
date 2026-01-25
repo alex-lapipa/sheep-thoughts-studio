@@ -30,34 +30,119 @@ function generateSemanticEmbedding(text: string): number[] {
   return embedding.map(val => val / (magnitude || 1));
 }
 
-// Shopify Admin API helper
-async function shopifyAdminRequest(query: string, variables: Record<string, unknown> = {}) {
-  const shopifyToken = Deno.env.get("SHOPIFY_ACCESS_TOKEN");
-  const storeDomain = "bubblesheet-storefront-ops-o5m9w.myshopify.com";
+// Store configuration cache
+let shopifyConfig: { storeDomain: string; apiVersion: string; token: string } | null = null;
+
+// Initialize Shopify configuration from database/environment
+async function getShopifyConfig(supabase: any): Promise<{ storeDomain: string; apiVersion: string; token: string }> {
+  if (shopifyConfig) return shopifyConfig;
   
+  const shopifyToken = Deno.env.get("SHOPIFY_ACCESS_TOKEN");
   if (!shopifyToken) {
-    throw new Error("SHOPIFY_ACCESS_TOKEN not configured");
+    throw new Error("SHOPIFY_ACCESS_TOKEN not configured - please verify the secret is set correctly");
+  }
+  
+  // Get store domain from settings table (same pattern as shopify-integrations)
+  const { data: settings, error: settingsError } = await supabase
+    .from("shopify_settings")
+    .select("store_domain, api_version")
+    .limit(1)
+    .single();
+  
+  if (settingsError || !settings?.store_domain) {
+    console.error("Failed to get shopify_settings:", settingsError);
+    // Fallback to known domain if settings missing
+    shopifyConfig = {
+      storeDomain: "bubblesheet-storefront-ops-o5m9w.myshopify.com",
+      apiVersion: "2024-04",
+      token: shopifyToken,
+    };
+  } else {
+    shopifyConfig = {
+      storeDomain: settings.store_domain,
+      apiVersion: settings.api_version || "2024-04",
+      token: shopifyToken,
+    };
+  }
+  
+  console.log(`Using Shopify config: ${shopifyConfig.storeDomain} / API ${shopifyConfig.apiVersion}`);
+  return shopifyConfig;
+}
+
+// Shopify REST Admin API helper (primary - works reliably)
+async function shopifyRestRequest(supabase: any, endpoint: string) {
+  const config = await getShopifyConfig(supabase);
+  
+  const url = `https://${config.storeDomain}/admin/api/${config.apiVersion}${endpoint}`;
+  console.log(`Calling Shopify REST API: ${url}`);
+  
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Shopify-Access-Token": config.token,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error(`Shopify REST API error: ${response.status}`, text);
+    
+    if (response.status === 401) {
+      throw new Error("Shopify API authentication failed - check if token has required permissions");
+    }
+    if (response.status === 403) {
+      throw new Error("Shopify API access denied - token may lack required scopes");
+    }
+    throw new Error(`Shopify API error: ${response.status} - ${text.substring(0, 200)}`);
   }
 
-  const response = await fetch(`https://${storeDomain}/admin/api/2025-01/graphql.json`, {
+  return response.json();
+}
+
+// Shopify GraphQL Admin API helper (fallback)
+async function shopifyAdminRequest(supabase: any, query: string, variables: Record<string, unknown> = {}) {
+  const config = await getShopifyConfig(supabase);
+  
+  const url = `https://${config.storeDomain}/admin/api/${config.apiVersion}/graphql.json`;
+  console.log(`Calling Shopify GraphQL API: ${url}`);
+  
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Shopify-Access-Token": shopifyToken,
+      "X-Shopify-Access-Token": config.token,
     },
     body: JSON.stringify({ query, variables }),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Shopify API error: ${response.status} - ${text}`);
+    console.error(`Shopify GraphQL API error: ${response.status}`, text);
+    
+    if (response.status === 401) {
+      throw new Error("Shopify API authentication failed - check if token has required permissions");
+    }
+    if (response.status === 403) {
+      throw new Error("Shopify API access denied - token may lack required scopes");
+    }
+    throw new Error(`Shopify API error: ${response.status} - ${text.substring(0, 200)}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  // Check for GraphQL errors
+  if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+    const errorMessages = data.errors.map((e: { message: string }) => e.message).join(", ");
+    console.error("GraphQL errors:", errorMessages);
+    throw new Error(`Shopify GraphQL error: ${errorMessages}`);
+  }
+  
+  return data;
 }
 
-// Health check functions
-async function runHealthChecks() {
+// Health check functions using REST API (more reliable)
+async function runHealthChecks(supabase: any) {
   const checks: Array<{
     category: string;
     check_name: string;
@@ -69,28 +154,20 @@ async function runHealthChecks() {
   }> = [];
 
   try {
-    // 1. Store & Theme Health
-    const shopQuery = `{
-      shop {
-        name
-        primaryDomain { host sslEnabled }
-        currencyCode
-        enabledPresentmentCurrencies
-        checkoutApiSupported
-      }
-      onlineStore: publication(id: "gid://shopify/Publication/1") {
-        id
-      }
-    }`;
-    
-    const shopData = await shopifyAdminRequest(shopQuery);
-    const shop = shopData?.data?.shop;
+    // 1. Store & Theme Health - using REST API
+    const shopData = await shopifyRestRequest(supabase, "/shop.json");
+    const shop = shopData?.shop;
     
     checks.push({
       category: "storefront_theme",
       check_name: "Store Configuration",
       status: shop ? "ok" : "critical",
-      evidence: { shop },
+      evidence: { 
+        name: shop?.name,
+        domain: shop?.domain,
+        currency: shop?.currency,
+        email: shop?.email,
+      },
       likely_cause: shop ? null : "Store data unavailable",
       suggested_fix: shop ? null : "Check Shopify API connection",
       requires_approval: false,
@@ -98,104 +175,98 @@ async function runHealthChecks() {
 
     checks.push({
       category: "storefront_theme",
-      check_name: "SSL Status",
-      status: shop?.primaryDomain?.sslEnabled ? "ok" : "critical",
-      evidence: { domain: shop?.primaryDomain },
-      likely_cause: shop?.primaryDomain?.sslEnabled ? null : "SSL not enabled",
-      suggested_fix: shop?.primaryDomain?.sslEnabled ? null : "Enable SSL in Shopify domain settings",
+      check_name: "Domain Status",
+      status: shop?.domain ? "ok" : "warn",
+      evidence: { 
+        domain: shop?.domain,
+        myshopifyDomain: shop?.myshopify_domain,
+      },
+      likely_cause: shop?.domain ? null : "Custom domain not configured",
+      suggested_fix: shop?.domain ? null : "Set up custom domain in Shopify settings",
       requires_approval: false,
     });
 
-    // 2. Catalog & Inventory Health
-    const inventoryQuery = `{
-      products(first: 100) {
-        edges {
-          node {
-            id
-            title
-            status
-            totalInventory
-            priceRangeV2 {
-              minVariantPrice { amount }
-            }
-            images(first: 1) {
-              edges { node { id } }
-            }
-          }
+    // 2. Catalog & Inventory Health - using REST API
+    const productsData = await shopifyRestRequest(supabase, "/products.json?limit=100");
+    const products = productsData?.products || [];
+    
+    let lowStockCount = 0;
+    let outOfStockCount = 0;
+    let noImagesCount = 0;
+    let zeroPriceCount = 0;
+    const lowStockItems: Array<{title: string; stock: number}> = [];
+    const zeroPriceItems: Array<string> = [];
+    
+    for (const p of products) {
+      const hasImages = p.images && p.images.length > 0;
+      if (!hasImages) noImagesCount++;
+      
+      for (const v of (p.variants || [])) {
+        const qty = v.inventory_quantity || 0;
+        const price = parseFloat(v.price || "0");
+        
+        if (qty === 0) outOfStockCount++;
+        else if (qty <= 5) {
+          lowStockCount++;
+          if (lowStockItems.length < 5) lowStockItems.push({ title: `${p.title} - ${v.title}`, stock: qty });
+        }
+        
+        if (price === 0) {
+          zeroPriceCount++;
+          if (zeroPriceItems.length < 5) zeroPriceItems.push(`${p.title} - ${v.title}`);
         }
       }
-    }`;
-    
-    const productsData = await shopifyAdminRequest(inventoryQuery);
-    const products = productsData?.data?.products?.edges || [];
-    
-    const lowStock = products.filter((p: any) => p.node.totalInventory <= 5 && p.node.totalInventory > 0);
-    const outOfStock = products.filter((p: any) => p.node.totalInventory === 0);
-    const noImages = products.filter((p: any) => !p.node.images?.edges?.length);
-    const zeroPrice = products.filter((p: any) => parseFloat(p.node.priceRangeV2?.minVariantPrice?.amount || "0") === 0);
+    }
 
     checks.push({
       category: "catalog_inventory",
       check_name: "Inventory Levels",
-      status: outOfStock.length > 5 ? "critical" : lowStock.length > 3 ? "warn" : "ok",
+      status: outOfStockCount > 10 ? "critical" : lowStockCount > 5 ? "warn" : "ok",
       evidence: { 
         totalProducts: products.length,
-        lowStock: lowStock.length,
-        outOfStock: outOfStock.length,
-        lowStockItems: lowStock.slice(0, 5).map((p: any) => ({ title: p.node.title, stock: p.node.totalInventory })),
+        lowStockVariants: lowStockCount,
+        outOfStockVariants: outOfStockCount,
+        lowStockItems,
       },
-      likely_cause: outOfStock.length > 0 ? "Products have zero inventory" : null,
-      suggested_fix: outOfStock.length > 0 ? "Restock items or mark as unavailable" : null,
+      likely_cause: outOfStockCount > 0 ? "Some variants have zero inventory" : null,
+      suggested_fix: outOfStockCount > 0 ? "Restock items or mark as unavailable" : null,
       requires_approval: false,
     });
 
     checks.push({
       category: "catalog_inventory",
       check_name: "Product Images",
-      status: noImages.length > 0 ? "warn" : "ok",
+      status: noImagesCount > 0 ? "warn" : "ok",
       evidence: { 
-        productsWithoutImages: noImages.length,
-        items: noImages.slice(0, 5).map((p: any) => p.node.title),
+        productsWithoutImages: noImagesCount,
+        totalProducts: products.length,
       },
-      likely_cause: noImages.length > 0 ? "Some products missing images" : null,
-      suggested_fix: noImages.length > 0 ? "Add product images for better conversion" : null,
+      likely_cause: noImagesCount > 0 ? "Some products missing images" : null,
+      suggested_fix: noImagesCount > 0 ? "Add product images for better conversion" : null,
       requires_approval: false,
     });
 
     checks.push({
       category: "catalog_inventory",
       check_name: "Pricing Anomalies",
-      status: zeroPrice.length > 0 ? "critical" : "ok",
+      status: zeroPriceCount > 0 ? "critical" : "ok",
       evidence: { 
-        zeroPriceProducts: zeroPrice.length,
-        items: zeroPrice.slice(0, 5).map((p: any) => p.node.title),
+        zeroPriceVariants: zeroPriceCount,
+        items: zeroPriceItems,
       },
-      likely_cause: zeroPrice.length > 0 ? "Products with $0 price detected" : null,
-      suggested_fix: zeroPrice.length > 0 ? "Review and set correct pricing" : null,
+      likely_cause: zeroPriceCount > 0 ? "Variants with $0 price detected" : null,
+      suggested_fix: zeroPriceCount > 0 ? "Review and set correct pricing" : null,
       requires_approval: true,
     });
 
-    // 3. Orders Health
-    const ordersQuery = `{
-      orders(first: 50, query: "fulfillment_status:unfulfilled") {
-        edges {
-          node {
-            id
-            name
-            createdAt
-            displayFulfillmentStatus
-          }
-        }
-      }
-    }`;
-    
-    const ordersData = await shopifyAdminRequest(ordersQuery);
-    const unfulfilledOrders = ordersData?.data?.orders?.edges || [];
+    // 3. Orders Health - using REST API
+    const ordersData = await shopifyRestRequest(supabase, "/orders.json?status=open&fulfillment_status=unfulfilled&limit=50");
+    const unfulfilledOrders = ordersData?.orders || [];
     
     // Check for stuck orders (unfulfilled for > 3 days)
     const now = new Date();
     const stuckOrders = unfulfilledOrders.filter((o: any) => {
-      const created = new Date(o.node.createdAt);
+      const created = new Date(o.created_at);
       const daysDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
       return daysDiff > 3;
     });
@@ -207,40 +278,30 @@ async function runHealthChecks() {
       evidence: { 
         totalUnfulfilled: unfulfilledOrders.length,
         stuckOrders: stuckOrders.length,
-        stuckItems: stuckOrders.slice(0, 5).map((o: any) => ({ name: o.node.name, created: o.node.createdAt })),
+        stuckItems: stuckOrders.slice(0, 5).map((o: any) => ({ name: o.name, created: o.created_at })),
       },
       likely_cause: stuckOrders.length > 0 ? "Orders pending fulfillment for over 3 days" : null,
       suggested_fix: stuckOrders.length > 0 ? "Review and process stuck orders" : null,
       requires_approval: false,
     });
 
-    // 4. Checkout & Payment (limited visibility - detect only)
+    // 4. Checkout & Payment (limited visibility)
     checks.push({
       category: "checkout_payments",
-      check_name: "Checkout API Status",
-      status: shop?.checkoutApiSupported ? "ok" : "warn",
-      evidence: { checkoutApiSupported: shop?.checkoutApiSupported },
-      likely_cause: shop?.checkoutApiSupported ? null : "Checkout API may be limited",
-      suggested_fix: null,
+      check_name: "Checkout Status",
+      status: shop?.checkout_api_supported !== false ? "ok" : "warn",
+      evidence: { 
+        planName: shop?.plan_name,
+        passwordEnabled: shop?.password_enabled,
+      },
+      likely_cause: shop?.password_enabled ? "Storefront password is enabled" : null,
+      suggested_fix: shop?.password_enabled ? "Disable storefront password for public access" : null,
       requires_approval: false,
     });
 
-    // 5. Apps health (via webhooks)
-    const webhooksQuery = `{
-      webhookSubscriptions(first: 50) {
-        edges {
-          node {
-            id
-            topic
-            endpoint { __typename }
-            createdAt
-          }
-        }
-      }
-    }`;
-    
-    const webhooksData = await shopifyAdminRequest(webhooksQuery);
-    const webhooks = webhooksData?.data?.webhookSubscriptions?.edges || [];
+    // 5. Webhooks health - using REST API
+    const webhooksData = await shopifyRestRequest(supabase, "/webhooks.json");
+    const webhooks = webhooksData?.webhooks || [];
 
     checks.push({
       category: "apps_integrations",
@@ -248,7 +309,7 @@ async function runHealthChecks() {
       status: webhooks.length === 0 ? "warn" : "ok",
       evidence: { 
         totalWebhooks: webhooks.length,
-        topics: webhooks.map((w: any) => w.node.topic),
+        topics: webhooks.map((w: any) => w.topic),
       },
       likely_cause: webhooks.length === 0 ? "No webhooks registered" : null,
       suggested_fix: webhooks.length === 0 ? "Configure webhooks for real-time sync" : null,
@@ -256,11 +317,12 @@ async function runHealthChecks() {
     });
 
   } catch (error) {
+    console.error("Health check error:", error);
     checks.push({
       category: "storefront_theme",
       check_name: "API Connection",
       status: "critical",
-      evidence: { error: error.message },
+      evidence: { error: (error as Error).message },
       likely_cause: "Failed to connect to Shopify API",
       suggested_fix: "Check API credentials and permissions",
       requires_approval: false,
@@ -270,64 +332,18 @@ async function runHealthChecks() {
   return checks;
 }
 
-// Get store configuration summary
-async function getStoreConfig() {
-  const query = `{
-    shop {
-      name
-      email
-      primaryDomain { host sslEnabled }
-      currencyCode
-      enabledPresentmentCurrencies
-      billingAddress { country countryCodeV2 }
-      timezoneAbbreviation
-      checkoutApiSupported
-    }
-    localization: shop {
-      currencyFormats {
-        moneyFormat
-        moneyWithCurrencyFormat
-      }
-    }
-    products(first: 1) { edges { node { id } } }
-    productVariants(first: 1) { edges { node { id } } }
-  }`;
-
-  const data = await shopifyAdminRequest(query);
-  return data?.data;
+// Get store configuration summary using REST API
+async function getStoreConfig(supabase: any) {
+  const shopData = await shopifyRestRequest(supabase, "/shop.json");
+  return shopData?.shop;
 }
 
-// Get apps/integrations summary
-async function getAppsIntegrations() {
-  // Note: Shopify Admin API doesn't expose installed apps directly
-  // We can infer from webhooks, metafields, and script tags
-  const query = `{
-    webhookSubscriptions(first: 100) {
-      edges {
-        node {
-          id
-          topic
-          endpoint { __typename }
-          createdAt
-        }
-      }
-    }
-    scriptTags(first: 50) {
-      edges {
-        node {
-          id
-          src
-          displayScope
-          createdAt
-        }
-      }
-    }
-  }`;
-
-  const data = await shopifyAdminRequest(query);
+// Get apps/integrations summary using REST API
+async function getAppsIntegrations(supabase: any) {
+  const webhooksData = await shopifyRestRequest(supabase, "/webhooks.json");
   return {
-    webhooks: data?.data?.webhookSubscriptions?.edges || [],
-    scriptTags: data?.data?.scriptTags?.edges || [],
+    webhooks: webhooksData?.webhooks || [],
+    scriptTags: [],
   };
 }
 
@@ -381,7 +397,7 @@ async function handleAgentChat(
   // Get current store state for context
   let storeContext = null;
   try {
-    storeContext = await getStoreConfig();
+    storeContext = await getStoreConfig(supabase);
   } catch (e) {
     console.error("Failed to get store context:", e);
   }
@@ -470,10 +486,10 @@ async function createSnapshot(supabase: any, snapshotType: string) {
   
   try {
     if (snapshotType === "full" || snapshotType === "config") {
-      snapshotData = { ...snapshotData, config: await getStoreConfig() };
+      snapshotData = { ...snapshotData, config: await getStoreConfig(supabase) };
     }
     if (snapshotType === "full" || snapshotType === "apps") {
-      snapshotData = { ...snapshotData, apps: await getAppsIntegrations() };
+      snapshotData = { ...snapshotData, apps: await getAppsIntegrations(supabase) };
     }
     
     // Get previous snapshot for diff
@@ -540,7 +556,7 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case "health_check":
-        const checks = await runHealthChecks();
+        const checks = await runHealthChecks(supabase);
         
         // Store results in database
         for (const check of checks) {
@@ -551,11 +567,11 @@ Deno.serve(async (req) => {
         break;
 
       case "get_store_config":
-        result = { success: true, config: await getStoreConfig() };
+        result = { success: true, config: await getStoreConfig(supabase) };
         break;
 
       case "get_apps":
-        result = { success: true, apps: await getAppsIntegrations() };
+        result = { success: true, apps: await getAppsIntegrations(supabase) };
         break;
 
       case "chat":
