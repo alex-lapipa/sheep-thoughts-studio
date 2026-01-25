@@ -41,6 +41,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { GA4SetupGuide } from '@/components/admin/GA4SetupGuide';
 
 interface ShareEventStats {
   content_type: string;
@@ -486,17 +487,11 @@ export default function AdminAnalytics() {
           {/* GA4 Tab */}
           <TabsContent value="ga4" className="space-y-6">
             {ga4Error ? (
-              <Card className="border-destructive/50">
-                <CardHeader>
-                  <CardTitle className="text-destructive">GA4 Connection Error</CardTitle>
-                  <CardDescription>{ga4Error}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Check that GA4_PROPERTY_ID and GOOGLE_SERVICE_ACCOUNT_KEY are configured correctly.
-                  </p>
-                </CardContent>
-              </Card>
+              <GA4SetupGuide 
+                error={ga4Error} 
+                onRetry={fetchGA4Analytics}
+                isRetrying={ga4Loading}
+              />
             ) : (
               <>
                 {/* GA4 Summary Cards */}
