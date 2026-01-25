@@ -27,11 +27,13 @@ import {
   AlertTriangle,
   FileImage,
   ShoppingBag,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { DesignCanvas, ElementControls, type DesignElement } from "@/components/admin/DesignCanvas";
 import { PrintFileUpload, type PrintFile } from "@/components/admin/PrintFileUpload";
+import { ProductMockupPreview, MockupThumbnailStrip, GARMENT_COLORS } from "@/components/admin/ProductMockupPreview";
 
 // Official Bubbles brand assets
 import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
@@ -135,6 +137,10 @@ export default function DesignStudio() {
   
   // Print files state
   const [printFiles, setPrintFiles] = useState<PrintFile[]>([]);
+  
+  // Mockup preview state
+  const [selectedGarmentColors, setSelectedGarmentColors] = useState<string[]>(["black"]);
+  const [showMockupPreview, setShowMockupPreview] = useState(true);
   
   // Dialog states
   const [showProductDialog, setShowProductDialog] = useState(false);
@@ -412,7 +418,7 @@ export default function DesignStudio() {
 
           {/* CREATE TAB */}
           <TabsContent value="create" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Left: Base Product Selection */}
               <Card>
                 <CardHeader>
@@ -604,7 +610,108 @@ export default function DesignStudio() {
                 </CardContent>
               </Card>
 
-              {/* Print File Upload - Fourth Column on Large Screens */}
+              {/* Fourth Column: Mockup Preview */}
+              <Card className="lg:row-span-2">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Eye className="h-5 w-5" />
+                      Live Preview
+                    </span>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedGarmentColors.length} colors
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Preview on different colors & angles
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {selectedProduct ? (
+                    <>
+                      <ProductMockupPreview
+                        productType={selectedProduct.productType || "T-Shirt"}
+                        productTitle={selectedProduct.title}
+                        productImage={selectedProduct.images?.edges?.[0]?.node?.url}
+                        designElements={designElements}
+                        printPosition={printPosition}
+                        onColorSelect={(colorId) => {
+                          if (!selectedGarmentColors.includes(colorId)) {
+                            setSelectedGarmentColors([...selectedGarmentColors, colorId]);
+                          }
+                        }}
+                        selectedColors={selectedGarmentColors}
+                      />
+                      
+                      {/* Color Thumbnails Strip */}
+                      <div className="pt-3 border-t">
+                        <Label className="text-xs mb-2 block">Quick Color Preview</Label>
+                        <MockupThumbnailStrip
+                          colors={GARMENT_COLORS}
+                          activeColorId={selectedGarmentColors[0] || "black"}
+                          onColorSelect={(color) => {
+                            setSelectedGarmentColors([color.id]);
+                          }}
+                          designElements={designElements}
+                          productType={selectedProduct.productType || "T-Shirt"}
+                        />
+                      </div>
+
+                      {/* Selected Colors for Variants */}
+                      <div className="pt-3 border-t">
+                        <div className="flex items-center justify-between mb-2">
+                          <Label className="text-xs">Product Colors</Label>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-xs"
+                            onClick={() => setSelectedGarmentColors(["black"])}
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {selectedGarmentColors.map((colorId) => {
+                            const color = GARMENT_COLORS.find(c => c.id === colorId);
+                            return color ? (
+                              <Badge
+                                key={colorId}
+                                variant="secondary"
+                                className="gap-1 pr-1"
+                              >
+                                <span
+                                  className="w-3 h-3 rounded-full border"
+                                  style={{ backgroundColor: color.hex }}
+                                />
+                                {color.name}
+                                <button
+                                  className="ml-1 hover:text-destructive"
+                                  onClick={() => setSelectedGarmentColors(
+                                    selectedGarmentColors.filter(c => c !== colorId)
+                                  )}
+                                >
+                                  ×
+                                </button>
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Click colors in preview to add variants
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                      <Package className="h-12 w-12 mb-3 opacity-30" />
+                      <p className="text-sm">Select a base product</p>
+                      <p className="text-xs">to preview mockups</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Print File Upload - Full Width Bottom Row */}
               <div className="lg:col-span-3">
                 <PrintFileUpload
                   designId={undefined}
