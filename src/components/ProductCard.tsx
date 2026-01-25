@@ -9,6 +9,7 @@ import { BubbleMode } from "@/data/thoughtBubbles";
 import { ModeBadge } from "./ModeBadge";
 import { ProductQuickView } from "./ProductQuickView";
 import { WishlistButton } from "./WishlistButton";
+import { LowStockBadge, calculateTotalInventory } from "./LowStockBadge";
 import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { useABProductTracking } from "@/hooks/useABTracking";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,9 @@ export function ProductCard({ product, position, listName, enableHoverQuickView 
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
   const firstVariant = node.variants.edges[0]?.node;
+  
+  // Calculate total inventory for low stock badge
+  const totalInventory = calculateTotalInventory(node.variants.edges);
   
   // Get mode from tags
   const modeTag = node.tags?.find(tag => 
@@ -182,6 +186,13 @@ export function ProductCard({ product, position, listName, enableHoverQuickView 
             {modeTag && (
               <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                 <ModeBadge mode={modeTag} />
+              </div>
+            )}
+            
+            {/* Low Stock Badge */}
+            {totalInventory > 0 && totalInventory <= 10 && (
+              <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
+                <LowStockBadge quantity={totalInventory} variant="compact" />
               </div>
             )}
             
