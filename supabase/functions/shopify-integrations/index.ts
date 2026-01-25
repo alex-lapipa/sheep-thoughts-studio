@@ -675,13 +675,27 @@ Deno.serve(async (req) => {
     if (action === "inventory") {
       const { locationId = null } = body;
       
-      // Get locations first
+      // Get locations first - handle 403 gracefully (missing read_locations permission)
       const locationsResponse = await fetch(`${shopifyAdminUrl}/locations.json`, {
         headers: {
           "X-Shopify-Access-Token": shopifyAccessToken,
           "Content-Type": "application/json",
         },
       });
+
+      // If 403, the API token doesn't have read_locations permission - return empty gracefully
+      if (locationsResponse.status === 403) {
+        console.warn("Shopify API token lacks read_locations permission - returning empty inventory");
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            locations: [], 
+            inventory: [],
+            warning: "Inventory access requires 'read_locations' and 'read_inventory' permissions in your Shopify app."
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       if (!locationsResponse.ok) {
         throw new Error(`Failed to fetch locations: ${locationsResponse.status}`);
