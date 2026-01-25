@@ -8,37 +8,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Palette,
   Package,
-  Shirt,
-  Image as ImageIcon,
   Save,
   Send,
   RefreshCw,
   Search,
   Layers,
-  Move,
-  RotateCw,
-  ZoomIn,
-  ZoomOut,
-  Upload,
   Sparkles,
   Store,
   Check,
   AlertTriangle,
-  Eye,
   FileImage,
   ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { DesignCanvas, ElementControls, type DesignElement } from "@/components/admin/DesignCanvas";
 
 // Official Bubbles brand assets
 import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
@@ -73,18 +65,7 @@ interface BaseProduct {
   options: Array<{ name: string; values: string[] }>;
 }
 
-interface DesignElement {
-  id: string;
-  type: "stencil" | "silhouette" | "text" | "custom";
-  url?: string;
-  text?: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  opacity: number;
-}
+// DesignElement is imported from DesignCanvas component
 
 interface SavedDesign {
   id: string;
@@ -510,75 +491,25 @@ export default function DesignStudio() {
 
               {/* Center: Design Canvas */}
               <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <ImageIcon className="h-5 w-5" />
-                      Design Canvas
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => setCanvasZoom(z => Math.max(50, z - 10))}>
-                        <ZoomOut className="h-4 w-4" />
-                      </Button>
-                      <span className="text-sm w-12 text-center">{canvasZoom}%</span>
-                      <Button variant="ghost" size="icon" onClick={() => setCanvasZoom(z => Math.min(150, z + 10))}>
-                        <ZoomIn className="h-4 w-4" />
-                      </Button>
-                    </div>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5" />
+                    Design Canvas
                   </CardTitle>
+                  <CardDescription>Drag elements to position • Arrow keys for precision</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {/* Canvas Area */}
-                  <div
-                    className="relative bg-muted/50 rounded-lg border-2 border-dashed border-border aspect-square overflow-hidden"
-                    style={{ transform: `scale(${canvasZoom / 100})`, transformOrigin: "top center" }}
-                  >
-                    {/* Base Product Image */}
-                    {selectedProduct?.images?.edges?.[0]?.node?.url ? (
-                      <img
-                        src={selectedProduct.images.edges[0].node.url}
-                        alt={selectedProduct.title}
-                        className="absolute inset-0 w-full h-full object-contain opacity-30"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                        <Shirt className="h-24 w-24 opacity-20" />
-                      </div>
-                    )}
-
-                    {/* Design Elements */}
-                    <AnimatePresence>
-                      {designElements.map(element => (
-                        <motion.div
-                          key={element.id}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: element.opacity / 100, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          className={cn(
-                            "absolute cursor-move",
-                            selectedElement === element.id && "ring-2 ring-primary ring-offset-2"
-                          )}
-                          style={{
-                            left: element.x,
-                            top: element.y,
-                            width: element.width,
-                            height: element.height,
-                            transform: `rotate(${element.rotation}deg)`,
-                          }}
-                          onClick={() => setSelectedElement(element.id)}
-                        >
-                          {element.url && (
-                            <img
-                              src={element.url}
-                              alt={element.type}
-                              className="w-full h-full object-contain"
-                              draggable={false}
-                            />
-                          )}
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
+                  <DesignCanvas
+                    elements={designElements}
+                    selectedElementId={selectedElement}
+                    onSelectElement={setSelectedElement}
+                    onUpdateElement={updateElement}
+                    onRemoveElement={removeElement}
+                    backgroundImage={selectedProduct?.images?.edges?.[0]?.node?.url}
+                    backgroundAlt={selectedProduct?.title}
+                    canvasZoom={canvasZoom}
+                    onZoomChange={setCanvasZoom}
+                  />
 
                   {/* Print Position */}
                   <div className="mt-4">
@@ -635,58 +566,13 @@ export default function DesignStudio() {
                     </button>
                   </div>
 
-                  {/* Element Controls */}
-                  {selectedElementData && (
-                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium capitalize">{selectedElementData.type}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeElement(selectedElementData.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div>
-                          <Label className="text-xs">Size</Label>
-                          <Slider
-                            value={[selectedElementData.width]}
-                            onValueChange={([v]) => updateElement(selectedElementData.id, { width: v, height: v })}
-                            min={50}
-                            max={300}
-                            step={10}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">Rotation</Label>
-                          <Slider
-                            value={[selectedElementData.rotation]}
-                            onValueChange={([v]) => updateElement(selectedElementData.id, { rotation: v })}
-                            min={-180}
-                            max={180}
-                            step={5}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">Opacity</Label>
-                          <Slider
-                            value={[selectedElementData.opacity]}
-                            onValueChange={([v]) => updateElement(selectedElementData.id, { opacity: v })}
-                            min={10}
-                            max={100}
-                            step={5}
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {/* Element Controls - Using new component */}
+                  <ElementControls
+                    element={selectedElementData}
+                    onUpdate={updateElement}
+                    onRemove={removeElement}
+                    snapToGrid={true}
+                  />
 
                   {/* Save Design */}
                   <div className="space-y-3 pt-4 border-t">
@@ -747,7 +633,7 @@ export default function DesignStudio() {
                               variant="outline"
                               className={cn(
                                 design.status === "published" && "bg-affirmative/10 text-affirmative border-affirmative/20",
-                                design.status === "synced" && "bg-blue-500/10 text-blue-600 border-blue-500/20",
+                                design.status === "synced" && "bg-primary/10 text-primary border-primary/20",
                                 design.status === "draft" && "bg-muted text-muted-foreground"
                               )}
                             >
