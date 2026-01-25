@@ -6,6 +6,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper to safely extract error messages from Shopify GraphQL responses
+function extractGraphQLErrors(errors: unknown): string {
+  if (!errors) return "Unknown GraphQL error";
+  if (Array.isArray(errors)) {
+    return errors.map((e: { message?: string }) => e.message || String(e)).join(", ");
+  }
+  if (typeof errors === "object" && errors !== null) {
+    const err = errors as { message?: string };
+    if (err.message) return err.message;
+    return JSON.stringify(errors);
+  }
+  return String(errors);
+}
+
 interface DesignRequest {
   action: 
     | "list_base_products" 
@@ -172,7 +186,7 @@ serve(async (req: Request) => {
       const data = await response.json();
       
       if (data.errors) {
-        throw new Error(data.errors.map((e: { message: string }) => e.message).join(", "));
+        throw new Error(extractGraphQLErrors(data.errors));
       }
 
       const products = data.data?.products?.edges?.map((edge: { node: Record<string, unknown> }) => ({
@@ -248,7 +262,7 @@ serve(async (req: Request) => {
       const data = await response.json();
       
       if (data.errors) {
-        throw new Error(data.errors.map((e: { message: string }) => e.message).join(", "));
+        throw new Error(extractGraphQLErrors(data.errors));
       }
 
       return new Response(
@@ -389,7 +403,7 @@ serve(async (req: Request) => {
       const data = await response.json();
 
       if (data.errors) {
-        throw new Error(data.errors.map((e: { message: string }) => e.message).join(", "));
+        throw new Error(extractGraphQLErrors(data.errors));
       }
 
       const result = data.data?.productCreate;
@@ -516,7 +530,7 @@ serve(async (req: Request) => {
       const data = await response.json();
 
       if (data.errors) {
-        throw new Error(data.errors.map((e: { message: string }) => e.message).join(", "));
+        throw new Error(extractGraphQLErrors(data.errors));
       }
 
       // Update design status
