@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminBreadcrumb } from './AdminBreadcrumb';
 import { AdminQuickJump } from './AdminQuickJump';
+import { OrderNotificationBell } from './OrderNotificationBell';
 import {
   Tooltip,
   TooltipContent,
@@ -272,6 +273,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </Badge>
                 ))}
               </div>
+              <OrderNotificationBell />
               <span className="text-sm text-muted-foreground hidden lg:inline">{user?.email}</span>
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden sm:flex">
                 <LogOut className="h-4 w-4 sm:mr-2" />
