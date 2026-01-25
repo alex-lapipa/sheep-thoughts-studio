@@ -10,6 +10,8 @@ import { useABProductTracking } from "@/hooks/useABTracking";
 import { useAbandonedCartTracking } from "@/hooks/useAbandonedCartTracking";
 import { useAuth } from "@/contexts/AuthContext";
 import { optimizeShopifyImage, IMAGE_PRESETS } from "@/lib/imageOptimization";
+import { CartCrossSell } from "./CartCrossSell";
+
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
@@ -133,8 +135,11 @@ export function CartDrawer() {
                 </div>
               </div>
               
+              {/* Cross-sell Recommendations */}
+              <CartCrossSell cartItems={items} maxItems={3} className="py-4 border-t" />
+              
               {/* Checkout Footer - Fixed at bottom */}
-              <div className="flex-shrink-0 space-y-3 sm:space-y-4 pt-4 pb-4 sm:pb-6 border-t bg-background -mx-4 sm:-mx-6 px-4 sm:px-6 mt-4">
+              <div className="flex-shrink-0 space-y-3 sm:space-y-4 pt-4 pb-4 sm:pb-6 border-t bg-background -mx-4 sm:-mx-6 px-4 sm:px-6">
                 <div className="flex justify-between items-center">
                   <span className="text-base sm:text-lg font-display font-semibold">Total</span>
                   <span className="text-lg sm:text-xl font-display font-bold">{items[0]?.price.currencyCode || 'EUR'} {totalPrice.toFixed(2)}</span>
