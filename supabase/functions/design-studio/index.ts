@@ -282,6 +282,9 @@ serve(async (req: Request) => {
           base_product_id: design.baseProductId,
           base_product_title: design.baseProductTitle,
           design_data: design,
+          print_files: design.printFiles || [],
+          pod_provider: design.podProvider || null,
+          pod_template_id: design.podTemplateId || null,
           status: "draft",
           created_by: userId,
           updated_at: new Date().toISOString(),
@@ -554,14 +557,32 @@ serve(async (req: Request) => {
         );
       }
 
-      // Return placeholder templates - actual POD API integration would go here
-      const templates = [
-        { id: "tshirt-unisex", name: "Unisex T-Shirt", type: "T-Shirt", provider: podProvider },
-        { id: "hoodie-unisex", name: "Unisex Hoodie", type: "Hoodie", provider: podProvider },
-        { id: "mug-11oz", name: "11oz Ceramic Mug", type: "Mug", provider: podProvider },
-        { id: "tote-canvas", name: "Canvas Tote Bag", type: "Tote", provider: podProvider },
-        { id: "cap-trucker", name: "Trucker Cap", type: "Cap", provider: podProvider },
-      ];
+      // POD provider template definitions
+      const podTemplates: Record<string, Array<{ id: string; name: string; type: string; provider: string; printAreas: string[]; dimensions: { width: number; height: number } }>> = {
+        printful: [
+          { id: "pf-tshirt-unisex", name: "Unisex Staple T-Shirt", type: "T-Shirt", provider: "printful", printAreas: ["front", "back"], dimensions: { width: 4500, height: 5400 } },
+          { id: "pf-hoodie-unisex", name: "Unisex Heavy Blend Hoodie", type: "Hoodie", provider: "printful", printAreas: ["front", "back", "left-sleeve", "right-sleeve"], dimensions: { width: 4500, height: 5400 } },
+          { id: "pf-mug-11oz", name: "White Glossy Mug 11oz", type: "Mug", provider: "printful", printAreas: ["front"], dimensions: { width: 2475, height: 1050 } },
+          { id: "pf-tote-canvas", name: "Canvas Tote Bag", type: "Tote", provider: "printful", printAreas: ["front", "back"], dimensions: { width: 3600, height: 3600 } },
+          { id: "pf-cap-dad", name: "Dad Hat Cap", type: "Cap", provider: "printful", printAreas: ["front"], dimensions: { width: 2400, height: 1200 } },
+          { id: "pf-allover-tee", name: "All-Over Print T-Shirt", type: "T-Shirt", provider: "printful", printAreas: ["all-over"], dimensions: { width: 5904, height: 5904 } },
+        ],
+        printify: [
+          { id: "py-tshirt-bella", name: "Bella+Canvas 3001 Tee", type: "T-Shirt", provider: "printify", printAreas: ["front", "back"], dimensions: { width: 4500, height: 5400 } },
+          { id: "py-hoodie-gildan", name: "Gildan 18500 Hoodie", type: "Hoodie", provider: "printify", printAreas: ["front", "back"], dimensions: { width: 4500, height: 5400 } },
+          { id: "py-mug-ceramic", name: "Ceramic Mug 11oz", type: "Mug", provider: "printify", printAreas: ["front"], dimensions: { width: 2400, height: 1000 } },
+          { id: "py-tote-natural", name: "Natural Tote Bag", type: "Tote", provider: "printify", printAreas: ["front"], dimensions: { width: 3000, height: 3000 } },
+          { id: "py-cap-structured", name: "Structured Twill Cap", type: "Cap", provider: "printify", printAreas: ["front"], dimensions: { width: 2200, height: 1100 } },
+        ],
+        gelato: [
+          { id: "ge-tshirt-organic", name: "Organic Cotton T-Shirt", type: "T-Shirt", provider: "gelato", printAreas: ["front", "back"], dimensions: { width: 4200, height: 5000 } },
+          { id: "ge-hoodie-classic", name: "Classic Hoodie", type: "Hoodie", provider: "gelato", printAreas: ["front", "back"], dimensions: { width: 4200, height: 5000 } },
+          { id: "ge-mug-white", name: "White Ceramic Mug", type: "Mug", provider: "gelato", printAreas: ["front"], dimensions: { width: 2400, height: 1000 } },
+          { id: "ge-tote-eco", name: "Eco Tote Bag", type: "Tote", provider: "gelato", printAreas: ["front"], dimensions: { width: 3000, height: 3000 } },
+        ],
+      };
+
+      const templates = podTemplates[podProvider as string] || [];
 
       return new Response(
         JSON.stringify({ success: true, templates, provider: provider.name }),
@@ -569,14 +590,134 @@ serve(async (req: Request) => {
       );
     }
 
-    // === UPLOAD PRINT FILE ===
-    if (action === "upload_print_file") {
-      // This would handle file uploads to storage for print-ready files
+    // === MAP PRINT FILE TO TEMPLATE ===
+    if (action === "map_print_file") {
+      const { designId, fileId, templateId, position } = body as { designId: string; fileId: string; templateId: string; position: string };
+
+      if (!designId || !fileId || !templateId) {
+        throw new Error("Design ID, file ID, and template ID are required");
+      }
+
+      // Get existing design
+      const { data: design, error: designError } = await supabase
+        .from("product_designs")
+        .select("*")
+        .eq("id", designId)
+        .single();
+
+      if (designError || !design) {
+        throw new Error("Design not found");
+      }
+
+      // Update print files with mapping
+      const printFiles = (design.print_files as Array<{ id: string; podTemplateId?: string; mappingStatus: string }>) || [];
+      const updatedFiles = printFiles.map((f: { id: string; podTemplateId?: string; mappingStatus: string }) =>
+        f.id === fileId
+          ? { ...f, podTemplateId: templateId, mappingStatus: "mapped" }
+          : f
+      );
+
+      // Save updated design
+      const { error: updateError } = await supabase
+        .from("product_designs")
+        .update({
+          print_files: updatedFiles,
+          pod_template_id: templateId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", designId);
+
+      if (updateError) throw updateError;
+
+      // If design has Shopify product ID, update variant mappings
+      if (design.shopify_product_id) {
+        await supabase
+          .from("variant_mappings")
+          .update({
+            pod_template_id: templateId,
+            print_files: updatedFiles.filter((f: { id: string; podTemplateId?: string }) => f.podTemplateId === templateId),
+            status: "ok",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("shopify_product_id", design.shopify_product_id);
+      }
+
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: "Print file upload handled via Supabase Storage directly" 
+        JSON.stringify({ success: true, message: "Print file mapped to template" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // === VALIDATE PRINT FILE ===
+    if (action === "validate_print_file") {
+      const { fileUrl, templateId, podProvider: provider } = body as { fileUrl: string; templateId: string; podProvider: string };
+
+      // Template dimensions for validation
+      const templateDimensions: Record<string, { minWidth: number; minHeight: number; maxSize: number }> = {
+        "pf-tshirt-unisex": { minWidth: 4500, minHeight: 5400, maxSize: 25000000 },
+        "pf-hoodie-unisex": { minWidth: 4500, minHeight: 5400, maxSize: 25000000 },
+        "pf-mug-11oz": { minWidth: 2475, minHeight: 1050, maxSize: 10000000 },
+        "default": { minWidth: 3000, minHeight: 3000, maxSize: 25000000 },
+      };
+
+      const requirements = templateDimensions[templateId] || templateDimensions.default;
+
+      // Return validation requirements (actual image validation would be done client-side)
+      return new Response(
+        JSON.stringify({
+          success: true,
+          requirements: {
+            minWidth: requirements.minWidth,
+            minHeight: requirements.minHeight,
+            maxFileSize: requirements.maxSize,
+            recommendedDPI: 300,
+            acceptedFormats: ["PNG", "PDF", "SVG", "TIFF"],
+            colorMode: "sRGB",
+          },
+          message: `File should be at least ${requirements.minWidth}x${requirements.minHeight}px at 300 DPI`,
         }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // === UPLOAD PRINT FILE (storage handled client-side, this updates design record) ===
+    if (action === "upload_print_file") {
+      const { designId, printFile } = body as { designId: string; printFile: { id: string; name: string; path: string; position: string } };
+
+      if (!designId || !printFile) {
+        throw new Error("Design ID and print file data are required");
+      }
+
+      // Get existing design
+      const { data: design, error: designError } = await supabase
+        .from("product_designs")
+        .select("print_files")
+        .eq("id", designId)
+        .single();
+
+      if (designError) throw designError;
+
+      // Append new print file
+      const existingFiles = (design?.print_files as Array<unknown>) || [];
+      const updatedFiles = [...existingFiles, {
+        ...printFile,
+        mappingStatus: "unmapped",
+        uploadedAt: new Date().toISOString(),
+      }];
+
+      // Update design
+      const { error: updateError } = await supabase
+        .from("product_designs")
+        .update({
+          print_files: updatedFiles,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", designId);
+
+      if (updateError) throw updateError;
+
+      return new Response(
+        JSON.stringify({ success: true, message: "Print file added to design" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

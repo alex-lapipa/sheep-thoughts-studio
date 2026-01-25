@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { DesignCanvas, ElementControls, type DesignElement } from "@/components/admin/DesignCanvas";
+import { PrintFileUpload, type PrintFile } from "@/components/admin/PrintFileUpload";
 
 // Official Bubbles brand assets
 import bubblesStencil from "@/assets/bubbles-hero-stencil.png";
@@ -131,6 +132,9 @@ export default function DesignStudio() {
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
   const [loadingDesigns, setLoadingDesigns] = useState(false);
   const [savingDesign, setSavingDesign] = useState(false);
+  
+  // Print files state
+  const [printFiles, setPrintFiles] = useState<PrintFile[]>([]);
   
   // Dialog states
   const [showProductDialog, setShowProductDialog] = useState(false);
@@ -258,6 +262,8 @@ export default function DesignStudio() {
               garment: "black",
               print: ["white"],
             },
+            printFiles: printFiles, // Include uploaded print files
+            podProvider: selectedPodProvider || undefined,
             metadata: {
               productType: selectedProduct.productType,
               vendor: selectedProduct.vendor,
@@ -597,6 +603,17 @@ export default function DesignStudio() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Print File Upload - Fourth Column on Large Screens */}
+              <div className="lg:col-span-3">
+                <PrintFileUpload
+                  designId={undefined}
+                  designName={designName || "New Design"}
+                  printFiles={printFiles}
+                  onFilesChange={setPrintFiles}
+                  podProvider={selectedPodProvider || undefined}
+                />
+              </div>
             </div>
           </TabsContent>
 
