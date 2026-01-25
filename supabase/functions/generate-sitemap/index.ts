@@ -19,7 +19,7 @@ const staticPages = [
   { path: "/about", changefreq: "monthly", priority: 0.8, image: "/og-about.jpg", title: "About Bubbles" },
   { path: "/facts", changefreq: "weekly", priority: 0.9, image: "/og-facts.jpg", title: "Bubbles Facts" },
   { path: "/faq", changefreq: "weekly", priority: 0.9, image: "/og-faq.jpg", title: "Frequently Asked Questions" },
-  { path: "/scenarios", changefreq: "weekly", priority: 0.7, image: null, title: "Bubbles Scenarios" },
+  // Scenarios removed from public sitemap - admin only
   { path: "/explains", changefreq: "weekly", priority: 0.7, image: "/og-explains.jpg", title: "Bubbles Explains" },
   { path: "/achievements", changefreq: "monthly", priority: 0.6, image: "/og-achievements.jpg", title: "Wisdom Badges" },
   { path: "/share-badges", changefreq: "monthly", priority: 0.5, image: "/og-share-badges.jpg", title: "Share Your Badges" },

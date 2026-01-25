@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const CONFUSION_PROMPTS = [
-  { text: "Wait, did you mean to click that?", link: "/scenarios", linkText: "Try again here" },
+  { text: "Wait, did you mean to click that?", link: "/facts", linkText: "Try The Facts™" },
   { text: "Bubbles thinks you should also see...", link: "/facts", linkText: "The Facts™" },
   { text: "Since you're here anyway...", link: "/about", linkText: "Meet Bubbles" },
   { text: "Lost? That's the spirit!", link: "/faq", linkText: "Ask Bubbles" },
   { text: "This way to more confusion →", link: "/collections/all", linkText: "Shop the chaos" },
-  { text: "While you're wandering...", link: "/scenarios", linkText: "Watch Bubbles escalate" },
+  { text: "While you're wandering...", link: "/hall-of-fame", linkText: "See the Hall of Fame" },
 ];
 
 interface ConfusionPromptProps {

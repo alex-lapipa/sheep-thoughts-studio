@@ -159,7 +159,6 @@ const navSections: NavSection[] = [
     title: 'On Hold',
     requiredModule: 'admin',
     items: [
-      { href: '/scenarios', label: 'Live Scenarios', icon: Zap, external: true },
       { href: '/dach', label: 'DACH Region 🇩🇪🇦🇹🇨🇭', icon: Globe, external: true },
       { href: '/fr', label: 'Francophone 🇫🇷🇧🇪🇨🇭', icon: Globe, external: true },
       { href: '/es', label: 'Hispanic 🇪🇸🇲🇽🇦🇷', icon: Globe, external: true },

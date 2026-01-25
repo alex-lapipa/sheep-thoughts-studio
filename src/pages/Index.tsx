@@ -179,12 +179,6 @@ export default function Index() {
                     {t("hero.cta.learn")}
                   </Button>
                 </Link>
-                <Link to="/scenarios">
-                  <Button size="lg" variant="ghost" className="font-display hover:scale-105 transition-all group">
-                    <Sparkles className="mr-2 h-4 w-4 group-hover:animate-confused-spin" />
-                    {t("common.watchEscalations")}
-                  </Button>
-                </Link>
               </div>
             </div>
 
