@@ -178,7 +178,35 @@ export default function DesignStudio() {
       }
     } catch (error) {
       console.error("Error loading products:", error);
-      toast.error("Failed to load products from Shopify");
+      const errorMessage = (error as Error).message || "Unknown error";
+      
+      // Check for specific Shopify API errors
+      if (errorMessage.includes("401") || errorMessage.includes("Unauthorized")) {
+        toast.error("Shopify API Authentication Failed", {
+          description: "The Admin API token is invalid or missing required scopes. Check Settings → Shopify.",
+          duration: 8000,
+        });
+      } else if (errorMessage.includes("402") || errorMessage.includes("Payment")) {
+        toast.error("Shopify Payment Required", {
+          description: "Your Shopify store requires an active billing plan to access the API.",
+          duration: 8000,
+        });
+      } else if (errorMessage.includes("403") || errorMessage.includes("Forbidden")) {
+        toast.error("Shopify Access Denied", {
+          description: "The API token lacks read_products scope. Update scopes in Shopify Admin → Develop Apps.",
+          duration: 8000,
+        });
+      } else if (errorMessage.includes("throttl") || errorMessage.includes("429")) {
+        toast.error("Shopify Rate Limited", {
+          description: "Too many requests. Please wait a moment and try again.",
+          duration: 5000,
+        });
+      } else {
+        toast.error("Failed to Load Products", {
+          description: errorMessage.length > 100 ? errorMessage.substring(0, 100) + "..." : errorMessage,
+          duration: 6000,
+        });
+      }
     } finally {
       setLoadingProducts(false);
     }
@@ -198,7 +226,10 @@ export default function DesignStudio() {
       }
     } catch (error) {
       console.error("Error loading designs:", error);
-      toast.error("Failed to load saved designs");
+      toast.error("Failed to Load Designs", {
+        description: (error as Error).message || "Could not retrieve saved designs from database.",
+        duration: 5000,
+      });
     } finally {
       setLoadingDesigns(false);
     }
@@ -236,11 +267,15 @@ export default function DesignStudio() {
 
   async function handleSaveDesign() {
     if (!designName.trim()) {
-      toast.error("Please enter a design name");
+      toast.error("Missing Design Name", {
+        description: "Please enter a name for your design before saving.",
+      });
       return;
     }
     if (!selectedProduct) {
-      toast.error("Please select a base product");
+      toast.error("No Base Product Selected", {
+        description: "Please select a base product from the catalog first.",
+      });
       return;
     }
 
@@ -268,7 +303,7 @@ export default function DesignStudio() {
               garment: "black",
               print: ["white"],
             },
-            printFiles: printFiles, // Include uploaded print files
+            printFiles: printFiles,
             podProvider: selectedPodProvider || undefined,
             metadata: {
               productType: selectedProduct.productType,
@@ -281,14 +316,20 @@ export default function DesignStudio() {
       if (error) throw error;
 
       if (data?.success) {
-        toast.success("Design saved successfully!");
+        toast.success("Design Saved", {
+          description: `"${designName}" has been saved successfully.`,
+        });
         loadSavedDesigns();
       } else {
         throw new Error(data?.error || "Failed to save design");
       }
     } catch (error) {
       console.error("Error saving design:", error);
-      toast.error("Failed to save design");
+      const errorMessage = (error as Error).message || "Unknown error";
+      toast.error("Failed to Save Design", {
+        description: errorMessage.length > 120 ? errorMessage.substring(0, 120) + "..." : errorMessage,
+        duration: 6000,
+      });
     } finally {
       setSavingDesign(false);
     }
@@ -296,11 +337,15 @@ export default function DesignStudio() {
 
   async function handleCreateProduct() {
     if (!productTitle.trim()) {
-      toast.error("Please enter a product title");
+      toast.error("Missing Product Title", {
+        description: "Please enter a title for the new product.",
+      });
       return;
     }
     if (!selectedProduct) {
-      toast.error("Please select a base product first");
+      toast.error("No Base Product Selected", {
+        description: "Please select a base product from the catalog before creating.",
+      });
       return;
     }
 
@@ -334,7 +379,9 @@ export default function DesignStudio() {
       if (error) throw error;
 
       if (data?.success) {
-        toast.success("Product created in Shopify!");
+        toast.success("Product Created in Shopify", {
+          description: `"${productTitle}" is now a draft product in your store.`,
+        });
         setShowCreateDialog(false);
         loadSavedDesigns();
       } else {
@@ -342,7 +389,30 @@ export default function DesignStudio() {
       }
     } catch (error) {
       console.error("Error creating product:", error);
-      toast.error("Failed to create product in Shopify");
+      const errorMessage = (error as Error).message || "Unknown error";
+      
+      // Parse specific Shopify product creation errors
+      if (errorMessage.includes("401") || errorMessage.includes("Unauthorized")) {
+        toast.error("Shopify Authentication Error", {
+          description: "Cannot create product. The API token is invalid or expired. Check Settings → Shopify.",
+          duration: 8000,
+        });
+      } else if (errorMessage.includes("write_products") || errorMessage.includes("ACCESS_DENIED")) {
+        toast.error("Missing Shopify Permissions", {
+          description: "The API token needs write_products scope to create products. Update in Shopify Admin → Develop Apps.",
+          duration: 8000,
+        });
+      } else if (errorMessage.includes("INVALID") || errorMessage.includes("validation")) {
+        toast.error("Invalid Product Data", {
+          description: errorMessage,
+          duration: 8000,
+        });
+      } else {
+        toast.error("Failed to Create Product", {
+          description: errorMessage.length > 120 ? errorMessage.substring(0, 120) + "..." : errorMessage,
+          duration: 6000,
+        });
+      }
     } finally {
       setCreatingProduct(false);
     }
@@ -360,14 +430,33 @@ export default function DesignStudio() {
       if (error) throw error;
 
       if (data?.success) {
-        toast.success("Product published to store!");
+        toast.success("Product Published to Store", {
+          description: "The product is now live and available for customers.",
+        });
         loadSavedDesigns();
       } else {
         throw new Error(data?.error || "Failed to sync");
       }
     } catch (error) {
       console.error("Error syncing:", error);
-      toast.error((error as Error).message || "Failed to sync to store");
+      const errorMessage = (error as Error).message || "Unknown error";
+      
+      if (errorMessage.includes("not yet created")) {
+        toast.error("Product Not Created Yet", {
+          description: "Create the product in Shopify first before publishing.",
+          duration: 6000,
+        });
+      } else if (errorMessage.includes("401") || errorMessage.includes("Unauthorized")) {
+        toast.error("Shopify Authentication Error", {
+          description: "Cannot publish product. API token is invalid. Check Settings → Shopify.",
+          duration: 8000,
+        });
+      } else {
+        toast.error("Failed to Publish Product", {
+          description: errorMessage.length > 120 ? errorMessage.substring(0, 120) + "..." : errorMessage,
+          duration: 6000,
+        });
+      }
     }
   }
 
