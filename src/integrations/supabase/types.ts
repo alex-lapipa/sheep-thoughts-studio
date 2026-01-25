@@ -1436,6 +1436,57 @@ export type Database = {
         }
         Relationships: []
       }
+      product_designs: {
+        Row: {
+          base_product_id: string
+          base_product_title: string
+          created_at: string
+          created_by: string | null
+          design_data: Json
+          id: string
+          name: string
+          pod_provider: string | null
+          pod_template_id: string | null
+          published_at: string | null
+          shopify_product_id: string | null
+          status: string
+          synced_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_product_id: string
+          base_product_title: string
+          created_at?: string
+          created_by?: string | null
+          design_data?: Json
+          id?: string
+          name: string
+          pod_provider?: string | null
+          pod_template_id?: string | null
+          published_at?: string | null
+          shopify_product_id?: string | null
+          status?: string
+          synced_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_product_id?: string
+          base_product_title?: string
+          created_at?: string
+          created_by?: string | null
+          design_data?: Json
+          id?: string
+          name?: string
+          pod_provider?: string | null
+          pod_template_id?: string | null
+          published_at?: string | null
+          shopify_product_id?: string | null
+          status?: string
+          synced_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       revenue_goals: {
         Row: {
           achieved_milestones: Json | null
