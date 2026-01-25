@@ -108,7 +108,6 @@ const navSections: NavSection[] = [
       { href: '/admin/scenarios', label: 'Scenarios', icon: Zap },
       { href: '/admin/triggers', label: 'Triggers', icon: Target },
       { href: '/admin/mentors', label: 'Mentors', icon: Users },
-      { href: '/admin/mentors/analytics', label: 'Mentor Analytics', icon: BarChart3 },
       { href: '/admin/knowledge', label: 'Knowledge', icon: BookOpen },
       { href: '/admin/rag-content', label: 'RAG Content', icon: FileText },
       { href: '/admin/rag-search', label: 'RAG Search', icon: Sparkles },
@@ -121,7 +120,6 @@ const navSections: NavSection[] = [
     title: 'Brand',
     items: [
       { href: '/admin/brand', label: 'Overview', icon: BookOpen },
-      { href: '/about', label: 'My Story', icon: User, external: true },
       { href: '/admin/brand/colors', label: 'Colors', icon: Sparkles },
       { href: '/admin/brand/typography', label: 'Typography', icon: FileText },
       { href: '/admin/brand/character', label: 'Character', icon: Target },
@@ -134,28 +132,33 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: 'Marketing',
+    requiredModule: 'ops',
+    items: [
+      { href: '/admin/subscribers', label: 'Subscribers', icon: Users, requiredModule: 'ops' },
+      { href: '/admin/campaigns', label: 'Campaigns', icon: Megaphone, requiredModule: 'ops' },
+      { href: '/admin/templates', label: 'Email Templates', icon: Mail, requiredModule: 'ops' },
+      { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
+      { href: '/admin/og-preview', label: 'OG Image Preview', icon: Image },
+      { href: '/admin/og-cache', label: 'OG Cache Manager', icon: HardDrive },
+    ],
+  },
+  {
     title: 'Support',
     requiredModule: 'ops',
     items: [
       { href: '/admin/messages', label: 'Contact Messages', icon: MessageCircle, requiredModule: 'ops' },
       { href: '/admin/spam-queue', label: 'Spam Queue', icon: AlertTriangle, requiredModule: 'ops' },
-      { href: '/admin/subscribers', label: 'Subscribers', icon: Users, requiredModule: 'ops' },
-      { href: '/admin/campaigns', label: 'Campaigns', icon: Megaphone, requiredModule: 'ops' },
-      { href: '/admin/templates', label: 'Email Templates', icon: Mail, requiredModule: 'ops' },
     ],
   },
   {
-    title: 'Languages',
+    title: 'On Hold',
     requiredModule: 'admin',
     items: [
-      { href: '/dach', label: 'Deutschland 🇩🇪', icon: Globe, external: true },
-      { href: '/fr', label: 'France 🇫🇷', icon: Globe, external: true },
-      { href: '/es', label: 'España 🇪🇸', icon: Globe, external: true },
-      { href: '/mx', label: 'México 🇲🇽', icon: Globe, external: true },
-      { href: '/ar', label: 'Argentina 🇦🇷', icon: Globe, external: true },
-      { href: '/latam', label: 'Latinoamérica 🌎', icon: Globe, external: true },
-      { href: '/be', label: 'Belgique 🇧🇪', icon: Globe, external: true },
-      { href: '/lu', label: 'Luxembourg 🇱🇺', icon: Globe, external: true },
+      { href: '/scenarios', label: 'Live Scenarios', icon: Zap, external: true },
+      { href: '/dach', label: 'DACH Region 🇩🇪🇦🇹🇨🇭', icon: Globe, external: true },
+      { href: '/fr', label: 'Francophone 🇫🇷🇧🇪🇨🇭', icon: Globe, external: true },
+      { href: '/es', label: 'Hispanic 🇪🇸🇲🇽🇦🇷', icon: Globe, external: true },
     ],
   },
   {
@@ -165,9 +168,6 @@ const navSections: NavSection[] = [
       { href: '/admin/users', label: 'Users & Roles', icon: Users, requiredModule: 'admin' },
       { href: '/admin/pre-authorized', label: 'Pre-Authorized', icon: Shield, requiredModule: 'admin' },
       { href: '/admin/sitemap', label: 'Sitemap & SEO', icon: Map },
-      { href: '/admin/og-preview', label: 'OG Image Preview', icon: ExternalLink },
-      { href: '/admin/og-cache', label: 'OG Cache Manager', icon: HardDrive },
-      { href: '/admin/seasonal-banners', label: 'Seasonal Banners', icon: Calendar },
       { href: '/admin/cron-jobs', label: 'Scheduled Tasks', icon: Timer },
       { href: '/admin/audit', label: 'Audit Log', icon: FileText, requiredModule: 'audit' },
       { href: '/admin/whats-new', label: "What's New", icon: Bell },
@@ -181,7 +181,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { roles, isAdmin, isOwner, canAccess, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Store', 'Bubbles AI', 'Brand', 'Support', 'System']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['Overview', 'Store', 'Bubbles AI', 'Brand', 'Marketing', 'Support', 'System']);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem('admin-sidebar-collapsed') === 'true';
