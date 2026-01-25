@@ -91,6 +91,7 @@ const navSections: NavSection[] = [
     items: [
       { href: '/admin/shopify', label: 'Connection & Sync', icon: Store, requiredModule: 'shopify' },
       { href: '/admin/products', label: 'Products', icon: Package, requiredModule: 'products' },
+      { href: '/admin/design-studio', label: 'Design Studio', icon: Sparkles, requiredModule: 'products' },
       { href: '/admin/orders', label: 'Orders', icon: ShoppingCart, requiredModule: 'orders' },
       { href: '/admin/orders/exceptions', label: 'Exceptions', icon: AlertTriangle, requiredModule: 'exceptions' },
       { href: '/admin/pod', label: 'POD & Apps', icon: Link2, requiredModule: 'pod' },
