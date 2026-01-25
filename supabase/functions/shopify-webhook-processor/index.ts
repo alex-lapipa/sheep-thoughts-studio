@@ -138,6 +138,33 @@ Deno.serve(async (req) => {
     const payloadToProcess = (body.payload || body) as Record<string, unknown>;
     const result = await processWebhook(supabase, topic, payloadToProcess, supabaseUrl);
 
+    // Broadcast real-time notification for new orders
+    if (topic === "orders/create") {
+      const orderName = payloadToProcess.name as string || `#${payloadToProcess.order_number || payloadToProcess.id}`;
+      const customerEmail = (payloadToProcess.customer as Record<string, unknown>)?.email as string || 
+                           payloadToProcess.email as string || 'Guest';
+      const totalPrice = payloadToProcess.total_price as string || '0.00';
+      const currency = payloadToProcess.currency as string || 'EUR';
+      
+      // Broadcast to admin-notifications channel
+      await supabase.channel('admin-notifications').send({
+        type: 'broadcast',
+        event: 'new_order',
+        payload: {
+          orderId: payloadToProcess.id,
+          orderName,
+          customerEmail,
+          totalPrice,
+          currency,
+          itemCount: (payloadToProcess.line_items as unknown[])?.length || 0,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      
+      console.log(`Broadcasted new order notification: ${orderName}`);
+      result.actions.push(`Real-time notification sent for order ${orderName}`);
+    }
+
     // Update webhook status
     await supabase
       .from("shopify_webhooks")
