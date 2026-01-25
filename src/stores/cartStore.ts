@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { toast } from 'sonner';
 import { 
   ShopifyProduct, 
   storefrontApiRequest, 
@@ -138,31 +139,44 @@ export const useCartStore = create<CartStore>()(
                 checkoutUrl: result.checkoutUrl,
                 items: [{ ...item, lineId: result.lineId }]
               });
+              toast.success(`Added ${item.product.node.title} to cart`);
+            } else {
+              toast.error('Failed to create cart. Please try again.');
             }
           } else if (existingItem) {
             const newQuantity = existingItem.quantity + item.quantity;
             if (!existingItem.lineId) {
               console.error('Cannot update quantity for item without lineId:', existingItem);
+              toast.error('Cart sync error. Please refresh and try again.');
               return;
             }
             const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
             if (result.success) {
               const currentItems = get().items;
               set({ items: currentItems.map(i => i.variantId === item.variantId ? { ...i, quantity: newQuantity } : i) });
+              toast.success(`Updated quantity to ${newQuantity}`);
             } else if (result.cartNotFound) {
               clearCart();
+              toast.error('Cart expired. Please add items again.');
+            } else {
+              toast.error('Failed to update cart. Please try again.');
             }
           } else {
             const result = await addLineToShopifyCart(cartId, { ...item, lineId: null });
             if (result.success) {
               const currentItems = get().items;
               set({ items: [...currentItems, { ...item, lineId: result.lineId ?? null }] });
+              toast.success(`Added ${item.product.node.title} to cart`);
             } else if (result.cartNotFound) {
               clearCart();
+              toast.error('Cart expired. Please add items again.');
+            } else {
+              toast.error('Failed to add item. Please try again.');
             }
           }
         } catch (error) {
           console.error('Failed to add item:', error);
+          toast.error('Something went wrong. Please try again.');
         } finally {
           set({ isLoading: false });
         }
@@ -186,9 +200,13 @@ export const useCartStore = create<CartStore>()(
             set({ items: currentItems.map(i => i.variantId === variantId ? { ...i, quantity } : i) });
           } else if (result.cartNotFound) {
             clearCart();
+            toast.error('Cart expired. Please add items again.');
+          } else {
+            toast.error('Failed to update quantity.');
           }
         } catch (error) {
           console.error('Failed to update quantity:', error);
+          toast.error('Something went wrong. Please try again.');
         } finally {
           set({ isLoading: false });
         }
@@ -199,6 +217,7 @@ export const useCartStore = create<CartStore>()(
         const item = items.find(i => i.variantId === variantId);
         if (!item?.lineId || !cartId) return;
 
+        const itemTitle = item.product.node.title;
         set({ isLoading: true });
         try {
           const result = await removeLineFromShopifyCart(cartId, item.lineId);
@@ -206,11 +225,16 @@ export const useCartStore = create<CartStore>()(
             const currentItems = get().items;
             const newItems = currentItems.filter(i => i.variantId !== variantId);
             newItems.length === 0 ? clearCart() : set({ items: newItems });
+            toast.success(`Removed ${itemTitle} from cart`);
           } else if (result.cartNotFound) {
             clearCart();
+            toast.error('Cart expired. Please add items again.');
+          } else {
+            toast.error('Failed to remove item.');
           }
         } catch (error) {
           console.error('Failed to remove item:', error);
+          toast.error('Something went wrong. Please try again.');
         } finally {
           set({ isLoading: false });
         }

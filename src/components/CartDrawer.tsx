@@ -9,7 +9,7 @@ import { ecommerceTracking } from "@/lib/ecommerceTracking";
 import { useABProductTracking } from "@/hooks/useABTracking";
 import { useAbandonedCartTracking } from "@/hooks/useAbandonedCartTracking";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { optimizeShopifyImage, IMAGE_PRESETS } from "@/lib/imageOptimization";
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
@@ -76,13 +76,17 @@ export function CartDrawer() {
                 <div className="space-y-3 sm:space-y-4">
                   {items.map((item) => (
                     <div key={item.variantId} className="flex gap-3 sm:gap-4 p-3 rounded-lg bg-secondary/30">
-                      {/* Product Image */}
+                      {/* Product Image - Optimized for cart thumbnail */}
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-md overflow-hidden flex-shrink-0">
                         {item.product.node.images?.edges?.[0]?.node && (
                           <img 
-                            src={item.product.node.images.edges[0].node.url} 
+                            src={optimizeShopifyImage(
+                              item.product.node.images.edges[0].node.url,
+                              IMAGE_PRESETS.cartThumbnail
+                            )} 
                             alt={item.product.node.title} 
-                            className="w-full h-full object-cover" 
+                            className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                         )}
                       </div>
