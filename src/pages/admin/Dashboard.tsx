@@ -9,6 +9,7 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
 import { Lightbulb, Zap, Target, BookOpen, Eye, MousePointerClick, ShoppingCart, CreditCard, ArrowRight, TrendingUp, TrendingDown, Minus, FlaskConical, Home, Settings, BarChart3 } from 'lucide-react';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
 import { ShoppingHeatmap } from '@/components/admin/ShoppingHeatmap';
+import { RevenueGoalTracker } from '@/components/admin/RevenueGoalTracker';
 import { toast } from 'sonner';
 
 interface Stats {
@@ -442,6 +443,9 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Revenue Goal Tracking */}
+        <RevenueGoalTracker />
 
         {/* Shopping Activity Heatmap */}
         <ShoppingHeatmap />
