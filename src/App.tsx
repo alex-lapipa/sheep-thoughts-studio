@@ -179,7 +179,7 @@ const App = () => (
                   
                   <Route path="/checkout/success" element={<CheckoutSuccess />} />
                   <Route path="/order-tracking" element={<OrderTracking />} />
-                  <Route path="/scenarios" element={<Scenarios />} />
+                  {/* Scenarios moved to admin-only */}
                   <Route path="/hall-of-fame" element={<HallOfFame />} />
                   <Route path="/recipes" element={<Recipes />} />
                   <Route path="/adventures" element={<Adventures />} />
