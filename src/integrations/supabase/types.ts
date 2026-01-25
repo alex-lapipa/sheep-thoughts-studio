@@ -1447,6 +1447,7 @@ export type Database = {
           name: string
           pod_provider: string | null
           pod_template_id: string | null
+          print_files: Json | null
           published_at: string | null
           shopify_product_id: string | null
           status: string
@@ -1463,6 +1464,7 @@ export type Database = {
           name: string
           pod_provider?: string | null
           pod_template_id?: string | null
+          print_files?: Json | null
           published_at?: string | null
           shopify_product_id?: string | null
           status?: string
@@ -1479,6 +1481,7 @@ export type Database = {
           name?: string
           pod_provider?: string | null
           pod_template_id?: string | null
+          print_files?: Json | null
           published_at?: string | null
           shopify_product_id?: string | null
           status?: string
