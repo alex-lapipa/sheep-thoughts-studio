@@ -100,13 +100,13 @@ export function ProductRecommendations({
       .map(item => item.product);
 
     // If not enough scored products, fill with random products
-    if (recommendations.length < maxRecommendations) {
+    if (scoredProducts.length < maxRecommendations) {
       const remaining = allProducts
         .filter(p => 
           p.node.id !== currentProductId && 
-          !recommendations.find(r => r.node.id === p.node.id)
+          !scoredProducts.find(r => r.node.id === p.node.id)
         )
-        .slice(0, maxRecommendations - recommendations.length);
+        .slice(0, maxRecommendations - scoredProducts.length);
       return [...scoredProducts, ...remaining].slice(0, maxRecommendations);
     }
 
