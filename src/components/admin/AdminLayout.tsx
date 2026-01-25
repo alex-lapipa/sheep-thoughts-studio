@@ -100,6 +100,9 @@ const navSections: NavSection[] = [
       { href: '/admin/pricing', label: 'Pricing Rules', icon: DollarSign, requiredModule: 'pricing' },
       { href: '/admin/drops', label: 'Drops', icon: Tag, requiredModule: 'drops' },
       { href: '/admin/shopify/webhooks', label: 'Webhooks', icon: Webhook, requiredModule: 'webhooks' },
+      { href: '/admin/ops', label: 'Store Ops', icon: BarChart3, requiredModule: 'admin' },
+      { href: '/admin/ops/agent', label: 'Ops Agent', icon: MessageCircle, requiredModule: 'admin' },
+      { href: '/admin/ops/audit', label: 'Ops Audit', icon: FileText, requiredModule: 'admin' },
     ],
   },
   {
@@ -160,15 +163,6 @@ const navSections: NavSection[] = [
       { href: '/dach', label: 'DACH Region 🇩🇪🇦🇹🇨🇭', icon: Globe, external: true },
       { href: '/fr', label: 'Francophone 🇫🇷🇧🇪🇨🇭', icon: Globe, external: true },
       { href: '/es', label: 'Hispanic 🇪🇸🇲🇽🇦🇷', icon: Globe, external: true },
-    ],
-  },
-  {
-    title: 'Store Ops',
-    requiredModule: 'admin',
-    items: [
-      { href: '/admin/ops', label: 'Overview', icon: BarChart3, requiredModule: 'admin' },
-      { href: '/admin/ops/agent', label: 'Agent Console', icon: MessageCircle, requiredModule: 'admin' },
-      { href: '/admin/ops/audit', label: 'Ops Audit Log', icon: FileText, requiredModule: 'admin' },
     ],
   },
   {
