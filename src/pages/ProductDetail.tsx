@@ -21,6 +21,7 @@ import { SizeGuideModal } from "@/components/SizeGuideModal";
 import { StickyAddToCart } from "@/components/StickyAddToCart";
 import { RecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { ProductRecommendations } from "@/components/ProductRecommendations";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
@@ -341,6 +342,13 @@ const ProductDetail = () => {
             </Accordion>
           </div>
         </div>
+
+        {/* Product Recommendations */}
+        <ProductRecommendations 
+          currentProductId={product.id}
+          currentProductTags={product.tags || []}
+          currentProductType={product.productType}
+        />
 
         {/* Recently Viewed Products */}
         <RecentlyViewedProducts excludeProductId={product.id} />
