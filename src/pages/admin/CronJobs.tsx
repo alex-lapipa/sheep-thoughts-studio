@@ -28,6 +28,7 @@ interface CronJob {
   description: string;
   active: boolean;
   function: string;
+  params?: Record<string, unknown>;
 }
 
 interface CronJobRun {
