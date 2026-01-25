@@ -70,15 +70,23 @@ export function LowStockBadge({
 
 /**
  * Helper to calculate total inventory from variants
+ * Note: quantityAvailable requires special Storefront API scope
+ * If not available, returns 0 (badges won't show)
  */
-export function calculateTotalInventory(variants: Array<{ node: { quantityAvailable?: number } }> | undefined): number {
+export function calculateTotalInventory(variants: Array<{ node: Record<string, unknown> }> | undefined): number {
   if (!variants) return 0;
-  return variants.reduce((sum, v) => sum + (v.node.quantityAvailable || 0), 0);
+  return variants.reduce((sum, v) => {
+    const qty = typeof v.node?.quantityAvailable === 'number' ? v.node.quantityAvailable : 0;
+    return sum + qty;
+  }, 0);
 }
 
 /**
  * Helper to get specific variant inventory
+ * Note: quantityAvailable requires special Storefront API scope
+ * If not available, returns 0 (badges won't show)
  */
-export function getVariantInventory(variant: { quantityAvailable?: number } | undefined): number {
-  return variant?.quantityAvailable || 0;
+export function getVariantInventory(variant: Record<string, unknown> | undefined): number {
+  if (!variant) return 0;
+  return typeof variant.quantityAvailable === 'number' ? variant.quantityAvailable : 0;
 }
