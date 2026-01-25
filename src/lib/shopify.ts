@@ -10,9 +10,25 @@ export interface ShopifyProduct {
     id: string;
     title: string;
     description: string;
+    descriptionHtml?: string;
     handle: string;
     tags: string[];
+    vendor?: string;
+    productType?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    availableForSale?: boolean;
     priceRange: {
+      minVariantPrice: {
+        amount: string;
+        currencyCode: string;
+      };
+      maxVariantPrice?: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+    compareAtPriceRange?: {
       minVariantPrice: {
         amount: string;
         currencyCode: string;
@@ -23,6 +39,8 @@ export interface ShopifyProduct {
         node: {
           url: string;
           altText: string | null;
+          width?: number;
+          height?: number;
         };
       }>;
     };
@@ -31,10 +49,18 @@ export interface ShopifyProduct {
         node: {
           id: string;
           title: string;
+          sku?: string;
+          barcode?: string;
+          weight?: number;
+          weightUnit?: string;
           price: {
             amount: string;
             currencyCode: string;
           };
+          compareAtPrice?: {
+            amount: string;
+            currencyCode: string;
+          } | null;
           availableForSale: boolean;
           quantityAvailable?: number;
           selectedOptions: Array<{
@@ -45,9 +71,20 @@ export interface ShopifyProduct {
       }>;
     };
     options: Array<{
+      id?: string;
       name: string;
       values: string[];
     }>;
+    seo?: {
+      title?: string;
+      description?: string;
+    };
+    metafields?: Array<{
+      namespace: string;
+      key: string;
+      value: string;
+      type: string;
+    }> | null;
   };
 }
 
@@ -89,9 +126,24 @@ export const PRODUCTS_QUERY = `
           id
           title
           description
+          descriptionHtml
           handle
           tags
+          vendor
+          productType
+          availableForSale
+          createdAt
           priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+            maxVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          compareAtPriceRange {
             minVariantPrice {
               amount
               currencyCode
@@ -102,6 +154,8 @@ export const PRODUCTS_QUERY = `
               node {
                 url
                 altText
+                width
+                height
               }
             }
           }
@@ -110,7 +164,12 @@ export const PRODUCTS_QUERY = `
               node {
                 id
                 title
+                sku
                 price {
+                  amount
+                  currencyCode
+                }
+                compareAtPrice {
                   amount
                   currencyCode
                 }
@@ -124,6 +183,7 @@ export const PRODUCTS_QUERY = `
             }
           }
           options {
+            id
             name
             values
           }
@@ -139,28 +199,58 @@ export const PRODUCT_BY_HANDLE_QUERY = `
       id
       title
       description
+      descriptionHtml
       handle
       tags
+      vendor
+      productType
+      availableForSale
+      createdAt
+      updatedAt
       priceRange {
         minVariantPrice {
           amount
           currencyCode
         }
+        maxVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      seo {
+        title
+        description
       }
       images(first: 10) {
         edges {
           node {
             url
             altText
+            width
+            height
           }
         }
       }
-      variants(first: 20) {
+      variants(first: 30) {
         edges {
           node {
             id
             title
+            sku
+            barcode
+            weight
+            weightUnit
             price {
+              amount
+              currencyCode
+            }
+            compareAtPrice {
               amount
               currencyCode
             }
@@ -174,6 +264,7 @@ export const PRODUCT_BY_HANDLE_QUERY = `
         }
       }
       options {
+        id
         name
         values
       }
