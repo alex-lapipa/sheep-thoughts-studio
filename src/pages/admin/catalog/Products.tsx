@@ -9,7 +9,8 @@ import { Package, Search, RefreshCw, ExternalLink, Tag, DollarSign } from 'lucid
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function ProductsPage() {
-  const { data: products = [], isLoading: loading, refetch } = useProducts();
+  // Fetch up to 100 products for the admin catalog view
+  const { data: products = [], isLoading: loading, refetch } = useProducts(undefined, 100);
   const [search, setSearch] = useState('');
 
   const filteredProducts = products.filter((p: any) => {
@@ -56,10 +57,10 @@ export default function ProductsPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-600">Active</CardTitle>
+              <CardTitle className="text-sm font-medium text-affirmative">Active</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+              <div className="text-2xl font-bold text-affirmative">{stats.active}</div>
             </CardContent>
           </Card>
           <Card>
@@ -163,7 +164,7 @@ export default function ProductsPage() {
                           <Badge 
                             variant="outline"
                             className={product?.availableForSale 
-                              ? 'bg-green-500/10 text-green-600' 
+                              ? 'bg-affirmative/10 text-affirmative' 
                               : 'bg-muted text-muted-foreground'
                             }
                           >
