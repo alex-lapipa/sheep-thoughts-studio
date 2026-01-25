@@ -1436,6 +1436,57 @@ export type Database = {
         }
         Relationships: []
       }
+      revenue_goals: {
+        Row: {
+          achieved_milestones: Json | null
+          created_at: string
+          created_by: string | null
+          current_amount: number | null
+          end_date: string
+          id: string
+          metadata: Json | null
+          milestones: Json | null
+          name: string
+          period_type: string
+          start_date: string
+          status: string
+          target_amount: number
+          updated_at: string
+        }
+        Insert: {
+          achieved_milestones?: Json | null
+          created_at?: string
+          created_by?: string | null
+          current_amount?: number | null
+          end_date: string
+          id?: string
+          metadata?: Json | null
+          milestones?: Json | null
+          name: string
+          period_type?: string
+          start_date?: string
+          status?: string
+          target_amount: number
+          updated_at?: string
+        }
+        Update: {
+          achieved_milestones?: Json | null
+          created_at?: string
+          created_by?: string | null
+          current_amount?: number | null
+          end_date?: string
+          id?: string
+          metadata?: Json | null
+          milestones?: Json | null
+          name?: string
+          period_type?: string
+          start_date?: string
+          status?: string
+          target_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       share_events: {
         Row: {
           content_id: string | null
