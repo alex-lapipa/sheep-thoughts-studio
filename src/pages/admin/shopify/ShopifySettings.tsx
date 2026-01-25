@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Store, CheckCircle, XCircle, RefreshCw, ExternalLink, Shield, Clock, AlertTriangle, Webhook, Trash2 } from 'lucide-react';
+import { Store, CheckCircle, RefreshCw, ExternalLink, Shield, Clock, Webhook, Trash2 } from 'lucide-react';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { SyncStatusDashboard } from '@/components/admin/SyncStatusDashboard';
 import { useShopifyIntegrations } from '@/hooks/useShopifyIntegrations';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface WebhookStatus {
   registered: number;
@@ -19,58 +17,34 @@ interface WebhookStatus {
   endpoint: string | null;
 }
 
-interface ShopifySettingsData {
-  id: string;
-  store_domain: string;
-  api_version: string;
-  default_location_id: string | null;
-  scopes: string[] | null;
-  last_api_call: string | null;
-  last_api_status: string | null;
-  is_connected: boolean;
-}
-
 export default function ShopifySettings() {
-  const [settings, setSettings] = useState<ShopifySettingsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [testing, setTesting] = useState(false);
-  const [storeDomain, setStoreDomain] = useState('');
   const [webhookStatus, setWebhookStatus] = useState<WebhookStatus | null>(null);
   const [registeringWebhooks, setRegisteringWebhooks] = useState(false);
   const [unregisteringWebhooks, setUnregisteringWebhooks] = useState(false);
   const { log } = useAuditLog();
-  const { fetchSyncStatus, fetchAnalytics } = useShopifyIntegrations();
+  
+  // Use the hook to get live connection data from Shopify API
+  const { 
+    store,
+    connection,
+    isLoading, 
+    refetch,
+    fetchSyncStatus, 
+    fetchAnalytics 
+  } = useShopifyIntegrations();
+
+  const isConnected = connection?.isConnected ?? false;
+  const storeDomain = store?.domain ?? '';
+  const storeName = store?.name ?? '';
+  const apiVersion = connection?.apiVersion ?? '';
+  const scopes = connection?.scopes ?? [];
+  const storePlan = store?.plan ?? '';
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  useEffect(() => {
-    if (settings?.is_connected) {
+    if (isConnected) {
       fetchWebhookStatus();
     }
-  }, [settings?.is_connected]);
-
-  async function fetchSettings() {
-    try {
-      const { data, error } = await supabase
-        .from('shopify_settings')
-        .select('*')
-        .limit(1)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      
-      if (data) {
-        setSettings(data);
-        setStoreDomain(data.store_domain);
-      }
-    } catch (error) {
-      console.error('Error fetching Shopify settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [isConnected]);
 
   async function fetchWebhookStatus() {
     try {
@@ -152,63 +126,30 @@ export default function ShopifySettings() {
     }
   }
 
-  async function handleTestConnection() {
-    setTesting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('shopify-admin', {
-        body: { action: 'test_connection' },
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast.success('Connection successful!');
-        await log({
-          action: 'test_connection',
-          entityType: 'shopify_settings',
-          metadata: { success: true },
-        });
-        fetchSettings();
-      } else {
-        toast.error(data.error || 'Connection failed');
-      }
-    } catch (error) {
-      console.error('Connection test failed:', error);
-      toast.error('Failed to test connection');
-    } finally {
-      setTesting(false);
+  async function handleRefresh() {
+    await refetch();
+    if (isConnected) {
+      await fetchWebhookStatus();
     }
+    toast.success('Connection status refreshed');
   }
 
-  async function handleStartOAuth() {
-    try {
-      const { data, error } = await supabase.functions.invoke('shopify-oauth', {
-        body: { action: 'start', storeDomain },
-      });
-
-      if (error) throw error;
-
-      if (data.authUrl) {
-        await log({
-          action: 'start_oauth',
-          entityType: 'shopify_settings',
-          metadata: { store_domain: storeDomain },
-        });
-        window.location.href = data.authUrl;
-      } else {
-        toast.error('Failed to start OAuth flow');
-      }
-    } catch (error) {
-      console.error('OAuth start failed:', error);
-      toast.error('Failed to start OAuth flow');
-    }
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="space-y-6">
+          <div>
+            <Skeleton className="h-9 w-64" />
+            <Skeleton className="h-5 w-96 mt-2" />
+          </div>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-24 w-full" />
+            </CardContent>
+          </Card>
         </div>
       </AdminLayout>
     );
@@ -217,11 +158,17 @@ export default function ShopifySettings() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Shopify Connection</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your Shopify Admin API connection and settings
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-3xl font-bold">Shopify Connection</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your Shopify Admin API connection and settings
+            </p>
+          </div>
+          <Button variant="outline" onClick={handleRefresh}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
 
         {/* Connection Status */}
@@ -233,98 +180,37 @@ export default function ShopifySettings() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {settings?.is_connected ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-500" />
-                  <div>
-                    <p className="font-medium">Connected</p>
-                    <p className="text-sm text-muted-foreground">{settings.store_domain}</p>
-                  </div>
-                  <Badge variant="outline" className="ml-auto">
-                    API v{settings.api_version}
-                  </Badge>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-affirmative" />
+                <div>
+                  <p className="font-medium">Connected to {storeName}</p>
+                  <p className="text-sm text-muted-foreground">{storeDomain}</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Last API Call</p>
-                    <p className="text-sm font-medium">
-                      {settings.last_api_call 
-                        ? new Date(settings.last_api_call).toLocaleString()
-                        : 'Never'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Status</p>
-                    <Badge variant={settings.last_api_status === 'success' ? 'default' : 'destructive'}>
-                      {settings.last_api_status || 'Unknown'}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button onClick={handleTestConnection} disabled={testing}>
-                    {testing ? (
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                    )}
-                    Test Connection
-                  </Button>
-                  <a 
-                    href={`https://${settings.store_domain}/admin`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Open Shopify Admin
-                    </Button>
-                  </a>
+                <div className="ml-auto flex items-center gap-2">
+                  <Badge variant="outline">API v{apiVersion}</Badge>
+                  <Badge variant="secondary">{storePlan}</Badge>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <XCircle className="h-6 w-6 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Not Connected</p>
-                    <p className="text-sm text-muted-foreground">
-                      Connect your Shopify store to enable Admin API features
-                    </p>
-                  </div>
-                </div>
 
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    You'll need to create a Shopify app and configure OAuth credentials to connect.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="space-y-3 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="store">Store Domain</Label>
-                    <Input
-                      id="store"
-                      placeholder="your-store.myshopify.com"
-                      value={storeDomain}
-                      onChange={(e) => setStoreDomain(e.target.value)}
-                    />
-                  </div>
-                  <Button onClick={handleStartOAuth} disabled={!storeDomain}>
-                    <Store className="h-4 w-4 mr-2" />
-                    Connect with OAuth
+              <div className="flex gap-2 pt-4 border-t">
+                <a 
+                  href={`https://${storeDomain}/admin`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Open Shopify Admin
                   </Button>
-                </div>
+                </a>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 
         {/* Scopes */}
-        {settings?.is_connected && settings.scopes && (
+        {scopes.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -337,7 +223,7 @@ export default function ShopifySettings() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {settings.scopes.map((scope) => (
+                {scopes.map((scope) => (
                   <Badge key={scope} variant="secondary">
                     {scope}
                   </Badge>
@@ -346,32 +232,6 @@ export default function ShopifySettings() {
             </CardContent>
           </Card>
         )}
-
-        {/* Required Scopes Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Required Scopes</CardTitle>
-            <CardDescription>
-              Your Shopify app needs these scopes for full functionality
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {[
-                'read_products', 'write_products',
-                'read_orders', 'write_orders',
-                'read_inventory', 'write_inventory',
-                'read_fulfillments', 'write_fulfillments',
-                'read_locations',
-                'read_price_rules', 'write_price_rules',
-              ].map((scope) => (
-                <Badge key={scope} variant="outline" className="justify-start">
-                  {scope}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Webhook Configuration */}
         <Card>
@@ -414,7 +274,7 @@ export default function ShopifySettings() {
               <div className="flex flex-wrap gap-2">
                 <Button 
                   onClick={handleRegisterWebhooks} 
-                  disabled={registeringWebhooks || !settings?.is_connected}
+                  disabled={registeringWebhooks}
                 >
                   {registeringWebhooks ? (
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -446,26 +306,15 @@ export default function ShopifySettings() {
                   </a>
                 </Button>
               </div>
-
-              {!settings?.is_connected && (
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Connect your Shopify store first to register webhooks.
-                  </AlertDescription>
-                </Alert>
-              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Sync Status Dashboard */}
-        {settings?.is_connected && (
-          <SyncStatusDashboard 
-            fetchSyncStatus={fetchSyncStatus} 
-            fetchAnalytics={fetchAnalytics} 
-          />
-        )}
+        <SyncStatusDashboard 
+          fetchSyncStatus={fetchSyncStatus} 
+          fetchAnalytics={fetchAnalytics} 
+        />
       </div>
     </AdminLayout>
   );
