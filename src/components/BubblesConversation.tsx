@@ -606,7 +606,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             <Button
               size="lg"
               onClick={startConversation}
-              disabled={isConnecting || !agentId.trim()}
+              disabled={isConnecting}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent-hover"
             >
               {isConnecting ? (
