@@ -109,7 +109,6 @@ interface BubblesConversationProps {
 export function BubblesConversation({ className }: BubblesConversationProps) {
   const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [agentId, setAgentId] = useState("");
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
