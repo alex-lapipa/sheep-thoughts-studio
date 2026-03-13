@@ -14,6 +14,7 @@ import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 import { DevToolsPanel } from "@/components/DevToolsPanel";
+import { BubblesFloatingWidget } from "@/components/BubblesFloatingWidget";
 import { useCartSync } from "@/hooks/useCartSync";
 
 // Eagerly load critical pages
