@@ -37,9 +37,6 @@ interface ToolAction {
   params: Record<string, any>;
   timestamp: Date;
 }
-  params: Record<string, string>;
-  timestamp: Date;
-}
 
 // Liam - Irish male voice from ElevenLabs
 const BUBBLES_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
