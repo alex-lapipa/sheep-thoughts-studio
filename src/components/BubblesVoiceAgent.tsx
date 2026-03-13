@@ -64,6 +64,7 @@ const BUBBLES_FIRST_MESSAGE = "Ah, hello there! Bubbles here, from Wicklow. Sure
 
 interface BubblesVoiceAgentProps {
   className?: string;
+  onConnectionChange?: (connected: boolean) => void;
 }
 
 export function BubblesVoiceAgent({ className }: BubblesVoiceAgentProps) {
