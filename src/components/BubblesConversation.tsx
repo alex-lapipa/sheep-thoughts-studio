@@ -223,6 +223,149 @@ export function BubblesConversation({ className }: BubblesConversationProps) {
       const path = window.location.pathname;
       return `User is currently on: ${path}`;
     },
+
+    // Show a collection of products
+    showCollection: (params: { collection: string; reason?: string }) => {
+      console.log("Bubbles shows collection:", params);
+
+      const collectionMap: Record<string, string> = {
+        "all": "/collections/all",
+        "new": "/collections/new",
+        "best-sellers": "/collections/best-sellers",
+        "clothing": "/collections/clothing",
+        "accessories": "/collections/accessories",
+        "home": "/collections/home",
+        "stickers": "/collections/stickers",
+      };
+
+      const path = collectionMap[params.collection.toLowerCase()] || `/collections/${params.collection}`;
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "show_collection",
+        params: { collection: params.collection, path },
+        timestamp: new Date()
+      }]);
+
+      toast.info("Bubbles recommends a collection...", {
+        description: params.reason || `Have a look at the ${params.collection} collection, like.`,
+        action: {
+          label: "Browse Collection",
+          onClick: () => navigate(path)
+        }
+      });
+
+      return `Suggested collection: ${params.collection}`;
+    },
+
+    // Trigger a specific Bubbles mode for dramatic effect
+    triggerSavageMode: (params: { reason: string; intensity?: string }) => {
+      console.log("Bubbles triggered savage mode:", params);
+      const intensity = params.intensity || "savage";
+      const modeMap: Record<string, string> = {
+        "concerned": "concerned",
+        "triggered": "triggered",
+        "savage": "savage",
+        "nuclear": "nuclear",
+      };
+      const mode = modeMap[intensity.toLowerCase()] || "savage";
+      setCurrentMode(mode);
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "trigger_mode",
+        params: { mode, reason: params.reason },
+        timestamp: new Date()
+      }]);
+
+      return `Mode escalated to ${mode}. Reason: ${params.reason}`;
+    },
+
+    // Share a Bubbles thought bubble (inner monologue moment)
+    showThoughtBubble: (params: { thought: string; mode?: string }) => {
+      console.log("Bubbles inner thought:", params);
+      const mode = params.mode || "innocent";
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "thought_bubble",
+        params: { thought: params.thought, mode },
+        timestamp: new Date()
+      }]);
+
+      toast(`💭 [Inner thought] ${params.thought}`, {
+        duration: 6000,
+      });
+
+      return `Displayed thought bubble: ${params.thought}`;
+    },
+
+    // Challenge the user with a Bubbles-style wrong fact quiz
+    startChallenge: (params: { topic: string; claim: string }) => {
+      console.log("Bubbles starts challenge:", params);
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "challenge",
+        params: { topic: params.topic, claim: params.claim },
+        timestamp: new Date()
+      }]);
+
+      toast.warning("Bubbles challenges you!", {
+        description: `"${params.claim}" — Do you dare disagree?`,
+        action: {
+          label: "Challenge Bubbles",
+          onClick: () => navigate("/explains")
+        },
+        duration: 10000,
+      });
+
+      return `Challenge issued on topic "${params.topic}": "${params.claim}"`;
+    },
+
+    // Play a sound effect or mood music cue
+    playMoodCue: (params: { mood: string }) => {
+      console.log("Bubbles mood cue:", params);
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "mood_cue",
+        params: { mood: params.mood },
+        timestamp: new Date()
+      }]);
+
+      return `Mood cue registered: ${params.mood}. UI can respond accordingly.`;
+    },
+
+    // Reference a mentor by name during conversation
+    channelMentor: (params: { mentor: string; topic?: string }) => {
+      console.log("Bubbles channels mentor:", params);
+
+      const mentorMap: Record<string, { emoji: string; style: string }> = {
+        "anthony": { emoji: "🍺", style: "Philosophy & pints" },
+        "peggy": { emoji: "🍞", style: "Comfort & kitchen wisdom" },
+        "jimmy": { emoji: "⚖️", style: "Law & authority" },
+        "aidan": { emoji: "🎸", style: "Cosmic mystery & music" },
+        "seamus": { emoji: "🌍", style: "Travel & impossible temperatures" },
+        "carmel": { emoji: "🐑", style: "Practical field wisdom" },
+      };
+
+      const mentor = mentorMap[params.mentor.toLowerCase()] || { emoji: "🐑", style: "Unknown wisdom" };
+
+      setToolActions(prev => [...prev, {
+        id: crypto.randomUUID(),
+        type: "channel_mentor",
+        params: { mentor: params.mentor, topic: params.topic },
+        timestamp: new Date()
+      }]);
+
+      toast(`${mentor.emoji} Channeling ${params.mentor}...`, {
+        description: mentor.style,
+        duration: 5000,
+      });
+
+      return `Now channeling mentor: ${params.mentor} (${mentor.style}). Topic: ${params.topic || "general wisdom"}`;
+    },
   }), [navigate]);
 
   // Agent overrides with Bubbles' personality and tool instructions
