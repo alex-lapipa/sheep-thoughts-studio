@@ -8,18 +8,7 @@ interface BubblesFloatingHeadProps {
   className?: string;
 }
 
-const pulseRingVariants = {
-  animate: (i: number) => ({
-    scale: [1, 2.5],
-    opacity: [0.5, 0],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      delay: i * 0.6,
-      ease: "easeOut",
-    },
-  }),
-};
+// Pulse rings use inline animate instead of variants for type safety
 
 export function BubblesFloatingHead({ isActive = false, onClick, className }: BubblesFloatingHeadProps) {
   return (

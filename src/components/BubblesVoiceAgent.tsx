@@ -501,3 +501,5 @@ Use tools naturally during conversation.`,
     </div>
   );
 }
+
+export default BubblesVoiceAgent;
