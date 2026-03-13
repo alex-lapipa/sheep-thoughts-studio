@@ -1,5 +1,5 @@
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,9 +64,10 @@ const BUBBLES_FIRST_MESSAGE = "Ah, hello there! Bubbles here, from Wicklow. Sure
 
 interface BubblesVoiceAgentProps {
   className?: string;
+  onConnectionChange?: (connected: boolean) => void;
 }
 
-export function BubblesVoiceAgent({ className }: BubblesVoiceAgentProps) {
+export function BubblesVoiceAgent({ className, onConnectionChange }: BubblesVoiceAgentProps) {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -287,6 +288,10 @@ Use tools naturally during conversation.`,
   const isConnected = conversation.status === "connected";
   const isSpeaking = conversation.isSpeaking;
 
+  useEffect(() => {
+    onConnectionChange?.(isConnected);
+  }, [isConnected, onConnectionChange]);
+
   // Determine animation state
   const agentState = !isConnected ? "idle" : isSpeaking ? "speaking" : "listening";
 
@@ -500,3 +505,5 @@ Use tools naturally during conversation.`,
     </div>
   );
 }
+
+export default BubblesVoiceAgent;
