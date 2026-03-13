@@ -41,6 +41,9 @@ interface ToolAction {
 // Liam - Irish male voice from ElevenLabs
 const BUBBLES_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
 
+// Hardcoded ElevenLabs Agent ID for Bubbles
+const BUBBLES_AGENT_ID = "agent_0801kkm8f4q6f4yty4mfhezfr894";
+
 // Bubbles' personality system prompt for the agent
 const BUBBLES_SYSTEM_PROMPT = `You are Bubbles, a sheep from County Wicklow, Ireland. You were raised by humans and exposed to international opinions without adult supervision from an early age.
 
