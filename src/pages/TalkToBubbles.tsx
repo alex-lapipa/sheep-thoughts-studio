@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Layout } from "@/components/Layout";
-import { BubblesConversation } from "@/components/BubblesConversation";
 import { BubblesVoiceChat } from "@/components/BubblesVoiceChat";
+import { BubblesVoiceAgent } from "@/components/BubblesVoiceAgent";
 import { MentorFrequencyCards } from "@/components/MentorFrequencyCards";
 import { MentorFrequencyWidget } from "@/components/MentorFrequencyWidget";
 import { BubblesHeroImage } from "@/components/BubblesHeroImage";
