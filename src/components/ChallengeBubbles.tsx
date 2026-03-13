@@ -88,6 +88,7 @@ export const ChallengeBubbles = () => {
   const [initialResponse, setInitialResponse] = useState<InitialResponse | null>(null);
   const [challenges, setChallenges] = useState<ChallengeEntry[]>([]);
   const [currentMode, setCurrentMode] = useState<EscalationMode>("innocent");
+  const { explain, challenge: challengeBubbles } = useBubblesOrchestrator();
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,16 +105,7 @@ export const ChallengeBubbles = () => {
     setAskedQuestion(question);
 
     try {
-      const { data, error } = await supabase.functions.invoke("bubbles-explain", {
-        body: { question: question.trim() },
-      });
-
-      if (error) throw error;
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
-
+      const data = await explain(question.trim());
       setInitialResponse(data);
       setQuestion("");
     } catch (err) {
