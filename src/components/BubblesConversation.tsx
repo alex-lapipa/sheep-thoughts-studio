@@ -33,7 +33,10 @@ import { Slider } from "@/components/ui/slider";
 // Client tool action types for UI feedback
 interface ToolAction {
   id: string;
-  type: "navigate" | "show_product" | "show_fact" | "notification";
+  type: "navigate" | "show_product" | "show_fact" | "notification" | "show_collection" | "trigger_mode" | "thought_bubble" | "challenge" | "mood_cue" | "channel_mentor";
+  params: Record<string, any>;
+  timestamp: Date;
+}
   params: Record<string, string>;
   timestamp: Date;
 }
