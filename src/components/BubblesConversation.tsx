@@ -554,10 +554,10 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             ) : (
               <>
                 <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center">
-                  <MicOff className="h-10 w-10 text-muted-foreground" />
+                  <Phone className="h-10 w-10 text-muted-foreground" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Enter your Agent ID and click Start to begin
+                  Click below to call Bubbles
                 </p>
               </>
             )}
