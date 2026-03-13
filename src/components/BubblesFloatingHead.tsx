@@ -24,9 +24,16 @@ export function BubblesFloatingHead({ isActive = false, onClick, className }: Bu
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          custom={i}
-          variants={pulseRingVariants}
-          animate="animate"
+          animate={{
+            scale: [1, 2.5],
+            opacity: [0.5, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            delay: i * 0.6,
+            ease: "easeOut" as const,
+          }}
           className={cn(
             "absolute inset-0 rounded-full border-2",
             isActive
