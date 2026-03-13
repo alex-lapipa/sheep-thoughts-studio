@@ -3,7 +3,7 @@ import { Send, Loader2, Sparkles, Zap, Flame, Skull, AlertTriangle, RefreshCw } 
 import { ThoughtBubble } from "./ThoughtBubble";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useBubblesOrchestrator } from "@/hooks/useBubblesOrchestrator";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -88,6 +88,7 @@ export const ChallengeBubbles = () => {
   const [initialResponse, setInitialResponse] = useState<InitialResponse | null>(null);
   const [challenges, setChallenges] = useState<ChallengeEntry[]>([]);
   const [currentMode, setCurrentMode] = useState<EscalationMode>("innocent");
+  const { explain, challenge: challengeBubbles } = useBubblesOrchestrator();
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,16 +105,7 @@ export const ChallengeBubbles = () => {
     setAskedQuestion(question);
 
     try {
-      const { data, error } = await supabase.functions.invoke("bubbles-explain", {
-        body: { question: question.trim() },
-      });
-
-      if (error) throw error;
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
-
+      const data = await explain(question.trim());
       setInitialResponse(data);
       setQuestion("");
     } catch (err) {
@@ -140,32 +132,24 @@ export const ChallengeBubbles = () => {
     setIsChallenging(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("bubbles-challenge", {
-        body: {
-          originalQuestion: askedQuestion,
-          originalAnswer: initialResponse.explanation,
-          challenge: challenge.trim(),
-          currentMode: currentMode === "innocent" ? null : currentMode,
-          conversationHistory: challenges,
-        },
+      const data = await challengeBubbles({
+        originalQuestion: askedQuestion,
+        originalAnswer: initialResponse.explanation,
+        challenge: challenge.trim(),
+        currentMode: currentMode === "innocent" ? null : currentMode,
+        conversationHistory: challenges,
       });
-
-      if (error) throw error;
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
 
       const newEntry: ChallengeEntry = {
         challenge: challenge.trim(),
         response: data.response,
-        mode: data.mode,
+        mode: data.mode as EscalationMode,
         confidence: data.confidence,
         innerThought: data.innerThought,
       };
 
       setChallenges(prev => [...prev, newEntry]);
-      setCurrentMode(data.mode);
+      setCurrentMode(data.mode as EscalationMode);
       setChallenge("");
 
       if (data.isMaxEscalation) {

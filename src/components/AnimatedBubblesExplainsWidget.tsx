@@ -7,7 +7,7 @@ import {
   Loader2, RefreshCw, Lightbulb, Quote, Volume2, VolumeX, 
   Play, Pause, Square, SkipForward, Sparkles 
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useBubblesOrchestrator } from "@/hooks/useBubblesOrchestrator";
 import { toast } from "sonner";
 import type { BubbleMode } from "@/data/thoughtBubbles";
 import { cn } from "@/lib/utils";
@@ -92,14 +92,11 @@ export const AnimatedBubblesExplainsWidget = () => {
   const [autoPlay, setAutoPlay] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { explain } = useBubblesOrchestrator();
 
   const fetchExplanation = useCallback(async (topic: string): Promise<Explanation | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('bubbles-explain', {
-        body: { question: topic }
-      });
-
-      if (error) throw error;
+      const data = await explain(topic);
 
       return {
         topic,
@@ -111,7 +108,7 @@ export const AnimatedBubblesExplainsWidget = () => {
       console.error('Error fetching explanation:', error);
       return null;
     }
-  }, []);
+  }, [explain]);
 
   // Initial load of AI explanations
   useEffect(() => {
