@@ -614,7 +614,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
               ) : (
                 <Phone className="h-5 w-5" />
               )}
-              {isConnecting ? "Connecting..." : "Start Conversation"}
+              {isConnecting ? "Connecting..." : "Call Bubbles"}
             </Button>
           )}
         </div>
