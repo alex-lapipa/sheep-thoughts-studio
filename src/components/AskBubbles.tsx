@@ -4,7 +4,7 @@ import { ThoughtBubble } from "./ThoughtBubble";
 import { CitationGenerator } from "./CitationGenerator";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useBubblesOrchestrator } from "@/hooks/useBubblesOrchestrator";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
