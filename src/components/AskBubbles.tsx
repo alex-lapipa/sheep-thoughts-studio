@@ -19,6 +19,7 @@ export const AskBubbles = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<BubblesResponse | null>(null);
   const [askedQuestion, setAskedQuestion] = useState("");
+  const { explain } = useBubblesOrchestrator();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,19 +34,7 @@ export const AskBubbles = () => {
     setAskedQuestion(question);
 
     try {
-      const { data, error } = await supabase.functions.invoke("bubbles-explain", {
-        body: { question: question.trim() },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
-
+      const data = await explain(question.trim());
       setResponse(data);
       setQuestion("");
     } catch (err) {

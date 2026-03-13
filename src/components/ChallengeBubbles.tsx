@@ -132,32 +132,24 @@ export const ChallengeBubbles = () => {
     setIsChallenging(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("bubbles-challenge", {
-        body: {
-          originalQuestion: askedQuestion,
-          originalAnswer: initialResponse.explanation,
-          challenge: challenge.trim(),
-          currentMode: currentMode === "innocent" ? null : currentMode,
-          conversationHistory: challenges,
-        },
+      const data = await challengeBubbles({
+        originalQuestion: askedQuestion,
+        originalAnswer: initialResponse.explanation,
+        challenge: challenge.trim(),
+        currentMode: currentMode === "innocent" ? null : currentMode,
+        conversationHistory: challenges,
       });
-
-      if (error) throw error;
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
 
       const newEntry: ChallengeEntry = {
         challenge: challenge.trim(),
         response: data.response,
-        mode: data.mode,
+        mode: data.mode as EscalationMode,
         confidence: data.confidence,
         innerThought: data.innerThought,
       };
 
       setChallenges(prev => [...prev, newEntry]);
-      setCurrentMode(data.mode);
+      setCurrentMode(data.mode as EscalationMode);
       setChallenge("");
 
       if (data.isMaxEscalation) {
