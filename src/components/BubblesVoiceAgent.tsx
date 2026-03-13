@@ -288,6 +288,10 @@ Use tools naturally during conversation.`,
   const isConnected = conversation.status === "connected";
   const isSpeaking = conversation.isSpeaking;
 
+  useEffect(() => {
+    onConnectionChange?.(isConnected);
+  }, [isConnected, onConnectionChange]);
+
   // Determine animation state
   const agentState = !isConnected ? "idle" : isSpeaking ? "speaking" : "listening";
 

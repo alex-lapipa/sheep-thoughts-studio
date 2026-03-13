@@ -285,6 +285,7 @@ const App = () => (
                 </Suspense>
                 <CookieConsent />
                 <DevToolsPanel />
+                <BubblesFloatingWidget />
               </CartSyncProvider>
               </BrowserRouter>
             </MoodProvider>
