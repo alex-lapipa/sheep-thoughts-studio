@@ -67,7 +67,7 @@ interface BubblesVoiceAgentProps {
   onConnectionChange?: (connected: boolean) => void;
 }
 
-export function BubblesVoiceAgent({ className }: BubblesVoiceAgentProps) {
+export function BubblesVoiceAgent({ className, onConnectionChange }: BubblesVoiceAgentProps) {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isConnecting, setIsConnecting] = useState(false);
