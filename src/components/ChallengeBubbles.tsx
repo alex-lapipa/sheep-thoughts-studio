@@ -3,7 +3,7 @@ import { Send, Loader2, Sparkles, Zap, Flame, Skull, AlertTriangle, RefreshCw } 
 import { ThoughtBubble } from "./ThoughtBubble";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useBubblesOrchestrator } from "@/hooks/useBubblesOrchestrator";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
