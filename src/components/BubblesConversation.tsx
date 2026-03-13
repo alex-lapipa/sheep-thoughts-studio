@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
   Mic, 
@@ -41,6 +40,9 @@ interface ToolAction {
 
 // Liam - Irish male voice from ElevenLabs
 const BUBBLES_VOICE_ID = "TX3LPaxmHKxFdv7VOQHJ";
+
+// Hardcoded ElevenLabs Agent ID for Bubbles
+const BUBBLES_AGENT_ID = "agent_0801kkm8f4q6f4yty4mfhezfr894";
 
 // Bubbles' personality system prompt for the agent
 const BUBBLES_SYSTEM_PROMPT = `You are Bubbles, a sheep from County Wicklow, Ireland. You were raised by humans and exposed to international opinions without adult supervision from an early age.
@@ -107,7 +109,6 @@ interface BubblesConversationProps {
 export function BubblesConversation({ className }: BubblesConversationProps) {
   const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [agentId, setAgentId] = useState("");
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
@@ -332,13 +333,6 @@ Use these tools naturally when relevant to help guide the conversation. For exam
 
   // Start conversation with WebRTC
   const startConversation = useCallback(async () => {
-    if (!agentId.trim()) {
-      toast.error("Agent ID Required", {
-        description: "Please enter your ElevenLabs Agent ID to start."
-      });
-      return;
-    }
-
     setIsConnecting(true);
     try {
       // Request microphone permission
@@ -354,7 +348,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ agentId: agentId.trim() }),
+          body: JSON.stringify({ agentId: BUBBLES_AGENT_ID }),
         }
       );
 
@@ -387,7 +381,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
     } finally {
       setIsConnecting(false);
     }
-  }, [agentId, conversation, volume, agentOverrides]);
+  }, [conversation, volume, agentOverrides]);
 
   // End conversation
   const endConversation = useCallback(async () => {
@@ -483,51 +477,23 @@ Use these tools naturally when relevant to help guide the conversation. For exam
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Agent ID Input (only when disconnected) */}
-        {!isConnected && (
-          <div className="space-y-3">
-            <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
-              <p className="text-sm text-foreground font-medium mb-1">
-                🐑 Bubbles' Voice Personality + Tools
-              </p>
-              <p className="text-xs text-muted-foreground mb-2">
-                Uses Irish voice (Liam) with full character system prompt, 
-                including wisdom from Anthony, Peggy, Jimmy, and Aidan.
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
-                  <Badge key={tool} variant="outline" className="text-xs">
-                    <Sparkles className="h-2.5 w-2.5 mr-1" />
-                    {tool}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="agent-id" className="text-sm font-medium">
-                ElevenLabs Agent ID
-              </Label>
-              <Input
-                id="agent-id"
-                placeholder="Enter your agent ID from ElevenLabs..."
-                value={agentId}
-                onChange={(e) => setAgentId(e.target.value)}
-                disabled={isConnecting}
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                Create a blank agent at{" "}
-                <a 
-                  href="https://elevenlabs.io/app/conversational-ai" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  ElevenLabs Conversational AI
-                </a>
-                {" "}— Bubbles' personality and tools will be injected automatically.
-              </p>
+        {/* Agent Info (only when disconnected) */}
+        {!isConnected && !isConnecting && (
+          <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
+            <p className="text-sm text-foreground font-medium mb-1">
+              🐑 Real-Time Voice Conversation
+            </p>
+            <p className="text-xs text-muted-foreground mb-2">
+              Speak directly with Bubbles using Irish voice. Bubbles can navigate pages, 
+              recommend products, and share wisdom during the call.
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
+                <Badge key={tool} variant="outline" className="text-xs">
+                  <Sparkles className="h-2.5 w-2.5 mr-1" />
+                  {tool}
+                </Badge>
+              ))}
             </div>
           </div>
         )}
@@ -588,10 +554,10 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             ) : (
               <>
                 <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center">
-                  <MicOff className="h-10 w-10 text-muted-foreground" />
+                  <Phone className="h-10 w-10 text-muted-foreground" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Enter your Agent ID and click Start to begin
+                  Click below to call Bubbles
                 </p>
               </>
             )}
@@ -640,7 +606,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             <Button
               size="lg"
               onClick={startConversation}
-              disabled={isConnecting || !agentId.trim()}
+              disabled={isConnecting}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent-hover"
             >
               {isConnecting ? (
@@ -648,7 +614,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
               ) : (
                 <Phone className="h-5 w-5" />
               )}
-              {isConnecting ? "Connecting..." : "Start Conversation"}
+              {isConnecting ? "Connecting..." : "Call Bubbles"}
             </Button>
           )}
         </div>
