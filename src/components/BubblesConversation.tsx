@@ -333,13 +333,6 @@ Use these tools naturally when relevant to help guide the conversation. For exam
 
   // Start conversation with WebRTC
   const startConversation = useCallback(async () => {
-    if (!agentId.trim()) {
-      toast.error("Agent ID Required", {
-        description: "Please enter your ElevenLabs Agent ID to start."
-      });
-      return;
-    }
-
     setIsConnecting(true);
     try {
       // Request microphone permission
@@ -355,7 +348,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ agentId: agentId.trim() }),
+          body: JSON.stringify({ agentId: BUBBLES_AGENT_ID }),
         }
       );
 
@@ -388,7 +381,7 @@ Use these tools naturally when relevant to help guide the conversation. For exam
     } finally {
       setIsConnecting(false);
     }
-  }, [agentId, conversation, volume, agentOverrides]);
+  }, [conversation, volume, agentOverrides]);
 
   // End conversation
   const endConversation = useCallback(async () => {
