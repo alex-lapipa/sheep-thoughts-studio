@@ -477,51 +477,23 @@ Use these tools naturally when relevant to help guide the conversation. For exam
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Agent ID Input (only when disconnected) */}
-        {!isConnected && (
-          <div className="space-y-3">
-            <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
-              <p className="text-sm text-foreground font-medium mb-1">
-                🐑 Bubbles' Voice Personality + Tools
-              </p>
-              <p className="text-xs text-muted-foreground mb-2">
-                Uses Irish voice (Liam) with full character system prompt, 
-                including wisdom from Anthony, Peggy, Jimmy, and Aidan.
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
-                  <Badge key={tool} variant="outline" className="text-xs">
-                    <Sparkles className="h-2.5 w-2.5 mr-1" />
-                    {tool}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="agent-id" className="text-sm font-medium">
-                ElevenLabs Agent ID
-              </Label>
-              <Input
-                id="agent-id"
-                placeholder="Enter your agent ID from ElevenLabs..."
-                value={agentId}
-                onChange={(e) => setAgentId(e.target.value)}
-                disabled={isConnecting}
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                Create a blank agent at{" "}
-                <a 
-                  href="https://elevenlabs.io/app/conversational-ai" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  ElevenLabs Conversational AI
-                </a>
-                {" "}— Bubbles' personality and tools will be injected automatically.
-              </p>
+        {/* Agent Info (only when disconnected) */}
+        {!isConnected && !isConnecting && (
+          <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
+            <p className="text-sm text-foreground font-medium mb-1">
+              🐑 Real-Time Voice Conversation
+            </p>
+            <p className="text-xs text-muted-foreground mb-2">
+              Speak directly with Bubbles using Irish voice. Bubbles can navigate pages, 
+              recommend products, and share wisdom during the call.
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {["Navigate", "Products", "Facts", "Notifications"].map(tool => (
+                <Badge key={tool} variant="outline" className="text-xs">
+                  <Sparkles className="h-2.5 w-2.5 mr-1" />
+                  {tool}
+                </Badge>
+              ))}
             </div>
           </div>
         )}
