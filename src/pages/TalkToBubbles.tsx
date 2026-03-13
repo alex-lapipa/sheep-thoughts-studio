@@ -113,7 +113,7 @@ export default function TalkToBubbles() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <BubblesConversation />
+                  <BubblesVoiceAgent />
                 </motion.div>
               </TabsContent>
             </Tabs>
