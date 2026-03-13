@@ -62,14 +62,11 @@ export const BubblesExplainsWidget = () => {
   const [isFading, setIsFading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [hasLoadedFromAI, setHasLoadedFromAI] = useState(false);
+  const { explain } = useBubblesOrchestrator();
 
   const fetchExplanation = useCallback(async (topic: string): Promise<Explanation | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('bubbles-explain', {
-        body: { question: topic }
-      });
-
-      if (error) throw error;
+      const data = await explain(topic);
 
       return {
         topic,
@@ -81,7 +78,7 @@ export const BubblesExplainsWidget = () => {
       console.error('Error fetching explanation:', error);
       return null;
     }
-  }, []);
+  }, [explain]);
 
   // Initial load of AI explanations
   useEffect(() => {
