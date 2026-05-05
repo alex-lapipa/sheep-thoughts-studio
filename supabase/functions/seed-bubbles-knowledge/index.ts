@@ -617,7 +617,7 @@ serve(async (req) => {
     for (const item of SEED_KNOWLEDGE) {
       let embedding = null;
       
-      if (generateEmbeddings && LOVABLE_API_KEY) {
+      if (generateEmbeddings) {
         const textToEmbed = `${item.title}\n\n${item.content}`;
         embedding = await generateEmbedding(textToEmbed, LOVABLE_API_KEY);
         if (embedding) embeddingsGenerated++;
@@ -638,7 +638,7 @@ serve(async (req) => {
     console.log(`Seeded ${SEED_KNOWLEDGE.length} knowledge entries (${embeddingsGenerated} with embeddings)`);
 
     // Generate embeddings for thoughts if API key available
-    if (generateEmbeddings && LOVABLE_API_KEY) {
+    if (generateEmbeddings) {
       const { data: thoughtsToEmbed } = await supabase
         .from("bubbles_thoughts")
         .select("id, text")

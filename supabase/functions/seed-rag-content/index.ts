@@ -136,7 +136,7 @@ serve(async (req) => {
       
       // Generate embedding if API key available and requested
       let embedding: number[] | null = null;
-      if (generateEmbeddings && LOVABLE_API_KEY) {
+      if (generateEmbeddings) {
         embedding = await generateEmbedding(embeddingText, LOVABLE_API_KEY);
         if (embedding) {
           embeddingsGenerated++;
@@ -170,7 +170,7 @@ serve(async (req) => {
       }
 
       // Small delay to avoid rate limiting
-      if (generateEmbeddings && LOVABLE_API_KEY) {
+      if (generateEmbeddings) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     }

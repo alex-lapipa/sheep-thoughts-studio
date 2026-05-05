@@ -320,16 +320,13 @@ serve(async (req) => {
       // Generate embedding for the content
       let embedding = null;
       try {
-        const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-        if (LOVABLE_API_KEY) {
-          const embeddingResponse = await aiEmbed([`${entry.title}\n\n${entry.content}`]);
+        const embeddingResponse = await aiEmbed([`${entry.title}\n\n${entry.content}`]);
 
-          if (embeddingResponse.ok) {
-            const embeddingData = await embeddingResponse.json();
-            embedding = embeddingData.data?.[0]?.embedding;
-            if (embedding) {
-              results.embeddings_generated++;
-            }
+        if (embeddingResponse.ok) {
+          const embeddingData = await embeddingResponse.json();
+          embedding = embeddingData.data?.[0]?.embedding;
+          if (embedding) {
+            results.embeddings_generated++;
           }
         }
       } catch (embError) {
