@@ -16,6 +16,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { DevToolsPanel } from "@/components/DevToolsPanel";
 import { BubblesFloatingWidget } from "@/components/BubblesFloatingWidget";
 import { useCartSync } from "@/hooks/useCartSync";
+import { Analytics } from "@vercel/analytics/react";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -286,6 +287,7 @@ const App = () => (
                 <CookieConsent />
                 <DevToolsPanel />
                 <BubblesFloatingWidget />
+                <Analytics />
               </CartSyncProvider>
               </BrowserRouter>
             </MoodProvider>
