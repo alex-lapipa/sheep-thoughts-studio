@@ -10,6 +10,7 @@ import {
   BUBBLES_ESCALATION_MODES,
   type BubblesCapability,
 } from "../_shared/bubbles-persona.ts";
+import { aiChat } from "../_shared/ai-gateway.ts";
 
 // ─── Shared RAG Context Fetcher ──────────────────────────────────
 
@@ -112,15 +113,11 @@ async function handleChat(
     ragContext,
   });
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const response = await aiChat({
       model: "google/gemini-3-flash-preview",
       messages: [{ role: "system", content: systemPrompt }, ...messages],
       stream: true,
-    }),
-  });
+    });
 
   if (!response.ok) {
     const errResponse = handleAIGatewayError(response, "Bubbles is too confused to chat.");
@@ -156,18 +153,14 @@ async function handleExplain(
     ragContext,
   });
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const response = await aiChat({
       model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Explain this to me: ${question}` },
       ],
       response_format: { type: "json_object" },
-    }),
-  });
+    });
 
   if (!response.ok) {
     const errResponse = handleAIGatewayError(response, "Bubbles is thinking too hard.");
@@ -210,18 +203,14 @@ async function handleAnswer(
 
   const systemPrompt = buildSystemPrompt({ capability: "answer", ragContext });
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const response = await aiChat({
       model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Please answer this question in your unique Bubbles way: "${question.trim()}"` },
       ],
       stream: false,
-    }),
-  });
+    });
 
   if (!response.ok) {
     const errResponse = handleAIGatewayError(response, "Bubbles got confused and wandered off.");
@@ -318,18 +307,14 @@ You must DEFEND your original position.${conversationContext}
 Respond with JSON: { "response": "2-4 sentences", "confidence": "${confidence}", "innerThought": "1 sentence internal state" }`,
   });
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const response = await aiChat({
       model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `The human just said: "${challenge}"\nOriginal question: "${originalQuestion}"\nRespond in ${nextMode.toUpperCase()} MODE.` },
       ],
       response_format: { type: "json_object" },
-    }),
-  });
+    });
 
   if (!response.ok) {
     const errResponse = handleAIGatewayError(response, "Bubbles is too triggered to respond.");
@@ -479,10 +464,7 @@ async function handleGenerate(
     additionalInstructions: exampleContext || undefined,
   });
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const response = await aiChat({
       model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: systemPrompt },
@@ -490,8 +472,7 @@ async function handleGenerate(
       ],
       tools,
       tool_choice: toolChoice,
-    }),
-  });
+    });
 
   if (!response.ok) {
     const errResponse = handleAIGatewayError(response, "Generation failed.");
@@ -537,13 +518,11 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    // ai-gateway adapter handles ANTHROPIC_API_KEY / OPENAI_API_KEY internally.
+    // The legacy `apiKey` parameter is kept for handler signatures but unused.
+    const LEGACY_API_KEY = "";
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
 
     // Initialize Supabase client
     let supabase: any = null;
@@ -559,22 +538,22 @@ serve(async (req) => {
         body.messages?.filter((m: any) => m.role === "user").pop()?.content ||
         "";
       if (queryText) {
-        ragContext = await fetchRAGContext(queryText, supabase, LOVABLE_API_KEY);
+        ragContext = await fetchRAGContext(queryText, supabase, LEGACY_API_KEY);
       }
     }
 
     // Route to handler
     switch (capability) {
       case "chat":
-        return await handleChat(body, LOVABLE_API_KEY, ragContext);
+        return await handleChat(body, LEGACY_API_KEY, ragContext);
       case "explain":
-        return await handleExplain(body, LOVABLE_API_KEY, ragContext);
+        return await handleExplain(body, LEGACY_API_KEY, ragContext);
       case "answer":
-        return await handleAnswer(body, LOVABLE_API_KEY, ragContext, supabase);
+        return await handleAnswer(body, LEGACY_API_KEY, ragContext, supabase);
       case "challenge":
-        return await handleChallenge(body, LOVABLE_API_KEY, ragContext);
+        return await handleChallenge(body, LEGACY_API_KEY, ragContext);
       case "generate":
-        return await handleGenerate(body, LOVABLE_API_KEY, supabase);
+        return await handleGenerate(body, LEGACY_API_KEY, supabase);
       default:
         return new Response(
           JSON.stringify({ error: `Unknown capability: ${capability}` }),

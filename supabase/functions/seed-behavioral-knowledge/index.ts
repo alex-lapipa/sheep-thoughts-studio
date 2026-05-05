@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { aiEmbed } from "../_shared/ai-gateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -319,26 +320,13 @@ serve(async (req) => {
       // Generate embedding for the content
       let embedding = null;
       try {
-        const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-        if (LOVABLE_API_KEY) {
-          const embeddingResponse = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              input: [`${entry.title}\n\n${entry.content}`],
-              model: "text-embedding-3-small",
-            }),
-          });
+        const embeddingResponse = await aiEmbed([`${entry.title}\n\n${entry.content}`]);
 
-          if (embeddingResponse.ok) {
-            const embeddingData = await embeddingResponse.json();
-            embedding = embeddingData.data?.[0]?.embedding;
-            if (embedding) {
-              results.embeddings_generated++;
-            }
+        if (embeddingResponse.ok) {
+          const embeddingData = await embeddingResponse.json();
+          embedding = embeddingData.data?.[0]?.embedding;
+          if (embedding) {
+            results.embeddings_generated++;
           }
         }
       } catch (embError) {

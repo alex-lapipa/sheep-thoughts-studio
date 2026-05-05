@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
+const SITE_URL = "https://bubblesheep.xyz";
 
 const organizationSchema = {
   "@context": "https://schema.org",

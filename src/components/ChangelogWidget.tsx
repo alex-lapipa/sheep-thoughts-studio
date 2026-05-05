@@ -72,7 +72,7 @@ export function ChangelogWidget() {
           </CardTitle>
           <div className="flex items-center gap-2">
             <a
-              href="https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/changelog-rss"
+              href="https://exdpmwoucahnfbgpzmzr.supabase.co/functions/v1/changelog-rss"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"

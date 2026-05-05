@@ -1,3 +1,4 @@
+import { aiImage } from "../_shared/ai-gateway.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -65,34 +66,9 @@ Deno.serve(async (req) => {
 - Color palette: Cream (#FFFDD0), sage green (#90B77D), heather purple (#C8A2C8), warm gold
 
 Ultra high resolution, professional social card layout.`;
+    const result = await aiImage(prompt, { size: '1792x1024' });
 
-    const apiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!apiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
-
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
-        messages: [{ role: 'user', content: prompt }],
-        modalities: ['image', 'text'],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI API error:', errorText);
-      throw new Error(`AI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
+    const imageData = result.dataUrl;
     if (!imageData) {
       throw new Error('No image generated');
     }

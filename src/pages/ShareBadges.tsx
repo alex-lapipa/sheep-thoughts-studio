@@ -70,7 +70,7 @@ export default function ShareBadges() {
   };
 
   const getOgImageUrl = () => {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || 'iteckeoeowgguhgrpcnm';
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || 'exdpmwoucahnfbgpzmzr';
     const params = new URLSearchParams({
       streak: currentStreak.toString(),
       badges: unlockedDays.join(','),

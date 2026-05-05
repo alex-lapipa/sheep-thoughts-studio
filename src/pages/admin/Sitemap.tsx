@@ -402,8 +402,8 @@ export default function AdminSitemap() {
   const [ogValidation, setOgValidation] = useState<OGImageValidation[]>([]);
   const [validatingOg, setValidatingOg] = useState(false);
   const [validationProgress, setValidationProgress] = useState(0);
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+  const siteUrl = "https://bubblesheep.xyz";
+  const supabaseUrl = "https://exdpmwoucahnfbgpzmzr.supabase.co";
 
   const fetchRobotsTxt = async () => {
     setLoadingRobots(true);
@@ -637,7 +637,7 @@ export default function AdminSitemap() {
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a 
-                href="https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Asheep-thoughts-studio.lovable.app" 
+                href="https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Abubblesheep.xyz" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
@@ -647,7 +647,7 @@ export default function AdminSitemap() {
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a 
-                href="https://www.bing.com/webmasters/sitemaps?siteUrl=https://sheep-thoughts-studio.lovable.app" 
+                href="https://www.bing.com/webmasters/sitemaps?siteUrl=https://bubblesheep.xyz" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { aiImage } from "../_shared/ai-gateway.ts";
 
 /**
  * BUBBLES ILLUSTRATION GENERATOR
@@ -130,44 +131,20 @@ async function generateSingleIllustration(
     style,
   });
 
-  // Call Lovable AI image generation
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image-preview",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      modalities: ["image", "text"],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("AI gateway error:", response.status, errorText);
-    
-    if (response.status === 429) {
-      return { success: false, error: "Rate limit exceeded. Please try again later." };
-    }
-    if (response.status === 402) {
-      return { success: false, error: "Payment required. Please add credits to your workspace." };
-    }
-    
-    return { success: false, error: `AI gateway error: ${response.status}` };
+  // Call image generation via the ai-gateway adapter (gpt-image-1).
+  let imageUrl: string;
+  try {
+    const result = await aiImage(prompt, { size: "1792x1024" });
+    imageUrl = result.dataUrl;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("AI gateway error:", message);
+    if (/429/.test(message)) return { success: false, error: "Rate limit exceeded. Please try again later." };
+    if (/402/.test(message)) return { success: false, error: "Payment required. Please add credits to your workspace." };
+    return { success: false, error: `AI gateway error: ${message}` };
   }
 
-  const data = await response.json();
-  
-  // Extract the generated image
-  const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-  const textResponse = data.choices?.[0]?.message?.content;
+  const textResponse: string | undefined = undefined;
 
   if (!imageUrl) {
     console.error("No image generated:", data);
@@ -196,10 +173,8 @@ serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    // ai-gateway adapter handles OPENAI_API_KEY internally for image generation.
+    const LOVABLE_API_KEY = "";
 
     // Parse request body
     const body: GenerateRequest = req.method === "POST" ? await req.json() : {};

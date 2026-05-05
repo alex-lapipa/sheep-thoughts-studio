@@ -141,7 +141,7 @@ const ProductDetail = () => {
 
   const thoughtBubble = modeTag ? getRandomBubble(modeTag) : getRandomBubble();
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const siteUrl = "https://bubblesheep.xyz";
   const productUrl = `${siteUrl}/product/${handle}`;
   const ogImageUrl = `${SUPABASE_URL}/functions/v1/og-product-image?title=${encodeURIComponent(product.title)}&price=${encodeURIComponent(price?.amount || '')}&mode=${encodeURIComponent(modeTag || 'innocent')}&type=${encodeURIComponent(product.productType || 'product')}`;
 

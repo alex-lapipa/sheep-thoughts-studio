@@ -9,7 +9,7 @@ import { TocItem } from "@/hooks/useTableOfContents";
 
 const Shipping = () => {
   const { language } = useLanguage();
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const siteUrl = "https://bubblesheep.xyz";
   const ogImageUrl = `${siteUrl}/og-shipping.jpg`;
 
   const tocItems: TocItem[] = [

@@ -214,7 +214,7 @@ export default function Hispanic() {
     }
   };
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const siteUrl = "https://bubblesheep.xyz";
 
   return (
     <Layout>

@@ -8,7 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
+const SITE_URL = "https://bubblesheep.xyz";
 const SHOPIFY_STORE_DOMAIN = "bubblesheet-storefront-ops-o5m9w.myshopify.com";
 const SHOPIFY_API_VERSION = "2025-07";
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;

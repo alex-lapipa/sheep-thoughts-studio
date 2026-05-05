@@ -12,7 +12,7 @@ interface SocialPreviewTesterProps {
   className?: string;
 }
 
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+const siteUrl = "https://bubblesheep.xyz";
 
 export function SocialPreviewTester({ path = "", className }: SocialPreviewTesterProps) {
   const fullUrl = `${siteUrl}${path}`;

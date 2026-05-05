@@ -171,8 +171,8 @@ export default function Francophone() {
     }
   };
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
-  const supabaseUrl = "https://iteckeoeowgguhgrpcnm.supabase.co";
+  const siteUrl = "https://bubblesheep.xyz";
+  const supabaseUrl = "https://exdpmwoucahnfbgpzmzr.supabase.co";
   const ogImageUrl = `${supabaseUrl}/functions/v1/og-francophone-image?region=${selectedRegion}`;
 
   return (

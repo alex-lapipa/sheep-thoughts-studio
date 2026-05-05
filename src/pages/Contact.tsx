@@ -16,7 +16,7 @@ import { z } from "zod";
 import { checkForSpam } from "@/lib/spamFilter";
 import { AnimatedOnView } from "@/components/AnimatedText";
 
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+const siteUrl = "https://bubblesheep.xyz";
 const ogImageUrl = `${siteUrl}/og-contact.jpg`;
 
 const contactSchema = z.object({

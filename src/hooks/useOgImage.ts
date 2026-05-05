@@ -1,7 +1,7 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
-const SUPABASE_URL = "https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1";
+const SITE_URL = "https://bubblesheep.xyz";
+const SUPABASE_URL = "https://exdpmwoucahnfbgpzmzr.supabase.co/functions/v1";
 
 // Map of page types to their dynamic OG image function names
 const DYNAMIC_OG_ENDPOINTS: Record<string, string> = {

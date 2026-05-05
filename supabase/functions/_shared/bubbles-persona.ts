@@ -1,3 +1,4 @@
+import { aiEmbed } from "../_shared/ai-gateway.ts";
 /**
  * Bubbles Master Persona — Single Source of Truth
  * 
@@ -353,17 +354,7 @@ export const CORS_HEADERS = {
 
 export async function getEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: [text],
-        model: "text-embedding-3-small",
-      }),
-    });
+    const response = await aiEmbed([text]);
 
     if (!response.ok) {
       console.error("Embedding error:", response.status);
