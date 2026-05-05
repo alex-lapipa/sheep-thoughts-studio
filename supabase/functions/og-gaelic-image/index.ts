@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { aiImage } from "../_shared/ai-gateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,8 +12,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    
     const prompt = `Create a social media preview image (1200x630) for an Irish Gaelic language website about Bubbles the Sheep.
 
 Scene requirements:
@@ -37,34 +36,8 @@ Style:
 The sheep should look friendly but slightly confused, embodying the "confidently wrong" character.
 Aspect ratio: 1200x630 for social media sharing.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        max_tokens: 8096,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    
-    // Extract image URL from response
-    const imageMatch = content?.match(/!\[.*?\]\((data:image\/[^)]+|https?:\/\/[^)]+)\)/);
-    const imageUrl = imageMatch?.[1];
+    const result = await aiImage(prompt, { size: "1792x1024" });
+    const imageUrl = result.dataUrl;
 
     if (imageUrl) {
       if (imageUrl.startsWith("data:image/")) {

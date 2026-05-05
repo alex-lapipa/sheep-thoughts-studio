@@ -66,7 +66,7 @@ export default function Gaelic() {
     return () => clearInterval(interval);
   }, []);
 
-  const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+  const siteUrl = "https://bubblesheep.xyz";
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const ogImageUrl = `${supabaseUrl}/functions/v1/og-gaelic-image`;
 

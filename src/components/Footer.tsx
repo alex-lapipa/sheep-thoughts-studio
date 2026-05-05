@@ -137,7 +137,7 @@ export function Footer() {
               <li><Link to="/terms" className="hover:text-foreground hover:translate-x-1 inline-block transition-all">Terms of Service</Link></li>
               <li>
                 <a 
-                  href="https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/generate-sitemap" 
+                  href="https://exdpmwoucahnfbgpzmzr.supabase.co/functions/v1/generate-sitemap" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-foreground hover:translate-x-1 inline-block transition-all"
@@ -147,7 +147,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/changelog-rss" 
+                  href="https://exdpmwoucahnfbgpzmzr.supabase.co/functions/v1/changelog-rss" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-foreground hover:translate-x-1 inline-flex items-center gap-1.5 transition-all"

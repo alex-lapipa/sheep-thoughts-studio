@@ -157,7 +157,7 @@ export function ShareableBadgeCard({
     ctx.font = "18px 'Inter', sans-serif";
     ctx.fillStyle = "#ffffff80";
     ctx.textAlign = "right";
-    ctx.fillText("sheep-thoughts-studio.lovable.app", canvas.width - 40, canvas.height - 40);
+    ctx.fillText("bubblesheep.xyz", canvas.width - 40, canvas.height - 40);
 
     // Convert to image
     const dataUrl = canvas.toDataURL("image/png");
@@ -207,7 +207,7 @@ export function ShareableBadgeCard({
 
   const shareToTwitter = () => {
     const text = `🏆 I just unlocked the "${badge.title}" badge on Bubbles the Sheep! ${badge.days} days of seeking wisdom from a confidently wrong sheep. 🐑`;
-    const url = "https://sheep-thoughts-studio.lovable.app/achievements";
+    const url = "https://bubblesheep.xyz/achievements";
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
       "_blank",
@@ -217,7 +217,7 @@ export function ShareableBadgeCard({
   };
 
   const shareToFacebook = () => {
-    const url = "https://sheep-thoughts-studio.lovable.app/achievements";
+    const url = "https://bubblesheep.xyz/achievements";
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
       "_blank",
@@ -227,7 +227,7 @@ export function ShareableBadgeCard({
   };
 
   const shareToWhatsApp = () => {
-    const text = `🏆 I just unlocked the "${badge.title}" badge on Bubbles the Sheep! ${badge.days} days of seeking wisdom from a confidently wrong sheep. 🐑 Check it out: https://sheep-thoughts-studio.lovable.app/achievements`;
+    const text = `🏆 I just unlocked the "${badge.title}" badge on Bubbles the Sheep! ${badge.days} days of seeking wisdom from a confidently wrong sheep. 🐑 Check it out: https://bubblesheep.xyz/achievements`;
     window.open(
       `https://wa.me/?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -236,7 +236,7 @@ export function ShareableBadgeCard({
   };
 
   const shareToLinkedIn = () => {
-    const url = "https://sheep-thoughts-studio.lovable.app/achievements";
+    const url = "https://bubblesheep.xyz/achievements";
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
       "_blank",

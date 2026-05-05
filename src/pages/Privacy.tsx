@@ -8,7 +8,7 @@ import { DeletionRequestForm } from "@/components/DeletionRequestForm";
 import { LegalPageLayout } from "@/components/LegalPageLayout";
 import { TocItem } from "@/hooks/useTableOfContents";
 
-const siteUrl = "https://sheep-thoughts-studio.lovable.app";
+const siteUrl = "https://bubblesheep.xyz";
 const ogImageUrl = `${siteUrl}/og-privacy.jpg`;
 
 const tocItems: TocItem[] = [

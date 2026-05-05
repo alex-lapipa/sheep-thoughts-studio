@@ -2,8 +2,14 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Hardcoded post-migration values. The publishable key is public-by-design
+// (anon JWT) and is safe to ship in client bundles. Falling back to env vars
+// for local dev where you may want to point at a different project.
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || "https://exdpmwoucahnfbgpzmzr.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  "sb_publishable_YFcmRwwBkI_2M8iO4z-F2w_bKkLNKUv";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { aiEmbed } from "../_shared/ai-gateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -536,17 +537,7 @@ const SEED_KNOWLEDGE = [
 // Generate embedding using Lovable AI Gateway
 async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: text,
-        model: "text-embedding-3-small",
-      }),
-    });
+    const response = await aiEmbed(text);
 
     if (!response.ok) {
       console.log("Embedding API returned non-OK status, using placeholder");

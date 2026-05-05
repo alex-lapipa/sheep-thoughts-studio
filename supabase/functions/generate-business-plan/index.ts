@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { aiChat } from "../_shared/ai-gateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -516,21 +517,14 @@ Conservative, investor-ready language. Professional markdown.`
       throw new Error(`Unknown section: ${section}`);
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const response = await aiChat({
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: "You are a senior business consultant with CFO experience at McKinsey. You write professional, conservative, investor-ready business plans. Use clear structure, bullet points, and tables where appropriate. All output should be in markdown format." },
           { role: "user", content: systemPrompt }
         ],
         max_tokens: 4000,
-      }),
-    });
+      });
 
     if (!response.ok) {
       if (response.status === 429) {

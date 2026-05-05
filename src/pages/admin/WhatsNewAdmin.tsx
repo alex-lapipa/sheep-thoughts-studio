@@ -43,7 +43,7 @@ export default function WhatsNewAdmin() {
   const [category, setCategory] = useState('feature');
   const [isPublished, setIsPublished] = useState(false);
 
-  const rssUrl = 'https://iteckeoeowgguhgrpcnm.supabase.co/functions/v1/changelog-rss';
+  const rssUrl = 'https://exdpmwoucahnfbgpzmzr.supabase.co/functions/v1/changelog-rss';
 
   useEffect(() => {
     fetchEntries();

@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const SITE_URL = "https://sheep-thoughts-studio.lovable.app";
+const SITE_URL = "https://bubblesheep.xyz";
 
 // Supported languages with their hreflang codes
 // Includes DACH regional variants for more precise targeting
